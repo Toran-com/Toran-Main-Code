@@ -14,7 +14,9 @@ pnpm dev                     # open http://localhost:3000
 
 ## Checks
 
-Every pull request must pass these before it can be merged:
+Every pull request must pass these before it can be merged. GitHub runs
+them automatically on each pull request (the **Checks** workflow); run them
+yourself first to catch problems early:
 
 ```bash
 pnpm check      # formatting, lint, type check and unit tests

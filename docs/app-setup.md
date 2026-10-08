@@ -4,7 +4,7 @@ The plan for step 3 of the build (an empty app that goes all the way to a
 live site). It follows decisions 0002 and 0003; if 0003 changes, this
 changes with it.
 
-Status: in progress. GitHub organisation, repo, Supabase and Vercel accounts exist (8 Oct 2026); pull request 1 is under way.
+Status: in progress. Pull request 1 merged and live on Vercel (8 Oct 2026); pull request 2 is under way.
 
 ---
 
@@ -75,10 +75,27 @@ Tools fixed in this pull request:
 
 ### Pull request 2 — automatic checks
 
-A GitHub Actions workflow that runs on every pull request and blocks merging
-if anything fails: install, code style, type check, unit tests, build, and
-one browser test that opens the home page. The main branch is protected:
-changes only arrive through pull requests that pass.
+A GitHub Actions workflow (`.github/workflows/checks.yml`, check name
+**Checks**) runs on every pull request and every change to `main`: install,
+formatting, lint, type check, unit tests, build, and the browser tests on a
+phone-sized screen. It takes about three minutes. If the browser tests fail,
+their report is kept for a week under the run's Artifacts.
+
+**Making a failing check block the merge.** GitHub only enforces this on a
+private repo with a paid plan (GitHub Team, per user per month; check
+github.com/pricing). On the free plan the red cross still shows on the pull
+request, so the rule until then is: never merge a pull request that isn't
+green. To turn enforcement on once the organisation is on Team:
+
+1. Repo → Settings → Rules → Rulesets → New ruleset → New branch ruleset.
+2. Name `Protect main`, Enforcement status **Active**, Target branches
+   **Include default branch**.
+3. Tick **Restrict deletions**, **Require a pull request before merging**,
+   **Require status checks to pass** (add **Checks** and **Vercel**), and
+   **Block force pushes**. Save.
+
+Free-plan limits that matter: 2,000 GitHub Actions minutes a month for
+private repos, which is roughly 600 runs of this workflow.
 
 ### Pull request 3 — three copies of the site
 
