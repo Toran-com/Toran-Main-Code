@@ -29,3 +29,8 @@ supabase/.branches/
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# misc
+*.pem
+.pnp
+.pnp.*

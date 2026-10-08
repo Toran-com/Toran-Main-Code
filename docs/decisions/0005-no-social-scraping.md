@@ -12,7 +12,7 @@ challenged would put the whole service at risk.
 
 ## Decision
 
-Mandirs forward posters and messages to an Utsav WhatsApp number or email
+Mandirs forward posters and messages to an Toran WhatsApp number or email
 address, and confirm the extracted event with one tap. Later, mandirs can
 connect their own Facebook page through Meta's official sign-in. We crawl
 only public websites, respecting robots.txt.

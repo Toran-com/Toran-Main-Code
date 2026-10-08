@@ -4,7 +4,7 @@ The plan for step 3 of the build (an empty app that goes all the way to a
 live site). It follows decisions 0002 and 0003; if 0003 changes, this
 changes with it.
 
-Status: ready to run once the company's GitHub organisation and repo exist.
+Status: in progress. GitHub organisation, repo, Supabase and Vercel accounts exist (8 Oct 2026); pull request 1 is under way.
 
 ---
 
@@ -12,18 +12,22 @@ Status: ready to run once the company's GitHub organisation and repo exist.
 
 1. **GitHub organisation.** On github.com: your profile picture → Your
    organizations → New organization → Free plan. Name it after the company
-   (for example `utsav-ltd`). Add your partner as an owner.
-2. **New repo** in that organisation: name `utsav`, private, with a README.
+   (for example `Toran-com`). Add your partner as an owner.
+2. **New repo** in that organisation: name `Toran-Main-Code`, private, with a README.
    Do not add a .gitignore or licence; the setup creates them.
 3. **Give Claude access.** Go to https://claude.ai/connect-github and install
    the Claude GitHub App on the new organisation (choose "only selected
-   repositories" → `utsav`).
+   repositories" → `Toran-Main-Code`).
 4. **Accounts, all signed up with a company email, not personal ones:**
-   - Supabase (database and login): create two projects, `utsav-staging`
-     and `utsav-prod`, region London (eu-west-2)
-   - Vercel (hosting): connect it to the GitHub organisation
+   - Supabase (database and login): create `toran-staging` now, region
+     London; create `toran-prod` nearer launch (free projects pause after a
+     week without use)
+   - Vercel (hosting): connect it to the GitHub organisation, but import
+     the project only after pull request 1 is merged. The free Hobby plan is
+     for non-commercial use; move to a Pro team (about $20 a month) before
+     the pilot launch
    - Sentry (error alerts): free plan
-5. Tell Claude: "the repo is utsav-ltd/utsav". Claude attaches it to this
+5. Tell Claude: "the repo is Toran-com/Toran-Main-Code". Claude attaches it to this
    session and does the rest.
 
 Never paste passwords or secret keys into the chat. Supabase and Vercel
@@ -36,13 +40,13 @@ keys go straight into Vercel's settings; Claude will say exactly which ones.
 ### Pull request 1 — the skeleton
 
 ```
-utsav/
+Toran-Main-Code/
 ├── app/                    Next.js app (App Router, TypeScript)
 │   ├── (public)/           public site: what's on, festivals, digest signup
 │   ├── (mandir)/           mandir admin area, behind login
-│   ├── (ops)/              Utsav admin area, behind login + second factor
+│   ├── (ops)/              Toran admin area, behind login + second factor
 │   ├── api/                webhooks (email, WhatsApp later)
-│   └── page.tsx            "Utsav — coming soon"
+│   └── page.tsx            "Toran — coming soon"
 ├── lib/                    shared code: database client, dates, festivals
 ├── db/
 │   ├── migrations/         every database change, numbered, in order
@@ -57,17 +61,17 @@ utsav/
 
 Tools fixed in this pull request:
 
-| Job | Tool |
-| --- | --- |
-| Language | TypeScript, strict mode |
-| Framework | Next.js |
-| Styling | Tailwind CSS, with the colours and type from the prototype |
-| Code style | ESLint and Prettier, run automatically |
-| Unit tests | Vitest |
-| Browser tests | Playwright |
-| Database | Supabase (Postgres), migrations via the Supabase CLI |
-| Package manager | pnpm |
-| Node version | pinned in `.nvmrc` |
+| Job             | Tool                                                       |
+| --------------- | ---------------------------------------------------------- |
+| Language        | TypeScript, strict mode                                    |
+| Framework       | Next.js                                                    |
+| Styling         | Tailwind CSS, with the colours and type from the prototype |
+| Code style      | ESLint and Prettier, run automatically                     |
+| Unit tests      | Vitest                                                     |
+| Browser tests   | Playwright                                                 |
+| Database        | Supabase (Postgres), migrations via the Supabase CLI       |
+| Package manager | pnpm                                                       |
+| Node version    | pinned in `.nvmrc`                                         |
 
 ### Pull request 2 — automatic checks
 
@@ -78,11 +82,11 @@ changes only arrive through pull requests that pass.
 
 ### Pull request 3 — three copies of the site
 
-| Copy | Where | Database | When it updates |
-| --- | --- | --- | --- |
-| Local | Your laptop | Local Supabase in Docker | When you run it |
-| Preview | A Vercel link per pull request | `utsav-staging` | Every push to a pull request |
-| Live | utsav domain (once bought) | `utsav-prod` | Every merge to main |
+| Copy    | Where                          | Database                 | When it updates              |
+| ------- | ------------------------------ | ------------------------ | ---------------------------- |
+| Local   | Your laptop                    | Local Supabase in Docker | When you run it              |
+| Preview | A Vercel link per pull request | `toran-staging`          | Every push to a pull request |
+| Live    | Toran domain (once bought)     | `toran-prod`             | Every merge to main          |
 
 Database migrations run against staging first, then live, by a workflow,
 never by hand.
@@ -90,7 +94,7 @@ never by hand.
 ### Pull request 4 — login and error alerts
 
 - Login by emailed link (Supabase Auth), no passwords
-- Three roles from the start: public, mandir admin, Utsav admin
+- Three roles from the start: public, mandir admin, Toran admin
 - Database rules (row-level security) so a mandir admin can only change
   their own mandir, tested
 - Sentry on the live and preview sites; an uptime check on the live site

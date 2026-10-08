@@ -12,7 +12,7 @@ delays, with 1–2 hours a day to spend.
 ## Decision
 
 Build one responsive web app that people can install to their home screen.
-Public, mandir admin and Utsav admin are areas of the same app, separated by
+Public, mandir admin and Toran admin are areas of the same app, separated by
 login and permissions.
 
 ## Consequences
