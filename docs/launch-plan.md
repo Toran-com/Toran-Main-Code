@@ -30,12 +30,12 @@ hand-made weekly email, they won't use an app.
 
 ### Hypotheses to test
 
-| # | Hypothesis | Passes if |
-|---|---|---|
-| H1 | People want one place for what's on at mandirs near them | 150+ people subscribe to a hand-made weekly email in 6 weeks, with 40%+ opening it |
-| H2 | Enough events can be found without the mandirs doing anything | You can find current events for 70%+ of mandirs in the pilot area each week |
-| H3 | Mandirs struggle with seva rotas and would use a simple tool | 3 of 8 committees you speak to agree to try a shared sign-up link for a real event |
-| H4 | Young people (16–30) are a reachable audience | 30%+ of subscribers are under 30, or under-30s ask for it unprompted |
+| #   | Hypothesis                                                    | Passes if                                                                          |
+| --- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| H1  | People want one place for what's on at mandirs near them      | 150+ people subscribe to a hand-made weekly email in 6 weeks, with 40%+ opening it |
+| H2  | Enough events can be found without the mandirs doing anything | You can find current events for 70%+ of mandirs in the pilot area each week        |
+| H3  | Mandirs struggle with seva rotas and would use a simple tool  | 3 of 8 committees you speak to agree to try a shared sign-up link for a real event |
+| H4  | Young people (16–30) are a reachable audience                 | 30%+ of subscribers are under 30, or under-30s ask for it unprompted               |
 
 ---
 
@@ -52,11 +52,11 @@ committee meetings for after Diwali.**
   (8 Nov). Look at how events are announced: posters, notice boards, WhatsApp
   QR codes, word of mouth. Photograph notice boards (ask first).
 - Have short conversations with attendees, especially under-30s and parents.
-  Ask about what they did, not what they'd like: *"How did you find out about
-  tonight?"*, *"What did you miss last year because you didn't know about
-  it?"*, *"Which WhatsApp groups do you get mandir news from?"*
-- Introduce yourself to whoever runs volunteers. Don't pitch. Ask: *"How did
-  you organise volunteers for tonight?"* and ask if you can come back after
+  Ask about what they did, not what they'd like: _"How did you find out about
+  tonight?"_, _"What did you miss last year because you didn't know about
+  it?"_, _"Which WhatsApp groups do you get mandir news from?"_
+- Introduce yourself to whoever runs volunteers. Don't pitch. Ask: _"How did
+  you organise volunteers for tonight?"_ and ask if you can come back after
   Diwali for 20 minutes.
 
 **Weekday evenings (1–2 hours):**
@@ -66,7 +66,7 @@ committee meetings for after Diwali.**
 - **Start the hand-made weekly email** for the pilot area. Every Wednesday
   evening, collect events from mandir websites, Facebook pages and posters you
   photographed. Send it on Thursday. Free tools are fine (Buttondown,
-  Substack or Mailchimp's free tier). This *is* the product test (H1, H2).
+  Substack or Mailchimp's free tier). This _is_ the product test (H1, H2).
 - Share it through people you meet, youth groups and university Hindu
   societies (NHSF chapters). Track subscribers, opens and forwards in a
   spreadsheet.
@@ -158,14 +158,14 @@ Claude Code in this repo, with you deciding scope and testing every change.
 
 ## Weekly rhythm
 
-| When | What | Time |
-|---|---|---|
-| Mon evening | Plan the week; send outreach messages; book visits | 1 h |
-| Tue evening | Write up conversations; foundations work | 1–1.5 h |
-| Wed evening | Collect events for the weekly email | 1.5–2 h |
-| Thu evening | Send the email; update the metrics sheet | 45 min |
-| Fri / Sat / Sun | Mandir visits (one cluster per weekend), conversations | 4–8 h |
-| Last Sunday of the month | Review hypotheses and numbers; adjust the plan | 1 h |
+| When                     | What                                                   | Time    |
+| ------------------------ | ------------------------------------------------------ | ------- |
+| Mon evening              | Plan the week; send outreach messages; book visits     | 1 h     |
+| Tue evening              | Write up conversations; foundations work               | 1–1.5 h |
+| Wed evening              | Collect events for the weekly email                    | 1.5–2 h |
+| Thu evening              | Send the email; update the metrics sheet               | 45 min  |
+| Fri / Sat / Sun          | Mandir visits (one cluster per weekend), conversations | 4–8 h   |
+| Last Sunday of the month | Review hypotheses and numbers; adjust the plan         | 1 h     |
 
 About 6 hours on weekday evenings plus a visit day: roughly 12–14 hours a
 week. Take one weekend in four off. This is a six-month effort before launch,

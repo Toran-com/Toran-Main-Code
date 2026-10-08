@@ -1,6 +1,6 @@
 # Technical plan
 
-How Utsav will be built: the parts, the data, how events get in and get
+How Toran will be built: the parts, the data, how events get in and get
 checked, and what the first version includes. It sits under
 `docs/core-functions.md` (what we build and why) and `docs/launch-plan.md`
 (when). Decisions behind it are logged in `docs/decisions/`.
@@ -20,7 +20,7 @@ flowchart LR
         A4[Mandir connects its<br/>Facebook page - later]
     end
 
-    subgraph CORE[Utsav]
+    subgraph CORE[Toran]
         X[Extractor<br/>AI reads text or image,<br/>proposes event fields]
         Q[Review queue<br/>confidence + conflicts]
         DB[(Database<br/>mandirs, events,<br/>sources, rotas)]
@@ -46,11 +46,11 @@ flowchart LR
 
 One web app serves three audiences from one codebase, each with its own area:
 
-| Area | Who | What they do | Login |
-| --- | --- | --- | --- |
-| Public site | Families, devotees | Browse events by postcode and date, see festivals, sign up for the digest, take a seva slot | None to browse; email link to sign up |
-| Mandir admin | Committee members | Add and confirm events, run a rota, see who signed up | Email or phone link, no password |
-| Utsav admin | Milan and partner | Approve mandir claims, clear the review queue, remove content | Email link plus second factor |
+| Area         | Who                | What they do                                                                                | Login                                 |
+| ------------ | ------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Public site  | Families, devotees | Browse events by postcode and date, see festivals, sign up for the digest, take a seva slot | None to browse; email link to sign up |
+| Mandir admin | Committee members  | Add and confirm events, run a rota, see who signed up                                       | Email or phone link, no password      |
+| Toran admin  | Milan and partner  | Approve mandir claims, clear the review queue, remove content                               | Email link plus second factor         |
 
 It is a website that works like an app on a phone (installable to the home
 screen). No App Store or Play Store apps until people ask for them
@@ -81,18 +81,18 @@ erDiagram
     PERSON ||--o{ DIGEST_SUBSCRIPTION : has
 ```
 
-| Thing | What it holds | Notes |
-| --- | --- | --- |
-| Mandir | Name, address, postcode, location, tradition, website, phone, charity number, claimed or not | Seeded from `outreach/mandirs_uk.csv` and the audit list |
-| Mandir admin | Which person can edit which mandir, and their role | Several per mandir; can be removed |
-| Event | Title, type, start and end, place, cost, link, status | Facts only; we link to the mandir's own page for posters and text |
-| Event occurrence | Each actual date of a repeating event | "Every Saturday 7pm except during Navratri" lives here |
-| Source | Where information comes from: website, forwarded message, admin entry, Facebook page, public report | Each with when it was last read |
-| Claim | One source saying one thing about one event, with a confidence score | See section 4 |
-| Festival / festival date | Navratri, Diwali, Ekadashi and so on, with the date per calendar tradition | Each mandir picks its own date; we never force one |
-| Seva role / shift / signup | "Kitchen, night 3, 6–10pm, need 6", and who took it | Linked to an event |
-| Person | Name, email or phone, consent flags | Kept to the minimum (section 6) |
-| Digest subscription | Postcode, radius, frequency | No account needed |
+| Thing                      | What it holds                                                                                       | Notes                                                             |
+| -------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Mandir                     | Name, address, postcode, location, tradition, website, phone, charity number, claimed or not        | Seeded from `outreach/mandirs_uk.csv` and the audit list          |
+| Mandir admin               | Which person can edit which mandir, and their role                                                  | Several per mandir; can be removed                                |
+| Event                      | Title, type, start and end, place, cost, link, status                                               | Facts only; we link to the mandir's own page for posters and text |
+| Event occurrence           | Each actual date of a repeating event                                                               | "Every Saturday 7pm except during Navratri" lives here            |
+| Source                     | Where information comes from: website, forwarded message, admin entry, Facebook page, public report | Each with when it was last read                                   |
+| Claim                      | One source saying one thing about one event, with a confidence score                                | See section 4                                                     |
+| Festival / festival date   | Navratri, Diwali, Ekadashi and so on, with the date per calendar tradition                          | Each mandir picks its own date; we never force one                |
+| Seva role / shift / signup | "Kitchen, night 3, 6–10pm, need 6", and who took it                                                 | Linked to an event                                                |
+| Person                     | Name, email or phone, consent flags                                                                 | Kept to the minimum (section 6)                                   |
+| Digest subscription        | Postcode, radius, frequency                                                                         | No account needed                                                 |
 
 Rules that save pain later:
 
@@ -111,7 +111,7 @@ Rules that save pain later:
 The order of preference, easiest for a committee member first:
 
 1. **Forward it.** A committee member forwards the poster, WhatsApp
-   message or email they already made to an Utsav WhatsApp number or email
+   message or email they already made to an Toran WhatsApp number or email
    address. The extractor reads it (text or image), fills in title, date,
    time and place, and sends back one message: "Navratri Garba, 11–19 Oct,
    8pm. Correct? Yes / Edit". One tap publishes it. This needs no new habit
@@ -139,14 +139,14 @@ Every event is a set of claims, each from a source with a confidence score
 (decision 0004). The site shows the best-supported version and says where it
 came from.
 
-| Situation | What happens |
-| --- | --- |
-| Mandir admin entered or confirmed it | Published; shows "Confirmed by the mandir, [date]" |
-| Crawler found it, high confidence, matches past pattern | Published as "From the mandir's website"; admin asked to confirm |
-| Crawler or forward, low confidence | Review queue; not shown until confirmed |
+| Situation                                                     | What happens                                                          |
+| ------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Mandir admin entered or confirmed it                          | Published; shows "Confirmed by the mandir, [date]"                    |
+| Crawler found it, high confidence, matches past pattern       | Published as "From the mandir's website"; admin asked to confirm      |
+| Crawler or forward, low confidence                            | Review queue; not shown until confirmed                               |
 | Two sources disagree (e.g. website says 7pm, poster says 8pm) | Flagged; the newer admin-confirmed claim wins; otherwise review queue |
-| Public "this is wrong" report | Event marked "being checked"; admin and Utsav admin notified |
-| Not confirmed for 30 days and in the future | Admin nudged; after 45 days shown as "unconfirmed" |
+| Public "this is wrong" report                                 | Event marked "being checked"; admin and Toran admin notified          |
+| Not confirmed for 30 days and in the future                   | Admin nudged; after 45 days shown as "unconfirmed"                    |
 
 Design target: the review queue needs no more than 15 minutes a day from
 us, even at 100 mandirs. If it needs more, we fix the rules, not add hours.
@@ -192,18 +192,18 @@ across sites.
 
 Proposed (decision 0003), to be confirmed by both of us:
 
-| Need | Choice | Why |
-| --- | --- | --- |
-| Language | TypeScript | One language for site, admin and background jobs |
-| Web app | Next.js | Widely used, well documented, works well with Claude Code |
-| Database and login | Supabase (Postgres) | Real database, email/phone login, row-level permissions, free tier |
-| Hosting | Vercel, UK/EU region | Free to start, automatic preview copy for every change |
-| Background jobs | Scheduled functions (crawler, digest, reminders) | No servers to manage |
-| Email | Postmark or Resend | Reliable delivery for the digest and login links |
-| WhatsApp | Personal number by hand in the pilot; WhatsApp Business Platform on a company number from v1 | Forward route and reminders; the platform is paid per message (decision 0008) |
-| AI extraction | Claude API | Reads posters and messages into event fields |
-| Errors and uptime | Sentry, plus an uptime check | Know before users tell us |
-| Visitor stats | Plausible | No cookies, no personal tracking |
+| Need               | Choice                                                                                       | Why                                                                           |
+| ------------------ | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Language           | TypeScript                                                                                   | One language for site, admin and background jobs                              |
+| Web app            | Next.js                                                                                      | Widely used, well documented, works well with Claude Code                     |
+| Database and login | Supabase (Postgres)                                                                          | Real database, email/phone login, row-level permissions, free tier            |
+| Hosting            | Vercel, UK/EU region                                                                         | Free to start, automatic preview copy for every change                        |
+| Background jobs    | Scheduled functions (crawler, digest, reminders)                                             | No servers to manage                                                          |
+| Email              | Postmark or Resend                                                                           | Reliable delivery for the digest and login links                              |
+| WhatsApp           | Personal number by hand in the pilot; WhatsApp Business Platform on a company number from v1 | Forward route and reminders; the platform is paid per message (decision 0008) |
+| AI extraction      | Claude API                                                                                   | Reads posters and messages into event fields                                  |
+| Errors and uptime  | Sentry, plus an uptime check                                                                 | Know before users tell us                                                     |
+| Visitor stats      | Plausible                                                                                    | No cookies, no personal tracking                                              |
 
 Estimated monthly running cost at pilot size (about 30 mandirs, 1,000
 subscribers): under £50, most of it WhatsApp messages and AI extraction.
@@ -237,15 +237,15 @@ Built January–February 2027, launched in the pilot area in March (see
 `docs/launch-plan.md`). Whether v1 includes the rota depends on the
 mid-December decision point.
 
-| In v1 | Not yet |
-| --- | --- |
-| Mandir list for the two pilot areas | Whole-UK coverage |
-| Mandir claim and admin login | Payments, donations, ticketing |
-| Forward-to-publish and three-field form | Facebook page connection |
-| Crawler for mandirs with websites | Native iOS or Android apps |
-| Review queue and "this is wrong" button | Our own panchang engine |
-| Public listing by postcode and date, festival pages | AI chat assistant |
-| Weekly email digest | WhatsApp digest |
+| In v1                                                             | Not yet                               |
+| ----------------------------------------------------------------- | ------------------------------------- |
+| Mandir list for the two pilot areas                               | Whole-UK coverage                     |
+| Mandir claim and admin login                                      | Payments, donations, ticketing        |
+| Forward-to-publish and three-field form                           | Facebook page connection              |
+| Crawler for mandirs with websites                                 | Native iOS or Android apps            |
+| Review queue and "this is wrong" button                           | Our own panchang engine               |
+| Public listing by postcode and date, festival pages               | AI chat assistant                     |
+| Weekly email digest                                               | WhatsApp digest                       |
 | Seva rota with email reminders (if the December test supports it) | Live streaming, verified seva records |
 
 Build order inside v1: data model and seed data → mandir admin and

@@ -42,13 +42,13 @@ engine, Facebook/Instagram scraping (Meta's terms prohibit it).
 
 ### Success and kill criteria
 
-| Measure | Target by end of first 3 months in the two clusters |
-|---|---|
-| Mandirs in clusters with at least one current event listed | ≥ 70% |
-| Listings found wrong after publishing | < 5% |
-| Manual review time | < 4 hours a week |
-| Digest subscribers | 500 |
-| Digest open rate | ≥ 40% |
+| Measure                                                    | Target by end of first 3 months in the two clusters |
+| ---------------------------------------------------------- | --------------------------------------------------- |
+| Mandirs in clusters with at least one current event listed | ≥ 70%                                               |
+| Listings found wrong after publishing                      | < 5%                                                |
+| Manual review time                                         | < 4 hours a week                                    |
+| Digest subscribers                                         | 500                                                 |
+| Digest open rate                                           | ≥ 40%                                               |
 
 If coverage stays under 40% because events live only on WhatsApp and Facebook,
 collection isn't the answer and the product should pivot to the mandir-side
