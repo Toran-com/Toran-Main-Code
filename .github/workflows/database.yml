@@ -45,7 +45,7 @@ jobs:
       - name: The public role can reach the health check
         run: |
           answer=$(psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" \
-            -tA -c "set role anon; select public.health();")
+            -qtA -c "set role anon; select public.health();")
           test "$answer" = "ok"
 
   deploy:
