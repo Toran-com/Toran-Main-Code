@@ -35,7 +35,7 @@ pnpm test:e2e   # builds the site and tests it in a phone-sized browser
 | `app/(ops)/`    | The Toran admin area, behind login and a second factor              |
 | `app/api/`      | Webhooks for incoming email and WhatsApp                            |
 | `lib/`          | Shared code                                                         |
-| `db/`           | Database migrations and seed data                                   |
+| `supabase/`     | Database migrations, seed data and local database settings          |
 | `jobs/`         | Scheduled work: crawler, digest, reminders                          |
 | `tests/`        | Unit tests (`unit/`, Vitest) and browser tests (`e2e/`, Playwright) |
 | `docs/`         | The technical plan, setup steps and decision records                |

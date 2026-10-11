@@ -4,7 +4,7 @@ The plan for step 3 of the build (an empty app that goes all the way to a
 live site). It follows decisions 0002 and 0003; if 0003 changes, this
 changes with it.
 
-Status: in progress. Pull request 1 merged and live on Vercel (8 Oct 2026); pull request 2 is under way.
+Status: in progress. Pull request 1 merged and live on Vercel (8 Oct 2026); pull request 2 ready to merge; pull request 3 under way (11 Oct).
 
 ---
 
@@ -48,9 +48,9 @@ Toran-Main-Code/
 │   ├── api/                webhooks (email, WhatsApp later)
 │   └── page.tsx            "Toran — coming soon"
 ├── lib/                    shared code: database client, dates, festivals
-├── db/
+├── supabase/
 │   ├── migrations/         every database change, numbered, in order
-│   └── seed/               mandir list, festival dates
+│   └── seed.sql            mandir list and festival dates for a fresh database
 ├── jobs/                   scheduled work: crawler, digest, reminders
 ├── tests/                  unit tests (Vitest) and browser tests (Playwright)
 ├── docs/                   moved from the research repo, decisions included
@@ -97,16 +97,45 @@ green. To turn enforcement on once the organisation is on Team:
 Free-plan limits that matter: 2,000 GitHub Actions minutes a month for
 private repos, which is roughly 600 runs of this workflow.
 
-### Pull request 3 — three copies of the site
+### Pull request 3 — the database and three copies of the site
 
-| Copy    | Where                          | Database                 | When it updates              |
-| ------- | ------------------------------ | ------------------------ | ---------------------------- |
-| Local   | Your laptop                    | Local Supabase in Docker | When you run it              |
-| Preview | A Vercel link per pull request | `toran-staging`          | Every push to a pull request |
-| Live    | Toran domain (once bought)     | `toran-prod`             | Every merge to main          |
+| Copy    | Where                          | Database                                    | When it updates              |
+| ------- | ------------------------------ | ------------------------------------------- | ---------------------------- |
+| Local   | Your laptop                    | Local Supabase in Docker                    | When you run it              |
+| Preview | A Vercel link per pull request | `toran-staging`                             | Every push to a pull request |
+| Live    | toran-main-code.vercel.app     | `toran-staging` now, `toran-prod` at launch | Every merge to main          |
 
-Database migrations run against staging first, then live, by a workflow,
-never by hand.
+What it adds: the `supabase/` folder with the first migration (a `health()`
+function), the Supabase client, `/api/health` (200 when the database
+answers, 503 when it doesn't or isn't connected), and the **Database**
+workflow. Migrations are checked on a fresh database in every pull request
+and applied to `toran-staging` on merge (decision 0009).
+
+**Your part, once (about 15 minutes):**
+
+1. **Vercel → project → Settings → Environment Variables.** Add, for both
+   **Production** and **Preview**, from Supabase → `toran-staging` →
+   Project Settings → API Keys / Data API:
+   - `NEXT_PUBLIC_SUPABASE_URL`: the Project URL, `https://<ref>.supabase.co`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: the publishable key
+     (`sb_publishable_…`; older projects call it the anon key)
+
+   Then Deployments → latest → Redeploy, so the site picks them up.
+
+2. **GitHub → repo → Settings → Secrets and variables → Actions → New
+   repository secret.** Add three:
+   - `SUPABASE_ACCESS_TOKEN`: Supabase → your avatar → Account → Access
+     Tokens → Generate new token (name it `github-toran`)
+   - `SUPABASE_STAGING_PROJECT_REF`: the `<ref>` part of the Project URL
+   - `SUPABASE_STAGING_DB_PASSWORD`: the database password you saved when
+     creating the project
+3. Check: after the next merge, the **Database** workflow's "Apply
+   migrations" step goes green, and `/api/health` on the live site shows
+   `"database":"ok"`.
+
+At launch, create `toran-prod`, add `SUPABASE_PRODUCTION_PROJECT_REF` and
+`SUPABASE_PRODUCTION_DB_PASSWORD`, run the Database workflow by hand with
+target `production`, and point Vercel's **Production** variables at it.
 
 ### Pull request 4 — login and error alerts
 
