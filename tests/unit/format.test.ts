@@ -6,6 +6,7 @@ import {
   formatEventStart,
   groupByRegionAndTown,
   londonDate,
+  londonToUtc,
   matchesSearch,
   monthOf,
   websiteLabel,
@@ -94,5 +95,36 @@ describe("matchesSearch", () => {
     expect(matchesSearch(m, "baps leicester")).toBe(true);
     expect(matchesSearch(m, "  ")).toBe(true);
     expect(matchesSearch(m, "baps leeds")).toBe(false);
+  });
+});
+
+describe("londonToUtc", () => {
+  it("takes an hour off in British Summer Time", () => {
+    expect(londonToUtc("2026-10-11", "19:00")?.toISOString()).toBe(
+      "2026-10-11T18:00:00.000Z",
+    );
+  });
+  it("matches UTC in winter", () => {
+    expect(londonToUtc("2026-11-08", "18:30")?.toISOString()).toBe(
+      "2026-11-08T18:30:00.000Z",
+    );
+  });
+  it("handles the night the clocks go back", () => {
+    expect(londonToUtc("2026-10-25", "00:30")?.toISOString()).toBe(
+      "2026-10-24T23:30:00.000Z",
+    );
+    expect(londonToUtc("2026-10-25", "12:00")?.toISOString()).toBe(
+      "2026-10-25T12:00:00.000Z",
+    );
+  });
+  it("moves a time skipped when the clocks go forward", () => {
+    expect(londonToUtc("2027-03-28", "01:30")?.toISOString()).toBe(
+      "2027-03-28T01:30:00.000Z",
+    );
+  });
+  it("rejects impossible dates and times", () => {
+    expect(londonToUtc("2026-02-30", "10:00")).toBeNull();
+    expect(londonToUtc("2026-10-11", "25:00")).toBeNull();
+    expect(londonToUtc("11/10/2026", "10:00")).toBeNull();
   });
 });

@@ -135,3 +135,29 @@ export function matchesSearch(
     `${m.name} ${m.town} ${m.region} ${m.tradition ?? ""}`.toLowerCase();
   return words.every((w) => text.includes(w));
 }
+
+// The UTC instant for a UK wall-clock date and time ("2026-10-11", "19:00"),
+// allowing for British Summer Time. Returns null for impossible values.
+export function londonToUtc(date: string, time: string): Date | null {
+  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  const t = /^(\d{2}):(\d{2})$/.exec(time);
+  if (!d || !t) return null;
+  const [y, mo, da, h, mi] = [...d.slice(1), ...t.slice(1)].map(Number);
+  if (h > 23 || mi > 59) return null;
+  const wall = Date.UTC(y, mo - 1, da, h, mi);
+  const check = new Date(wall);
+  if (check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== da) return null;
+  // London is UTC or UTC+1: try the offset in force at that moment.
+  for (const offsetHours of [1, 0]) {
+    const guess = new Date(wall - offsetHours * 3_600_000);
+    const shown = new Intl.DateTimeFormat("en-GB", {
+      timeZone: LONDON,
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).format(guess);
+    if (londonDate(guess) === date && shown === time) return guess;
+  }
+  // A time skipped when the clocks go forward: use the hour after.
+  return new Date(wall);
+}

@@ -226,6 +226,25 @@ the database and refreshed hourly, so they stay fast and cheap.
 **Your part:** once #3's database settings are in Vercel, open
 `/mandirs` on the preview link and click around on your phone.
 
+### Pull request 9 — mandir committees look after their page
+
+What it adds:
+
+1. **Claim:** on any mandir's page, "Look after this page" → log in → say
+   your role at the mandir → send.
+2. **Approve:** claims appear on `/ops` (Toran admins, after the
+   authenticator code) with the person's email, their role, and the
+   mandir's public phone and website. **Check with the mandir first**,
+   usually by phoning them, then press Approve. Let the person know by
+   email yourself for now.
+3. **Manage:** approved committee members find their mandir under "Your
+   mandirs" on `/account`. Adding an event takes three fields (what, date,
+   start time). Each event has "Still on", "Cancel" and "Remove" buttons.
+   Changes show on the public page straight away.
+
+Removed events are only hidden: they stay in the database, in case one is
+removed by mistake (ask Claude to restore it).
+
 ### Done when
 
 - The "coming soon" page is live on a real URL
