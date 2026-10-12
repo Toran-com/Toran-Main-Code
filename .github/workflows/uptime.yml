@@ -1,0 +1,76 @@
+# Checks the live site every hour. If /api/health doesn't answer ok, opens a
+# GitHub issue (labelled "site down"), which emails the repo's watchers;
+# closes it when the site recovers. Before the database is connected the
+# check only notes "not configured" and doesn't alert.
+name: Uptime
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check the live site
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SITE_URL: ${{ vars.SITE_URL || 'https://toran-main-code.vercel.app' }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Ask the site how it is
+        id: health
+        run: |
+          code=$(curl -sS -o body.json -w '%{http_code}' --max-time 20 \
+            --retry 2 --retry-delay 10 --retry-all-errors \
+            "$SITE_URL/api/health") || true
+          code=${code:-000}
+          database=$(jq -r '.database // "no answer"' body.json 2>/dev/null || echo "no answer")
+          echo "HTTP $code, database: $database"
+          if [ "$code" = "200" ]; then state=up
+          elif [ "$code" = "503" ] && [ "$database" = "not configured" ]; then
+            echo "::notice::The database isn't connected yet, so this isn't treated as an outage."
+            state=up
+          else state=down; fi
+          {
+            echo "state=$state"
+            echo "code=$code"
+            echo "database=$database"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the "site down" issue
+        if: steps.health.outputs.state == 'down'
+        env:
+          CODE: ${{ steps.health.outputs.code }}
+          DATABASE: ${{ steps.health.outputs.database }}
+        run: |
+          gh label create "site down" --color B60205 --description "Opened by the Uptime workflow" 2>/dev/null || true
+          now=$(date -u '+%d %b %Y %H:%M UTC')
+          open=$(gh issue list --label "site down" --state open --json number --jq '.[0].number')
+          msg="Still down at $now: HTTP $CODE, database: $DATABASE. Checked $SITE_URL/api/health."
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body "$msg"
+          else
+            gh issue create --label "site down" --title "The live site isn't healthy" --body "$(printf '%s\n\n%s\n\n%s' \
+              "First noticed $now: HTTP $CODE, database: $DATABASE." \
+              "Checked $SITE_URL/api/health. Look at Vercel → Deployments and Supabase → Project status." \
+              "This issue closes itself when the site recovers.")"
+          fi
+          exit 1
+
+      - name: Close the issue when the site is back
+        if: steps.health.outputs.state == 'up'
+        run: |
+          open=$(gh issue list --label "site down" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$open" ]; then
+            gh issue close "$open" --comment "Back up at $(date -u '+%d %b %Y %H:%M UTC')."
+          fi
