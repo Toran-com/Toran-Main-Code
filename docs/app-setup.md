@@ -4,7 +4,35 @@ The plan for step 3 of the build (an empty app that goes all the way to a
 live site). It follows decisions 0002 and 0003; if 0003 changes, this
 changes with it.
 
-Status: in progress. Pull request 1 merged and live on Vercel (8 Oct 2026); pull request 2 ready to merge; pull request 3 under way (11 Oct).
+Status (12 Oct 2026): pull request 1 merged and live on Vercel. Pull
+requests 2 to 11 are open, each built on the one before; merge them in
+order.
+
+## Your to-do list, in order
+
+Everything Claude can't do for you. Each step says where it's explained
+below.
+
+1. **Merge the pull requests in order**, #2 first. Wait for each to show
+   green ticks after the previous one is merged.
+2. **Vercel → Settings → Environment Variables** (pull request 3): add
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   from Supabase → Project Settings → API, for Production and Preview.
+   Redeploy.
+3. **GitHub → Settings → Secrets → Actions** (pull request 3):
+   `SUPABASE_ACCESS_TOKEN`, `SUPABASE_STAGING_PROJECT_REF`,
+   `SUPABASE_STAGING_DB_PASSWORD`. Then merged migrations reach the
+   database automatically.
+4. **Supabase → Authentication** (pull request 4): set the site URL and
+   redirect URLs, turn on TOTP, and add yourself as a Toran admin with the
+   SQL given there. Set up the email provider (SMTP) before the pilot.
+5. **Sentry** (pull request 5): sign up, then add `NEXT_PUBLIC_SENTRY_DSN`
+   in Vercel.
+6. **Watch** the GitHub repo so uptime and Dependabot emails reach you.
+7. **Skim the mandir list** (pull request 7) and try the pages on your
+   phone (pull requests 8 and 9).
+8. **Read the legal drafts** (pull request 11) before showing Toran to
+   anyone outside the pilot committees.
 
 ---
 
@@ -201,6 +229,13 @@ the real domain exists, set it in GitHub → Settings → Secrets and variables
 5. Test: open `/api/debug/error` on a preview link; the error should appear
    in Sentry within a minute.
 
+### Pull request 6 — the data model
+
+What it adds: the database tables for mandirs, their committees and
+claims, festivals and their dates, events, sources, and seva rotas, with
+security rules on every table. See `docs/data-model.md`. Nothing for you
+to do.
+
 ### Pull request 7 — the mandir list and festival dates
 
 What it adds: the 106 mandirs from your outreach and audit lists (no
@@ -245,6 +280,14 @@ What it adds:
 Removed events are only hidden: they stay in the database, in case one is
 removed by mistake (ask Claude to restore it).
 
+### Pull request 10 — housekeeping
+
+What it adds: Dependabot, which opens a pull request each week when
+packages have updates (grouped, so usually one) and each month for GitHub
+Actions. Merge them when their checks are green; anything bigger (a new
+major version) gets a separate pull request and is worth asking Claude
+about. Also a refreshed README listing every page built so far.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL
@@ -258,7 +301,9 @@ removed by mistake (ask Claude to restore it).
 
 ## After this
 
-Step 4 of the build: the data model as migrations, seeded with the 91 UK
-mandirs from `outreach/mandirs_uk.csv` and the 30 from `audit/mandirs.csv`,
-with tests for repeating events and festival dates. See
-`docs/architecture.md`, section 2.
+Next in the build (docs/architecture.md): what's on near you (events
+across mandirs by date and distance), the weekly digest, forwarding
+posters by WhatsApp or email into the review queue, and the seva rota.
+The digest and rota sign-ups hold the public's personal data, so they
+wait for ICO registration and the DPIA (decision 0006; drafts in
+`docs/legal/`).

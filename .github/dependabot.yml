@@ -1,0 +1,27 @@
+# Opens pull requests to keep packages and GitHub Actions up to date.
+# Small updates are grouped into one pull request a week so they're quick
+# to review; each still has to pass every check before it can be merged.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/London
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    labels: [dependencies]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: Europe/London
+    groups:
+      actions:
+        patterns: ["*"]
+    labels: [dependencies]
