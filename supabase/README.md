@@ -6,8 +6,10 @@ Supabase (Postgres). Every change to the database is a numbered SQL file in
 
 - `config.toml` — settings for the local Supabase stack
 - `migrations/` — one file per change, named `YYYYMMDDHHMMSS_what_it_does.sql`
-- `seed.sql` — data loaded into a fresh local database (added with the mandir
-  list in a later pull request)
+- `data/mandirs.csv` — the starting mandir directory (public fields only),
+  built by `scripts/build_directory.py` from the research lists and loaded by
+  the `initial_directory` migration
+- `tests/database/` — pgTAP tests of who can see and change what
 
 ## Working locally
 

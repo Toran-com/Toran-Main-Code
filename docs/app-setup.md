@@ -201,6 +201,17 @@ the real domain exists, set it in GitHub → Settings → Secrets and variables
 5. Test: open `/api/debug/error` on a preview link; the error should appear
    in Sentry within a minute.
 
+### Pull request 7 — the mandir list and festival dates
+
+What it adds: the 106 mandirs from your outreach and audit lists (no
+duplicates, no emails or phone numbers), and the main festival dates for
+2026-27, each marked _not yet checked_ with where it came from.
+
+**Your part (when you have 20 minutes):** skim `supabase/data/mandirs.csv`
+for anything wrong (a name, a town, a website). Tell Claude and it will fix
+the list. Later, the festival dates get checked against a London panchang
+(a Toran admin ticks them off).
+
 ### Done when
 
 - The "coming soon" page is live on a real URL
