@@ -22,11 +22,14 @@ insert into public.mandir_admins (mandir_id, user_id) values
 insert into public.mandir_contacts (mandir_id, email)
   values ('10000000-0000-0000-0000-000000000001', 'committee@mandir-one.org');
 
+-- Counts below look only at these three test mandirs, not the
+-- starting directory.
+
 -- Visitors ------------------------------------------------------------------
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 
-select is((select count(*)::int from public.mandirs), 2, 'visitors see listed mandirs, not hidden ones');
+select is((select count(*)::int from public.mandirs where slug in ('mandir-one', 'mandir-two', 'mandir-hidden')), 2, 'visitors see listed mandirs, not hidden ones');
 select throws_ok(
   $$insert into public.mandirs (slug, name, town, region) values ('x', 'X Mandir', 'Town', 'Region')$$,
   '42501', null, 'visitors cannot add mandirs');
@@ -41,7 +44,7 @@ set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"cccccccc-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', true);
 
-select is((select count(*)::int from public.mandirs), 2, 'a member sees listed mandirs');
+select is((select count(*)::int from public.mandirs where slug in ('mandir-one', 'mandir-two', 'mandir-hidden')), 2, 'a member sees listed mandirs');
 with u as (update public.mandirs set website = 'https://evil.example' where slug = 'mandir-one' returning 1)
 select is(count(*)::int, 0, 'a member cannot edit a mandir') from u;
 select is((select count(*)::int from public.mandir_contacts), 0, 'a member sees no contacts');
@@ -96,7 +99,7 @@ select is(count(*)::int, 0, 'a Toran admin without the second factor has no admi
 
 select set_config('request.jwt.claims',
   '{"sub":"dddddddd-0000-0000-0000-000000000004","role":"authenticated","aal":"aal2"}', true);
-select is((select count(*)::int from public.mandirs), 3, 'a Toran admin sees hidden mandirs too');
+select is((select count(*)::int from public.mandirs where slug in ('mandir-one', 'mandir-two', 'mandir-hidden')), 3, 'a Toran admin sees hidden mandirs too');
 select lives_ok(
   $$select public.decide_mandir_claim((select id from public.mandir_claims limit 1), true)$$,
   'a Toran admin can approve a claim');

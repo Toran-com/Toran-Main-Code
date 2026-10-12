@@ -25,7 +25,7 @@ insert into public.event_occurrences (event_id, starts_at) values
   ('e1000000-0000-0000-0000-000000000001', '2026-10-11 19:00+01'),
   ('e2000000-0000-0000-0000-000000000002', '2026-10-12 19:00+01');
 insert into public.festivals (id, slug, name) values
-  ('f0000000-0000-0000-0000-000000000001', 'navratri', 'Navratri');
+  ('f0000000-0000-0000-0000-000000000001', 'test-festival', 'Test festival');
 insert into public.seva_roles (id, event_id, name) values
   ('51000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'Kitchen'),
   ('52000000-0000-0000-0000-000000000002', 'e2000000-0000-0000-0000-000000000002', 'Parking');
@@ -40,7 +40,7 @@ select is((select count(*)::int from public.event_occurrences), 1,
   'visitors see dates only for events they can see');
 select is((select count(*)::int from public.seva_roles), 1,
   'visitors see rota roles only for events they can see');
-select is((select count(*)::int from public.festivals), 1, 'visitors see festivals');
+select is((select count(*)::int from public.festivals where slug = 'test-festival'), 1, 'visitors see festivals');
 select throws_ok(
   $$insert into public.events (mandir_id, title, starts_at) values
     ('10000000-0000-0000-0000-000000000001', 'Spam', now())$$,
