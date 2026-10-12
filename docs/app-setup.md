@@ -212,6 +212,20 @@ for anything wrong (a name, a town, a website). Tell Claude and it will fix
 the list. Later, the festival dates get checked against a London panchang
 (a Toran admin ticks them off).
 
+### Pull request 8 — the first public pages
+
+What it adds: `/mandirs` (every mandir by region and town, with a search
+box), a page for each mandir (details, directions, upcoming events, or a
+friendly "no events yet"), and `/festivals` (upcoming dates by month,
+marked "Date not yet checked" until checked). The home page links to both.
+
+Until launch, every page asks search engines not to list it
+(`launched: false` in `lib/site.ts`). Pages are built ahead of time from
+the database and refreshed hourly, so they stay fast and cheap.
+
+**Your part:** once #3's database settings are in Vercel, open
+`/mandirs` on the preview link and click around on your phone.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL

@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { ToranGarland } from "@/components/toran-garland";
+import { quietButtonClass } from "@/components/ui";
 import { site } from "@/lib/site";
 
 // Temporary home page until the public listing is built.
@@ -17,6 +19,14 @@ export default function ComingSoon() {
           and will open in 2027.
         </p>
       </div>
+      <nav aria-label="Explore" className="flex flex-wrap gap-3">
+        <Link href="/mandirs" className={quietButtonClass}>
+          Browse mandirs
+        </Link>
+        <Link href="/festivals" className={quietButtonClass}>
+          Festival dates
+        </Link>
+      </nav>
       <p className="border-line text-muted border-t pt-6 text-base">
         Coming soon
       </p>

@@ -101,7 +101,7 @@ jobs:
       - name: Install browser for tests
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Log in, log out, second factor
+      - name: Log in, log out, second factor, directory with real data
         run: |
           set -o pipefail
           pnpm exec playwright test -c playwright.auth.config.ts 2>&1 | tee login-flow.log

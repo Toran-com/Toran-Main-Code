@@ -16,6 +16,7 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   title: pageTitle(),
   description: site.description,
+  robots: site.launched ? undefined : { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
