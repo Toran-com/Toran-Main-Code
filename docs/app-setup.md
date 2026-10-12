@@ -174,8 +174,32 @@ the mandirs table in pull request 6.
 
 ### Pull request 5 — error alerts and uptime
 
-- Sentry on the live and preview sites; switches on when its key is added
-- An hourly check of `/api/health` that flags failures
+What it adds: Sentry error reporting (inactive until its key is set; never
+sends personal data: no cookies, headers, IP or user details, and email
+addresses are scrubbed from messages), a friendly error page and a branded
+"page not found", `/api/debug/error` (a deliberate error for testing Sentry
+on preview links and your computer; 404 on the live site), and the hourly
+**Uptime** workflow.
+
+**Uptime:** checks `https://toran-main-code.vercel.app/api/health` every
+hour. If it fails, it opens a GitHub issue labelled "site down" (GitHub
+emails you) and closes it when the site recovers. "Database not configured"
+isn't treated as an outage. It starts once this is merged to `main`. When
+the real domain exists, set it in GitHub → Settings → Secrets and variables
+→ Actions → **Variables** → `SITE_URL`. Make sure you **Watch** the repo
+(top right on GitHub) so issue emails reach you.
+
+**Sentry, your part (about 10 minutes, any time):**
+
+1. Sign up at sentry.io (free plan), create a project, platform **Next.js**,
+   name `toran`. Choose the EU data region if offered.
+2. Copy the **DSN** (Settings → Projects → toran → Client Keys).
+3. Vercel → Settings → Environment Variables: add
+   `NEXT_PUBLIC_SENTRY_DSN` for Production and Preview, then redeploy.
+4. Sentry → Settings → Security & Privacy: turn on **Prevent Storing of IP
+   Addresses**; keep **Data Scrubber** on.
+5. Test: open `/api/debug/error` on a preview link; the error should appear
+   in Sentry within a minute.
 
 ### Done when
 
