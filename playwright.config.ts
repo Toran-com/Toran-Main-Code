@@ -6,7 +6,7 @@ export default defineConfig({
   testDir: "tests/e2e",
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? "github" : "list",
+  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: { baseURL: `http://localhost:${port}` },
   projects: [
     {
@@ -21,9 +21,12 @@ export default defineConfig({
       },
     },
   ],
-  // The tests run against a production build, as the live site will.
+  // The tests run against a production build, as the live site will. In CI
+  // the build is a separate step, so only the server is started here.
   webServer: {
-    command: `pnpm build && pnpm start --port ${port}`,
+    command: process.env.CI
+      ? `pnpm start --port ${port}`
+      : `pnpm build && pnpm start --port ${port}`,
     port,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

@@ -4,7 +4,7 @@ The plan for step 3 of the build (an empty app that goes all the way to a
 live site). It follows decisions 0002 and 0003; if 0003 changes, this
 changes with it.
 
-Status: in progress. GitHub organisation, repo, Supabase and Vercel accounts exist (8 Oct 2026); pull request 1 is under way.
+Status: in progress. Pull request 1 merged and live on Vercel (8 Oct 2026); pull request 2 ready to merge; pull request 3 under way (11 Oct).
 
 ---
 
@@ -48,9 +48,9 @@ Toran-Main-Code/
 │   ├── api/                webhooks (email, WhatsApp later)
 │   └── page.tsx            "Toran — coming soon"
 ├── lib/                    shared code: database client, dates, festivals
-├── db/
+├── supabase/
 │   ├── migrations/         every database change, numbered, in order
-│   └── seed/               mandir list, festival dates
+│   └── seed.sql            mandir list and festival dates for a fresh database
 ├── jobs/                   scheduled work: crawler, digest, reminders
 ├── tests/                  unit tests (Vitest) and browser tests (Playwright)
 ├── docs/                   moved from the research repo, decisions included
@@ -75,29 +75,107 @@ Tools fixed in this pull request:
 
 ### Pull request 2 — automatic checks
 
-A GitHub Actions workflow that runs on every pull request and blocks merging
-if anything fails: install, code style, type check, unit tests, build, and
-one browser test that opens the home page. The main branch is protected:
-changes only arrive through pull requests that pass.
+A GitHub Actions workflow (`.github/workflows/checks.yml`, check name
+**Checks**) runs on every pull request and every change to `main`: install,
+formatting, lint, type check, unit tests, build, and the browser tests on a
+phone-sized screen. It takes about three minutes. If the browser tests fail,
+their report is kept for a week under the run's Artifacts.
 
-### Pull request 3 — three copies of the site
+**Making a failing check block the merge.** GitHub only enforces this on a
+private repo with a paid plan (GitHub Team, per user per month; check
+github.com/pricing). On the free plan the red cross still shows on the pull
+request, so the rule until then is: never merge a pull request that isn't
+green. To turn enforcement on once the organisation is on Team:
 
-| Copy    | Where                          | Database                 | When it updates              |
-| ------- | ------------------------------ | ------------------------ | ---------------------------- |
-| Local   | Your laptop                    | Local Supabase in Docker | When you run it              |
-| Preview | A Vercel link per pull request | `toran-staging`          | Every push to a pull request |
-| Live    | Toran domain (once bought)     | `toran-prod`             | Every merge to main          |
+1. Repo → Settings → Rules → Rulesets → New ruleset → New branch ruleset.
+2. Name `Protect main`, Enforcement status **Active**, Target branches
+   **Include default branch**.
+3. Tick **Restrict deletions**, **Require a pull request before merging**,
+   **Require status checks to pass** (add **Checks** and **Vercel**), and
+   **Block force pushes**. Save.
 
-Database migrations run against staging first, then live, by a workflow,
-never by hand.
+Free-plan limits that matter: 2,000 GitHub Actions minutes a month for
+private repos, which is roughly 600 runs of this workflow.
 
-### Pull request 4 — login and error alerts
+### Pull request 3 — the database and three copies of the site
 
-- Login by emailed link (Supabase Auth), no passwords
-- Three roles from the start: public, mandir admin, Toran admin
-- Database rules (row-level security) so a mandir admin can only change
-  their own mandir, tested
-- Sentry on the live and preview sites; an uptime check on the live site
+| Copy    | Where                          | Database                                    | When it updates              |
+| ------- | ------------------------------ | ------------------------------------------- | ---------------------------- |
+| Local   | Your laptop                    | Local Supabase in Docker                    | When you run it              |
+| Preview | A Vercel link per pull request | `toran-staging`                             | Every push to a pull request |
+| Live    | toran-main-code.vercel.app     | `toran-staging` now, `toran-prod` at launch | Every merge to main          |
+
+What it adds: the `supabase/` folder with the first migration (a `health()`
+function), the Supabase client, `/api/health` (200 when the database
+answers, 503 when it doesn't or isn't connected), and the **Database**
+workflow. Migrations are checked on a fresh database in every pull request
+and applied to `toran-staging` on merge (decision 0009).
+
+**Your part, once (about 15 minutes):**
+
+1. **Vercel → project → Settings → Environment Variables.** Add, for both
+   **Production** and **Preview**, from Supabase → `toran-staging` →
+   Project Settings → API Keys / Data API:
+   - `NEXT_PUBLIC_SUPABASE_URL`: the Project URL, `https://<ref>.supabase.co`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: the publishable key
+     (`sb_publishable_…`; older projects call it the anon key)
+
+   Then Deployments → latest → Redeploy, so the site picks them up.
+
+2. **GitHub → repo → Settings → Secrets and variables → Actions → New
+   repository secret.** Add three:
+   - `SUPABASE_ACCESS_TOKEN`: Supabase → your avatar → Account → Access
+     Tokens → Generate new token (name it `github-toran`)
+   - `SUPABASE_STAGING_PROJECT_REF`: the `<ref>` part of the Project URL
+   - `SUPABASE_STAGING_DB_PASSWORD`: the database password you saved when
+     creating the project
+3. Check: after the next merge, the **Database** workflow's "Apply
+   migrations" step goes green, and `/api/health` on the live site shows
+   `"database":"ok"`.
+
+At launch, create `toran-prod`, add `SUPABASE_PRODUCTION_PROJECT_REF` and
+`SUPABASE_PRODUCTION_DB_PASSWORD`, run the Database workflow by hand with
+target `production`, and point Vercel's **Production** variables at it.
+
+### Pull request 4 — login and roles
+
+What it adds: login by emailed link (`/login`), the link handler
+(`/auth/confirm`), `/account`, log out, and the Toran admin area (`/ops`),
+which also needs an authenticator app (decision 0010). Database:
+`toran_admins` and `is_toran_admin()`, with pgTAP tests. GitHub runs the
+whole login flow, including the authenticator step, against a real local
+Supabase on every pull request (the **Login flow** job).
+
+The rule that a mandir admin can only change their own mandir arrives with
+the mandirs table in pull request 6.
+
+**Your part, once (about 10 minutes), in Supabase → `toran-staging`:**
+
+1. **Authentication → URL Configuration.**
+   - Site URL: `https://toran-main-code.vercel.app`
+   - Redirect URLs, add three: `https://toran-main-code.vercel.app/**`,
+     `https://*-toran4.vercel.app/**` (preview links) and
+     `http://localhost:3000/**`
+2. **Authentication → Multi-Factor** (or Sign In / Providers → MFA): make
+   sure **TOTP (authenticator app)** is enabled.
+3. Log in once at `/login` with your email, then make yourself an admin in
+   **SQL Editor**:
+
+   ```sql
+   insert into public.toran_admins (user_id, note)
+   select id, 'Milan' from auth.users where email = 'you@example.com';
+   ```
+
+   Then open `/ops` and set up your authenticator app.
+
+4. Before the pilot: **Authentication → Emails → SMTP Settings**, connect a
+   proper email sender (Resend or Postmark). The built-in sender only sends
+   a few emails an hour and isn't meant for real use.
+
+### Pull request 5 — error alerts and uptime
+
+- Sentry on the live and preview sites; switches on when its key is added
+- An hourly check of `/api/health` that flags failures
 
 ### Done when
 

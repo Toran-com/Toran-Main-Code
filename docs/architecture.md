@@ -213,7 +213,7 @@ Check these figures against current prices before committing.
 
 ## 8. How we work on the code
 
-- **Repo layout:** `app/` (the web app), `db/` (migrations and seed data),
+- **Repo layout:** `app/` (the web app), `supabase/` (migrations and seed data),
   `jobs/` (crawler, digest, reminders), `docs/`, `audit/` (existing).
 - **Every change** on a branch, through a pull request, with automated
   checks (tests, linting, type checks) that must pass before merging.
