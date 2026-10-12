@@ -45,6 +45,16 @@ jobs:
       - name: Database security tests (pgTAP)
         run: supabase test db
 
+      - name: TypeScript types match the database
+        run: |
+          supabase gen types typescript --local --schema public > lib/database.types.ts
+          if ! git diff --exit-code lib/database.types.ts; then
+            echo "::error::lib/database.types.ts is out of date. Run: pnpm dlx supabase gen types typescript --local --schema public > lib/database.types.ts"
+            echo "----- generated file -----"
+            cat lib/database.types.ts
+            exit 1
+          fi
+
       - name: The public role can reach the health check
         run: |
           answer=$(psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" \
