@@ -13,3 +13,5 @@
 - Never commit secrets or personal data. Settings names go in `.env.example`.
 - Change the database only through a new file in `supabase/migrations/`;
   never edit an existing migration or the live database (decision 0009).
+- Read the login session only via `getCurrentUser()` (lib/auth.ts), inside a
+  `<Suspense>` boundary. Decide access in pages and database rules, not proxy.ts.

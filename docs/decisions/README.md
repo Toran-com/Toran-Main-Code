@@ -24,3 +24,4 @@ that replaces it and mark the old one Superseded.
 | 0007 | [Set up as a limited company](0007-limited-company.md)                                              | Accepted |
 | 0008 | [Personal WhatsApp number for the pilot, company number before automating](0008-whatsapp-number.md) | Accepted |
 | 0009 | [Database changes only through migrations; one project until launch](0009-database-changes.md)      | Proposed |
+| 0010 | [Login by emailed link; admins need an authenticator app](0010-login.md)                            | Proposed |

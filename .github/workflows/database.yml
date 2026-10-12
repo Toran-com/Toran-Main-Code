@@ -42,15 +42,69 @@ jobs:
       - name: Lint the database
         run: supabase db lint --local --level warning --fail-on warning
 
+      - name: Database security tests (pgTAP)
+        run: supabase test db
+
       - name: The public role can reach the health check
         run: |
           answer=$(psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" \
             -qtA -c "set role anon; select public.health();")
           test "$answer" = "ok"
 
+  login:
+    name: Login flow
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Start Supabase (database, login, API, test mailbox)
+        run: supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+
+      - name: Read local Supabase settings
+        run: |
+          supabase status -o env > supabase.env
+          set -a; . ./supabase.env; set +a
+          echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}" >> "$GITHUB_ENV"
+          echo "MAILPIT_URL=${MAILPIT_URL:-${INBUCKET_URL:-http://127.0.0.1:54324}}" >> "$GITHUB_ENV"
+          echo "DB_URL=$DB_URL" >> "$GITHUB_ENV"
+          rm supabase.env
+
+      - name: Install packages
+        run: pnpm install --frozen-lockfile
+
+      - name: Build against local Supabase
+        run: pnpm build
+
+      - name: Install browser for tests
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Log in, log out, second factor
+        run: pnpm exec playwright test -c playwright.auth.config.ts
+
+      - name: Keep the test report if they fail
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: login-flow-report
+          path: playwright-report/
+          retention-days: 7
+
   deploy:
     name: Apply migrations
-    needs: check
+    needs: [check, login]
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10

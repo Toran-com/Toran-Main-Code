@@ -137,13 +137,45 @@ At launch, create `toran-prod`, add `SUPABASE_PRODUCTION_PROJECT_REF` and
 `SUPABASE_PRODUCTION_DB_PASSWORD`, run the Database workflow by hand with
 target `production`, and point Vercel's **Production** variables at it.
 
-### Pull request 4 — login and error alerts
+### Pull request 4 — login and roles
 
-- Login by emailed link (Supabase Auth), no passwords
-- Three roles from the start: public, mandir admin, Toran admin
-- Database rules (row-level security) so a mandir admin can only change
-  their own mandir, tested
-- Sentry on the live and preview sites; an uptime check on the live site
+What it adds: login by emailed link (`/login`), the link handler
+(`/auth/confirm`), `/account`, log out, and the Toran admin area (`/ops`),
+which also needs an authenticator app (decision 0010). Database:
+`toran_admins` and `is_toran_admin()`, with pgTAP tests. GitHub runs the
+whole login flow, including the authenticator step, against a real local
+Supabase on every pull request (the **Login flow** job).
+
+The rule that a mandir admin can only change their own mandir arrives with
+the mandirs table in pull request 6.
+
+**Your part, once (about 10 minutes), in Supabase → `toran-staging`:**
+
+1. **Authentication → URL Configuration.**
+   - Site URL: `https://toran-main-code.vercel.app`
+   - Redirect URLs, add three: `https://toran-main-code.vercel.app/**`,
+     `https://*-toran4.vercel.app/**` (preview links) and
+     `http://localhost:3000/**`
+2. **Authentication → Multi-Factor** (or Sign In / Providers → MFA): make
+   sure **TOTP (authenticator app)** is enabled.
+3. Log in once at `/login` with your email, then make yourself an admin in
+   **SQL Editor**:
+
+   ```sql
+   insert into public.toran_admins (user_id, note)
+   select id, 'Milan' from auth.users where email = 'you@example.com';
+   ```
+
+   Then open `/ops` and set up your authenticator app.
+
+4. Before the pilot: **Authentication → Emails → SMTP Settings**, connect a
+   proper email sender (Resend or Postmark). The built-in sender only sends
+   a few emails an hour and isn't meant for real use.
+
+### Pull request 5 — error alerts and uptime
+
+- Sentry on the live and preview sites; switches on when its key is added
+- An hourly check of `/api/health` that flags failures
 
 ### Done when
 
