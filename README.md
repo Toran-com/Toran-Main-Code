@@ -12,6 +12,23 @@ cp .env.example .env.local   # settings; empty values are fine for now
 pnpm dev                     # open http://localhost:3000
 ```
 
+## What's built so far
+
+| Address                 | What it is                                         |
+| ----------------------- | -------------------------------------------------- |
+| `/`                     | Coming soon, with links to the directory           |
+| `/mandirs`              | Every mandir by region and town, with search       |
+| `/mandirs/<name>`       | A mandir's details and what's on                   |
+| `/mandirs/<name>/claim` | A committee member asks to look after the page     |
+| `/festivals`            | Festival dates for the UK                          |
+| `/login`, `/account`    | Email-link login; your mandirs                     |
+| `/manage/<name>`        | Add, confirm, cancel and remove a mandir's events  |
+| `/ops`                  | Toran admin (second factor): approve mandir claims |
+| `/api/health`           | Health check used by the hourly uptime check       |
+
+Until launch every page asks search engines not to list it (`launched` in
+`lib/site.ts`).
+
 ## Checks
 
 Every pull request must pass these before it can be merged. GitHub runs
@@ -26,19 +43,30 @@ pnpm test:e2e   # builds the site and tests it in a phone-sized browser
 `pnpm format` fixes formatting. The first time you run the browser tests,
 `pnpm exec playwright install chromium` downloads the browser.
 
+The **Database** workflow also starts a real local Supabase on GitHub. It
+applies every migration, runs the database security tests
+(`supabase/tests/database/`, pgTAP), checks `lib/database.types.ts` is up
+to date, and runs the browser tests that need real logins and data
+(`tests/e2e-auth/`). Locally that needs Docker; see `supabase/README.md`.
+
+Dependabot opens a pull request each week for package updates and each
+month for GitHub Actions updates.
+
 ## Layout
 
-| Folder          | What lives there                                                    |
-| --------------- | ------------------------------------------------------------------- |
-| `app/(public)/` | The public site: what's on, festivals, digest signup                |
-| `app/(mandir)/` | The mandir admin area, behind login                                 |
-| `app/(ops)/`    | The Toran admin area, behind login and a second factor              |
-| `app/api/`      | Webhooks for incoming email and WhatsApp                            |
-| `lib/`          | Shared code                                                         |
-| `supabase/`     | Database migrations, seed data and local database settings          |
-| `jobs/`         | Scheduled work: crawler, digest, reminders                          |
-| `tests/`        | Unit tests (`unit/`, Vitest) and browser tests (`e2e/`, Playwright) |
-| `docs/`         | The technical plan, setup steps and decision records                |
+| Folder          | What lives there                                                                 |
+| --------------- | -------------------------------------------------------------------------------- |
+| `app/(public)/` | The public site: mandirs, festivals, later what's on and the digest              |
+| `app/(mandir)/` | The mandir admin area, behind login                                              |
+| `app/(ops)/`    | The Toran admin area, behind login and a second factor                           |
+| `app/api/`      | Webhooks for incoming email and WhatsApp                                         |
+| `lib/`          | Shared code                                                                      |
+| `supabase/`     | Database migrations, seed data and local database settings                       |
+| `components/`   | Shared page parts                                                                |
+| `scripts/`      | One-off tools, e.g. building the starting mandir list                            |
+| `jobs/`         | Scheduled work: crawler, digest, reminders (not built yet)                       |
+| `tests/`        | Unit tests (`unit/`, Vitest) and browser tests (`e2e/`, `e2e-auth/`, Playwright) |
+| `docs/`         | The technical plan, setup steps and decision records                             |
 
 Folders in brackets group pages without adding to the web address, so
 `app/(public)/page.tsx` is the home page at `/`.
