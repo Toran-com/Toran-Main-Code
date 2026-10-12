@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import type { Database } from "@/lib/database.types";
 import { readSupabaseEnv } from "@/lib/env";
 
 // A Supabase client that acts as whoever is signed in, using the session
@@ -9,7 +10,7 @@ export async function createSessionClient() {
   const env = readSupabaseEnv();
   if (!env) return null;
   const store = await cookies();
-  return createServerClient(env.url, env.key, {
+  return createServerClient<Database>(env.url, env.key, {
     cookies: {
       getAll: () => store.getAll(),
       setAll: (toSet) => {
