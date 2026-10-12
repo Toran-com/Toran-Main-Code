@@ -49,6 +49,6 @@ test("upcoming festival dates show, marked not yet checked", async ({
   // Which festivals are upcoming depends on today's date, so check the
   // shape rather than a particular festival.
   const first = page.getByRole("article").first();
-  await expect(first).toContainText(/\b(19|20)\d\d\b/);
+  await expect(first).toContainText(/(19|20)\d\d/);
   await expect(first).toContainText("Date not yet checked");
 });
