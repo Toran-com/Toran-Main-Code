@@ -51,7 +51,9 @@ jobs:
   deploy:
     name: Apply migrations
     needs: check
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    # Only ever from main: a manual run on another branch must not apply
+    # unreviewed migrations to a real database.
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
