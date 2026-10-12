@@ -92,7 +92,14 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Log in, log out, second factor
-        run: pnpm exec playwright test -c playwright.auth.config.ts
+        run: |
+          set -o pipefail
+          pnpm exec playwright test -c playwright.auth.config.ts 2>&1 | tee login-flow.log
+          # The app must not log server errors during the flow either.
+          if grep -nE "\[WebServer\].*(Error|⨯)" login-flow.log; then
+            echo "::error::The app logged server errors during the login flow (see above)."
+            exit 1
+          fi
 
       - name: Keep the test report if they fail
         if: failure()
