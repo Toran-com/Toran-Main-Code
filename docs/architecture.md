@@ -169,7 +169,8 @@ does not hold certificates.
 Knowing where someone worships or volunteers reveals their religion, which is
 special category data under UK GDPR (decision 0006).
 
-Before anyone's personal data is collected:
+Before anyone's personal data is collected (drafts of the privacy notice,
+terms, DPIA and retention schedule are in `docs/legal/`):
 
 - [ ] Register with the ICO (about £50 a year for a small organisation)
 - [ ] Data protection impact assessment (DPIA) for the digest and the rota
