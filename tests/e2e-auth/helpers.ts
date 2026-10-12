@@ -1,3 +1,4 @@
+import { expect, type Page } from "@playwright/test";
 import { createHmac } from "node:crypto";
 import { execFileSync } from "node:child_process";
 
@@ -48,4 +49,32 @@ export function totp(secret: string, now = Date.now()): string {
   const offset = hmac[hmac.length - 1] & 0xf;
   const value = (hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
   return value.toString().padStart(6, "0");
+}
+
+// Logs in by email link, ending on `next`.
+export async function logIn(page: Page, email: string, next = "/account") {
+  await page.goto(`/login?next=${encodeURIComponent(next)}`);
+  await page.getByLabel("Email address").fill(email);
+  await page.getByRole("button", { name: "Email me a login link" }).click();
+  await expect(
+    page.getByText("Check your email for a login link"),
+  ).toBeVisible();
+  await page.goto(await latestLoginLink(email));
+}
+
+// Makes a fresh login a Toran admin with an authenticator app, unlocked.
+export async function logInAsAdmin(page: Page, email: string) {
+  await logIn(page, email);
+  await expect(page).toHaveURL(/\/account$/);
+  sql(
+    `insert into public.toran_admins (user_id, note) select id, 'e2e' from auth.users where email = '${email}'`,
+  );
+  await page.goto("/ops");
+  await page
+    .getByRole("button", { name: "Set up an authenticator app" })
+    .click();
+  const secret = (await page.getByTestId("totp-secret").textContent())!.trim();
+  await page.getByLabel(/6-digit code/).fill(totp(secret));
+  await page.getByRole("button", { name: "Confirm and unlock admin" }).click();
+  await expect(page.getByText("Unlocked.")).toBeVisible();
 }

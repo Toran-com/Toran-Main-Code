@@ -1,5 +1,6 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -80,4 +81,30 @@ export async function verifySecondFactor(
   });
   if (error) return { error: "That code didn't match. Try the newest code." };
   redirect("/ops");
+}
+
+// Approve or reject a mandir claim. The database only lets a Toran admin
+// with the second factor do this; approving makes them a mandir admin.
+export async function decideClaim(formData: FormData) {
+  const claim = String(formData.get("claim") ?? "");
+  const approve = formData.get("decision") === "approve";
+  const supabase = await createSessionClient();
+  if (!supabase) redirect("/ops?error=claim");
+
+  const { data: row } = await supabase
+    .from("mandir_claims")
+    .select("mandir:mandirs (slug)")
+    .eq("id", claim)
+    .maybeSingle();
+  const { error } = await supabase.rpc("decide_mandir_claim", {
+    claim,
+    approve,
+  });
+  if (error) redirect("/ops?error=claim");
+  if (approve && row?.mandir) {
+    // The public page shows "Run by the mandir's committee" once claimed.
+    updateTag(`mandir:${row.mandir.slug}`);
+    updateTag("mandirs");
+  }
+  redirect(`/ops?decided=${approve ? "approved" : "rejected"}`);
 }

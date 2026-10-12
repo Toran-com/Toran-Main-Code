@@ -43,3 +43,12 @@ test("signing out only works by form post", async ({ request }) => {
   const post = await request.post("/auth/signout", { maxRedirects: 0 });
   expect(post.status()).toBe(303);
 });
+
+test("claiming and managing a mandir need a login", async ({ page }) => {
+  await page.goto("/mandirs/some-mandir/claim");
+  await expect(page).toHaveURL(
+    /\/login\?next=%2Fmandirs%2Fsome-mandir%2Fclaim/,
+  );
+  await page.goto("/manage/some-mandir");
+  await expect(page).toHaveURL(/\/login\?next=%2Fmanage%2Fsome-mandir/);
+});

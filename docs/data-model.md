@@ -41,20 +41,20 @@ rota and digest features, after ICO registration and the DPIA.
 
 ## Who can do what
 
-| Table / action        | Visitor                       | Logged-in member | That mandir's admin                                     | Toran admin (with authenticator) |
-| --------------------- | ----------------------------- | ---------------- | ------------------------------------------------------- | -------------------------------- |
-| See mandirs           | Listed only                   | Listed only      | + their hidden mandir                                   | All                              |
-| Edit a mandir         | No                            | No               | Practical details only (not name, town, region, status) | Everything                       |
-| Add a mandir          | No                            | No               | No                                                      | Yes                              |
-| See contact details   | No                            | No               | Their mandir                                            | All                              |
-| Claim a mandir        | No                            | For themselves   | For themselves                                          | Yes                              |
-| Approve a claim       | No                            | No               | No                                                      | Yes                              |
-| See events            | Published, at visible mandirs | Same             | + their drafts                                          | All                              |
-| Add or edit events    | No                            | No               | Their mandir only                                       | All                              |
-| Delete events         | Never (mark removed)          | Never            | Never                                                   | Never                            |
-| Festivals and dates   | See                           | See              | See                                                     | See and edit                     |
-| Sources, review queue | No                            | No               | Their mandir                                            | All                              |
-| Rota roles and shifts | See (for visible events)      | See              | Edit for their events                                   | All                              |
+| Table / action        | Visitor                       | Logged-in member | That mandir's admin                                     | Toran admin (with authenticator)                                                                   |
+| --------------------- | ----------------------------- | ---------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| See mandirs           | Listed only                   | Listed only      | + their hidden mandir                                   | All                                                                                                |
+| Edit a mandir         | No                            | No               | Practical details only (not name, town, region, status) | Everything                                                                                         |
+| Add a mandir          | No                            | No               | No                                                      | Yes                                                                                                |
+| See contact details   | No                            | No               | Their mandir                                            | All                                                                                                |
+| Claim a mandir        | No                            | For themselves   | For themselves                                          | Yes                                                                                                |
+| Approve a claim       | No                            | No               | No                                                      | Yes, from `/ops`, which lists pending claims with the claimant's email (`pending_mandir_claims()`) |
+| See events            | Published, at visible mandirs | Same             | + their drafts                                          | All                                                                                                |
+| Add or edit events    | No                            | No               | Their mandir only                                       | All                                                                                                |
+| Delete events         | Never (mark removed)          | Never            | Never                                                   | Never                                                                                              |
+| Festivals and dates   | See                           | See              | See                                                     | See and edit                                                                                       |
+| Sources, review queue | No                            | No               | Their mandir                                            | All                                                                                                |
+| Rota roles and shifts | See (for visible events)      | See              | Edit for their events                                   | All                                                                                                |
 
 "Confirmed by" on an event is always set to the person who confirmed it,
 whatever the app sends. A Toran admin without the authenticator step has no

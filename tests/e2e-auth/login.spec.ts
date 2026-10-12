@@ -1,18 +1,8 @@
-import { expect, test, type Page } from "@playwright/test";
-import { latestLoginLink, sql, totp } from "./helpers";
+import { expect, test } from "@playwright/test";
+import { latestLoginLink, logIn, sql, totp } from "./helpers";
 
 // Runs against a real local Supabase (see the Database workflow): real login
 // emails, real sessions, real second factor.
-
-async function logIn(page: Page, email: string, next = "/account") {
-  await page.goto(`/login?next=${encodeURIComponent(next)}`);
-  await page.getByLabel("Email address").fill(email);
-  await page.getByRole("button", { name: "Email me a login link" }).click();
-  await expect(
-    page.getByText("Check your email for a login link"),
-  ).toBeVisible();
-  await page.goto(await latestLoginLink(email));
-}
 
 test("a committee member logs in by email link and out again", async ({
   page,

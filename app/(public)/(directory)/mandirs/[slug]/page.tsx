@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Badge, LoadProblem } from "@/components/public-shell";
-import { Card } from "@/components/ui";
+import { Card, quietButtonClass } from "@/components/ui";
 import {
   getMandir,
   listMandirs,
@@ -98,10 +98,26 @@ export default async function MandirPage({
         <h2 className="text-xl font-bold">
           Are you on this mandir&apos;s committee?
         </h2>
-        <p className="text-muted">
-          Soon you&apos;ll be able to look after this page: add events in a
-          minute, correct any details, and organise your seva rota.
-        </p>
+        {mandir.status === "claimed" ? (
+          <p className="text-muted">
+            This page is looked after by the committee.{" "}
+            <Link href="/account" className="text-peacock underline">
+              Log in
+            </Link>{" "}
+            to update it, or ask to join them.
+          </p>
+        ) : (
+          <p className="text-muted">
+            Look after this page: add events in a minute and correct any
+            details.
+          </p>
+        )}
+        <Link
+          href={`/mandirs/${mandir.slug}/claim`}
+          className={`${quietButtonClass} self-start`}
+        >
+          Look after this page
+        </Link>
       </Card>
     </>
   );
