@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { createSessionClient } from "@/lib/supabase/session";
 
 export type CurrentUser = {
@@ -15,8 +16,11 @@ export type CurrentUser = {
 // trusting the cookie.
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   // Always a per-request read, even before the database is connected, so
-  // pages using this are never saved as static pages.
+  // pages using this are never saved as static pages. connection() also
+  // keeps it out of background prefetches, where Supabase's clock reads
+  // aren't allowed.
   await cookies();
+  await connection();
   const supabase = await createSessionClient();
   if (!supabase) return null;
 
