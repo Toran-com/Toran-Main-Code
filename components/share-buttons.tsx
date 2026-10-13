@@ -58,7 +58,7 @@ export function ShareButtons({
   return (
     <div
       role="group"
-      aria-label={`${label}: ${text}`}
+      aria-label={label === "Share" ? `Share: ${text}` : label}
       className="flex flex-wrap items-center gap-x-4 gap-y-2 text-base font-semibold"
     >
       <span className="text-muted" aria-hidden="true">

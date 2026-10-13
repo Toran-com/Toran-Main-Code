@@ -230,6 +230,14 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                       <EventButton intent="cancel">Cancel</EventButton>
                     </>
                   )}
+                  {event.status !== "cancelled" && (
+                    <Link
+                      href={`/manage/${mandir.slug}/seva/${event.id}`}
+                      className={`${quietButtonClass} px-4 py-2 text-base`}
+                    >
+                      Seva rota
+                    </Link>
+                  )}
                   <ConfirmButton
                     name="intent"
                     value="remove"

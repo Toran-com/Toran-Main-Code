@@ -378,6 +378,17 @@ email, a photo of a printed poster):
 The database records who published or discarded each poster and when, and
 a decision can't be changed afterwards.
 
+### Seva rota (committees)
+
+On their manage page, each event has **Seva rota**. The committee adds
+roles (Kitchen, Parking, Shoes; tick "Needs a DBS check" where it applies)
+and shifts with how many people each needs. **Send the rota** turns it into
+a WhatsApp message for the volunteers' own group, where people reply as
+they do now.
+
+Toran keeps **no volunteer names or numbers**. Public sign-up waits for ICO
+registration and the DPIA (decision 0006).
+
 ### Ready for Google (switched off until launch)
 
 Until launch every page says "don't list me", `/sitemap.xml` is empty and
