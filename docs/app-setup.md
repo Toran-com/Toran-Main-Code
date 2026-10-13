@@ -361,6 +361,22 @@ festival name. To see one before launch, paste a preview link into a
 WhatsApp chat with yourself. WhatsApp keeps a card for a while once it has
 fetched it, so a change may take a day to show on a link already shared.
 
+### Ready for Google (switched off until launch)
+
+Until launch every page says "don't list me", `/sitemap.xml` is empty and
+`/robots.txt` offers no sitemap. Admin pages (`/ops`, `/manage`, `/account`)
+are always off-limits to search engines. Each event on a mandir's page
+already carries the schema.org description Google uses for event listings.
+
+**At launch** (a decision for you and your partner, not before):
+
+1. In `lib/site.ts`, change `launched: false` to `launched: true` and merge.
+2. In [Google Search Console](https://search.google.com/search-console),
+   add the site, then submit `https://<your domain>/sitemap.xml`.
+3. Paste a mandir page with events into Google's
+   [Rich Results Test](https://search.google.com/test/rich-results) to check
+   its events are read.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL
