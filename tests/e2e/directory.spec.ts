@@ -62,3 +62,12 @@ test("before launch, robots.txt offers no sitemap and hides admin pages", async 
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).not.toContain("<url>");
 });
+
+test("the demo page works without a database", async ({ page }) => {
+  await page.goto("/demo");
+  await expect(page.getByText("This is a sample.")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Shree Sample Mandir",
+  );
+  await expect(page.getByText("Reply here if you can help.")).toBeVisible();
+});
