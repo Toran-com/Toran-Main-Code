@@ -302,6 +302,23 @@ contains Royal Mail data © Royal Mail copyright and database right; source:
 Office for National Statistics, licensed under the Open Government Licence
 v3.0." The "near you" pages will include this.
 
+### Admin tools (`/ops`)
+
+After your authenticator code, `/ops` has three tabs:
+
+- **Overview**: committee requests to approve, and map positions.
+- **Mandirs**: search every mandir, including hidden ones. Open one to:
+  - correct its details (changing the postcode updates the map position);
+  - hide it from the public site the same day a mandir asks;
+  - see who looks after its page and remove someone's access. When nobody
+    is left, the page can be claimed again.
+
+  **Add a mandir** creates a new public listing straight away.
+
+- **Festival dates**: once you've checked a date against a London panchang,
+  mark it checked and say where you checked it. Its "Date not yet checked"
+  label disappears from the public site.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL

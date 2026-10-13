@@ -52,3 +52,10 @@ test("claiming and managing a mandir need a login", async ({ page }) => {
   await page.goto("/manage/some-mandir");
   await expect(page).toHaveURL(/\/login\?next=%2Fmanage%2Fsome-mandir/);
 });
+
+test("the admin pages need a login", async ({ page }) => {
+  for (const path of ["/ops/mandirs", "/ops/mandirs/new", "/ops/festivals"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/login\?next=%2Fops/);
+  }
+});

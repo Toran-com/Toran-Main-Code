@@ -8,6 +8,7 @@ import {
   PageShell,
   quietButtonClass,
 } from "@/components/ui";
+import { OpsNav } from "@/components/ops-nav";
 import { getCurrentUser } from "@/lib/auth";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function OpsPage(props: PageProps<"/ops">) {
   return (
-    <PageShell title="Toran admin">
+    <PageShell title="Toran admin" wide>
       <Suspense fallback={<Loading />}>
         <Ops searchParams={props.searchParams} />
       </Suspense>
@@ -58,6 +59,7 @@ async function Ops({ searchParams }: Pick<PageProps<"/ops">, "searchParams">) {
 
   return (
     <>
+      <OpsNav current="/ops" />
       <p className="text-xl font-semibold">Unlocked.</p>
       {query.error === "claim" && (
         <Notice tone="error">

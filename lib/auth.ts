@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -47,4 +48,15 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     ),
     isToranAdmin: Boolean(adminRow),
   };
+}
+
+// For admin pages other than /ops itself: a Toran admin who has entered
+// their authenticator code. Everyone else gets "not found" (or the login
+// page), and an admin without the code is sent to /ops to enter it.
+export async function requireToranAdmin(path: string): Promise<CurrentUser> {
+  const user = await getCurrentUser();
+  if (!user) redirect(`/login?next=${encodeURIComponent(path)}`);
+  if (!user.isToranAdmin) notFound();
+  if (user.aal !== "aal2") redirect("/ops");
+  return user;
 }
