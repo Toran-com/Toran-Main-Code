@@ -5,13 +5,12 @@ import { Badge, LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading, Notice } from "@/components/ui";
 import { listFestivalDates, type FestivalDate } from "@/lib/directory";
 import { calendarLabel, formatDateRange, monthOf } from "@/lib/format";
-import { pageTitle } from "@/lib/site";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: pageTitle("Festivals"),
-  description:
-    "Dates of Navratri, Diwali, Holi and other Hindu festivals in the UK.",
-};
+export const metadata: Metadata = pageMetadata(
+  "Festivals",
+  "Dates of Navratri, Diwali, Holi and other Hindu festivals in the UK.",
+);
 
 export default function FestivalsPage() {
   return (

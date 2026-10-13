@@ -4,12 +4,12 @@ import { DirectoryList } from "@/components/directory-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading, Notice } from "@/components/ui";
 import { listMandirs } from "@/lib/directory";
-import { pageTitle } from "@/lib/site";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: pageTitle("Mandirs"),
-  description: "Hindu mandirs across the UK, by region and town.",
-};
+export const metadata: Metadata = pageMetadata(
+  "Mandirs",
+  "Hindu mandirs across the UK, by region and town.",
+);
 
 export default function MandirsPage() {
   return (

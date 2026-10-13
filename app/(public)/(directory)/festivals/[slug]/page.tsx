@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EventList } from "@/components/event-list";
 import { Badge, LoadProblem } from "@/components/public-shell";
+import { ShareButtons } from "@/components/share-buttons";
 import { getFestival, listFestivals } from "@/lib/directory";
 import { mentionsFestival } from "@/lib/festival-words";
 import { calendarLabel, formatDateRange, londonDate } from "@/lib/format";
-import { pageTitle } from "@/lib/site";
+import { pageMetadata, pageTitle } from "@/lib/site";
 import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
 
@@ -30,10 +31,10 @@ export async function generateMetadata({
   if (result.state !== "ok" || !result.data) return { title: pageTitle() };
   const { name, dates } = result.data;
   const year = dates[0]?.starts_on.slice(0, 4);
-  return {
-    title: pageTitle(`${name}${year ? ` ${year}` : ""} in the UK`),
-    description: `${name} dates for the UK and events at mandirs near you.`,
-  };
+  return pageMetadata(
+    `${name}${year ? ` ${year}` : ""} in the UK`,
+    `${name} dates for the UK and events at mandirs near you.`,
+  );
 }
 
 export default async function FestivalPage({
@@ -76,6 +77,11 @@ export default async function FestivalPage({
         {festival.summary && (
           <p className="text-muted max-w-prose text-lg">{festival.summary}</p>
         )}
+        <ShareButtons
+          label="Share this festival"
+          text={`${festival.name} in the UK: dates and events at mandirs`}
+          path={`/festivals/${festival.slug}`}
+        />
       </div>
 
       {festival.dates.length ? (
