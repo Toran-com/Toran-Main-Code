@@ -361,6 +361,23 @@ festival name. To see one before launch, paste a preview link into a
 WhatsApp chat with yourself. WhatsApp keeps a card for a while once it has
 fetched it, so a change may take a day to show on a link already shared.
 
+### Forwarded posters (`/ops` → Posters)
+
+When someone forwards a poster or message about a mandir's event (WhatsApp,
+email, a photo of a printed poster):
+
+1. On **Posters**, choose the mandir, copy the event details in and say
+   where it came from. **Only the event**: never the name or phone number of
+   whoever sent it. The poster image itself isn't kept.
+2. **If the mandir has a committee**, it waits on their manage page under
+   "Posters waiting for you". Publishing it there marks it "Confirmed by the
+   mandir"; "Not right" discards it.
+3. **If nobody looks after the mandir yet**, you can publish it yourself. It
+   appears without the "Confirmed by the mandir" label.
+
+The database records who published or discarded each poster and when, and
+a decision can't be changed afterwards.
+
 ### Ready for Google (switched off until launch)
 
 Until launch every page says "don't list me", `/sitemap.xml` is empty and

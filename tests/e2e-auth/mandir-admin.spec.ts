@@ -118,6 +118,36 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   ).toBeVisible();
   await expect(member.getByText("0116 000 0000")).toBeVisible();
 
+  // Toran types up a poster someone forwarded; the committee publishes it.
+  await admin.goto("/ops/posters");
+  await admin.getByRole("combobox", { name: /^Mandir/ }).selectOption(SLUG);
+  await admin.getByLabel("What's happening?").fill("Sharad Purnima garba");
+  await admin.getByLabel("Date").fill(nextWeek());
+  await admin.getByLabel("Starts").fill("20:00");
+  await admin.getByRole("button", { name: "Add to the queue" }).click();
+  await expect(admin.getByText("Added to the queue.")).toBeVisible();
+  const queued = admin
+    .getByRole("listitem")
+    .filter({ hasText: "Sharad Purnima garba" });
+  await expect(queued).toContainText("Waiting for the committee");
+  await expect(queued.getByRole("button", { name: "Publish" })).toHaveCount(0);
+
+  await member.goto(`/manage/${SLUG}`);
+  await expect(member.getByText("Posters waiting for you")).toBeVisible();
+  await member
+    .getByRole("listitem")
+    .filter({ hasText: "Sharad Purnima garba" })
+    .getByRole("button", { name: "Publish" })
+    .click();
+  await expect(
+    member.getByText("Published. It's on your public page"),
+  ).toBeVisible();
+  await expect(member.getByText("Posters waiting for you")).toHaveCount(0);
+  await member.goto(`/mandirs/${SLUG}`);
+  await expect(
+    member.getByRole("article").filter({ hasText: "Sharad Purnima garba" }),
+  ).toContainText("Confirmed by the mandir");
+
   // Removing an event asks first.
   await member.goto(`/manage/${SLUG}`);
   let asked = "";

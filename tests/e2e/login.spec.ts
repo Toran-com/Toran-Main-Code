@@ -54,7 +54,12 @@ test("claiming and managing a mandir need a login", async ({ page }) => {
 });
 
 test("the admin pages need a login", async ({ page }) => {
-  for (const path of ["/ops/mandirs", "/ops/mandirs/new", "/ops/festivals"]) {
+  for (const path of [
+    "/ops/mandirs",
+    "/ops/mandirs/new",
+    "/ops/posters",
+    "/ops/festivals",
+  ]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login\?next=%2Fops/);
   }
