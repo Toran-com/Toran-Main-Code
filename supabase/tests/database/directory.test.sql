@@ -1,13 +1,15 @@
 -- The starting directory and festival dates load, and visitors can see them.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(7);
+select plan(8);
 
 select is((select count(*)::int from public.mandirs), 106, 'the starting directory has 106 mandirs');
 select is((select count(*)::int from public.mandirs where status <> 'listed'), 0,
   'every starting mandir is listed and unclaimed');
 select is((select count(distinct lower(name || town))::int from public.mandirs), 106,
   'no mandir is listed twice');
+select ok((select count(*) from public.mandirs where postcode is not null) >= 77,
+  'most mandirs have a postcode, so they can be found by distance');
 select is((select count(*)::int from public.festival_dates where verified), 0,
   'no festival date is marked checked yet');
 select is((select count(*)::int from public.festival_dates where source is null), 0,
