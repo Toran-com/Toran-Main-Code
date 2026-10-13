@@ -57,6 +57,10 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   const event = member.getByRole("article").filter({ hasText: "Annakut" });
   await expect(event).toContainText("6:30pm");
   await expect(event).toContainText("Confirmed by the mandir");
+  const whatsApp = await event
+    .getByRole("link", { name: "WhatsApp" })
+    .getAttribute("href");
+  expect(decodeURIComponent(whatsApp!)).toContain(`Annakut darshan at ${NAME}`);
   await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
 
   // And on What's on, under the mandir's name.

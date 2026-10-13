@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Badge } from "@/components/public-shell";
+import { ShareButtons } from "@/components/share-buttons";
 import { formatEventStart } from "@/lib/format";
 import { formatMiles } from "@/lib/geo";
 import { describeRule } from "@/lib/recurrence";
+import { eventPath, eventShareText } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";
 import { groupByDay } from "@/lib/whats-on-view";
 
@@ -53,6 +55,12 @@ export function EventList({
                     </span>
                   </p>
                   {e.summary && <p className="text-muted">{e.summary}</p>}
+                  {e.status !== "cancelled" && (
+                    <ShareButtons
+                      text={eventShareText(e, e.mandir)}
+                      path={eventPath(e.mandir.slug, e.id)}
+                    />
+                  )}
                 </article>
               </li>
             ))}

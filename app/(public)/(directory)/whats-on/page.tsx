@@ -6,15 +6,14 @@ import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
 import { REGIONS } from "@/lib/mandir-form";
-import { pageTitle } from "@/lib/site";
+import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
 import { nearTo, RADII, radiusFrom } from "@/lib/whats-on-view";
 
-export const metadata: Metadata = {
-  title: pageTitle("What's on"),
-  description:
-    "Events at Hindu mandirs across the UK in the next eight weeks: festivals, aarti, bhajans, classes and more.",
-};
+export const metadata: Metadata = pageMetadata(
+  "What's on",
+  "Events at Hindu mandirs across the UK in the next eight weeks: festivals, aarti, bhajans, classes and more.",
+);
 
 export default function WhatsOnPage(props: PageProps<"/whats-on">) {
   return (

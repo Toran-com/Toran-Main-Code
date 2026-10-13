@@ -14,3 +14,14 @@ test("text is at least 18px", async ({ page }) => {
     .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
   expect(size).toBeGreaterThanOrEqual(18);
 });
+
+test("shared links get a preview picture", async ({ page, request }) => {
+  await page.goto("/");
+  const image = await page
+    .locator('meta[property="og:image"]')
+    .getAttribute("content");
+  expect(image).toBeTruthy();
+  const response = await request.get(new URL(image!).pathname);
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toBe("image/png");
+});

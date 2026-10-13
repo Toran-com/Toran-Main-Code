@@ -348,6 +348,19 @@ After your authenticator code, `/ops` has three tabs:
 A repeating event shows once, at its next date, labelled "Every Saturday".
 New and changed events show on these pages straight away.
 
+### Sharing on WhatsApp
+
+Every event, mandir page and festival page has **Share: WhatsApp · Copy
+link** (on a phone, "Other apps" opens the phone's own share menu). WhatsApp
+opens with the message ready, for example "Diwali celebrations at Reading
+Hindu Temple, Reading: Sun 8 Nov, 6:30pm" and the link, which goes
+straight to that event on the mandir's page.
+
+Shared links show a preview card with the toran garland and the mandir or
+festival name. To see one before launch, paste a preview link into a
+WhatsApp chat with yourself. WhatsApp keeps a card for a while once it has
+fetched it, so a change may take a day to show on a link already shared.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL
