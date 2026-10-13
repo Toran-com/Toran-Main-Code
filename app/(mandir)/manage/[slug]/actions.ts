@@ -101,6 +101,7 @@ export async function addEvent(formData: FormData) {
     if (datesError) back("error=failed");
   }
   updateTag(`mandir:${mandir.slug}`);
+  updateTag("events");
   back("added=1");
 }
 
@@ -146,6 +147,7 @@ export async function changeEvent(formData: FormData) {
     .maybeSingle();
   if (error || !data) back("error=failed");
   if (data!.mandir) updateTag(`mandir:${data!.mandir.slug}`);
+  updateTag("events");
   back(`done=${intent}`);
 }
 

@@ -20,6 +20,9 @@ export default function ComingSoon() {
         </p>
       </div>
       <nav aria-label="Explore" className="flex flex-wrap gap-3">
+        <Link href="/whats-on" className={quietButtonClass}>
+          What&apos;s on
+        </Link>
         <Link href="/mandirs" className={quietButtonClass}>
           Browse mandirs
         </Link>

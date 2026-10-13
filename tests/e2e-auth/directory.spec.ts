@@ -52,3 +52,14 @@ test("upcoming festival dates show, marked not yet checked", async ({
   await expect(first).toContainText(/(19|20)\d\d/);
   await expect(first).toContainText("Date not yet checked");
 });
+
+test("a festival card opens the festival's own page", async ({ page }) => {
+  await page.goto("/festivals");
+  const first = page.getByRole("article").first();
+  const name = (await first.getByRole("link").first().textContent())?.trim();
+  await first.getByRole("link").first().click();
+  await expect(page).toHaveURL(/\/festivals\/[a-z0-9-]+$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(name!);
+  await expect(page.getByText(/(19|20)\d\d/).first()).toBeVisible();
+  await expect(page.getByText("Date not yet checked").first()).toBeVisible();
+});

@@ -59,6 +59,12 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(event).toContainText("Confirmed by the mandir");
   await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
 
+  // And on What's on, under the mandir's name.
+  await member.goto("/whats-on");
+  await expect(
+    member.getByRole("article").filter({ hasText: "Annakut darshan" }),
+  ).toContainText(NAME);
+
   // A weekly event shows once, with its next date.
   await member.goto(`/manage/${SLUG}`);
   await member.getByLabel("What's happening?").fill("Weekly aarti");
