@@ -24,7 +24,7 @@ export function OpsNav({
               aria-current={href === current ? "page" : undefined}
               className={`inline-block rounded-full border px-4 py-1.5 text-base font-semibold ${
                 href === current
-                  ? "border-peacock bg-peacock text-white"
+                  ? "border-peacock bg-peacock text-on-peacock"
                   : "border-line hover:bg-sunk"
               }`}
             >
