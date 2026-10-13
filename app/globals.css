@@ -11,6 +11,7 @@
   --muted: #5d5a6e;
   --line: rgba(27, 26, 44, 0.12);
   --peacock: #0b6b68;
+  --on-peacock: #ffffff;
   --marigold: #f0a00a;
   --marigold-ink: #8a5a00;
   --kumkum: #c21e3a;
@@ -26,6 +27,8 @@
     --muted: #a6a3bc;
     --line: rgba(237, 234, 245, 0.12);
     --peacock: #3cc6bf;
+    /* Bright teal needs dark text to be readable (WCAG AA). */
+    --on-peacock: #0d1120;
     --marigold: #ffb627;
     --marigold-ink: #ffc95c;
     --kumkum: #ff5c77;
@@ -41,6 +44,7 @@
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-peacock: var(--peacock);
+  --color-on-peacock: var(--on-peacock);
   --color-marigold: var(--marigold);
   --color-marigold-ink: var(--marigold-ink);
   --color-kumkum: var(--kumkum);

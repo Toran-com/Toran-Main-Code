@@ -51,6 +51,11 @@ applies every migration, runs the database security tests
 to date, and runs the browser tests that need real logins and data
 (`tests/e2e-auth/`). Locally that needs Docker; see `supabase/README.md`.
 
+Both sets of browser tests check pages for accessibility (WCAG 2.2 AA, with
+[axe](https://github.com/dequelabs/axe-core)) in light and dark mode:
+public pages, a committee's pages and the admin area. A colour, label or
+heading that fails stops the merge. `tests/a11y.ts` has the check.
+
 Dependabot opens a pull request each week for package updates and each
 month for GitHub Actions updates.
 

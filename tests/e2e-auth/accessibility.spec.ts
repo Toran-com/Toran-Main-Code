@@ -1,0 +1,70 @@
+import { expect, test } from "@playwright/test";
+import { expectAccessible } from "../a11y";
+import { logIn, logInAsAdmin, sql } from "./helpers";
+
+// Every kind of page, with real data, meets WCAG 2.2 AA in light and dark
+// mode: public pages, a committee's pages and the admin area.
+
+test("public pages are accessible", async ({ page }) => {
+  test.setTimeout(90_000);
+  for (const path of [
+    "/mandirs",
+    "/mandirs/geeta-bhavan-leicester",
+    "/mandirs/geeta-bhavan-leicester/claim",
+    "/festivals",
+    "/whats-on",
+    "/whats-on?near=ZZ99&within=15",
+    "/login",
+  ]) {
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+    await expectAccessible(page);
+  }
+  // A festival's own page.
+  await page.goto("/festivals");
+  await page.getByRole("article").first().getByRole("link").first().click();
+  await expect(page).toHaveURL(/\/festivals\/[a-z0-9-]+$/);
+  await expectAccessible(page);
+});
+
+test("a committee's pages are accessible", async ({ page }) => {
+  test.setTimeout(90_000);
+  const slug = "bedford-hindu-temple-and-community-trust";
+  const email = `a11y-committee-${Date.now()}@example.com`;
+  await logIn(page, email);
+  await expectAccessible(page);
+  sql(
+    `insert into public.mandir_admins (mandir_id, user_id)
+       select m.id, u.id from public.mandirs m, auth.users u
+       where m.slug = '${slug}' and u.email = '${email}'`,
+  );
+  const event = sql(
+    `insert into public.events (mandir_id, title, starts_at, status)
+       select id, 'Accessibility check', now() + interval '3 days', 'published'
+       from public.mandirs where slug = '${slug}'
+       returning id`,
+  );
+  await page.goto(`/manage/${slug}`);
+  await expect(page.getByText("Accessibility check")).toBeVisible();
+  await expectAccessible(page);
+  await page.goto(`/manage/${slug}/seva/${event}`);
+  await expectAccessible(page);
+});
+
+test("the admin area is accessible", async ({ page }) => {
+  test.setTimeout(120_000);
+  await logInAsAdmin(page, `a11y-admin-${Date.now()}@example.com`);
+  for (const path of [
+    "/ops",
+    "/ops/mandirs",
+    "/ops/mandirs/new",
+    "/ops/mandirs/geeta-bhavan-leicester",
+    "/ops/posters",
+    "/ops/festivals",
+    "/ops/digest",
+  ]) {
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+    await expectAccessible(page);
+  }
+});

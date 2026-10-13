@@ -62,7 +62,7 @@ export const inputClass =
   "border-line bg-surface focus:outline-peacock w-full rounded-xl border px-4 py-3 text-lg focus:outline-2";
 
 export const buttonClass =
-  "bg-peacock w-full rounded-xl px-5 py-3 text-lg font-semibold text-white hover:opacity-90 disabled:opacity-60";
+  "bg-peacock w-full rounded-xl px-5 py-3 text-lg font-semibold text-on-peacock hover:opacity-90 disabled:opacity-60";
 
 export const quietButtonClass =
   "border-line text-ink hover:bg-sunk rounded-xl border px-5 py-3 text-lg font-semibold";
