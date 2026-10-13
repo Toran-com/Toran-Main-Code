@@ -2,67 +2,24 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { londonDate, londonToUtc } from "@/lib/format";
+import { checkEvent, eventInputFrom } from "@/lib/event-form";
+import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
 import { parsePracticalDetails } from "@/lib/mandir-form";
-import {
-  occurrenceDates,
-  type Repeat,
-  toRule,
-  weekOfMonth,
-} from "@/lib/recurrence";
+import { reviewPoster } from "@/lib/poster-review";
 import { createSessionClient } from "@/lib/supabase/session";
 
 // Changes a mandir admin makes to their mandir's events. The database's
 // row-level security decides who may change what; these actions check the
 // form and refresh the public pages afterwards.
 
-const DAY_MS = 86_400_000;
-
 export async function addEvent(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
-  const title = String(formData.get("title") ?? "").trim();
-  const date = String(formData.get("date") ?? "");
-  const time = String(formData.get("time") ?? "");
-  const summary = String(formData.get("summary") ?? "").trim();
-  const repeatChoice = String(formData.get("repeat") ?? "none");
-  const untilInput = String(formData.get("until") ?? "");
   const back: (query: string) => never = (query) =>
     redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
 
-  if (title.length < 2 || title.length > 120) back("error=title");
-  if (summary.length > 280) back("error=summary");
-  const today = londonDate();
-  const latest = londonDate(new Date(Date.now() + 2 * 366 * DAY_MS));
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < today || date > latest) {
-    back("error=date");
-  }
-  const allDay = time === "";
-  const startsAt = londonToUtc(date, allDay ? "00:00" : time);
-  if (!startsAt) back(allDay ? "error=date" : "error=time");
-
-  // Repeating: every date is worked out now, up to a year ahead.
-  let rule: string | null = null;
-  let dates = [date];
-  if (repeatChoice !== "none") {
-    const repeat = repeatFromChoice(repeatChoice, date);
-    if (!repeat) back("error=repeat");
-    const first = new Date(`${date}T00:00:00Z`).getTime();
-    const until =
-      untilInput || new Date(first + 182 * DAY_MS).toISOString().slice(0, 10);
-    const lastAllowed = new Date(first + 366 * DAY_MS)
-      .toISOString()
-      .slice(0, 10);
-    if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(until) ||
-      until <= date ||
-      until > lastAllowed
-    ) {
-      back("error=until");
-    }
-    rule = toRule(repeat, date, until);
-    dates = occurrenceDates(rule, date);
-  }
+  const checked = checkEvent(eventInputFrom(formData));
+  if (!checked.ok) back(`error=${checked.error}`);
 
   const supabase = await createSessionClient();
   if (!supabase) back("error=failed");
@@ -73,47 +30,14 @@ export async function addEvent(formData: FormData) {
     .maybeSingle();
   if (!mandir) back("error=failed");
 
-  const { data: event, error } = await supabase
-    .from("events")
-    .insert({
-      mandir_id: mandir.id,
-      title,
-      summary: summary || null,
-      starts_at: startsAt.toISOString(),
-      all_day: allDay,
-      recurrence: rule,
-      status: "published",
-      // Adding it is confirming it; the database records who did.
-      confirmed_at: new Date().toISOString(),
-    })
-    .select("id")
-    .single();
-  if (error || !event) back("error=failed");
-
-  if (rule) {
-    const rows = dates.flatMap((d) => {
-      const at = londonToUtc(d, allDay ? "00:00" : time);
-      return at ? [{ event_id: event.id, starts_at: at.toISOString() }] : [];
-    });
-    const { error: datesError } = await supabase
-      .from("event_occurrences")
-      .insert(rows);
-    if (datesError) back("error=failed");
-  }
+  // Adding it is confirming it.
+  const id = await saveEvent(supabase, mandir.id, checked.event, {
+    confirmed: true,
+  });
+  if (!id) back("error=failed");
   updateTag(`mandir:${mandir.slug}`);
   updateTag("events");
   back("added=1");
-}
-
-function repeatFromChoice(choice: string, date: string): Repeat | null {
-  if (choice === "weekly") return { kind: "weekly", interval: 1 };
-  if (choice === "fortnightly") return { kind: "weekly", interval: 2 };
-  if (choice === "monthly") {
-    const { week } = weekOfMonth(date);
-    return { kind: "monthly", week: week >= 5 ? -1 : (week as 1 | 2 | 3 | 4) };
-  }
-  if (choice === "monthly-last") return { kind: "monthly", week: -1 };
-  return null;
 }
 
 const CHANGES = {
@@ -191,4 +115,29 @@ export async function updatePracticalDetails(formData: FormData) {
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");
   back("done=details");
+}
+
+// The committee publishes a poster someone forwarded to Toran (which
+// confirms it), or says it's not right.
+export async function reviewPosterAsCommittee(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const claimId = String(formData.get("poster") ?? "");
+  const decision =
+    formData.get("decision") === "publish" ? "publish" : "discard";
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const result = await reviewPoster(supabase, claimId, decision, "committee");
+  if (!result.ok) {
+    back(
+      `error=${result.error === "done" || result.error === "failed" ? result.error : "poster"}`,
+    );
+  }
+  if (decision === "publish") {
+    updateTag(`mandir:${result.slug}`);
+    updateTag("events");
+  }
+  back(`done=${decision === "publish" ? "published" : "discarded"}`);
 }
