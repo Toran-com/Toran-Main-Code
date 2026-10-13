@@ -389,6 +389,16 @@ they do now.
 Toran keeps **no volunteer names or numbers**. Public sign-up waits for ICO
 registration and the DPIA (decision 0006).
 
+### Weekly digest preview (`/ops` → Digest)
+
+Shows what the weekly email would say: every event in the next seven days,
+by day, and festivals in the next fortnight, for the whole UK or one region.
+There's a plain-text version to copy.
+
+**Nobody receives it yet.** There's no sign-up form or subscriber list until
+Toran is registered with the ICO and the DPIA is done (decision 0006).
+Sending it for real is a later step.
+
 ### Ready for Google (switched off until launch)
 
 Until launch every page says "don't list me", `/sitemap.xml` is empty and
