@@ -56,6 +56,13 @@ Both sets of browser tests check pages for accessibility (WCAG 2.2 AA, with
 public pages, a committee's pages and the admin area. A colour, label or
 heading that fails stops the merge. `tests/a11y.ts` has the check.
 
+They also keep to a **speed budget** (`tests/speed.ts`): at most 250 KB of
+JavaScript and 350 KB in all per page, as sent over the network, because
+many visitors are on older phones and mobile data.
+
+Backups, and the restore drill to practise every three months, are in
+`docs/backup-and-restore.md`.
+
 Dependabot opens a pull request each week for package updates and each
 month for GitHub Actions updates.
 
