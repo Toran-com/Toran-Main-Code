@@ -64,7 +64,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByLabel("What's happening?").fill("Weekly aarti");
   await member.getByLabel("Date").fill(nextWeek());
   await member.getByLabel("Starts").fill("19:00");
-  await member.getByLabel("Repeats", { exact: true }).selectOption("weekly");
+  await member
+    .getByRole("combobox", { name: /^Repeats/ })
+    .selectOption("weekly");
   await member.getByRole("button", { name: "Add event" }).click();
   await expect(member.getByText("Added.")).toBeVisible();
   await expect(
