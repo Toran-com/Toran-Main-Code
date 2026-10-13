@@ -277,6 +277,11 @@ What it adds:
    start time). Each event has "Still on", "Cancel" and "Remove" buttons.
    Changes show on the public page straight away.
 
+Events can repeat: every week, every other week, or once a month (for
+example the second Saturday, or the last Friday). Each repeating event
+shows once on the public page with its next date. Repeats run for six
+months by default, or up to a year.
+
 Committees can also correct their mandir's postcode, website and phone
 number on the same page; the name and town stay with you. Removing an event
 asks "Are you sure?" first.

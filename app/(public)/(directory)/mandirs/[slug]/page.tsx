@@ -11,6 +11,7 @@ import {
   type MandirEvent,
 } from "@/lib/directory";
 import { formatEventStart, websiteLabel } from "@/lib/format";
+import { describeRule } from "@/lib/recurrence";
 import { pageTitle } from "@/lib/site";
 
 // Every mandir page is fully static. A mandir added after the build is
@@ -194,7 +195,8 @@ function EventCard({ event }: { event: MandirEvent }) {
   return (
     <article className="border-line bg-surface flex flex-col gap-2 rounded-2xl border p-5">
       <p className="text-marigold-ink font-semibold">
-        {formatEventStart(event.starts_at, event.all_day)}
+        {event.recurrence && `${describeRule(event.recurrence)} · next `}
+        {formatEventStart(event.next_starts_at, event.all_day)}
       </p>
       <h3 className={`text-xl font-bold ${cancelled ? "line-through" : ""}`}>
         {event.title}

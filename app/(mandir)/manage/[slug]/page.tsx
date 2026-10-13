@@ -13,7 +13,9 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { getCurrentUser } from "@/lib/auth";
+import { upcomingFilter, withNextStart } from "@/lib/events";
 import { formatEventStart, londonDate } from "@/lib/format";
+import { describeRule } from "@/lib/recurrence";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { ConfirmButton } from "@/components/confirm-button";
@@ -31,6 +33,9 @@ const ERRORS: Record<string, string> = {
   summary: "Please keep the description under 280 characters.",
   date: "Please choose a date from today onwards, within the next two years.",
   time: "Please choose a valid start time, or leave it empty for all day.",
+  repeat: "Please choose how often it repeats.",
+  until:
+    "Please choose an end date after the first date, and within a year of it.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -76,14 +81,19 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     .maybeSingle();
   if (!admin && !(user.isToranAdmin && user.aal === "aal2")) notFound();
 
-  const { data: events } = await supabase!
+  const from = `${londonDate()}T00:00:00Z`;
+  const { data: rows } = await supabase!
     .from("events")
-    .select("id, title, summary, starts_at, all_day, status, confirmed_at")
+    .select(
+      "id, title, summary, starts_at, all_day, status, confirmed_at, recurrence, event_occurrences (starts_at, cancelled)",
+    )
     .eq("mandir_id", mandir.id)
     .neq("status", "removed")
-    .gte("starts_at", `${londonDate()}T00:00:00Z`)
+    .or(upcomingFilter(from))
+    .gte("event_occurrences.starts_at", from)
     .order("starts_at")
     .limit(100);
+  const events = withNextStart(rows ?? [], from);
 
   const query = await searchParams;
   const error = ERRORS[String(query.error ?? "")];
@@ -141,6 +151,30 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           <p className="text-muted -mt-3 text-base">
             Leave the start time empty for an all-day event.
           </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">Repeats</span>
+              <select name="repeat" defaultValue="none" className={inputClass}>
+                <option value="none">Doesn&apos;t repeat</option>
+                <option value="weekly">Every week</option>
+                <option value="fortnightly">Every other week</option>
+                <option value="monthly">
+                  Once a month (e.g. 2nd Saturday)
+                </option>
+                <option value="monthly-last">
+                  Once a month, the last one (e.g. last Friday)
+                </option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">Repeats until</span>
+              <input name="until" type="date" className={inputClass} />
+            </label>
+          </div>
+          <p className="text-muted -mt-3 text-base">
+            For repeating events, leave &ldquo;until&rdquo; empty for six
+            months. Up to a year.
+          </p>
           <details className="flex flex-col gap-2">
             <summary className="cursor-pointer font-semibold">
               Add a short description (optional)
@@ -173,7 +207,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               >
                 <div className="flex flex-col gap-1">
                   <p className="text-marigold-ink font-semibold">
-                    {formatEventStart(event.starts_at, event.all_day)}
+                    {event.recurrence && (
+                      <span className="text-ink">
+                        {describeRule(event.recurrence)} · next{" "}
+                      </span>
+                    )}
+                    {formatEventStart(event.next_starts_at, event.all_day)}
                   </p>
                   <p className="text-xl font-bold">{event.title}</p>
                   {event.status === "cancelled" && (

@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { Database } from "@/lib/database.types";
+import { upcomingFilter, withNextStart } from "@/lib/events";
 import { londonDate } from "@/lib/format";
 import { createPublicServerClient } from "@/lib/supabase/server";
 
@@ -54,7 +55,8 @@ export type MandirEvent = Pick<
   | "link"
   | "status"
   | "confirmed_at"
->;
+  | "recurrence"
+> & { next_starts_at: string };
 
 export type MandirDetails = Pick<
   Row<"mandirs">,
@@ -109,19 +111,23 @@ export async function getMandir(
   if (error) return settle<never>(unavailable);
   if (!mandir) return settle({ state: "ok", data: null });
 
-  // Events from the start of today (UK) onwards. Cached for an hour, so an
-  // event can linger up to an hour after its day ends.
-  const { data: events, error: eventsError } = await db
+  // Events from the start of today (UK) onwards, repeating ones by their
+  // next date. Cached for an hour, so an event can linger up to an hour
+  // after its day ends.
+  const from = `${londonDate()}T00:00:00Z`;
+  const { data: rows, error: eventsError } = await db
     .from("events")
     .select(
-      "id, title, kind, summary, starts_at, ends_at, all_day, location_note, cost_note, link, status, confirmed_at",
+      "id, title, kind, summary, starts_at, ends_at, all_day, location_note, cost_note, link, status, confirmed_at, recurrence, event_occurrences (starts_at, cancelled)",
     )
     .eq("mandir_id", mandir.id)
-    .gte("starts_at", `${londonDate()}T00:00:00Z`)
+    .or(upcomingFilter(from))
+    .gte("event_occurrences.starts_at", from)
     .order("starts_at")
-    .limit(50);
+    .limit(100);
   if (eventsError) return settle<never>(unavailable);
 
+  const events = withNextStart(rows, from).slice(0, 50);
   return settle({ state: "ok", data: { ...mandir, events } });
 }
 
