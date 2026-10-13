@@ -12,6 +12,7 @@ import type { Loaded } from "@/lib/directory";
 export type ListedEvent = {
   id: string;
   title: string;
+  title_gu: string | null;
   summary: string | null;
   all_day: boolean;
   status: string;
@@ -51,7 +52,7 @@ export async function listUpcomingEvents(): Promise<Loaded<ListedEvent[]>> {
   const { data, error } = await db
     .from("events")
     .select(
-      "id, title, summary, starts_at, all_day, status, recurrence, link, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), event_occurrences (starts_at, cancelled)",
+      "id, title, title_gu, summary, starts_at, all_day, status, recurrence, link, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), event_occurrences (starts_at, cancelled)",
     )
     .in("status", ["published", "cancelled"])
     .or(upcomingFilter(from))

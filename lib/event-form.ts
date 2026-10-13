@@ -12,7 +12,8 @@ import {
 
 const DAY_MS = 86_400_000;
 
-// What the forms send, as text. Also what a poster in the queue stores.
+// What the forms send, as text. Also what a poster in the queue stores
+// (posters don't carry the Gujarati, so it's optional).
 export type EventInput = {
   title: string;
   date: string;
@@ -20,14 +21,26 @@ export type EventInput = {
   summary: string;
   repeat: string;
   until: string;
+  title_gu?: string;
+  summary_gu?: string;
 };
 
 export type EventError =
-  "title" | "summary" | "date" | "time" | "repeat" | "until";
+  | "title"
+  | "summary"
+  | "titleGu"
+  | "summaryGu"
+  | "date"
+  | "time"
+  | "repeat"
+  | "until";
 
 export type CheckedEvent = {
   title: string;
   summary: string | null;
+  // The same in Gujarati, if given.
+  titleGu: string | null;
+  summaryGu: string | null;
   allDay: boolean;
   startsAt: Date;
   rule: string | null;
@@ -55,6 +68,8 @@ export function eventInputFrom(source: {
     summary: text("summary"),
     repeat: text("repeat") || "none",
     until: text("until"),
+    title_gu: text("title_gu"),
+    summary_gu: text("summary_gu"),
   };
 }
 
@@ -66,6 +81,12 @@ export function checkEvent(
   const { title, date, time, summary } = input;
   if (title.length < 2 || title.length > 120) return fail("title");
   if (summary.length > 280) return fail("summary");
+  const titleGu = input.title_gu?.trim() ?? "";
+  const summaryGu = input.summary_gu?.trim() ?? "";
+  if (titleGu && (titleGu.length < 2 || titleGu.length > 120)) {
+    return fail("titleGu");
+  }
+  if (summaryGu.length > 280) return fail("summaryGu");
   const today = londonDate(now);
   const latest = londonDate(new Date(now.getTime() + 2 * 366 * DAY_MS));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < today || date > latest) {
@@ -106,6 +127,8 @@ export function checkEvent(
     event: {
       title,
       summary: summary || null,
+      titleGu: titleGu || null,
+      summaryGu: summaryGu || null,
       allDay,
       startsAt,
       rule,
@@ -129,6 +152,8 @@ function repeatFromChoice(choice: string, date: string): Repeat | null {
 export const EVENT_ERRORS: Record<EventError, string> = {
   title: "Please give the event a name (2 to 120 characters).",
   summary: "Please keep the description under 280 characters.",
+  titleGu: "Please keep the Gujarati name between 2 and 120 characters.",
+  summaryGu: "Please keep the Gujarati description under 280 characters.",
   date: "Please choose a date from today onwards, within the next two years.",
   time: "Please choose a valid start time, or leave it empty for all day.",
   repeat: "Please choose how often it repeats.",

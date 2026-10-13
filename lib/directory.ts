@@ -45,8 +45,10 @@ export type MandirEvent = Pick<
   Row<"events">,
   | "id"
   | "title"
+  | "title_gu"
   | "kind"
   | "summary"
+  | "summary_gu"
   | "starts_at"
   | "ends_at"
   | "all_day"
@@ -118,7 +120,7 @@ export async function getMandir(
   const { data: rows, error: eventsError } = await db
     .from("events")
     .select(
-      "id, title, kind, summary, starts_at, ends_at, all_day, location_note, cost_note, link, status, confirmed_at, recurrence, event_occurrences (starts_at, cancelled)",
+      "id, title, title_gu, kind, summary, summary_gu, starts_at, ends_at, all_day, location_note, cost_note, link, status, confirmed_at, recurrence, event_occurrences (starts_at, cancelled)",
     )
     .eq("mandir_id", mandir.id)
     .or(upcomingFilter(from))

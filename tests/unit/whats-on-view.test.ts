@@ -15,6 +15,7 @@ const event = (
 ): ListedEvent => ({
   id,
   title: id,
+  title_gu: null,
   summary: null,
   all_day: false,
   status: "published",

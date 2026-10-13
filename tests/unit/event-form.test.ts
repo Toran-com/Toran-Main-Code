@@ -86,6 +86,52 @@ describe("eventInputFrom", () => {
       summary: "",
       repeat: "none",
       until: "",
+      title_gu: "",
+      summary_gu: "",
+    });
+  });
+
+  it("reads the Gujarati fields", () => {
+    const form = new FormData();
+    form.set("title_gu", " દિવાળી ");
+    form.set("summary_gu", "સૌનું સ્વાગત છે.");
+    expect(eventInputFrom(form)).toMatchObject({
+      title_gu: "દિવાળી",
+      summary_gu: "સૌનું સ્વાગત છે.",
+    });
+  });
+});
+
+describe("checkEvent in Gujarati", () => {
+  it("keeps the Gujarati name and description", () => {
+    const result = checkEvent(
+      { ...base, title_gu: "દિવાળી ઉજવણી", summary_gu: "સૌનું સ્વાગત છે." },
+      now,
+    );
+    expect(result.ok && result.event).toMatchObject({
+      titleGu: "દિવાળી ઉજવણી",
+      summaryGu: "સૌનું સ્વાગત છે.",
+    });
+  });
+
+  it("treats missing or empty Gujarati as none", () => {
+    for (const extra of [{}, { title_gu: "", summary_gu: "  " }]) {
+      const result = checkEvent({ ...base, ...extra }, now);
+      expect(result.ok && result.event).toMatchObject({
+        titleGu: null,
+        summaryGu: null,
+      });
+    }
+  });
+
+  it("refuses a Gujarati name or description of the wrong length", () => {
+    expect(checkEvent({ ...base, title_gu: "દ" }, now)).toEqual({
+      ok: false,
+      error: "titleGu",
+    });
+    expect(checkEvent({ ...base, summary_gu: "ક".repeat(281) }, now)).toEqual({
+      ok: false,
+      error: "summaryGu",
     });
   });
 });

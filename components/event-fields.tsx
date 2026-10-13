@@ -2,8 +2,9 @@ import { inputClass } from "@/components/ui";
 import { londonDate } from "@/lib/format";
 
 // The details of an event: used by a committee adding an event and by
-// Toran typing up a forwarded poster.
-export function EventFields() {
+// Toran typing up a forwarded poster. Committees can also give the name
+// and description in Gujarati.
+export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
   return (
     <>
       <label className="flex flex-col gap-2">
@@ -71,6 +72,39 @@ export function EventFields() {
           className={`${inputClass} mt-2`}
         />
       </details>
+      {gujarati && (
+        <details className="flex flex-col gap-2">
+          <summary className="cursor-pointer font-semibold">
+            Add the name and description in Gujarati (optional)
+          </summary>
+          <div className="mt-2 flex flex-col gap-3">
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">Name in Gujarati</span>
+              <input
+                name="title_gu"
+                lang="gu"
+                minLength={2}
+                maxLength={120}
+                placeholder="દા.ત. દિવાળી ઉજવણી"
+                className={inputClass}
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">Description in Gujarati</span>
+              <textarea
+                name="summary_gu"
+                lang="gu"
+                maxLength={280}
+                rows={3}
+                className={inputClass}
+              />
+            </label>
+            <p className="text-muted text-base">
+              Shown under the English, for families who read Gujarati.
+            </p>
+          </div>
+        </details>
+      )}
     </>
   );
 }
