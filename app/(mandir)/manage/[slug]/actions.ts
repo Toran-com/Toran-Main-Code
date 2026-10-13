@@ -3,6 +3,8 @@
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { londonDate, londonToUtc } from "@/lib/format";
+import { lookupPostcode } from "@/lib/geo";
+import { parsePracticalDetails } from "@/lib/mandir-form";
 import { createSessionClient } from "@/lib/supabase/session";
 
 // Changes a mandir admin makes to their mandir's events. The database's
@@ -87,4 +89,46 @@ export async function changeEvent(formData: FormData) {
   if (error || !data) back("error=failed");
   if (data!.mandir) updateTag(`mandir:${data!.mandir.slug}`);
   back(`done=${intent}`);
+}
+
+// A committee updates its mandir's practical details. Name, town, region
+// and status stay with Toran admins (enforced by the database).
+export async function updatePracticalDetails(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
+  const parsed = parsePracticalDetails(formData);
+  if (!parsed.ok) back(`error=${parsed.error}`);
+  const values = parsed.values;
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: before } = await supabase
+    .from("mandirs")
+    .select("postcode, latitude")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!before) back("error=failed");
+
+  let position = {};
+  if (before.postcode !== values.postcode || before.latitude === null) {
+    position = { latitude: null, longitude: null };
+    if (values.postcode) {
+      try {
+        position = (await lookupPostcode(values.postcode)) ?? position;
+      } catch {
+        // Saved without a map position; Toran fills it in later.
+      }
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("mandirs")
+    .update({ ...values, ...position })
+    .eq("slug", slug)
+    .select("slug");
+  if (error || !data?.length) back("error=failed");
+  updateTag(`mandir:${slug}`);
+  updateTag("mandirs");
+  back("done=details");
 }

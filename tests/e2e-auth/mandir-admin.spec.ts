@@ -67,6 +67,33 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByRole("article").filter({ hasText: "Annakut" }),
   ).toContainText("Cancelled");
+
+  // The committee corrects its own details.
+  await member.goto(`/manage/${SLUG}`);
+  await member
+    .getByLabel("Website")
+    .fill("krishnatemple-leicester.example.org");
+  await member.getByLabel("Mandir phone number").fill("0116 000 0000");
+  await member.getByRole("button", { name: "Save details" }).click();
+  await expect(member.getByText("Saved. Your public page")).toBeVisible();
+  await member.goto(`/mandirs/${SLUG}`);
+  await expect(
+    member
+      .getByRole("link", { name: "krishnatemple-leicester.example.org" })
+      .first(),
+  ).toBeVisible();
+  await expect(member.getByText("0116 000 0000")).toBeVisible();
+
+  // Removing an event asks first.
+  await member.goto(`/manage/${SLUG}`);
+  let asked = "";
+  member.once("dialog", (dialog) => {
+    asked = dialog.message();
+    void dialog.accept();
+  });
+  await member.getByRole("button", { name: "Remove" }).click();
+  await expect(member.getByText("Removed from your page.")).toBeVisible();
+  expect(asked).toContain("Annakut darshan");
 });
 
 test("someone who doesn't run a mandir can't manage it", async ({ page }) => {
