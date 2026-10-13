@@ -59,9 +59,31 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(event).toContainText("Confirmed by the mandir");
   await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
 
+  // A weekly event shows once, with its next date.
+  await member.goto(`/manage/${SLUG}`);
+  await member.getByLabel("What's happening?").fill("Weekly aarti");
+  await member.getByLabel("Date").fill(nextWeek());
+  await member.getByLabel("Starts").fill("19:00");
+  await member.getByLabel("Repeats", { exact: true }).selectOption("weekly");
+  await member.getByRole("button", { name: "Add event" }).click();
+  await expect(member.getByText("Added.")).toBeVisible();
+  await expect(
+    member.getByRole("listitem").filter({ hasText: "Weekly aarti" }),
+  ).toContainText(/Every \w+day · next/);
+  await member.goto(`/mandirs/${SLUG}`);
+  const weekly = member
+    .getByRole("article")
+    .filter({ hasText: "Weekly aarti" });
+  await expect(weekly).toHaveCount(1);
+  await expect(weekly).toContainText(/Every \w+day · next .*7pm/);
+
   // Cancelling shows on the public page too.
   await member.goto(`/manage/${SLUG}`);
-  await member.getByRole("button", { name: "Cancel" }).click();
+  await member
+    .getByRole("listitem")
+    .filter({ hasText: "Annakut darshan" })
+    .getByRole("button", { name: "Cancel" })
+    .click();
   await expect(member.getByText("Marked as cancelled")).toBeVisible();
   await member.goto(`/mandirs/${SLUG}`);
   await expect(
@@ -91,7 +113,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     asked = dialog.message();
     void dialog.accept();
   });
-  await member.getByRole("button", { name: "Remove" }).click();
+  await member
+    .getByRole("listitem")
+    .filter({ hasText: "Annakut darshan" })
+    .getByRole("button", { name: "Remove" })
+    .click();
   await expect(member.getByText("Removed from your page.")).toBeVisible();
   expect(asked).toContain("Annakut darshan");
 });
