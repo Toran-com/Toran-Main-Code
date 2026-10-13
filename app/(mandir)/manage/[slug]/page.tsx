@@ -19,8 +19,17 @@ import { describeRule } from "@/lib/recurrence";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { ConfirmButton } from "@/components/confirm-button";
+import { EventFields } from "@/components/event-fields";
 import { FORM_ERRORS } from "@/lib/mandir-form";
-import { addEvent, changeEvent, updatePracticalDetails } from "./actions";
+import { EVENT_ERRORS } from "@/lib/event-form";
+import { posterFrom } from "@/lib/posters";
+import { PosterDetails } from "@/components/poster-details";
+import {
+  addEvent,
+  changeEvent,
+  reviewPosterAsCommittee,
+  updatePracticalDetails,
+} from "./actions";
 
 export const metadata: Metadata = {
   title: pageTitle("Manage your mandir"),
@@ -29,13 +38,10 @@ export const metadata: Metadata = {
 
 const ERRORS: Record<string, string> = {
   ...FORM_ERRORS,
-  title: "Please give the event a name (2 to 120 characters).",
-  summary: "Please keep the description under 280 characters.",
-  date: "Please choose a date from today onwards, within the next two years.",
-  time: "Please choose a valid start time, or leave it empty for all day.",
-  repeat: "Please choose how often it repeats.",
-  until:
-    "Please choose an end date after the first date, and within a year of it.",
+  ...EVENT_ERRORS,
+  poster:
+    "That poster can't be published as it is (for example, the date has passed). Choose \u201cNot right\u201d and add the event yourself.",
+  done: "Someone has already dealt with that poster.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -46,6 +52,8 @@ const DONE: Record<string, string> = {
   restore: "Back on. Visitors will see it as happening.",
   remove: "Removed from your page.",
   details: "Saved. Your public page shows the new details.",
+  published: "Published. It's on your public page now.",
+  discarded: "Thanks. That poster won't be published.",
 };
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
@@ -94,6 +102,16 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     .order("starts_at")
     .limit(100);
   const events = withNextStart(rows ?? [], from);
+  const { data: claims } = await supabase!
+    .from("event_claims")
+    .select("id, proposed")
+    .eq("mandir_id", mandir.id)
+    .eq("status", "pending")
+    .order("created_at");
+  const posters = (claims ?? []).flatMap((c) => {
+    const poster = posterFrom(c.proposed);
+    return poster ? [{ id: c.id, poster }] : [];
+  });
 
   const query = await searchParams;
   const error = ERRORS[String(query.error ?? "")];
@@ -117,77 +135,55 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       {error && <Notice tone="error">{error}</Notice>}
       {done && <Notice tone="success">{done}</Notice>}
 
+      {posters.length > 0 && (
+        <Card>
+          <h2 className="text-2xl font-bold">Posters waiting for you</h2>
+          <p className="text-muted">
+            Someone sent Toran {posters.length === 1 ? "this" : "these"} for
+            your mandir. If the details are right, publish; if not, choose
+            &ldquo;Not right&rdquo; and add the event yourself.
+          </p>
+          <ul className="flex flex-col gap-3">
+            {posters.map(({ id, poster }) => (
+              <li
+                key={id}
+                className="border-line flex flex-col gap-3 rounded-2xl border p-4"
+              >
+                <PosterDetails poster={poster} />
+                <form
+                  action={reviewPosterAsCommittee}
+                  className="flex flex-wrap gap-2"
+                >
+                  <input type="hidden" name="slug" value={mandir.slug} />
+                  <input type="hidden" name="poster" value={id} />
+                  <button
+                    type="submit"
+                    name="decision"
+                    value="publish"
+                    className={buttonClass}
+                  >
+                    Publish
+                  </button>
+                  <button
+                    type="submit"
+                    name="decision"
+                    value="discard"
+                    className={quietButtonClass}
+                  >
+                    Not right
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
       <Card>
         <h2 className="text-2xl font-bold">Add an event</h2>
         <form action={addEvent} className="flex flex-col gap-5">
           <input type="hidden" name="slug" value={mandir.slug} />
-          <label className="flex flex-col gap-2">
-            <span className="font-semibold">What&apos;s happening?</span>
-            <input
-              name="title"
-              required
-              minLength={2}
-              maxLength={120}
-              placeholder="e.g. Diwali celebrations"
-              className={inputClass}
-            />
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="flex flex-col gap-2">
-              <span className="font-semibold">Date</span>
-              <input
-                name="date"
-                type="date"
-                required
-                min={londonDate()}
-                className={inputClass}
-              />
-            </label>
-            <label className="flex flex-col gap-2">
-              <span className="font-semibold">Starts</span>
-              <input name="time" type="time" className={inputClass} />
-            </label>
-          </div>
-          <p className="text-muted -mt-3 text-base">
-            Leave the start time empty for an all-day event.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-2">
-              <span className="font-semibold">Repeats</span>
-              <select name="repeat" defaultValue="none" className={inputClass}>
-                <option value="none">Doesn&apos;t repeat</option>
-                <option value="weekly">Every week</option>
-                <option value="fortnightly">Every other week</option>
-                <option value="monthly">
-                  Once a month (e.g. 2nd Saturday)
-                </option>
-                <option value="monthly-last">
-                  Once a month, the last one (e.g. last Friday)
-                </option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-2">
-              <span className="font-semibold">Repeats until</span>
-              <input name="until" type="date" className={inputClass} />
-            </label>
-          </div>
-          <p className="text-muted -mt-3 text-base">
-            For repeating events, leave &ldquo;until&rdquo; empty for six
-            months. Up to a year.
-          </p>
-          <details className="flex flex-col gap-2">
-            <summary className="cursor-pointer font-semibold">
-              Add a short description (optional)
-            </summary>
-            <textarea
-              name="summary"
-              maxLength={280}
-              rows={3}
-              aria-label="Short description"
-              placeholder="e.g. Garba from 8pm, prasad after aarti. All welcome."
-              className={`${inputClass} mt-2`}
-            />
-          </details>
+          <EventFields />
           <button type="submit" className={buttonClass}>
             Add event
           </button>
@@ -233,6 +229,14 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                       <EventButton intent="confirm">Still on</EventButton>
                       <EventButton intent="cancel">Cancel</EventButton>
                     </>
+                  )}
+                  {event.status !== "cancelled" && (
+                    <Link
+                      href={`/manage/${mandir.slug}/seva/${event.id}`}
+                      className={`${quietButtonClass} px-4 py-2 text-base`}
+                    >
+                      Seva rota
+                    </Link>
                   )}
                   <ConfirmButton
                     name="intent"

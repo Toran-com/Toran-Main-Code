@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
-import { pageTitle, site } from "@/lib/site";
+import { pageMetadata, site } from "@/lib/site";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -14,8 +14,7 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: pageTitle(),
-  description: site.description,
+  ...pageMetadata(),
   robots: site.launched ? undefined : { index: false, follow: false },
 };
 

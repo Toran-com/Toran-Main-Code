@@ -44,6 +44,7 @@ export async function createMandir(formData: FormData) {
   });
   if (error) redirect("/ops/mandirs/new?error=failed");
   updateTag("mandirs");
+  updateTag("events");
   redirect(`/ops/mandirs/${slug}?saved=added`);
 }
 
@@ -78,6 +79,7 @@ export async function updateMandir(formData: FormData) {
   if (error) back("error=failed");
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");
+  updateTag("events");
   back("saved=1");
 }
 
@@ -96,5 +98,6 @@ export async function removeMandirAdmin(formData: FormData) {
   if (error) back("error=failed");
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");
+  updateTag("events");
   back("saved=removed");
 }

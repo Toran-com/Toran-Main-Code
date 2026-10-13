@@ -3,7 +3,10 @@ import Link from "next/link";
 const LINKS = [
   { href: "/ops", label: "Overview" },
   { href: "/ops/mandirs", label: "Mandirs" },
+  { href: "/ops/posters", label: "Posters" },
   { href: "/ops/festivals", label: "Festival dates" },
+  { href: "/ops/digest", label: "Digest" },
+  { href: "/ops/translations", label: "Translations" },
 ] as const;
 
 // The admin area's own menu.
@@ -22,7 +25,7 @@ export function OpsNav({
               aria-current={href === current ? "page" : undefined}
               className={`inline-block rounded-full border px-4 py-1.5 text-base font-semibold ${
                 href === current
-                  ? "border-peacock bg-peacock text-white"
+                  ? "border-peacock bg-peacock text-on-peacock"
                   : "border-line hover:bg-sunk"
               }`}
             >

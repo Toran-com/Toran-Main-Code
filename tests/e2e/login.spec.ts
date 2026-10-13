@@ -51,10 +51,21 @@ test("claiming and managing a mandir need a login", async ({ page }) => {
   );
   await page.goto("/manage/some-mandir");
   await expect(page).toHaveURL(/\/login\?next=%2Fmanage%2Fsome-mandir/);
+  await page.goto("/manage/some-mandir/seva/some-event");
+  await expect(page).toHaveURL(
+    /\/login\?next=%2Fmanage%2Fsome-mandir%2Fseva%2Fsome-event/,
+  );
 });
 
 test("the admin pages need a login", async ({ page }) => {
-  for (const path of ["/ops/mandirs", "/ops/mandirs/new", "/ops/festivals"]) {
+  for (const path of [
+    "/ops/mandirs",
+    "/ops/mandirs/new",
+    "/ops/posters",
+    "/ops/festivals",
+    "/ops/digest",
+    "/ops/translations",
+  ]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login\?next=%2Fops/);
   }

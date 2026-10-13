@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 // Names and words used across the site, kept in one place so the brand can
 // change without hunting through pages.
 export const site = {
@@ -11,8 +13,35 @@ export const site = {
   launched: false,
 } as const;
 
+// The live site's address, for links that must be complete (the sitemap,
+// search engine data). Vercel provides it; elsewhere it's this computer.
+export function siteUrl(): string {
+  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  return host ? `https://${host}` : "http://localhost:3000";
+}
+
 // Builds the browser tab title for a page, e.g. "Festivals · Toran".
 export function pageTitle(page?: string): string {
   const name = page?.trim();
   return name ? `${name} · ${site.name}` : `${site.name} · ${site.tagline}`;
+}
+
+// Title and description for the browser tab, search results and link
+// previews. WhatsApp and Facebook read the "og:" copies.
+export function pageMetadata(
+  page?: string,
+  description: string = site.description,
+): Metadata {
+  const title = pageTitle(page);
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      siteName: site.name,
+      locale: "en_GB",
+      type: "website",
+    },
+  };
 }

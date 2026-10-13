@@ -147,3 +147,55 @@ export async function listFestivalDates(): Promise<Loaded<FestivalDate[]>> {
     .order("calendar", { nullsFirst: true });
   return settle(error ? unavailable : { state: "ok", data });
 }
+
+export type FestivalWithDates = {
+  slug: string;
+  name: string;
+  summary: string | null;
+  dates: Pick<
+    Row<"festival_dates">,
+    "id" | "calendar" | "starts_on" | "ends_on" | "verified"
+  >[];
+};
+
+export async function listFestivals(): Promise<
+  Loaded<Pick<Row<"festivals">, "slug" | "name">[]>
+> {
+  "use cache";
+  cacheTag("festivals");
+  const db = connect();
+  if (db === null) return settle<never>(notConnected);
+  if (db === "misconfigured") return settle<never>(unavailable);
+  const { data, error } = await db
+    .from("festivals")
+    .select("slug, name")
+    .order("name");
+  return settle(error ? unavailable : { state: "ok", data });
+}
+
+// One festival with its upcoming dates (any calendar).
+export async function getFestival(
+  slug: string,
+): Promise<Loaded<FestivalWithDates | null>> {
+  "use cache";
+  cacheTag("festivals", `festival:${slug}`);
+  const db = connect();
+  if (db === null) return settle<never>(notConnected);
+  if (db === "misconfigured") return settle<never>(unavailable);
+  const { data: festival, error } = await db
+    .from("festivals")
+    .select("id, slug, name, summary")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) return settle<never>(unavailable);
+  if (!festival) return settle({ state: "ok", data: null });
+  const { data: dates, error: datesError } = await db
+    .from("festival_dates")
+    .select("id, calendar, starts_on, ends_on, verified")
+    .eq("festival_id", festival.id)
+    .gte("ends_on", londonDate())
+    .order("starts_on");
+  if (datesError) return settle<never>(unavailable);
+  const { id, ...rest } = festival;
+  return settle({ state: "ok", data: { ...rest, dates } });
+}

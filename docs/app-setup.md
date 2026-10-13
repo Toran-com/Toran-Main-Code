@@ -328,6 +328,112 @@ After your authenticator code, `/ops` has three tabs:
   mark it checked and say where you checked it. Its "Date not yet checked"
   label disappears from the public site.
 
+### What's on and festival pages
+
+- **`/whats-on`** lists every event at every mandir for the next eight
+  weeks, grouped by day. Someone can type a postcode or just the first half
+  (for example "HA9") and pick a distance; the list then shows only events at
+  mandirs that close, still by day, each with its distance. The postcode is looked up
+  on postcodes.io and is **not saved in Toran's database**. It is part of
+  the page address (so a search can be shared), which means it appears in
+  Vercel's request logs for as long as those are kept, and the looked-up
+  position is cached on the server for a few days. Worth a line in the
+  DPIA. Mandirs without a map position are left out of a "near you" search,
+  so press **Fill in map positions** on `/ops` first.
+- **`/festivals/<name>`**, for example `/festivals/diwali`, shows the
+  festival's UK dates and the events during those dates whose title or
+  description mentions it (for example "Garba" counts for Navratri). The
+  festivals list links to each one.
+
+A repeating event shows once, at its next date, labelled "Every Saturday".
+New and changed events show on these pages straight away.
+
+### Sharing on WhatsApp
+
+Every event, mandir page and festival page has **Share: WhatsApp · Copy
+link** (on a phone, "Other apps" opens the phone's own share menu). WhatsApp
+opens with the message ready, for example "Diwali celebrations at Reading
+Hindu Temple, Reading: Sun 8 Nov, 6:30pm" and the link, which goes
+straight to that event on the mandir's page.
+
+Shared links show a preview card with the toran garland and the mandir or
+festival name. To see one before launch, paste a preview link into a
+WhatsApp chat with yourself. WhatsApp keeps a card for a while once it has
+fetched it, so a change may take a day to show on a link already shared.
+
+### Forwarded posters (`/ops` → Posters)
+
+When someone forwards a poster or message about a mandir's event (WhatsApp,
+email, a photo of a printed poster):
+
+1. On **Posters**, choose the mandir, copy the event details in and say
+   where it came from. **Only the event**: never the name or phone number of
+   whoever sent it. The poster image itself isn't kept.
+2. **If the mandir has a committee**, it waits on their manage page under
+   "Posters waiting for you". Publishing it there marks it "Confirmed by the
+   mandir"; "Not right" discards it.
+3. **If nobody looks after the mandir yet**, you can publish it yourself. It
+   appears without the "Confirmed by the mandir" label.
+
+The database records who published or discarded each poster and when, and
+a decision can't be changed afterwards.
+
+### Seva rota (committees)
+
+On their manage page, each event has **Seva rota**. The committee adds
+roles (Kitchen, Parking, Shoes; tick "Needs a DBS check" where it applies)
+and shifts with how many people each needs. **Send the rota** turns it into
+a WhatsApp message for the volunteers' own group, where people reply as
+they do now.
+
+Toran keeps **no volunteer names or numbers**. Public sign-up waits for ICO
+registration and the DPIA (decision 0006).
+
+### Weekly digest preview (`/ops` → Digest)
+
+Shows what the weekly email would say: every event in the next seven days,
+by day, and festivals in the next fortnight, for the whole UK or one region.
+There's a plain-text version to copy.
+
+**Nobody receives it yet.** There's no sign-up form or subscriber list until
+Toran is registered with the ICO and the DPIA is done (decision 0006).
+Sending it for real is a later step.
+
+### Translations (`/ops` → Translations)
+
+Public text comes from `lib/i18n/en.ts` (English) through a small
+translation layer (`lib/i18n/index.ts`), so other languages can follow.
+**Gujarati** (`lib/i18n/gu.ts`) is a first draft and is **not shown on the
+site**.
+
+**Before Gujarati can go live:**
+
+1. A native Gujarati speaker checks every line. On Translations, **Copy the
+   list** gives numbered English and Gujarati pairs to send them; they reply
+   with numbers and corrections.
+2. Decide how visitors choose it: a "ગુજરાતી" link to `/gu/…` addresses is
+   the usual way and keeps pages fast.
+3. Add a Gujarati font (Noto Sans Gujarati) and check the speed budget.
+4. Translate the remaining text: dates ("Sat 17 Oct"), "Every Saturday",
+   share buttons, and the mandir and festival lists. Admin pages stay in
+   English.
+
+### Ready for Google (switched off until launch)
+
+Until launch every page says "don't list me", `/sitemap.xml` is empty and
+`/robots.txt` offers no sitemap. Admin pages (`/ops`, `/manage`, `/account`)
+are always off-limits to search engines. Each event on a mandir's page
+already carries the schema.org description Google uses for event listings.
+
+**At launch** (a decision for you and your partner, not before):
+
+1. In `lib/site.ts`, change `launched: false` to `launched: true` and merge.
+2. In [Google Search Console](https://search.google.com/search-console),
+   add the site, then submit `https://<your domain>/sitemap.xml`.
+3. Paste a mandir page with events into Google's
+   [Rich Results Test](https://search.google.com/test/rich-results) to check
+   its events are read.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL

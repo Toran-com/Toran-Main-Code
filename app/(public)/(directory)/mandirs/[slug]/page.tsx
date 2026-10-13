@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
+import { ShareButtons } from "@/components/share-buttons";
 import { Card, quietButtonClass } from "@/components/ui";
 import {
   getMandir,
@@ -12,7 +14,9 @@ import {
 } from "@/lib/directory";
 import { formatEventStart, websiteLabel } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
-import { pageTitle } from "@/lib/site";
+import { eventPath, eventShareText } from "@/lib/share";
+import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
+import { eventData } from "@/lib/structured-data";
 
 // Every mandir page is fully static. A mandir added after the build is
 // rendered on its first visit (which waits for it), so an unknown address
@@ -36,10 +40,10 @@ export async function generateMetadata({
   const result = await getMandir(slug);
   if (result.state !== "ok" || !result.data) return { title: pageTitle() };
   const { name, town } = result.data;
-  return {
-    title: pageTitle(`${name}, ${town}`),
-    description: `What's on at ${name} in ${town}: events, festivals and how to find it.`,
-  };
+  return pageMetadata(
+    `${name}, ${town}`,
+    `What's on at ${name} in ${town}: events, festivals and how to find it.`,
+  );
 }
 
 export default async function MandirPage({
@@ -71,6 +75,11 @@ export default async function MandirPage({
             <Badge tone="peacock">Run by the mandir&apos;s committee</Badge>
           </p>
         )}
+        <ShareButtons
+          label="Share this mandir"
+          text={`${mandir.name}, ${mandir.town}: what's on`}
+          path={`/mandirs/${mandir.slug}`}
+        />
       </div>
 
       <Facts mandir={mandir} />
@@ -83,7 +92,7 @@ export default async function MandirPage({
           <ul className="flex flex-col gap-3">
             {mandir.events.map((event) => (
               <li key={event.id}>
-                <EventCard event={event} />
+                <EventCard event={event} mandir={mandir} />
               </li>
             ))}
           </ul>
@@ -190,10 +199,19 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
   );
 }
 
-function EventCard({ event }: { event: MandirEvent }) {
+function EventCard({
+  event,
+  mandir,
+}: {
+  event: MandirEvent;
+  mandir: MandirDetails;
+}) {
   const cancelled = event.status === "cancelled";
   return (
-    <article className="border-line bg-surface flex flex-col gap-2 rounded-2xl border p-5">
+    <article
+      id={`event-${event.id}`}
+      className="border-line bg-surface flex scroll-mt-4 flex-col gap-2 rounded-2xl border p-5"
+    >
       <p className="text-marigold-ink font-semibold">
         {event.recurrence && `${describeRule(event.recurrence)} · next `}
         {formatEventStart(event.next_starts_at, event.all_day)}
@@ -230,6 +248,19 @@ function EventCard({ event }: { event: MandirEvent }) {
             month: "short",
           }).format(new Date(event.confirmed_at))}
         </p>
+      )}
+      <JsonLd
+        data={eventData(
+          event,
+          mandir,
+          `${siteUrl()}${eventPath(mandir.slug, event.id)}`,
+        )}
+      />
+      {!cancelled && (
+        <ShareButtons
+          text={eventShareText(event, mandir)}
+          path={eventPath(mandir.slug, event.id)}
+        />
       )}
     </article>
   );

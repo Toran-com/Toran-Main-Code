@@ -14,17 +14,19 @@ pnpm dev                     # open http://localhost:3000
 
 ## What's built so far
 
-| Address                 | What it is                                         |
-| ----------------------- | -------------------------------------------------- |
-| `/`                     | Coming soon, with links to the directory           |
-| `/mandirs`              | Every mandir by region and town, with search       |
-| `/mandirs/<name>`       | A mandir's details and what's on                   |
-| `/mandirs/<name>/claim` | A committee member asks to look after the page     |
-| `/festivals`            | Festival dates for the UK                          |
-| `/login`, `/account`    | Email-link login; your mandirs                     |
-| `/manage/<name>`        | Add, confirm, cancel and remove a mandir's events  |
-| `/ops`                  | Toran admin (second factor): approve mandir claims |
-| `/api/health`           | Health check used by the hourly uptime check       |
+| Address                 | What it is                                          |
+| ----------------------- | --------------------------------------------------- |
+| `/`                     | Coming soon, with links to the directory            |
+| `/mandirs`              | Every mandir by region and town, with search        |
+| `/mandirs/<name>`       | A mandir's details and what's on                    |
+| `/mandirs/<name>/claim` | A committee member asks to look after the page      |
+| `/whats-on`             | Every upcoming event, or those near a postcode      |
+| `/festivals`            | Festival dates for the UK                           |
+| `/festivals/<name>`     | One festival's dates and events at mandirs          |
+| `/login`, `/account`    | Email-link login; your mandirs                      |
+| `/manage/<name>`        | Add, confirm, cancel and remove a mandir's events   |
+| `/ops`                  | Toran admin (second factor): claims, mandirs, dates |
+| `/api/health`           | Health check used by the hourly uptime check        |
 
 Until launch every page asks search engines not to list it (`launched` in
 `lib/site.ts`).
@@ -49,6 +51,18 @@ applies every migration, runs the database security tests
 to date, and runs the browser tests that need real logins and data
 (`tests/e2e-auth/`). Locally that needs Docker; see `supabase/README.md`.
 
+Both sets of browser tests check pages for accessibility (WCAG 2.2 AA, with
+[axe](https://github.com/dequelabs/axe-core)) in light and dark mode:
+public pages, a committee's pages and the admin area. A colour, label or
+heading that fails stops the merge. `tests/a11y.ts` has the check.
+
+They also keep to a **speed budget** (`tests/speed.ts`): at most 250 KB of
+JavaScript and 350 KB in all per page, as sent over the network, because
+many visitors are on older phones and mobile data.
+
+Backups, and the restore drill to practise every three months, are in
+`docs/backup-and-restore.md`.
+
 Dependabot opens a pull request each week for package updates and each
 month for GitHub Actions updates.
 
@@ -56,7 +70,7 @@ month for GitHub Actions updates.
 
 | Folder          | What lives there                                                                 |
 | --------------- | -------------------------------------------------------------------------------- |
-| `app/(public)/` | The public site: mandirs, festivals, later what's on and the digest              |
+| `app/(public)/` | The public site: mandirs, festivals, what's on, later the digest                 |
 | `app/(mandir)/` | The mandir admin area, behind login                                              |
 | `app/(ops)/`    | The Toran admin area, behind login and a second factor                           |
 | `app/api/`      | Webhooks for incoming email and WhatsApp                                         |
