@@ -2,31 +2,33 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Notice } from "@/components/ui";
 import { ToranGarland } from "@/components/toran-garland";
+import { translator } from "@/lib/i18n";
 
 // Header, footer and page width for the public directory pages.
 export function PublicShell({ children }: { children: ReactNode }) {
+  const t = translator();
   return (
     <>
       <header className="border-line border-b">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link href="/" aria-label="Toran home" className="shrink-0">
+          <Link href="/" aria-label={t("shell.home")} className="shrink-0">
             <ToranGarland className="h-5 w-16 sm:h-8 sm:w-32" />
           </Link>
           <nav aria-label="Main">
             <ul className="flex gap-3 text-base font-semibold whitespace-nowrap sm:gap-5 sm:text-lg">
               <li>
                 <Link href="/whats-on" className="hover:text-peacock">
-                  What&apos;s on
+                  {t("shell.whatsOn")}
                 </Link>
               </li>
               <li>
                 <Link href="/mandirs" className="hover:text-peacock">
-                  Mandirs
+                  {t("shell.mandirs")}
                 </Link>
               </li>
               <li>
                 <Link href="/festivals" className="hover:text-peacock">
-                  Festivals
+                  {t("shell.festivals")}
                 </Link>
               </li>
             </ul>
@@ -38,9 +40,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
       </main>
       <footer className="border-line text-muted border-t">
         <p className="mx-auto w-full max-w-3xl px-4 py-6 text-base sm:px-6">
-          Toran is being tested with mandir committees and opens in 2027.
-          Details come from mandirs&apos; own websites and our research; if
-          something is wrong, the mandir&apos;s committee can correct it.
+          {t("shell.footer")}
         </p>
       </footer>
     </>

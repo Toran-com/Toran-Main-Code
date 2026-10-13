@@ -6,6 +6,7 @@ const LINKS = [
   { href: "/ops/posters", label: "Posters" },
   { href: "/ops/festivals", label: "Festival dates" },
   { href: "/ops/digest", label: "Digest" },
+  { href: "/ops/translations", label: "Translations" },
 ] as const;
 
 // The admin area's own menu.

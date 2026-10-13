@@ -399,6 +399,25 @@ There's a plain-text version to copy.
 Toran is registered with the ICO and the DPIA is done (decision 0006).
 Sending it for real is a later step.
 
+### Translations (`/ops` → Translations)
+
+Public text comes from `lib/i18n/en.ts` (English) through a small
+translation layer (`lib/i18n/index.ts`), so other languages can follow.
+**Gujarati** (`lib/i18n/gu.ts`) is a first draft and is **not shown on the
+site**.
+
+**Before Gujarati can go live:**
+
+1. A native Gujarati speaker checks every line. On Translations, **Copy the
+   list** gives numbered English and Gujarati pairs to send them; they reply
+   with numbers and corrections.
+2. Decide how visitors choose it: a "ગુજરાતી" link to `/gu/…` addresses is
+   the usual way and keeps pages fast.
+3. Add a Gujarati font (Noto Sans Gujarati) and check the speed budget.
+4. Translate the remaining text: dates ("Sat 17 Oct"), "Every Saturday",
+   share buttons, and the mandir and festival lists. Admin pages stay in
+   English.
+
 ### Ready for Google (switched off until launch)
 
 Until launch every page says "don't list me", `/sitemap.xml` is empty and
