@@ -43,3 +43,20 @@ test("Toran publishes a poster for a mandir with no committee", async ({
   await expect(event).toContainText("8pm");
   await expect(event).not.toContainText("Confirmed by the mandir");
 });
+
+test("Toran previews the weekly digest", async ({ page }) => {
+  test.setTimeout(60_000);
+  await logInAsAdmin(page, `digest-${Date.now()}@example.com`);
+  await page.goto("/ops/digest");
+  await expect(
+    page.getByRole("heading", { name: "What's on at mandirs" }),
+  ).toBeVisible();
+  await expect(page.getByText("Nobody receives it yet")).toBeVisible();
+  await expect(page.locator("pre")).toContainText("What's on at mandirs:");
+  await expect(page.locator("pre")).toContainText("/whats-on");
+
+  await page.getByRole("combobox", { name: /^Region/ }).selectOption("Wales");
+  await page.getByRole("button", { name: "Show" }).click();
+  await expect(page).toHaveURL(/region=Wales/);
+  await expect(page.locator("pre")).toContainText("(Wales)");
+});

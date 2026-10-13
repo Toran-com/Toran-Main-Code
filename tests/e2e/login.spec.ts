@@ -63,6 +63,7 @@ test("the admin pages need a login", async ({ page }) => {
     "/ops/mandirs/new",
     "/ops/posters",
     "/ops/festivals",
+    "/ops/digest",
   ]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login\?next=%2Fops/);
