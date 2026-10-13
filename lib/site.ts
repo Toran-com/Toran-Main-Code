@@ -13,6 +13,13 @@ export const site = {
   launched: false,
 } as const;
 
+// The live site's address, for links that must be complete (the sitemap,
+// search engine data). Vercel provides it; elsewhere it's this computer.
+export function siteUrl(): string {
+  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  return host ? `https://${host}` : "http://localhost:3000";
+}
+
 // Builds the browser tab title for a page, e.g. "Festivals · Toran".
 export function pageTitle(page?: string): string {
   const name = page?.trim();

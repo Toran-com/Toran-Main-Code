@@ -51,3 +51,14 @@ test("pages ask search engines not to list them before launch", async ({
     /noindex/,
   );
 });
+
+test("before launch, robots.txt offers no sitemap and hides admin pages", async ({
+  request,
+}) => {
+  const robots = await (await request.get("/robots.txt")).text();
+  expect(robots).toContain("Disallow: /ops");
+  expect(robots).toContain("Disallow: /manage");
+  expect(robots).not.toContain("Sitemap:");
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  expect(sitemap).not.toContain("<url>");
+});

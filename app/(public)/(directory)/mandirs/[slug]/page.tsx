@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import { Card, quietButtonClass } from "@/components/ui";
@@ -14,7 +15,8 @@ import {
 import { formatEventStart, websiteLabel } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath, eventShareText } from "@/lib/share";
-import { pageMetadata, pageTitle } from "@/lib/site";
+import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
+import { eventData } from "@/lib/structured-data";
 
 // Every mandir page is fully static. A mandir added after the build is
 // rendered on its first visit (which waits for it), so an unknown address
@@ -247,6 +249,13 @@ function EventCard({
           }).format(new Date(event.confirmed_at))}
         </p>
       )}
+      <JsonLd
+        data={eventData(
+          event,
+          mandir,
+          `${siteUrl()}${eventPath(mandir.slug, event.id)}`,
+        )}
+      />
       {!cancelled && (
         <ShareButtons
           text={eventShareText(event, mandir)}
