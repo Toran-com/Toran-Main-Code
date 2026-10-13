@@ -35,6 +35,11 @@ What the database holds and who can do what. The tables are defined in
   _not yet checked_ with their source, until a Toran admin checks them
   against a panchang for London.
 
+Toran admins (with the second factor) also have `mandir_admin_list()`,
+which shows who looks after a mandir with their login email, and
+`remove_mandir_admin()`. When the last person is removed, the mandir can be
+claimed again.
+
 Not yet built, on purpose (decision 0006): seva sign-ups and digest
 subscribers. They hold the public's personal data, so they arrive with the
 rota and digest features, after ICO registration and the DPIA.

@@ -5,13 +5,18 @@ import { ToranGarland } from "@/components/toran-garland";
 // The narrow card layout used by login, account and admin pages.
 export function PageShell({
   title,
+  wide = false,
   children,
 }: {
   title: string;
+  // Wider pages for admin lists and forms.
+  wide?: boolean;
   children: ReactNode;
 }) {
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-8 px-6 py-16">
+    <main
+      className={`mx-auto flex w-full flex-1 flex-col gap-8 px-6 py-16 ${wide ? "max-w-3xl" : "max-w-lg"}`}
+    >
       <Link href="/" aria-label="Toran home" className="self-start">
         <ToranGarland className="h-8 w-36" />
       </Link>
