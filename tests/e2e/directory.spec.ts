@@ -15,6 +15,17 @@ test("the festivals page explains it isn't connected yet", async ({ page }) => {
   await expect(page.getByText("isn't connected yet")).toBeVisible();
 });
 
+test("what's on explains it isn't connected yet", async ({ page }) => {
+  await page.goto("/whats-on");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("What's on");
+  await expect(page.getByText("isn't connected yet")).toBeVisible();
+});
+
+test("an unknown festival is not found", async ({ page }) => {
+  const response = await page.goto("/festivals/no-such-festival");
+  expect(response?.status()).toBe(404);
+});
+
 test("an unknown mandir is not found", async ({ page }) => {
   const response = await page.goto("/mandirs/no-such-mandir");
   expect(response?.status()).toBe(404);

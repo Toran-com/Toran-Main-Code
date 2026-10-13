@@ -328,6 +328,26 @@ After your authenticator code, `/ops` has three tabs:
   mark it checked and say where you checked it. Its "Date not yet checked"
   label disappears from the public site.
 
+### What's on and festival pages
+
+- **`/whats-on`** lists every event at every mandir for the next eight
+  weeks, grouped by day. Someone can type a postcode or just the first half
+  (for example "HA9") and pick a distance; the list then shows only events at
+  mandirs that close, still by day, each with its distance. The postcode is looked up
+  on postcodes.io and is **not saved in Toran's database**. It is part of
+  the page address (so a search can be shared), which means it appears in
+  Vercel's request logs for as long as those are kept, and the looked-up
+  position is cached on the server for a few days. Worth a line in the
+  DPIA. Mandirs without a map position are left out of a "near you" search,
+  so press **Fill in map positions** on `/ops` first.
+- **`/festivals/<name>`**, for example `/festivals/diwali`, shows the
+  festival's UK dates and the events during those dates whose title or
+  description mentions it (for example "Garba" counts for Navratri). The
+  festivals list links to each one.
+
+A repeating event shows once, at its next date, labelled "Every Saturday".
+New and changed events show on these pages straight away.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL

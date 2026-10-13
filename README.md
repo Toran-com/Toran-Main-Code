@@ -14,17 +14,19 @@ pnpm dev                     # open http://localhost:3000
 
 ## What's built so far
 
-| Address                 | What it is                                         |
-| ----------------------- | -------------------------------------------------- |
-| `/`                     | Coming soon, with links to the directory           |
-| `/mandirs`              | Every mandir by region and town, with search       |
-| `/mandirs/<name>`       | A mandir's details and what's on                   |
-| `/mandirs/<name>/claim` | A committee member asks to look after the page     |
-| `/festivals`            | Festival dates for the UK                          |
-| `/login`, `/account`    | Email-link login; your mandirs                     |
-| `/manage/<name>`        | Add, confirm, cancel and remove a mandir's events  |
-| `/ops`                  | Toran admin (second factor): approve mandir claims |
-| `/api/health`           | Health check used by the hourly uptime check       |
+| Address                 | What it is                                          |
+| ----------------------- | --------------------------------------------------- |
+| `/`                     | Coming soon, with links to the directory            |
+| `/mandirs`              | Every mandir by region and town, with search        |
+| `/mandirs/<name>`       | A mandir's details and what's on                    |
+| `/mandirs/<name>/claim` | A committee member asks to look after the page      |
+| `/whats-on`             | Every upcoming event, or those near a postcode      |
+| `/festivals`            | Festival dates for the UK                           |
+| `/festivals/<name>`     | One festival's dates and events at mandirs          |
+| `/login`, `/account`    | Email-link login; your mandirs                      |
+| `/manage/<name>`        | Add, confirm, cancel and remove a mandir's events   |
+| `/ops`                  | Toran admin (second factor): claims, mandirs, dates |
+| `/api/health`           | Health check used by the hourly uptime check        |
 
 Until launch every page asks search engines not to list it (`launched` in
 `lib/site.ts`).
@@ -56,7 +58,7 @@ month for GitHub Actions updates.
 
 | Folder          | What lives there                                                                 |
 | --------------- | -------------------------------------------------------------------------------- |
-| `app/(public)/` | The public site: mandirs, festivals, later what's on and the digest              |
+| `app/(public)/` | The public site: mandirs, festivals, what's on, later the digest                 |
 | `app/(mandir)/` | The mandir admin area, behind login                                              |
 | `app/(ops)/`    | The Toran admin area, behind login and a second factor                           |
 | `app/api/`      | Webhooks for incoming email and WhatsApp                                         |

@@ -8,12 +8,17 @@ export function PublicShell({ children }: { children: ReactNode }) {
   return (
     <>
       <header className="border-line border-b">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href="/" aria-label="Toran home">
-            <ToranGarland className="h-8 w-32" />
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <Link href="/" aria-label="Toran home" className="shrink-0">
+            <ToranGarland className="h-5 w-16 sm:h-8 sm:w-32" />
           </Link>
           <nav aria-label="Main">
-            <ul className="flex gap-5 text-lg font-semibold">
+            <ul className="flex gap-3 text-base font-semibold whitespace-nowrap sm:gap-5 sm:text-lg">
+              <li>
+                <Link href="/whats-on" className="hover:text-peacock">
+                  What&apos;s on
+                </Link>
+              </li>
               <li>
                 <Link href="/mandirs" className="hover:text-peacock">
                   Mandirs

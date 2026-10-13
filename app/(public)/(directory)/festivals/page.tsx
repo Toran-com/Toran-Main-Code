@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { Badge, LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading, Notice } from "@/components/ui";
@@ -66,7 +67,18 @@ function FestivalCard({ date }: { date: FestivalDate }) {
       <p className="text-marigold-ink font-semibold">
         {formatDateRange(date.starts_on, date.ends_on)}
       </p>
-      <h3 className="text-xl font-bold">{date.festival?.name ?? "Festival"}</h3>
+      <h3 className="text-xl font-bold">
+        {date.festival ? (
+          <Link
+            href={`/festivals/${date.festival.slug}`}
+            className="text-peacock underline"
+          >
+            {date.festival.name}
+          </Link>
+        ) : (
+          "Festival"
+        )}
+      </h3>
       {calendar && <p className="text-muted -mt-2">{calendar}</p>}
       {date.festival?.summary && <p>{date.festival.summary}</p>}
       {!date.verified && (
