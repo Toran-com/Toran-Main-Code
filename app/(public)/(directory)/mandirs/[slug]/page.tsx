@@ -99,9 +99,19 @@ export default async function MandirPage({
         ) : (
           <NoEvents website={mandir.website} />
         )}
-        <Link href="/festivals" className="text-peacock font-semibold">
-          Festival dates for the UK →
-        </Link>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <Link href="/festivals" className="text-peacock font-semibold">
+            Festival dates for the UK →
+          </Link>
+          {mandir.events.length > 0 && (
+            <Link
+              href={`/mandirs/${mandir.slug}/print`}
+              className="text-peacock font-semibold"
+            >
+              Print for a noticeboard →
+            </Link>
+          )}
+        </div>
       </section>
 
       <Card>

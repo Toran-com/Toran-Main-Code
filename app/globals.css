@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 /* Colours carried over from the prototype. Light mode is the default; dark
-   mode follows the device setting. Use the Tailwind names (bg-surface,
-   text-peacock, …) in components rather than raw hex values. */
+   mode follows the device setting on screen, and printouts are always light.
+   Use the Tailwind names (bg-surface, text-peacock, …) in components rather
+   than raw hex values. */
 :root {
   --bg: #faf8f4;
   --surface: #ffffff;
@@ -18,7 +19,7 @@
   --leaf: #3f7d3a;
 }
 
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root {
     --bg: #0d1120;
     --surface: #151a2d;
@@ -61,4 +62,16 @@ html {
 body {
   background: var(--bg);
   color: var(--ink);
+}
+
+/* Notice-board printouts (/mandirs/<slug>/print): A4, white paper. */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff;
+  }
 }

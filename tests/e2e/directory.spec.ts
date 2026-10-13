@@ -62,3 +62,8 @@ test("before launch, robots.txt offers no sitemap and hides admin pages", async 
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).not.toContain("<url>");
 });
+
+test("an unknown mandir's print page is not found", async ({ page }) => {
+  const response = await page.goto("/mandirs/no-such-mandir/print");
+  expect(response?.status()).toBe(404);
+});
