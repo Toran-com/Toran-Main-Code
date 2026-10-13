@@ -60,3 +60,15 @@ test("Toran previews the weekly digest", async ({ page }) => {
   await expect(page).toHaveURL(/region=Wales/);
   await expect(page.locator("pre")).toContainText("(Wales)");
 });
+
+test("Toran can review the Gujarati draft", async ({ page }) => {
+  test.setTimeout(60_000);
+  await logInAsAdmin(page, `translations-${Date.now()}@example.com`);
+  await page.goto("/ops/translations");
+  await expect(page.getByText("isn't shown on the site")).toBeVisible();
+  const line = page.getByRole("listitem").filter({ hasText: "Toran home" });
+  await expect(line.locator('[lang="gu"]')).toContainText("મુખ્ય પાનું");
+  await expect(
+    page.getByRole("button", { name: "Copy the list" }),
+  ).toBeVisible();
+});

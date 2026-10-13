@@ -10,6 +10,7 @@ import { calendarLabel, formatDateRange, londonDate } from "@/lib/format";
 import { pageMetadata, pageTitle } from "@/lib/site";
 import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
+import { translator } from "@/lib/i18n";
 
 // Every festival page is fully static, refreshed when festival dates or
 // events change.
@@ -51,6 +52,7 @@ export default async function FestivalPage({
   }
   if (!result.data) notFound();
   const festival = result.data;
+  const t = translator();
 
   // Events during the festival whose title or description mentions it.
   const during =
@@ -68,7 +70,7 @@ export default async function FestivalPage({
   return (
     <>
       <Link href="/festivals" className="text-peacock self-start font-semibold">
-        ← All festivals
+        {t("festival.all")}
       </Link>
       <div className="flex flex-col gap-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
@@ -100,25 +102,25 @@ export default async function FestivalPage({
                 </span>
               )}
               {!d.verified && (
-                <Badge tone="marigold">Date not yet checked</Badge>
+                <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge>
               )}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-muted">No upcoming date is listed yet.</p>
+        <p className="text-muted">{t("festival.noDate")}</p>
       )}
 
       <section aria-labelledby="events" className="flex flex-col gap-4">
         <h2 id="events" className="font-display text-3xl font-bold">
-          {festival.name} at mandirs
+          {t("festival.atMandirs", { name: festival.name })}
         </h2>
         {during.length ? (
           <EventList events={nearTo(during, null, 0)} />
         ) : (
           <div className="bg-sunk rounded-2xl p-5">
             <p className="font-semibold">
-              No mandir has listed {festival.name} events yet.
+              {t("festival.noEvents", { name: festival.name })}
             </p>
             <p className="text-muted">
               They appear here as mandirs add them. Check{" "}

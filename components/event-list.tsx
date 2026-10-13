@@ -7,6 +7,7 @@ import { describeRule } from "@/lib/recurrence";
 import { eventPath, eventShareText } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";
 import { groupByDay } from "@/lib/whats-on-view";
+import { translator } from "@/lib/i18n";
 
 // Events across mandirs, grouped by day.
 // Pass "now" on pages rendered per visit, so headings can say "Today";
@@ -18,6 +19,7 @@ export function EventList({
   events: EventNear[];
   now?: Date | null;
 }) {
+  const t = translator();
   return (
     <div className="flex flex-col gap-8">
       {groupByDay(events, now).map(({ heading, events: day }) => (
@@ -38,7 +40,7 @@ export function EventList({
                   </h3>
                   {e.status === "cancelled" && (
                     <p>
-                      <Badge tone="kumkum">Cancelled</Badge>
+                      <Badge tone="kumkum">{t("event.cancelled")}</Badge>
                     </p>
                   )}
                   <p>

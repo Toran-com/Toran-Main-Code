@@ -9,6 +9,7 @@ import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
 import { nearTo, RADII, radiusFrom } from "@/lib/whats-on-view";
+import { translator } from "@/lib/i18n";
 
 export const metadata: Metadata = pageMetadata(
   "What's on",
@@ -16,12 +17,10 @@ export const metadata: Metadata = pageMetadata(
 );
 
 export default function WhatsOnPage(props: PageProps<"/whats-on">) {
+  const t = translator();
   return (
     <>
-      <PageHeading
-        title="What's on"
-        intro="Events at mandirs across the UK in the next eight weeks. Type your postcode to see what's near you."
-      />
+      <PageHeading title={t("whatsOn.title")} intro={t("whatsOn.intro")} />
       <Suspense fallback={<Loading />}>
         <WhatsOn {...props} />
       </Suspense>
@@ -30,6 +29,7 @@ export default function WhatsOnPage(props: PageProps<"/whats-on">) {
 }
 
 async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
+  const t = translator();
   const query = await searchParams;
   // The list says "Today" and "Tomorrow", so it's worked out per visit,
   // never ahead of time (for example when a link to it is prefetched).
@@ -48,17 +48,17 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const form = (
     <form className="border-line bg-surface grid gap-4 rounded-2xl border p-5 sm:grid-cols-[2fr_1fr_1.5fr_auto] sm:items-end">
       <label className="flex flex-col gap-2">
-        <span className="font-semibold">Your postcode or area</span>
+        <span className="font-semibold">{t("whatsOn.near")}</span>
         <input
           name="near"
           defaultValue={near}
-          placeholder="e.g. HA9 or LE4 6AR"
+          placeholder={t("whatsOn.nearExample")}
           autoComplete="postal-code"
           className={inputClass}
         />
       </label>
       <label className="flex flex-col gap-2">
-        <span className="font-semibold">Within</span>
+        <span className="font-semibold">{t("whatsOn.within")}</span>
         <select
           name="within"
           defaultValue={String(within)}
@@ -66,22 +66,22 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
         >
           {RADII.map((r) => (
             <option key={r} value={r}>
-              {r} miles
+              {t("whatsOn.miles", { miles: r })}
             </option>
           ))}
         </select>
       </label>
       <label className="flex flex-col gap-2">
-        <span className="font-semibold">Region</span>
+        <span className="font-semibold">{t("whatsOn.region")}</span>
         <select name="region" defaultValue={region} className={inputClass}>
-          <option value="">Anywhere</option>
+          <option value="">{t("whatsOn.anywhere")}</option>
           {REGIONS.map((r) => (
             <option key={r}>{r}</option>
           ))}
         </select>
       </label>
       <button type="submit" className={`${buttonClass} sm:w-auto`}>
-        Show
+        {t("whatsOn.show")}
       </button>
     </form>
   );
@@ -98,10 +98,9 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   let problem: string | null = null;
   let position = null;
   if (near && origin === "unavailable") {
-    problem =
-      "We couldn't look up that postcode just now, so all events are shown.";
+    problem = t("whatsOn.lookupFailed");
   } else if (near && !origin) {
-    problem = `We couldn't find "${near}". Try a full postcode like LE4 6AR, or just the first part like LE4.`;
+    problem = t("whatsOn.notFound", { place: near });
   } else if (origin && origin !== "unavailable") {
     position = origin;
   }
@@ -118,26 +117,27 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       {events.length ? (
         <>
           <p className="text-muted" aria-live="polite">
-            {events.length} {events.length === 1 ? "event" : "events"}
-            {position && ` within ${within} miles of ${near.toUpperCase()}`}
-            {region && ` in ${region}`}
+            {t.count("whatsOn.count", events.length)}
+            {position &&
+              t("whatsOn.countNear", {
+                miles: within,
+                place: near.toUpperCase(),
+              })}
+            {region && t("whatsOn.countRegion", { region })}
           </p>
           <EventList events={events} now={new Date()} />
         </>
       ) : (
         <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-5">
           <p className="font-semibold">
-            {position || region
-              ? "No events listed there in the next eight weeks."
-              : "No events listed yet."}
+            {position || region ? t("whatsOn.noneThere") : t("whatsOn.noneYet")}
           </p>
           <p className="text-muted">
-            Mandirs are adding their events as they join Toran. In the meantime,
-            find your nearest mandir on the{" "}
+            {t("whatsOn.emptyBefore")}
             <Link href="/mandirs" className="text-peacock underline">
-              mandir list
+              {t("whatsOn.emptyLink")}
             </Link>
-            .
+            {t("whatsOn.emptyAfter")}
           </p>
         </div>
       )}
