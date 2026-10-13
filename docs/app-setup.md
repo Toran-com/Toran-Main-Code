@@ -288,6 +288,20 @@ Actions. Merge them when their checks are green; anything bigger (a new
 major version) gets a separate pull request and is worth asking Claude
 about. Also a refreshed README listing every page built so far.
 
+### Map positions (after the mandir details are merged)
+
+Once, on `/ops` (after your authenticator code), press **Fill in map
+positions**. It looks up each mandir's postcode on postcodes.io and saves
+the map position, which "near you" and distances need. It only fills
+mandirs without a position, so it's safe to press again after adding
+mandirs.
+
+Postcode positions come from the ONS Postcode Directory. Pages that show
+distances must say: "Contains OS data © Crown copyright and database right;
+contains Royal Mail data © Royal Mail copyright and database right; source:
+Office for National Statistics, licensed under the Open Government Licence
+v3.0." The "near you" pages will include this.
+
 ### Done when
 
 - The "coming soon" page is live on a real URL
