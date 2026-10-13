@@ -16,7 +16,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
-import { addEvent, changeEvent } from "./actions";
+import { ConfirmButton } from "@/components/confirm-button";
+import { FORM_ERRORS } from "@/lib/mandir-form";
+import { addEvent, changeEvent, updatePracticalDetails } from "./actions";
 
 export const metadata: Metadata = {
   title: pageTitle("Manage your mandir"),
@@ -24,6 +26,7 @@ export const metadata: Metadata = {
 };
 
 const ERRORS: Record<string, string> = {
+  ...FORM_ERRORS,
   title: "Please give the event a name (2 to 120 characters).",
   summary: "Please keep the description under 280 characters.",
   date: "Please choose a date from today onwards, within the next two years.",
@@ -37,6 +40,7 @@ const DONE: Record<string, string> = {
   cancel: "Marked as cancelled. Visitors will see that it's off.",
   restore: "Back on. Visitors will see it as happening.",
   remove: "Removed from your page.",
+  details: "Saved. Your public page shows the new details.",
 };
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
@@ -58,7 +62,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const { data: mandir } = supabase
     ? await supabase
         .from("mandirs")
-        .select("id, slug, name, town")
+        .select("id, slug, name, town, postcode, website, phone")
         .eq("slug", slug)
         .maybeSingle()
     : { data: null };
@@ -191,7 +195,14 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                       <EventButton intent="cancel">Cancel</EventButton>
                     </>
                   )}
-                  <EventButton intent="remove">Remove</EventButton>
+                  <ConfirmButton
+                    name="intent"
+                    value="remove"
+                    question={`Remove "${event.title}" from your page?`}
+                    className={`${quietButtonClass} px-4 py-2 text-base`}
+                  >
+                    Remove
+                  </ConfirmButton>
                 </form>
               </li>
             ))}
@@ -203,6 +214,51 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           </p>
         )}
       </section>
+
+      <Card>
+        <h2 className="text-2xl font-bold">Your mandir&apos;s details</h2>
+        <p className="text-muted">
+          Shown on your public page. To change the mandir&apos;s name or town,
+          ask Toran.
+        </p>
+        <form action={updatePracticalDetails} className="flex flex-col gap-5">
+          <input type="hidden" name="slug" value={mandir.slug} />
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Postcode</span>
+            <input
+              name="postcode"
+              autoComplete="off"
+              defaultValue={mandir.postcode ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Website</span>
+            <input
+              name="website"
+              inputMode="url"
+              defaultValue={mandir.website ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Mandir phone number</span>
+            <span className="text-muted -mt-1 text-base">
+              The mandir&apos;s own number, not a personal mobile, as it&apos;s
+              shown publicly.
+            </span>
+            <input
+              name="phone"
+              type="tel"
+              defaultValue={mandir.phone ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <button type="submit" className={quietButtonClass}>
+            Save details
+          </button>
+        </form>
+      </Card>
     </>
   );
 }

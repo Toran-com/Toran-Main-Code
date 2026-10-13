@@ -277,6 +277,10 @@ What it adds:
    start time). Each event has "Still on", "Cancel" and "Remove" buttons.
    Changes show on the public page straight away.
 
+Committees can also correct their mandir's postcode, website and phone
+number on the same page; the name and town stay with you. Removing an event
+asks "Are you sure?" first.
+
 Removed events are only hidden: they stay in the database, in case one is
 removed by mistake (ask Claude to restore it).
 
