@@ -2,6 +2,7 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { lookupPostcodes, normalisePostcode } from "@/lib/geo";
 import { createSessionClient } from "@/lib/supabase/session";
 
 export type EnrolState =
@@ -107,4 +108,43 @@ export async function decideClaim(formData: FormData) {
     updateTag("mandirs");
   }
   redirect(`/ops?decided=${approve ? "approved" : "rejected"}`);
+}
+
+// Looks up map positions for every mandir that has a postcode but no
+// position yet, so "near you" and distances work. Safe to run again.
+export async function fillMapPositions() {
+  const supabase = await createSessionClient();
+  if (!supabase) redirect("/ops?error=positions");
+
+  const { data: missing, error } = await supabase
+    .from("mandirs")
+    .select("id, postcode")
+    .not("postcode", "is", null)
+    .is("latitude", null);
+  if (error) redirect("/ops?error=positions");
+
+  let found: Awaited<ReturnType<typeof lookupPostcodes>>;
+  try {
+    found = await lookupPostcodes(missing.map((m) => m.postcode!));
+  } catch {
+    redirect("/ops?error=postcodes");
+  }
+
+  let updated = 0;
+  let unknown = 0;
+  for (const m of missing) {
+    const position = found.get(normalisePostcode(m.postcode!) ?? "");
+    if (!position) {
+      unknown++;
+      continue;
+    }
+    const { error: updateError } = await supabase
+      .from("mandirs")
+      .update(position)
+      .eq("id", m.id);
+    if (updateError) unknown++;
+    else updated++;
+  }
+  updateTag("mandirs");
+  redirect(`/ops?positions=${updated}&unknown=${unknown}`);
 }

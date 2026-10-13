@@ -11,7 +11,7 @@ import {
 import { getCurrentUser } from "@/lib/auth";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
-import { decideClaim } from "./actions";
+import { decideClaim, fillMapPositions } from "./actions";
 import { EnrolSecondFactor, VerifySecondFactor } from "./second-factor";
 
 export const metadata: Metadata = {
@@ -48,6 +48,13 @@ async function Ops({ searchParams }: Pick<PageProps<"/ops">, "searchParams">) {
   const { data: claims, error } = supabase
     ? await supabase.rpc("pending_mandir_claims")
     : { data: null, error: true };
+  const { count: unmapped } = supabase
+    ? await supabase
+        .from("mandirs")
+        .select("id", { count: "exact", head: true })
+        .not("postcode", "is", null)
+        .is("latitude", null)
+    : { count: null };
 
   return (
     <>
@@ -111,6 +118,41 @@ async function Ops({ searchParams }: Pick<PageProps<"/ops">, "searchParams">) {
           </ul>
         ) : (
           <p className="text-muted">No claims waiting.</p>
+        )}
+      </section>
+      <section aria-labelledby="positions" className="flex flex-col gap-3">
+        <h2 id="positions" className="text-2xl font-bold">
+          Map positions
+        </h2>
+        {query.positions !== undefined && (
+          <Notice tone="success">
+            Added {String(query.positions)} map positions.
+            {Number(query.unknown) > 0 &&
+              ` ${String(query.unknown)} postcodes weren't recognised; check them.`}
+          </Notice>
+        )}
+        {(query.error === "positions" || query.error === "postcodes") && (
+          <Notice tone="error">
+            Couldn&apos;t look up postcodes just now. Please try again later.
+          </Notice>
+        )}
+        {unmapped ? (
+          <Card>
+            <p>
+              {unmapped} {unmapped === 1 ? "mandir has" : "mandirs have"} a
+              postcode but no map position yet, so they can&apos;t show
+              distances.
+            </p>
+            <form action={fillMapPositions}>
+              <button type="submit" className={quietButtonClass}>
+                Fill in map positions
+              </button>
+            </form>
+          </Card>
+        ) : (
+          <p className="text-muted">
+            Every mandir with a postcode has a map position.
+          </p>
         )}
       </section>
     </>
