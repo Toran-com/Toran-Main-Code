@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
@@ -30,6 +31,9 @@ export default function WhatsOnPage(props: PageProps<"/whats-on">) {
 
 async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const query = await searchParams;
+  // The list says "Today" and "Tomorrow", so it's worked out per visit,
+  // never ahead of time (for example when a link to it is prefetched).
+  await connection();
   const near = String(query.near ?? "")
     .trim()
     .slice(0, 10);
