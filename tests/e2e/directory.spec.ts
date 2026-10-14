@@ -71,3 +71,8 @@ test("the demo page works without a database", async ({ page }) => {
   );
   await expect(page.getByText("Reply here if you can help.")).toBeVisible();
 });
+
+test("an unknown mandir's print page is not found", async ({ page }) => {
+  const response = await page.goto("/mandirs/no-such-mandir/print");
+  expect(response?.status()).toBe(404);
+});

@@ -63,3 +63,25 @@ test("a festival card opens the festival's own page", async ({ page }) => {
   await expect(page.getByText(/(19|20)\d\d/).first()).toBeVisible();
   await expect(page.getByText("Date not yet checked").first()).toBeVisible();
 });
+
+test("a mandir's print page has a QR code to its page", async ({ page }) => {
+  await page.goto("/mandirs/geeta-bhavan-leicester");
+  // No events yet, so nothing worth printing is offered.
+  await expect(
+    page.getByRole("link", { name: "Print for a noticeboard →" }),
+  ).toHaveCount(0);
+
+  await page.goto("/mandirs/geeta-bhavan-leicester/print");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Geeta Bhavan Leicester",
+  );
+  await expect(
+    page.getByRole("img", {
+      name: /^QR code for https?:\/\/.+\/mandirs\/geeta-bhavan-leicester$/,
+    }),
+  ).toBeVisible();
+  await expect(page.getByText("No events are listed yet.")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Print this page" }),
+  ).toBeVisible();
+});
