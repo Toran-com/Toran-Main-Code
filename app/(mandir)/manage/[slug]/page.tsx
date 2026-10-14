@@ -183,7 +183,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         <h2 className="text-2xl font-bold">Add an event</h2>
         <form action={addEvent} className="flex flex-col gap-5">
           <input type="hidden" name="slug" value={mandir.slug} />
-          <EventFields />
+          <EventFields gujarati />
           <button type="submit" className={buttonClass}>
             Add event
           </button>

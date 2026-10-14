@@ -38,6 +38,11 @@ export function EventList({
                   >
                     {e.title}
                   </h3>
+                  {e.title_gu && (
+                    <p lang="gu" className="text-lg font-semibold">
+                      {e.title_gu}
+                    </p>
+                  )}
                   {e.status === "cancelled" && (
                     <p>
                       <Badge tone="kumkum">{t("event.cancelled")}</Badge>

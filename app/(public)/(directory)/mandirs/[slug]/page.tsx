@@ -229,12 +229,18 @@ function EventCard({
       <h3 className={`text-xl font-bold ${cancelled ? "line-through" : ""}`}>
         {event.title}
       </h3>
+      {event.title_gu && (
+        <p lang="gu" className="-mt-1 text-lg font-semibold">
+          {event.title_gu}
+        </p>
+      )}
       {cancelled && (
         <p>
           <Badge tone="kumkum">Cancelled</Badge>
         </p>
       )}
       {event.summary && <p>{event.summary}</p>}
+      {event.summary_gu && <p lang="gu">{event.summary_gu}</p>}
       {(event.location_note || event.cost_note) && (
         <p className="text-muted">
           {[event.location_note, event.cost_note].filter(Boolean).join(" · ")}

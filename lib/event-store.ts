@@ -18,6 +18,8 @@ export async function saveEvent(
       mandir_id: mandirId,
       title: event.title,
       summary: event.summary,
+      title_gu: event.titleGu,
+      summary_gu: event.summaryGu,
       starts_at: event.startsAt.toISOString(),
       all_day: event.allDay,
       recurrence: event.rule,

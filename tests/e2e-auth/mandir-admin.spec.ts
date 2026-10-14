@@ -49,13 +49,23 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByLabel("What's happening?").fill("Annakut darshan");
   await member.getByLabel("Date").fill(nextWeek());
   await member.getByLabel("Starts").fill("18:30");
+  await member
+    .getByText("Add the name and description in Gujarati (optional)")
+    .click();
+  await member.getByLabel("Name in Gujarati").fill("અન્નકૂટ દર્શન");
+  await member.getByLabel("Description in Gujarati").fill("સૌનું સ્વાગત છે.");
   await member.getByRole("button", { name: "Add event" }).click();
   await expect(member.getByText("Added.")).toBeVisible();
 
-  // It's on the public page at once, with the committee badge.
+  // It's on the public page at once, with the committee badge and the
+  // Gujarati under the English.
   await member.goto(`/mandirs/${SLUG}`);
   const event = member.getByRole("article").filter({ hasText: "Annakut" });
   await expect(event).toContainText("6:30pm");
+  await expect(event.locator('[lang="gu"]').first()).toHaveText(
+    "અન્નકૂટ દર્શન",
+  );
+  await expect(event).toContainText("સૌનું સ્વાગત છે.");
   await expect(event).toContainText("Confirmed by the mandir");
   const whatsApp = await event
     .getByRole("link", { name: "WhatsApp" })
@@ -65,9 +75,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
 
   // And on What's on, under the mandir's name.
   await member.goto("/whats-on");
-  await expect(
-    member.getByRole("article").filter({ hasText: "Annakut darshan" }),
-  ).toContainText(NAME);
+  const listed = member
+    .getByRole("article")
+    .filter({ hasText: "Annakut darshan" });
+  await expect(listed).toContainText(NAME);
+  await expect(listed).toContainText("અન્નકૂટ દર્શન");
 
   // A weekly event shows once, with its next date.
   await member.goto(`/manage/${SLUG}`);
