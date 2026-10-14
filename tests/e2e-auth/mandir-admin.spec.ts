@@ -109,23 +109,21 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByRole("link", { name: "Edit" })
     .click();
   await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}/events/`));
-  // Wait for the edit page to replace the old one (both are briefly there).
-  await expect(
-    member.getByRole("button", { name: "Save changes" }),
-  ).toBeVisible();
-  await expect(member.getByRole("button", { name: "Add event" })).toHaveCount(
-    0,
-  );
-  await expect(member.getByLabel("What's happening?")).toHaveValue(
+  // The committee's page stays in the document, hidden, after moving on
+  // (Next.js keeps it for going back), so look only inside the edit form.
+  const form = member
+    .locator("form")
+    .filter({ has: member.getByRole("button", { name: "Save changes" }) });
+  await expect(form.getByLabel("What's happening?")).toHaveValue(
     "Weekly aarti",
   );
-  await expect(member.getByLabel("Starts")).toHaveValue("19:00");
-  await expect(member.getByRole("combobox", { name: /^Repeats/ })).toHaveValue(
+  await expect(form.getByLabel("Starts")).toHaveValue("19:00");
+  await expect(form.getByRole("combobox", { name: /^Repeats/ })).toHaveValue(
     "weekly",
   );
-  await member.getByLabel("What's happening?").fill("Weekly sandhya aarti");
-  await member.getByLabel("Starts").fill("19:30");
-  await member.getByRole("button", { name: "Save changes" }).click();
+  await form.getByLabel("What's happening?").fill("Weekly sandhya aarti");
+  await form.getByLabel("Starts").fill("19:30");
+  await form.getByRole("button", { name: "Save changes" }).click();
   await expect(member.getByText("Saved. Your public page shows")).toBeVisible();
   await member.goto(`/mandirs/${SLUG}`);
   const edited = member
