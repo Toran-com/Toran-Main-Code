@@ -33,7 +33,8 @@ begin
     or coalesce(p ->> 'time', '') !~ '^(\d{2}:\d{2})?$'
     or coalesce(p ->> 'repeat', 'none') not in ('none', 'weekly', 'fortnightly', 'monthly', 'monthly-last')
     or coalesce(p ->> 'until', '') !~ '^(\d{4}-\d{2}-\d{2})?$'
-    or coalesce(p ->> 'link', '') !~ '^(https?://\S{1,290})?$' then
+    or coalesce(length(p ->> 'link'), 0) > 300
+    or coalesce(p ->> 'link', '') !~ '^(https?://\S+)?$' then
     raise exception 'That report isn''t complete' using errcode = '22023';
   end if;
 
