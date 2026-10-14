@@ -6,21 +6,25 @@ What the database holds and who can do what. The tables are defined in
 
 ## Tables
 
-| Table               | Holds                                                                                                                                                                                                                                      | Personal data?          |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
-| `mandirs`           | Name, town, region, postcode, location, tradition, calendar, website, public phone, charity number, status (listed / claimed / hidden)                                                                                                     | No                      |
-| `mandir_contacts`   | The committee email Toran uses, and notes. Never public                                                                                                                                                                                    | Organisation contact    |
-| `mandir_admins`     | Which logged-in person runs which mandir                                                                                                                                                                                                   | Links to a login        |
-| `mandir_claims`     | "I'm on this mandir's committee" requests, with role and a short message                                                                                                                                                                   | Links to a login        |
-| `toran_admins`      | People who run Toran                                                                                                                                                                                                                       | Links to a login        |
-| `festivals`         | Navratri, Diwali and so on                                                                                                                                                                                                                 | No                      |
-| `festival_dates`    | When each festival falls, per calendar tradition, with source and a verified flag                                                                                                                                                          | No                      |
-| `events`            | Title and description (optionally also in Gujarati), kind, where it came from (mandir, poster, website or visitor), start and end (UTC + time zone), repeat rule, place and cost notes, link, festival, status, when and by whom confirmed | Who confirmed (a login) |
-| `event_occurrences` | Each actual date of a repeating event                                                                                                                                                                                                      | No                      |
-| `sources`           | Where a mandir's information comes from (website, forward, admin, …)                                                                                                                                                                       | No                      |
-| `event_claims`      | The review queue: what a source says about an event, with confidence                                                                                                                                                                       | No                      |
-| `seva_roles`        | Roles an event needs (kitchen, parking), and whether the mandir requires a DBS check                                                                                                                                                       | No                      |
-| `seva_shifts`       | Shift times and how many people each needs                                                                                                                                                                                                 | No                      |
+| Table               | Holds                                                                                                                                                                             | Personal data?          |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `mandirs`           | Name, town, region, postcode, location, tradition, calendar, website, public phone, charity number, status (listed / claimed / hidden)                                            | No                      |
+| `mandir_contacts`   | The committee email Toran uses, and notes. Never public                                                                                                                           | Organisation contact    |
+| `mandir_admins`     | Which logged-in person runs which mandir                                                                                                                                          | Links to a login        |
+| `mandir_claims`     | "I'm on this mandir's committee" requests, with role and a short message                                                                                                          | Links to a login        |
+| `toran_admins`      | People who run Toran                                                                                                                                                              | Links to a login        |
+| `festivals`         | Navratri, Diwali and so on                                                                                                                                                        | No                      |
+| `festival_dates`    | When each festival falls, per calendar tradition, with source and a verified flag                                                                                                 | No                      |
+| `events`            | Title and description (optionally also in Gujarati), kind, start and end (UTC + time zone), repeat rule, place and cost notes, link, festival, status, when and by whom confirmed | Who confirmed (a login) |
+| `event_occurrences` | Each actual date of a repeating event                                                                                                                                             | No                      |
+| `sources`           | Where a mandir's information comes from (website, forward, admin, …)                                                                                                              | No                      |
+| `event_claims`      | The review queue: what a source says about an event, with confidence                                                                                                              | No                      |
+| `seva_roles`        | Roles an event needs (kitchen, parking), and whether the mandir requires a DBS check                                                                                              | No                      |
+| `seva_shifts`       | Shift times and how many people each needs                                                                                                                                        | No                      |
+
+Each event also records where it came from (`events.origin`): added by the
+mandir, typed up from a poster, read from the mandir's website, or sent in by
+a visitor. Pages show this to families when the mandir hasn't confirmed it.
 
 ## Starting data
 
