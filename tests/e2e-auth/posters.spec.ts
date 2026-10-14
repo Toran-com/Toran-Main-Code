@@ -61,13 +61,20 @@ test("Toran previews the weekly digest", async ({ page }) => {
     page.getByRole("heading", { name: "What's on at mandirs" }),
   ).toBeVisible();
   await expect(page.getByText("Nobody receives it yet")).toBeVisible();
-  await expect(page.locator("pre")).toContainText("What's on at mandirs:");
-  await expect(page.locator("pre")).toContainText("/whats-on");
+  // The WhatsApp version, then the plain text.
+  const whatsApp = page.locator("pre").first();
+  const plain = page.locator("pre").last();
+  await expect(whatsApp).toContainText("*What's on at mandirs*");
+  await expect(plain).toContainText("What's on at mandirs:");
+  await expect(plain).toContainText("/whats-on");
+  await expect(
+    page.getByRole("button", { name: "Copy the email" }),
+  ).toBeVisible();
 
   await page.getByRole("combobox", { name: /^Region/ }).selectOption("Wales");
   await page.getByRole("button", { name: "Show" }).click();
   await expect(page).toHaveURL(/region=Wales/);
-  await expect(page.locator("pre")).toContainText("(Wales)");
+  await expect(plain).toContainText("(Wales)");
 });
 
 test("Toran can review the Gujarati draft", async ({ page }) => {

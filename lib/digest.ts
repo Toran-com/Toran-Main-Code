@@ -5,6 +5,7 @@
 
 import type { FestivalDate } from "@/lib/directory";
 import { formatDateRange, formatEventStart, londonDate } from "@/lib/format";
+import { eventPath } from "@/lib/share";
 import type { ListedEvent } from "@/lib/whats-on";
 import { groupByDay } from "@/lib/whats-on-view";
 
@@ -14,6 +15,8 @@ export type Digest = {
   start: string;
   end: string;
   region: string | null;
+  // A place it's been narrowed to, such as "within 10 miles of HA9".
+  area: string | null;
   festivals: { name: string; slug: string; when: string; checked: boolean }[];
   days: { heading: string; events: ListedEvent[] }[];
   count: number;
@@ -30,6 +33,7 @@ export function buildDigest(
   dates: readonly FestivalDate[],
   now: Date,
   region: string | null,
+  area: string | null = null,
 ): Digest {
   const start = londonDate(now);
   const end = addDays(start, 6);
@@ -59,6 +63,7 @@ export function buildDigest(
     start,
     end,
     region,
+    area,
     festivals,
     days: groupByDay(week, null),
     count: week.length,
@@ -73,10 +78,15 @@ export function eventTime(
   return formatEventStart(event.next_starts_at, false).split(", ").at(-1)!;
 }
 
-// The digest as plain text, for an email's text part or a WhatsApp
-// broadcast.
+// "Mon 19 Oct – Sun 25 Oct 2026 (London, within 10 miles of HA9)"
+function dates(digest: Digest): string {
+  const where = [digest.region, digest.area].filter(Boolean).join(", ");
+  return `${formatDateRange(digest.start, digest.end)}${where ? ` (${where})` : ""}`;
+}
+
+// The digest as plain text, for an email's text part.
 export function digestText(digest: Digest, siteUrl: string): string {
-  const title = `What's on at mandirs: ${formatDateRange(digest.start, digest.end)}${digest.region ? ` (${digest.region})` : ""}`;
+  const title = `What's on at mandirs: ${dates(digest)}`;
   const parts = [title];
   if (digest.festivals.length) {
     parts.push(
@@ -106,4 +116,88 @@ export function digestText(digest: Digest, siteUrl: string): string {
   }
   parts.push(`More, and what's near you: ${siteUrl}/whats-on`);
   return parts.join("\n\n");
+}
+
+// For a WhatsApp broadcast or group: *bold* headings, one line per event.
+export function digestWhatsApp(digest: Digest, siteUrl: string): string {
+  const parts = [`*What's on at mandirs*\n${dates(digest)}`];
+  if (digest.festivals.length) {
+    parts.push(
+      [
+        "*Festivals coming up*",
+        ...digest.festivals.map(
+          (f) =>
+            `• ${f.name}: ${f.when}${f.checked ? "" : " (date not yet checked)"}`,
+        ),
+      ].join("\n"),
+    );
+  }
+  for (const day of digest.days) {
+    parts.push(
+      [
+        `*${day.heading}*`,
+        ...day.events.map(
+          (e) =>
+            `• ${eventTime(e)} ${e.title}, ${e.mandir.name} (${e.mandir.town})`,
+        ),
+      ].join("\n"),
+    );
+  }
+  if (!digest.days.length) parts.push("No events listed this week yet.");
+  parts.push(`More, and what's near you: ${siteUrl}/whats-on 🙏`);
+  return parts.join("\n\n");
+}
+
+const escape = (text: string) =>
+  text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+// The digest as email HTML: simple, with styles written on each element
+// (email programs ignore style sheets), and a link to every event.
+export function digestHtml(digest: Digest, siteUrl: string): string {
+  const font =
+    "font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;color:#1b1a2c";
+  const heading = `${font};font-size:18px;font-weight:bold;margin:20px 0 6px`;
+  const link = "color:#0b6b68";
+  const list = "margin:0;padding-left:20px";
+  const out = [
+    `<div style="${font}">`,
+    `<h1 style="${font};font-size:24px;font-weight:bold;margin:0">What's on at mandirs</h1>`,
+    `<p style="${font};color:#8a5a00;font-weight:bold;margin:4px 0 0">${escape(dates(digest))}</p>`,
+  ];
+  if (digest.festivals.length) {
+    out.push(
+      `<h2 style="${heading}">Festivals coming up</h2>`,
+      `<ul style="${list}">`,
+    );
+    for (const f of digest.festivals) {
+      out.push(
+        `<li><a href="${escape(`${siteUrl}/festivals/${f.slug}`)}" style="${link}">${escape(f.name)}</a>: ${escape(f.when)}${f.checked ? "" : " <em>(date not yet checked)</em>"}</li>`,
+      );
+    }
+    out.push("</ul>");
+  }
+  for (const day of digest.days) {
+    out.push(
+      `<h2 style="${heading}">${escape(day.heading)}</h2>`,
+      `<ul style="${list}">`,
+    );
+    for (const e of day.events) {
+      out.push(
+        `<li><strong>${escape(eventTime(e))}</strong> <a href="${escape(`${siteUrl}${eventPath(e.mandir.slug, e.id)}`)}" style="${link}">${escape(e.title)}</a>, ${escape(e.mandir.name)} (${escape(e.mandir.town)})</li>`,
+      );
+    }
+    out.push("</ul>");
+  }
+  if (!digest.days.length) {
+    out.push(`<p style="${font}">No events listed this week yet.</p>`);
+  }
+  out.push(
+    `<p style="${font};margin-top:20px"><a href="${escape(`${siteUrl}/whats-on`)}" style="${link}">See more, and what's near you</a></p>`,
+    "</div>",
+  );
+  return out.join("\n");
 }

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildDigest, digestText } from "@/lib/digest";
+import {
+  buildDigest,
+  digestHtml,
+  digestText,
+  digestWhatsApp,
+} from "@/lib/digest";
 import type { ListedEvent } from "@/lib/whats-on";
 
 // Tuesday 13 October 2026.
@@ -141,5 +146,64 @@ describe("digestText", () => {
     expect(
       digestText(buildDigest([], [], now, "Wales"), "https://x.org"),
     ).toContain("(Wales)\n\nNo events listed this week yet.");
+  });
+});
+
+describe("narrowed to an area", () => {
+  it("says where in the title", () => {
+    const digest = buildDigest(
+      events,
+      dates,
+      now,
+      "London",
+      "within 10 miles of HA9",
+    );
+    expect(digestText(digest, "https://x.org")).toContain(
+      "Tue 13 Oct – Mon 19 Oct 2026 (London, within 10 miles of HA9)",
+    );
+  });
+});
+
+describe("digestWhatsApp", () => {
+  it("uses WhatsApp's bold for headings", () => {
+    const text = digestWhatsApp(
+      buildDigest(events, dates, now, null),
+      "https://example.org",
+    );
+    expect(text.startsWith("*What's on at mandirs*\nTue 13 Oct")).toBe(true);
+    expect(text).toContain("*Festivals coming up*");
+    expect(text).toContain(
+      "*Wednesday 14 October*\n• 7pm Garba night, Geeta Bhavan Leicester (Leicester)",
+    );
+    expect(text).toContain("https://example.org/whats-on");
+  });
+});
+
+describe("digestHtml", () => {
+  it("links every event to its card on the mandir's page", () => {
+    const html = digestHtml(
+      buildDigest(events, dates, now, null),
+      "https://example.org",
+    );
+    expect(html).toContain(
+      '<a href="https://example.org/mandirs/geeta-bhavan-leicester#event-Garba night"',
+    );
+    expect(html).toContain('href="https://example.org/festivals/navratri"');
+    expect(html).toContain("<em>(date not yet checked)</em>");
+    expect(html).not.toContain("Called off");
+  });
+
+  it("escapes what mandirs typed", () => {
+    const html = digestHtml(
+      buildDigest(
+        [event("Garba & <b>dandiya</b>", "2026-10-14T18:00:00Z")],
+        [],
+        now,
+        null,
+      ),
+      "https://example.org",
+    );
+    expect(html).toContain("Garba &amp; &lt;b&gt;dandiya&lt;/b&gt;");
+    expect(html).not.toContain("<b>dandiya</b>");
   });
 });
