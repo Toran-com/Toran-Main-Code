@@ -5,6 +5,7 @@ export const en = {
   "shell.whatsOn": "What's on",
   "shell.mandirs": "Mandirs",
   "shell.festivals": "Festivals",
+  "shell.forMandirs": "For mandir committees",
   "shell.footer":
     "Toran is being tested with mandir committees and opens in 2027. Details come from mandirs' own websites and our research; if something is wrong, the mandir's committee can correct it.",
 

@@ -39,9 +39,17 @@ export function PublicShell({ children }: { children: ReactNode }) {
         {children}
       </main>
       <footer className="border-line text-muted border-t">
-        <p className="mx-auto w-full max-w-3xl px-4 py-6 text-base sm:px-6">
-          {t("shell.footer")}
-        </p>
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 py-6 text-base sm:px-6">
+          <p>{t("shell.footer")}</p>
+          <p>
+            <Link
+              href="/for-mandirs"
+              className="text-peacock font-semibold underline"
+            >
+              {t("shell.forMandirs")}
+            </Link>
+          </p>
+        </div>
       </footer>
     </>
   );

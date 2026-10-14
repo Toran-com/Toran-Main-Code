@@ -14,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: base, changeFrequency: "daily", priority: 1 },
     { url: `${base}/whats-on`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${base}/for-mandirs`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/mandirs`, changeFrequency: "weekly" },
     { url: `${base}/festivals`, changeFrequency: "weekly" },
     ...(mandirs.state === "ok" ? mandirs.data : []).map((m) => ({

@@ -76,3 +76,15 @@ test("an unknown mandir's print page is not found", async ({ page }) => {
   const response = await page.goto("/mandirs/no-such-mandir/print");
   expect(response?.status()).toBe(404);
 });
+
+test("committees can find out what Toran does for them", async ({ page }) => {
+  await page.goto("/mandirs");
+  await page.getByRole("link", { name: "For mandir committees" }).click();
+  await expect(page).toHaveURL(/\/for-mandirs$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "For mandir committees",
+  );
+  await expect(
+    page.getByRole("link", { name: "Try the example" }),
+  ).toHaveAttribute("href", "/demo");
+});
