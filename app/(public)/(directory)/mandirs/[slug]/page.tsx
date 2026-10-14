@@ -100,6 +100,12 @@ export default async function MandirPage({
           <NoEvents website={mandir.website} />
         )}
         <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <Link
+            href={`/mandirs/${mandir.slug}/tell-us`}
+            className="text-peacock font-semibold"
+          >
+            Know about an event here? Tell us →
+          </Link>
           <Link href="/festivals" className="text-peacock font-semibold">
             Festival dates for the UK →
           </Link>

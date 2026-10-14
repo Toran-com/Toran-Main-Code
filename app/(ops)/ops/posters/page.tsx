@@ -136,11 +136,13 @@ async function Posters({ searchParams }: PageProps<"/ops/posters">) {
               defaultValue="whatsapp"
               className={inputClass}
             >
-              {Object.entries(POSTER_SOURCES).map(([key, { label }]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              ))}
+              {Object.entries(POSTER_SOURCES)
+                .filter(([key]) => key !== "visitor")
+                .map(([key, { label }]) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                ))}
             </select>
           </label>
           <button type="submit" className={buttonClass}>

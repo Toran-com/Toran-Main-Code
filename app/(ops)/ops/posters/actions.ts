@@ -17,7 +17,7 @@ export async function addPoster(formData: FormData) {
   const back: (query: string) => never = (query) =>
     redirect(`/ops/posters?mandir=${encodeURIComponent(slug)}&${query}`);
 
-  if (!(from in POSTER_SOURCES)) back("error=from");
+  if (!(from in POSTER_SOURCES) || from === "visitor") back("error=from");
   if (!checkLink(link)) back("error=link");
   const input = eventInputFrom(formData);
   const checked = checkEvent(input);
