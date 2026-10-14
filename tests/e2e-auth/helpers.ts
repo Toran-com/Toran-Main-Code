@@ -78,3 +78,27 @@ export async function logInAsAdmin(page: Page, email: string) {
   await page.getByRole("button", { name: "Confirm and unlock admin" }).click();
   await expect(page.getByText("Unlocked.")).toBeVisible();
 }
+
+// The mandirs map's pictures come from OpenStreetMap. Tests get a blank
+// picture instead, so they never call OpenStreetMap or wait on it.
+const BLANK_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+  "base64",
+);
+
+export async function stubMapTiles(page: Page) {
+  await page
+    .context()
+    .route("https://tile.openstreetmap.org/**", (route) =>
+      route.fulfill({ body: BLANK_PNG, contentType: "image/png" }),
+    );
+}
+
+// The map is the default view of /mandirs once mandirs have map positions
+// (saving a mandir in /ops looks its position up), so tests of the list
+// switch to it first.
+export async function showMandirList(page: Page) {
+  const list = page.getByRole("button", { name: "List", exact: true });
+  await list.click();
+  await expect(list).toHaveAttribute("aria-pressed", "true");
+}

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { logInAsAdmin } from "./helpers";
+import { logInAsAdmin, showMandirList, stubMapTiles } from "./helpers";
 
 async function setVisibility(
   page: Page,
@@ -19,6 +19,7 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
   page,
 }) => {
   test.setTimeout(120_000);
+  await stubMapTiles(page);
   await logInAsAdmin(page, `ops-${Date.now()}@example.com`);
 
   // Find and edit a mandir.
@@ -65,6 +66,7 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
     page.getByText("Added. It's on the public list now."),
   ).toBeVisible();
   await publicPage.goto("/mandirs");
+  await showMandirList(publicPage);
   await expect(
     publicPage.getByRole("link", { name: new RegExp(name) }),
   ).toBeVisible();

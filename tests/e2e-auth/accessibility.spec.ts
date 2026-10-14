@@ -1,12 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { expectAccessible } from "../a11y";
-import { logIn, logInAsAdmin, sql } from "./helpers";
+import {
+  logIn,
+  logInAsAdmin,
+  showMandirList,
+  sql,
+  stubMapTiles,
+} from "./helpers";
 
 // Every kind of page, with real data, meets WCAG 2.2 AA in light and dark
 // mode: public pages, a committee's pages and the admin area.
 
 test("public pages are accessible", async ({ page }) => {
   test.setTimeout(90_000);
+  await stubMapTiles(page);
   for (const path of [
     "/mandirs",
     "/mandirs/geeta-bhavan-leicester",
@@ -22,6 +29,10 @@ test("public pages are accessible", async ({ page }) => {
     await page.waitForLoadState("networkidle");
     await expectAccessible(page);
   }
+  // The mandirs as a list as well as on the map.
+  await page.goto("/mandirs");
+  await showMandirList(page);
+  await expectAccessible(page);
   // A festival's own page.
   await page.goto("/festivals");
   await page.getByRole("article").first().getByRole("link").first().click();

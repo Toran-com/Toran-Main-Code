@@ -1,10 +1,14 @@
 import { expect, test } from "@playwright/test";
+import { showMandirList, stubMapTiles } from "./helpers";
 
 // The directory against a real local Supabase with the starting data
 // (supabase/data/mandirs.csv and the festival dates migration).
 
+test.beforeEach(({ page }) => stubMapTiles(page));
+
 test("the mandir list shows the starting directory", async ({ page }) => {
   await page.goto("/mandirs");
+  await showMandirList(page);
   await expect(page.getByText("106 mandirs")).toBeVisible();
   await expect(
     page.getByRole("heading", { level: 2, name: "East Midlands" }),
@@ -13,6 +17,7 @@ test("the mandir list shows the starting directory", async ({ page }) => {
 
 test("searching narrows the list", async ({ page }) => {
   await page.goto("/mandirs");
+  await showMandirList(page);
   await page.getByLabel("Find a mandir or town").fill("geeta leicester");
   await expect(page.getByText(/^\d+ of 106 mandirs$/)).toBeVisible();
   await expect(
@@ -28,6 +33,7 @@ test("a mandir page shows its details and an empty events list", async ({
   page,
 }) => {
   await page.goto("/mandirs");
+  await showMandirList(page);
   await page.getByRole("link", { name: /Geeta Bhavan Leicester/ }).click();
   await expect(page).toHaveURL(/\/mandirs\/geeta-bhavan-leicester$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
