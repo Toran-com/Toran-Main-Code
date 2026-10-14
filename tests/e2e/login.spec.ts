@@ -62,6 +62,7 @@ test("the admin pages need a login", async ({ page }) => {
     "/ops/mandirs",
     "/ops/mandirs/new",
     "/ops/posters",
+    "/ops/websites",
     "/ops/festivals",
     "/ops/digest",
     "/ops/translations",

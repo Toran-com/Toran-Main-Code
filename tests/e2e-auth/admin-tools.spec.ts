@@ -88,6 +88,24 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
   await expect(page.getByText("Marked as not checked.")).toBeVisible();
 });
 
+test("an admin sees which mandir websites can be checked", async ({ page }) => {
+  await logInAsAdmin(page, `websites-${Date.now()}@example.com`);
+  await page.getByRole("link", { name: "Websites", exact: true }).click();
+  await expect(page).toHaveURL(/\/ops\/websites$/);
+  // Lists mandirs with a website, each with its own check. (Checking
+  // itself reads real websites, so it's tested with a fake site instead:
+  // tests/unit/website-check.test.ts.)
+  await expect(page.getByText("With a website")).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Check Geeta Bhavan Leicester's website",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Check the next 5 websites" }),
+  ).toBeVisible();
+});
+
 test("the admin pages are hidden from everyone else", async ({ page }) => {
   const response = await page.goto("/ops/mandirs");
   await expect(page).toHaveURL(/\/login\?next=%2Fops%2Fmandirs/);

@@ -13,6 +13,16 @@ export function londonDate(now: Date = new Date()): string {
   }).format(now);
 }
 
+// The time in London as HH:MM (24-hour), as a time input wants it.
+export function londonTime(at: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: LONDON,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(at);
+}
+
 // A date-only value (YYYY-MM-DD) as a Date at midnight UTC, so formatting in
 // UTC never shifts it a day.
 function dateOnly(value: string): Date {
