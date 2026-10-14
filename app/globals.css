@@ -230,6 +230,12 @@ a:hover {
   opacity: 0.85;
 }
 
+/* Keeps the map's own layers (zoom buttons, popups) inside the map, so
+   they slide under the header rather than over it. */
+.leaflet-container {
+  isolation: isolate;
+}
+
 /* A small ornament under page headings: two fading lines and a diamond. */
 .ornament {
   display: flex;
