@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import { checkEvent, type EventError } from "@/lib/event-form";
+import { originOfPoster } from "@/lib/event-kinds";
 import { saveEvent } from "@/lib/event-store";
 import { posterFrom } from "@/lib/posters";
 
@@ -48,6 +49,7 @@ export async function reviewPoster(
   const eventId = await saveEvent(db, claim.mandir.id, checked.event, {
     confirmed: as === "committee",
     link: poster.link || null,
+    origin: originOfPoster(poster.from),
   });
   if (!eventId) return { ok: false, error: "failed" };
   const { data } = await db

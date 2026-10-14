@@ -2,6 +2,7 @@
 // committee's "Add an event" form, or Toran's poster queue. Pure, so the
 // rules are tested once and the same everywhere.
 
+import { type EventKind, isEventKind } from "@/lib/event-kinds";
 import { londonDate, londonTime, londonToUtc } from "@/lib/format";
 import {
   occurrenceDates,
@@ -24,6 +25,8 @@ export type EventInput = {
   until: string;
   title_gu?: string;
   summary_gu?: string;
+  // What kind of event (lib/event-kinds.ts); posters leave it out.
+  kind?: string;
 };
 
 export type EventError =
@@ -31,6 +34,7 @@ export type EventError =
   | "summary"
   | "titleGu"
   | "summaryGu"
+  | "kind"
   | "date"
   | "time"
   | "repeat"
@@ -42,6 +46,7 @@ export type CheckedEvent = {
   // The same in Gujarati, if given.
   titleGu: string | null;
   summaryGu: string | null;
+  kind: EventKind;
   allDay: boolean;
   startsAt: Date;
   rule: string | null;
@@ -71,6 +76,7 @@ export function eventInputFrom(source: {
     until: text("until"),
     title_gu: text("title_gu"),
     summary_gu: text("summary_gu"),
+    kind: text("kind") || "other",
   };
 }
 
@@ -84,6 +90,7 @@ export function eventInputFromEvent(event: {
   all_day: boolean;
   recurrence: string | null;
   next_starts_at: string;
+  kind?: string;
 }): EventInput {
   const at = new Date(event.next_starts_at);
   const parsed = event.recurrence ? parseRule(event.recurrence) : null;
@@ -96,6 +103,7 @@ export function eventInputFromEvent(event: {
     until: parsed?.until ?? "",
     title_gu: event.title_gu ?? "",
     summary_gu: event.summary_gu ?? "",
+    kind: event.kind ?? "other",
   };
 }
 
@@ -120,6 +128,8 @@ export function checkEvent(
     return fail("titleGu");
   }
   if (summaryGu.length > 280) return fail("summaryGu");
+  const kind = input.kind || "other";
+  if (!isEventKind(kind)) return fail("kind");
   const today = londonDate(now);
   const latest = londonDate(new Date(now.getTime() + 2 * 366 * DAY_MS));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < today || date > latest) {
@@ -162,6 +172,7 @@ export function checkEvent(
       summary: summary || null,
       titleGu: titleGu || null,
       summaryGu: summaryGu || null,
+      kind,
       allDay,
       startsAt,
       rule,
@@ -187,6 +198,7 @@ export const EVENT_ERRORS: Record<EventError, string> = {
   summary: "Please keep the description under 280 characters.",
   titleGu: "Please keep the Gujarati name between 2 and 120 characters.",
   summaryGu: "Please keep the Gujarati description under 280 characters.",
+  kind: "Please choose what kind of event it is.",
   date: "Please choose a date from today onwards, within the next two years.",
   time: "Please choose a valid start time, or leave it empty for all day.",
   repeat: "Please choose how often it repeats.",

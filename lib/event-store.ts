@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
+import type { EventOrigin } from "@/lib/event-kinds";
 import type { CheckedEvent } from "@/lib/event-form";
 import { londonDate } from "@/lib/format";
 
@@ -11,7 +12,11 @@ export async function saveEvent(
   db: SupabaseClient<Database>,
   mandirId: string,
   event: CheckedEvent,
-  { confirmed, link = null }: { confirmed: boolean; link?: string | null },
+  {
+    confirmed,
+    link = null,
+    origin,
+  }: { confirmed: boolean; link?: string | null; origin: EventOrigin },
 ): Promise<string | null> {
   const { data, error } = await db
     .from("events")
@@ -21,6 +26,8 @@ export async function saveEvent(
       summary: event.summary,
       title_gu: event.titleGu,
       summary_gu: event.summaryGu,
+      kind: event.kind,
+      origin,
       starts_at: event.startsAt.toISOString(),
       all_day: event.allDay,
       recurrence: event.rule,
@@ -64,6 +71,7 @@ export async function updateEvent(
       summary: event.summary ?? "",
       title_gu: event.titleGu ?? "",
       summary_gu: event.summaryGu ?? "",
+      kind: event.kind,
       starts_at: event.startsAt.toISOString(),
       all_day: event.allDay,
       recurrence: event.rule ?? "",

@@ -42,6 +42,7 @@ test("Toran publishes a poster for a mandir with no committee", async ({
   const event = page.getByRole("article").filter({ hasText: "Navratri garba" });
   await expect(event).toContainText("8pm");
   await expect(event).not.toContainText("Confirmed by the mandir");
+  await expect(event).toContainText("From a poster or message");
 });
 
 test("Toran previews the weekly digest", async ({ page }) => {

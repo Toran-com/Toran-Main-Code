@@ -25,11 +25,14 @@ export const en = {
   "whatsOn.miles": "{miles} miles",
   "whatsOn.region": "Region",
   "whatsOn.anywhere": "Anywhere",
+  "whatsOn.type": "Type of event",
+  "whatsOn.anyType": "Any type",
   "whatsOn.show": "Show",
   "whatsOn.count.one": "{count} event",
   "whatsOn.count.other": "{count} events",
   "whatsOn.countNear": " within {miles} miles of {place}",
   "whatsOn.countRegion": " in {region}",
+  "whatsOn.countType": " ({type})",
   "whatsOn.lookupFailed":
     "We couldn't look up that postcode just now, so all events are shown.",
   "whatsOn.notFound":

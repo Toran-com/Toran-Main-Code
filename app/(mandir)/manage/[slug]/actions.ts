@@ -33,6 +33,7 @@ export async function addEvent(formData: FormData) {
   // Adding it is confirming it.
   const id = await saveEvent(supabase, mandir.id, checked.event, {
     confirmed: true,
+    origin: "mandir",
   });
   if (!id) back("error=failed");
   updateTag(`mandir:${mandir.slug}`);
