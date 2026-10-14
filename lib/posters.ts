@@ -30,7 +30,12 @@ export function posterFrom(proposed: unknown): Poster | null {
   if (!(String(p.from) in POSTER_SOURCES)) return null;
   // Claims can be added outside Toran's form, so check the link again.
   if (!checkLink(String(p.link))) return null;
-  return Object.fromEntries(fields.map((f) => [f, p[f]])) as Poster;
+  const poster = Object.fromEntries(fields.map((f) => [f, p[f]])) as Poster;
+  // The name and description in Gujarati, if the poster gave them.
+  for (const f of ["title_gu", "summary_gu"] as const) {
+    if (typeof p[f] === "string" && p[f]) poster[f] = p[f];
+  }
+  return poster;
 }
 
 // An optional "more details" link must be a web address.

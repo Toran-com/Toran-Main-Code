@@ -23,6 +23,21 @@ describe("posterFrom", () => {
     );
   });
 
+  it("keeps the Gujarati name and description when given", () => {
+    const gujarati = {
+      title_gu: "અન્નકૂટ દર્શન",
+      summary_gu: "સૌનું સ્વાગત છે.",
+    };
+    expect(posterFrom({ ...poster, ...gujarati })).toEqual({
+      ...poster,
+      ...gujarati,
+    });
+    // Empty or not text: left out.
+    expect(posterFrom({ ...poster, title_gu: "", summary_gu: 3 })).toEqual(
+      poster,
+    );
+  });
+
   it.each([
     null,
     "Annakut",

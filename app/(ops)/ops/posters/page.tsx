@@ -115,7 +115,7 @@ async function Posters({ searchParams }: PageProps<"/ops/posters">) {
               ))}
             </select>
           </label>
-          <EventFields />
+          <EventFields gujarati />
           <label className="flex flex-col gap-2">
             <span className="font-semibold">
               Link for more details (optional)
