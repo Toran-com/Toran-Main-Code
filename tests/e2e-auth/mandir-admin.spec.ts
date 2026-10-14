@@ -109,6 +109,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByRole("link", { name: "Edit" })
     .click();
   await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}/events/`));
+  // Wait for the edit page to replace the old one (both are briefly there).
+  await expect(
+    member.getByRole("button", { name: "Save changes" }),
+  ).toBeVisible();
+  await expect(member.getByRole("button", { name: "Add event" })).toHaveCount(
+    0,
+  );
   await expect(member.getByLabel("What's happening?")).toHaveValue(
     "Weekly aarti",
   );
