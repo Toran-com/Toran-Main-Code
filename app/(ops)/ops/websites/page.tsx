@@ -1,0 +1,171 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
+import { OpsNav } from "@/components/ops-nav";
+import { Badge } from "@/components/public-shell";
+import {
+  buttonClass,
+  Card,
+  Loading,
+  Notice,
+  PageShell,
+  quietButtonClass,
+} from "@/components/ui";
+import { requireToranAdmin } from "@/lib/auth";
+import { formatEventStart, websiteLabel } from "@/lib/format";
+import { pageTitle } from "@/lib/site";
+import { createSessionClient } from "@/lib/supabase/session";
+import { checkNext, checkOne } from "./actions";
+
+export const metadata: Metadata = {
+  title: pageTitle("Websites · Admin"),
+  robots: { index: false },
+};
+
+// Checking reads other people's websites, which can be slow.
+export const maxDuration = 60;
+
+const OUTCOMES = {
+  found: { label: "Events found", tone: "peacock" },
+  none: { label: "No readable events", tone: "quiet" },
+  blocked: { label: "Asks not to be read", tone: "marigold" },
+  unreachable: { label: "Couldn't reach", tone: "kumkum" },
+} as const;
+
+type Outcome = keyof typeof OUTCOMES;
+
+export default function OpsWebsitesPage(props: PageProps<"/ops/websites">) {
+  return (
+    <PageShell title="Websites" wide>
+      <OpsNav current="/ops/websites" />
+      <Suspense fallback={<Loading />}>
+        <Websites {...props} />
+      </Suspense>
+    </PageShell>
+  );
+}
+
+async function Websites({ searchParams }: PageProps<"/ops/websites">) {
+  await requireToranAdmin("/ops/websites");
+  const supabase = await createSessionClient();
+  const [{ data: mandirs }, { data: sources }] = supabase
+    ? await Promise.all([
+        supabase
+          .from("mandirs")
+          .select("id, slug, name, town, website")
+          .not("website", "is", null)
+          .neq("status", "hidden")
+          .order("name"),
+        supabase
+          .from("sources")
+          .select("mandir_id, last_checked_at, last_outcome, last_found")
+          .eq("kind", "crawler"),
+      ])
+    : [{ data: [] }, { data: [] }];
+  const checks = new Map((sources ?? []).map((s) => [s.mandir_id, s]));
+  const rows = (mandirs ?? []).map((m) => ({ ...m, check: checks.get(m.id) }));
+
+  const checked = rows.filter((r) => r.check?.last_checked_at);
+  const count = (outcome: Outcome) =>
+    checked.filter((r) => r.check?.last_outcome === outcome).length;
+
+  const query = await searchParams;
+  const added = Number(query.added ?? 0);
+  const outcome = String(query.outcome ?? "") as Outcome;
+  const notice = query.error
+    ? null
+    : query.batch !== undefined
+      ? `Checked ${query.batch} websites. ${added} new ${added === 1 ? "event" : "events"} added to the poster queue.`
+      : query.checked && outcome in OUTCOMES
+        ? `${OUTCOMES[outcome].label}. ${added} new ${added === 1 ? "event" : "events"} added to the poster queue.`
+        : null;
+
+  return (
+    <>
+      {query.error && (
+        <Notice tone="error">Something went wrong. Please try again.</Notice>
+      )}
+      {notice && <Notice tone="success">{notice}</Notice>}
+
+      <Card>
+        <p>
+          Reads each mandir&apos;s own website for events it publishes in a
+          standard, machine-readable form (event data in the page, or a calendar
+          feed). Anything new goes to the{" "}
+          <Link href="/ops/posters" className="text-peacock underline">
+            poster queue
+          </Link>
+          , for the committee or Toran to check before it&apos;s published. It
+          obeys each site&apos;s robots.txt and never reads Facebook or
+          Instagram.
+        </p>
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Stat label="With a website" value={rows.length} />
+          <Stat label="Checked" value={checked.length} />
+          <Stat label="Events found" value={count("found")} />
+          <Stat label="Nothing readable" value={count("none")} />
+        </dl>
+        <form action={checkNext}>
+          <button type="submit" className={buttonClass}>
+            Check the next 5 websites
+          </button>
+        </form>
+        <p className="text-muted text-base">
+          Starts with websites never checked, then the ones checked longest ago.
+          Takes up to a minute.
+        </p>
+      </Card>
+
+      <ul className="border-line bg-surface divide-line divide-y rounded-2xl border">
+        {rows.map((r) => {
+          const last = r.check?.last_outcome as Outcome | null | undefined;
+          return (
+            <li
+              key={r.id}
+              className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3"
+            >
+              <div className="flex min-w-0 flex-1 flex-col">
+                <Link
+                  href={`/ops/mandirs/${r.slug}`}
+                  className="text-peacock font-semibold"
+                >
+                  {r.name}
+                </Link>
+                <span className="text-muted text-base break-all">
+                  {websiteLabel(r.website!)}
+                  {r.check?.last_checked_at &&
+                    ` · checked ${formatEventStart(r.check.last_checked_at, true)}`}
+                </span>
+              </div>
+              {last && last in OUTCOMES && (
+                <Badge tone={OUTCOMES[last].tone}>
+                  {OUTCOMES[last].label}
+                  {last === "found" && ` (${r.check?.last_found ?? 0})`}
+                </Badge>
+              )}
+              <form action={checkOne}>
+                <input type="hidden" name="mandir" value={r.slug} />
+                <button
+                  type="submit"
+                  className={`${quietButtonClass} px-4 py-2 text-base`}
+                  aria-label={`Check ${r.name}'s website`}
+                >
+                  Check
+                </button>
+              </form>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-sunk rounded-xl p-3">
+      <dt className="text-muted text-base">{label}</dt>
+      <dd className="font-display text-3xl font-bold">{value}</dd>
+    </div>
+  );
+}

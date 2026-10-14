@@ -4,6 +4,7 @@ const LINKS = [
   { href: "/ops", label: "Overview" },
   { href: "/ops/mandirs", label: "Mandirs" },
   { href: "/ops/posters", label: "Posters" },
+  { href: "/ops/websites", label: "Websites" },
   { href: "/ops/festivals", label: "Festival dates" },
   { href: "/ops/digest", label: "Digest" },
   { href: "/ops/translations", label: "Translations" },
