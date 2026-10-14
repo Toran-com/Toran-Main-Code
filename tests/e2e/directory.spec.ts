@@ -63,6 +63,15 @@ test("before launch, robots.txt offers no sitemap and hides admin pages", async 
   expect(sitemap).not.toContain("<url>");
 });
 
+test("the demo page works without a database", async ({ page }) => {
+  await page.goto("/demo");
+  await expect(page.getByText("This is a sample.")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Shree Sample Mandir",
+  );
+  await expect(page.getByText("Reply here if you can help.")).toBeVisible();
+});
+
 test("an unknown mandir's print page is not found", async ({ page }) => {
   const response = await page.goto("/mandirs/no-such-mandir/print");
   expect(response?.status()).toBe(404);
