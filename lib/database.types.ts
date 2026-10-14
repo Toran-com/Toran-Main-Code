@@ -274,6 +274,9 @@ isOneToOne: false
             "decide_mandir_claim":
 { Args: { "approve": boolean,"claim": string }; Returns: undefined
                            },
+"edit_event":
+{ Args: { "dates": string[],"details": Json,"target": string,"today": string }; Returns: undefined
+                           },
 "health":
 { Args: Record<PropertyKey, never>; Returns: string
                            },

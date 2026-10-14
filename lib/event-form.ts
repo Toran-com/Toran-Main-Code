@@ -2,9 +2,10 @@
 // committee's "Add an event" form, or Toran's poster queue. Pure, so the
 // rules are tested once and the same everywhere.
 
-import { londonDate, londonToUtc } from "@/lib/format";
+import { londonDate, londonTime, londonToUtc } from "@/lib/format";
 import {
   occurrenceDates,
+  parseRule,
   type Repeat,
   toRule,
   weekOfMonth,
@@ -71,6 +72,38 @@ export function eventInputFrom(source: {
     title_gu: text("title_gu"),
     summary_gu: text("summary_gu"),
   };
+}
+
+// An existing event as the form's starting values. A repeating event
+// starts from its next date, so the form never offers a date in the past.
+export function eventInputFromEvent(event: {
+  title: string;
+  summary: string | null;
+  title_gu: string | null;
+  summary_gu: string | null;
+  all_day: boolean;
+  recurrence: string | null;
+  next_starts_at: string;
+}): EventInput {
+  const at = new Date(event.next_starts_at);
+  const parsed = event.recurrence ? parseRule(event.recurrence) : null;
+  return {
+    title: event.title,
+    date: londonDate(at),
+    time: event.all_day ? "" : londonTime(at),
+    summary: event.summary ?? "",
+    repeat: parsed ? repeatChoiceFor(parsed.repeat) : "none",
+    until: parsed?.until ?? "",
+    title_gu: event.title_gu ?? "",
+    summary_gu: event.summary_gu ?? "",
+  };
+}
+
+function repeatChoiceFor(repeat: Repeat): string {
+  if (repeat.kind === "weekly") {
+    return repeat.interval === 1 ? "weekly" : "fortnightly";
+  }
+  return repeat.week === -1 ? "monthly-last" : "monthly";
 }
 
 export function checkEvent(

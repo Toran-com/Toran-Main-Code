@@ -47,6 +47,7 @@ const ERRORS: Record<string, string> = {
 
 const DONE: Record<string, string> = {
   added: "Added. It's on your public page now.",
+  edited: "Saved. Your public page shows the changes.",
   confirm: "Thanks, marked as confirmed today.",
   cancel: "Marked as cancelled. Visitors will see that it's off.",
   restore: "Back on. Visitors will see it as happening.",
@@ -230,6 +231,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                       <EventButton intent="cancel">Cancel</EventButton>
                     </>
                   )}
+                  <Link
+                    href={`/manage/${mandir.slug}/events/${event.id}`}
+                    className={`${quietButtonClass} px-4 py-2 text-base`}
+                  >
+                    Edit
+                  </Link>
                   {event.status !== "cancelled" && (
                     <Link
                       href={`/manage/${mandir.slug}/seva/${event.id}`}

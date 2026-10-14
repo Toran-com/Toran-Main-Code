@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import type { CheckedEvent } from "@/lib/event-form";
+import { londonDate } from "@/lib/format";
 
 // Saves a checked event and, if it repeats, each of its dates. Row-level
 // security decides whether the signed-in person may add it.
@@ -45,4 +46,30 @@ export async function saveEvent(
     }
   }
   return data.id;
+}
+
+// Changes an event's details and, for a repeating event, its future dates,
+// in one step (the edit_event database function). Row-level security
+// decides whether the signed-in person may. Dates before today are kept as
+// they were.
+export async function updateEvent(
+  db: SupabaseClient<Database>,
+  eventId: string,
+  event: CheckedEvent,
+): Promise<boolean> {
+  const { error } = await db.rpc("edit_event", {
+    target: eventId,
+    details: {
+      title: event.title,
+      summary: event.summary ?? "",
+      title_gu: event.titleGu ?? "",
+      summary_gu: event.summaryGu ?? "",
+      starts_at: event.startsAt.toISOString(),
+      all_day: event.allDay,
+      recurrence: event.rule ?? "",
+    },
+    dates: event.occurrences.map((at) => at.toISOString()),
+    today: `${londonDate()}T00:00:00Z`,
+  });
+  return !error;
 }

@@ -6,6 +6,7 @@ import {
   formatEventStart,
   groupByRegionAndTown,
   londonDate,
+  londonTime,
   londonToUtc,
   matchesSearch,
   monthOf,
@@ -18,6 +19,14 @@ describe("londonDate", () => {
   });
   it("matches UTC in winter", () => {
     expect(londonDate(new Date("2026-11-08T23:30:00Z"))).toBe("2026-11-08");
+  });
+});
+
+describe("londonTime", () => {
+  it("gives London's 24-hour time in summer and winter", () => {
+    expect(londonTime(new Date("2026-10-17T18:30:00Z"))).toBe("19:30");
+    expect(londonTime(new Date("2026-11-08T18:30:00Z"))).toBe("18:30");
+    expect(londonTime(new Date("2026-11-08T00:05:00Z"))).toBe("00:05");
   });
 });
 

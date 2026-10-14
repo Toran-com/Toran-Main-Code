@@ -1,16 +1,25 @@
 import { inputClass } from "@/components/ui";
+import type { EventInput } from "@/lib/event-form";
 import { londonDate } from "@/lib/format";
 
-// The details of an event: used by a committee adding an event and by
-// Toran typing up a forwarded poster. Committees can also give the name
-// and description in Gujarati.
-export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
+// The details of an event: used by a committee adding or editing an event
+// and by Toran typing up a forwarded poster. Committees can also give the
+// name and description in Gujarati. "values" fills the fields in, when
+// editing.
+export function EventFields({
+  gujarati = false,
+  values,
+}: {
+  gujarati?: boolean;
+  values?: EventInput;
+}) {
   return (
     <>
       <label className="flex flex-col gap-2">
         <span className="font-semibold">What&apos;s happening?</span>
         <input
           name="title"
+          defaultValue={values?.title}
           required
           minLength={2}
           maxLength={120}
@@ -24,6 +33,7 @@ export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
           <input
             name="date"
             type="date"
+            defaultValue={values?.date}
             required
             min={londonDate()}
             className={inputClass}
@@ -31,7 +41,12 @@ export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
         </label>
         <label className="flex flex-col gap-2">
           <span className="font-semibold">Starts</span>
-          <input name="time" type="time" className={inputClass} />
+          <input
+            name="time"
+            type="time"
+            defaultValue={values?.time}
+            className={inputClass}
+          />
         </label>
       </div>
       <p className="text-muted -mt-3 text-base">
@@ -40,7 +55,11 @@ export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-2">
           <span className="font-semibold">Repeats</span>
-          <select name="repeat" defaultValue="none" className={inputClass}>
+          <select
+            name="repeat"
+            defaultValue={values?.repeat ?? "none"}
+            className={inputClass}
+          >
             <option value="none">Doesn&apos;t repeat</option>
             <option value="weekly">Every week</option>
             <option value="fortnightly">Every other week</option>
@@ -52,19 +71,25 @@ export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
         </label>
         <label className="flex flex-col gap-2">
           <span className="font-semibold">Repeats until</span>
-          <input name="until" type="date" className={inputClass} />
+          <input
+            name="until"
+            type="date"
+            defaultValue={values?.until}
+            className={inputClass}
+          />
         </label>
       </div>
       <p className="text-muted -mt-3 text-base">
         For repeating events, leave &ldquo;until&rdquo; empty for six months. Up
         to a year.
       </p>
-      <details className="flex flex-col gap-2">
+      <details className="flex flex-col gap-2" open={!!values?.summary}>
         <summary className="cursor-pointer font-semibold">
           Add a short description (optional)
         </summary>
         <textarea
           name="summary"
+          defaultValue={values?.summary}
           maxLength={280}
           rows={3}
           aria-label="Short description"
@@ -73,7 +98,10 @@ export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
         />
       </details>
       {gujarati && (
-        <details className="flex flex-col gap-2">
+        <details
+          className="flex flex-col gap-2"
+          open={!!(values?.title_gu || values?.summary_gu)}
+        >
           <summary className="cursor-pointer font-semibold">
             Add the name and description in Gujarati (optional)
           </summary>
@@ -82,6 +110,7 @@ export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
               <span className="font-semibold">Name in Gujarati</span>
               <input
                 name="title_gu"
+                defaultValue={values?.title_gu}
                 lang="gu"
                 minLength={2}
                 maxLength={120}
@@ -93,6 +122,7 @@ export function EventFields({ gujarati = false }: { gujarati?: boolean }) {
               <span className="font-semibold">Description in Gujarati</span>
               <textarea
                 name="summary_gu"
+                defaultValue={values?.summary_gu}
                 lang="gu"
                 maxLength={280}
                 rows={3}
