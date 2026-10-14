@@ -76,3 +76,10 @@ test("an unknown mandir's print page is not found", async ({ page }) => {
   const response = await page.goto("/mandirs/no-such-mandir/print");
   expect(response?.status()).toBe(404);
 });
+
+test("telling us about an event at an unknown mandir is not found", async ({
+  page,
+}) => {
+  const response = await page.goto("/mandirs/no-such-mandir/tell-us");
+  expect(response?.status()).toBe(404);
+});

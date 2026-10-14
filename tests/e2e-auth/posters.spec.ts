@@ -73,3 +73,58 @@ test("Toran can review the Gujarati draft", async ({ page }) => {
     page.getByRole("button", { name: "Copy the list" }),
   ).toBeVisible();
 });
+
+test("a visitor tells us about an event, and Toran sees it in the queue", async ({
+  page,
+  browser,
+}) => {
+  test.setTimeout(90_000);
+  const slug = "iskcon-leicester";
+  const visitor = await browser.newPage();
+  await visitor.goto(`/mandirs/${slug}`);
+  await visitor
+    .getByRole("link", { name: "Know about an event here? Tell us →" })
+    .click();
+  await expect(visitor).toHaveURL(new RegExp(`/mandirs/${slug}/tell-us$`));
+  await visitor.getByLabel("What's happening?").fill("Kartik deepotsav");
+  await visitor.getByLabel("Date").fill(nextWeek());
+  await visitor.getByLabel(/^Starts/).fill("18:00");
+  await visitor
+    .getByLabel(/Where did you see it/)
+    .fill("https://example.org/poster");
+  await visitor.getByRole("button", { name: "Send" }).click();
+  await expect(visitor.getByText("Thank you.")).toBeVisible();
+
+  // Something only spam fills in is quietly thrown away.
+  await visitor.goto(`/mandirs/${slug}/tell-us`);
+  await visitor.getByLabel("What's happening?").fill("Spam event");
+  await visitor.getByLabel("Date").fill(nextWeek());
+  await visitor.locator('input[name="company"]').fill("Spam Ltd", {
+    force: true,
+  });
+  await visitor.getByRole("button", { name: "Send" }).click();
+  await expect(visitor.getByText("Thank you.")).toBeVisible();
+
+  // Not on the public page until someone checks it.
+  await visitor.goto(`/mandirs/${slug}`);
+  await expect(visitor.getByText("Kartik deepotsav")).toHaveCount(0);
+
+  await logInAsAdmin(page, `reports-${Date.now()}@example.com`);
+  await page.goto("/ops/posters");
+  const report = page
+    .getByRole("listitem")
+    .filter({ hasText: "Kartik deepotsav" });
+  await expect(report).toContainText("ISKCON Leicester");
+  await expect(report).toContainText("From: Sent in by a visitor");
+  await expect(report).toContainText("https://example.org/poster");
+  await expect(
+    page.getByRole("listitem").filter({ hasText: "Spam event" }),
+  ).toHaveCount(0);
+  // Toran can't pretend to be a visitor when typing up a poster.
+  await expect(
+    page.getByRole("option", { name: "Sent in by a visitor" }),
+  ).toHaveCount(0);
+  // Tidy up, so the queue is as it was.
+  await report.getByRole("button", { name: "Discard" }).click();
+  await expect(page.getByText("Discarded.")).toBeVisible();
+});

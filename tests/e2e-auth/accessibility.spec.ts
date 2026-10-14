@@ -11,6 +11,7 @@ test("public pages are accessible", async ({ page }) => {
     "/mandirs",
     "/mandirs/geeta-bhavan-leicester",
     "/mandirs/geeta-bhavan-leicester/claim",
+    "/mandirs/geeta-bhavan-leicester/tell-us",
     "/mandirs/geeta-bhavan-leicester/print",
     "/festivals",
     "/whats-on",

@@ -298,6 +298,9 @@ isOneToOne: false
                            },
 "remove_mandir_admin":
 { Args: { "member": string,"target": string }; Returns: undefined
+                           },
+"report_event":
+{ Args: { "mandir_slug": string,"proposed": Json }; Returns: undefined
                            }
           }
           Enums: {

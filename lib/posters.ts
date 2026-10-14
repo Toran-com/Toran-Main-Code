@@ -10,6 +10,9 @@ export const POSTER_SOURCES = {
   printed: { label: "Printed poster", kind: "forward" },
   facebook: { label: "Facebook post", kind: "facebook" },
   website: { label: "Mandir's website", kind: "website" },
+  // Sent in through "Tell us about an event" (report_event in the
+  // database); Toran doesn't type these up itself.
+  visitor: { label: "Sent in by a visitor", kind: "public_report" },
 } as const;
 
 export type PosterSource = keyof typeof POSTER_SOURCES;
