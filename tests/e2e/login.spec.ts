@@ -55,6 +55,10 @@ test("claiming and managing a mandir need a login", async ({ page }) => {
   await expect(page).toHaveURL(
     /\/login\?next=%2Fmanage%2Fsome-mandir%2Fseva%2Fsome-event/,
   );
+  await page.goto("/manage/some-mandir/events/some-event");
+  await expect(page).toHaveURL(
+    /\/login\?next=%2Fmanage%2Fsome-mandir%2Fevents%2Fsome-event/,
+  );
 });
 
 test("the admin pages need a login", async ({ page }) => {

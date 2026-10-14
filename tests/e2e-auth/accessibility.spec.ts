@@ -50,6 +50,8 @@ test("a committee's pages are accessible", async ({ page }) => {
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/seva/${event}`);
   await expectAccessible(page);
+  await page.goto(`/manage/${slug}/events/${event}`);
+  await expectAccessible(page);
 });
 
 test("the admin area is accessible", async ({ page }) => {

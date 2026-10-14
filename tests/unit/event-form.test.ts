@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkEvent, type EventInput, eventInputFrom } from "@/lib/event-form";
+import {
+  checkEvent,
+  type EventInput,
+  eventInputFrom,
+  eventInputFromEvent,
+} from "@/lib/event-form";
 
 // Tuesday 13 October 2026, midday in London.
 const now = new Date("2026-10-13T11:00:00Z");
@@ -133,5 +138,61 @@ describe("checkEvent in Gujarati", () => {
       ok: false,
       error: "summaryGu",
     });
+  });
+});
+
+describe("eventInputFromEvent", () => {
+  const stored = {
+    title: "Aarti",
+    summary: null,
+    title_gu: "આરતી",
+    summary_gu: null,
+    all_day: false,
+    recurrence: null,
+    // 7:30pm in London during British Summer Time.
+    next_starts_at: "2026-10-17T18:30:00.000Z",
+  };
+
+  it("fills the form in London time", () => {
+    expect(eventInputFromEvent(stored)).toEqual({
+      title: "Aarti",
+      date: "2026-10-17",
+      time: "19:30",
+      summary: "",
+      repeat: "none",
+      until: "",
+      title_gu: "આરતી",
+      summary_gu: "",
+    });
+  });
+
+  it("leaves the time empty for an all-day event", () => {
+    expect(eventInputFromEvent({ ...stored, all_day: true }).time).toBe("");
+  });
+
+  it("turns a stored repeat back into the form's choice", () => {
+    const cases: [string, string][] = [
+      ["RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SA;UNTIL=20261231", "weekly"],
+      ["RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=SA;UNTIL=20261231", "fortnightly"],
+      ["RRULE:FREQ=MONTHLY;BYDAY=3SA;UNTIL=20261231", "monthly"],
+      ["RRULE:FREQ=MONTHLY;BYDAY=-1SA;UNTIL=20261231", "monthly-last"],
+    ];
+    for (const [recurrence, repeat] of cases) {
+      expect(eventInputFromEvent({ ...stored, recurrence })).toMatchObject({
+        repeat,
+        until: "2026-12-31",
+      });
+    }
+  });
+
+  it("gives back an event that checks out the same", () => {
+    const input = eventInputFromEvent({
+      ...stored,
+      recurrence: "RRULE:FREQ=MONTHLY;BYDAY=3SA;UNTIL=20261231",
+    });
+    const result = checkEvent(input, now);
+    expect(result.ok && result.event.rule).toBe(
+      "RRULE:FREQ=MONTHLY;BYDAY=3SA;UNTIL=20261231",
+    );
   });
 });
