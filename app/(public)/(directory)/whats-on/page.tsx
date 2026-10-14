@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
+import { EVENT_KINDS, isEventKind } from "@/lib/event-kinds";
 import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
@@ -39,6 +40,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     .slice(0, 10);
   const within = radiusFrom(query.within);
   const region = String(query.region ?? "");
+  const type = String(query.type ?? "");
+  const kind = isEventKind(type) ? type : "";
 
   const [result, origin] = await Promise.all([
     listUpcomingEvents(),
@@ -46,7 +49,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   ]);
 
   const form = (
-    <form className="border-line bg-surface grid gap-4 rounded-2xl border p-5 sm:grid-cols-[2fr_1fr_1.5fr_auto] sm:items-end">
+    <form className="border-line bg-surface grid gap-4 rounded-2xl border p-5 sm:grid-cols-2 sm:items-end lg:grid-cols-[2fr_1fr_1.5fr_1.5fr_auto]">
       <label className="flex flex-col gap-2">
         <span className="font-semibold">{t("whatsOn.near")}</span>
         <input
@@ -80,6 +83,17 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
           ))}
         </select>
       </label>
+      <label className="flex flex-col gap-2">
+        <span className="font-semibold">{t("whatsOn.type")}</span>
+        <select name="type" defaultValue={kind} className={inputClass}>
+          <option value="">{t("whatsOn.anyType")}</option>
+          {Object.entries(EVENT_KINDS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </label>
       <button type="submit" className={`${buttonClass} sm:w-auto`}>
         {t("whatsOn.show")}
       </button>
@@ -105,10 +119,11 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     position = origin;
   }
 
-  const inRegion = region
-    ? result.data.filter((e) => e.mandir.region === region)
-    : result.data;
-  const events = nearTo(inRegion, position, within);
+  const chosen = result.data.filter(
+    (e) =>
+      (!region || e.mandir.region === region) && (!kind || e.kind === kind),
+  );
+  const events = nearTo(chosen, position, within);
 
   return (
     <>
@@ -124,13 +139,16 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
                 place: near.toUpperCase(),
               })}
             {region && t("whatsOn.countRegion", { region })}
+            {kind && t("whatsOn.countType", { type: EVENT_KINDS[kind] })}
           </p>
           <EventList events={events} now={new Date()} />
         </>
       ) : (
         <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-5">
           <p className="font-semibold">
-            {position || region ? t("whatsOn.noneThere") : t("whatsOn.noneYet")}
+            {position || region || kind
+              ? t("whatsOn.noneThere")
+              : t("whatsOn.noneYet")}
           </p>
           <p className="text-muted">
             {t("whatsOn.emptyBefore")}

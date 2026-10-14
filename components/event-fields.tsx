@@ -1,16 +1,19 @@
 import { inputClass } from "@/components/ui";
 import type { EventInput } from "@/lib/event-form";
+import { EVENT_KINDS } from "@/lib/event-kinds";
 import { londonDate } from "@/lib/format";
 
 // The details of an event: used by a committee adding or editing an event
 // and by Toran typing up a forwarded poster. Committees can also give the
-// name and description in Gujarati. "values" fills the fields in, when
-// editing.
+// name and description in Gujarati, and say what kind of event it is.
+// "values" fills the fields in, when editing.
 export function EventFields({
   gujarati = false,
+  kinds = false,
   values,
 }: {
   gujarati?: boolean;
+  kinds?: boolean;
   values?: EventInput;
 }) {
   return (
@@ -27,6 +30,22 @@ export function EventFields({
           className={inputClass}
         />
       </label>
+      {kinds && (
+        <label className="flex flex-col gap-2">
+          <span className="font-semibold">What kind of event?</span>
+          <select
+            name="kind"
+            defaultValue={values?.kind ?? "other"}
+            className={inputClass}
+          >
+            {Object.entries(EVENT_KINDS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-2">
           <span className="font-semibold">Date</span>

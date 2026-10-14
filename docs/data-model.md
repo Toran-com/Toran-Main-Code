@@ -22,6 +22,10 @@ What the database holds and who can do what. The tables are defined in
 | `seva_roles`        | Roles an event needs (kitchen, parking), and whether the mandir requires a DBS check                                                                                              | No                      |
 | `seva_shifts`       | Shift times and how many people each needs                                                                                                                                        | No                      |
 
+Each event also records where it came from (`events.origin`): added by the
+mandir, typed up from a poster, read from the mandir's website, or sent in by
+a visitor. Pages show this to families when the mandir hasn't confirmed it.
+
 ## Starting data
 
 - **106 mandirs**, from the outreach list (91) and the NW London and

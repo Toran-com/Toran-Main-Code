@@ -12,6 +12,7 @@ import {
   type MandirDetails,
   type MandirEvent,
 } from "@/lib/directory";
+import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import { formatEventStart, websiteLabel } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath, eventShareText } from "@/lib/share";
@@ -234,9 +235,10 @@ function EventCard({
           {event.title_gu}
         </p>
       )}
-      {cancelled && (
-        <p>
-          <Badge tone="kumkum">Cancelled</Badge>
+      {(cancelled || kindLabel(event.kind)) && (
+        <p className="flex flex-wrap gap-2">
+          {cancelled && <Badge tone="kumkum">Cancelled</Badge>}
+          {kindLabel(event.kind) && <Badge>{kindLabel(event.kind)}</Badge>}
         </p>
       )}
       {event.summary && <p>{event.summary}</p>}
@@ -255,7 +257,7 @@ function EventCard({
           More details
         </a>
       )}
-      {event.confirmed_at && (
+      {event.confirmed_at ? (
         <p className="text-muted text-base">
           Confirmed by the mandir,{" "}
           {new Intl.DateTimeFormat("en-GB", {
@@ -264,6 +266,10 @@ function EventCard({
             month: "short",
           }).format(new Date(event.confirmed_at))}
         </p>
+      ) : (
+        sourceLabel(event) && (
+          <p className="text-muted text-base">{sourceLabel(event)}</p>
+        )
       )}
       <JsonLd
         data={eventData(

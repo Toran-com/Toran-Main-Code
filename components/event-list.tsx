@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
+import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import { formatEventStart } from "@/lib/format";
 import { formatMiles } from "@/lib/geo";
 import { describeRule } from "@/lib/recurrence";
@@ -62,6 +63,13 @@ export function EventList({
                     </span>
                   </p>
                   {e.summary && <p className="text-muted">{e.summary}</p>}
+                  {(kindLabel(e.kind) || sourceLabel(e)) && (
+                    <p className="text-muted text-base">
+                      {[kindLabel(e.kind), sourceLabel(e)]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
                   {e.status !== "cancelled" && (
                     <ShareButtons
                       text={eventShareText(e, e.mandir)}

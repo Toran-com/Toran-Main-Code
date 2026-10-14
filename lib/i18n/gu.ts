@@ -28,11 +28,14 @@ export const gu: Record<MessageKey, string> = {
   "whatsOn.miles": "{miles} માઇલ",
   "whatsOn.region": "પ્રદેશ",
   "whatsOn.anywhere": "ગમે ત્યાં",
+  "whatsOn.type": "કાર્યક્રમનો પ્રકાર",
+  "whatsOn.anyType": "કોઈ પણ પ્રકાર",
   "whatsOn.show": "બતાવો",
   "whatsOn.count.one": "{count} કાર્યક્રમ",
   "whatsOn.count.other": "{count} કાર્યક્રમો",
   "whatsOn.countNear": ", {place} થી {miles} માઇલની અંદર",
   "whatsOn.countRegion": ", {region}માં",
+  "whatsOn.countType": " ({type})",
   "whatsOn.lookupFailed":
     "અમે અત્યારે એ પોસ્ટકોડ શોધી શક્યા નથી, તેથી બધા કાર્યક્રમો બતાવ્યા છે.",
   "whatsOn.notFound":

@@ -93,6 +93,7 @@ describe("eventInputFrom", () => {
       until: "",
       title_gu: "",
       summary_gu: "",
+      kind: "other",
     });
   });
 
@@ -163,7 +164,14 @@ describe("eventInputFromEvent", () => {
       until: "",
       title_gu: "આરતી",
       summary_gu: "",
+      kind: "other",
     });
+  });
+
+  it("keeps the event's kind", () => {
+    expect(eventInputFromEvent({ ...stored, kind: "festival" }).kind).toBe(
+      "festival",
+    );
   });
 
   it("leaves the time empty for an all-day event", () => {
@@ -194,5 +202,22 @@ describe("eventInputFromEvent", () => {
     expect(result.ok && result.event.rule).toBe(
       "RRULE:FREQ=MONTHLY;BYDAY=3SA;UNTIL=20261231",
     );
+  });
+});
+
+describe("checkEvent kinds", () => {
+  it("treats a missing kind as other", () => {
+    const result = checkEvent(base, now);
+    expect(result.ok && result.event.kind).toBe("other");
+  });
+  it("keeps a known kind", () => {
+    const result = checkEvent({ ...base, kind: "festival" }, now);
+    expect(result.ok && result.event.kind).toBe("festival");
+  });
+  it("refuses an unknown kind", () => {
+    expect(checkEvent({ ...base, kind: "rave" }, now)).toEqual({
+      ok: false,
+      error: "kind",
+    });
   });
 });

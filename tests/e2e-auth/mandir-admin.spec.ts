@@ -47,6 +47,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByRole("link", { name: new RegExp(NAME) }).click();
   await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}$`));
   await member.getByLabel("What's happening?").fill("Annakut darshan");
+  await member.getByLabel("What kind of event?").selectOption("festival");
   await member.getByLabel("Date").fill(nextWeek());
   await member.getByLabel("Starts").fill("18:30");
   await member
@@ -66,6 +67,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     "અન્નકૂટ દર્શન",
   );
   await expect(event).toContainText("સૌનું સ્વાગત છે.");
+  await expect(event).toContainText("Festival");
   await expect(event).toContainText("Confirmed by the mandir");
   const whatsApp = await event
     .getByRole("link", { name: "WhatsApp" })
@@ -80,6 +82,16 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .filter({ hasText: "Annakut darshan" });
   await expect(listed).toContainText(NAME);
   await expect(listed).toContainText("અન્નકૂટ દર્શન");
+  await expect(listed).toContainText("Festival · Confirmed by the mandir");
+  // Choosing a type of event narrows the list.
+  await member.goto("/whats-on?type=festival");
+  await expect(
+    member.getByRole("article").filter({ hasText: "Annakut darshan" }),
+  ).toHaveCount(1);
+  await member.goto("/whats-on?type=class");
+  await expect(
+    member.getByRole("article").filter({ hasText: "Annakut darshan" }),
+  ).toHaveCount(0);
 
   // A weekly event shows once, with its next date.
   await member.goto(`/manage/${SLUG}`);
