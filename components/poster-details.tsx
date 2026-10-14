@@ -23,7 +23,13 @@ export function PosterDetails({ poster }: { poster: Poster }) {
         )}
       </p>
       <p className="text-xl font-bold">{poster.title}</p>
+      {poster.title_gu && (
+        <p lang="gu" className="text-lg font-semibold">
+          {poster.title_gu}
+        </p>
+      )}
       {poster.summary && <p>{poster.summary}</p>}
+      {poster.summary_gu && <p lang="gu">{poster.summary_gu}</p>}
       {poster.link && (
         <a
           href={poster.link}
