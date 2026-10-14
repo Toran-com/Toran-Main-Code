@@ -16,6 +16,15 @@ export const en = {
   "home.mandirs": "Browse mandirs",
   "home.festivals": "Festival dates",
   "home.comingSoon": "Coming soon",
+  "home.eventsTitle": "Find what's on",
+  "home.eventsBody":
+    "Aarti, bhajans, classes and festival celebrations at mandirs near you, ready to share on WhatsApp.",
+  "home.committeesTitle": "How it works for committees",
+  "home.committeesBody":
+    "Committees send the patrika or poster they already share, and check it before it goes live. It's free for mandirs.",
+  "home.festivalsTitle": "Festival calendar",
+  "home.festivalsBody":
+    "Navratri, Diwali, Holi and more, with the dates UK mandirs follow.",
 
   "whatsOn.title": "What's on",
   "whatsOn.intro":

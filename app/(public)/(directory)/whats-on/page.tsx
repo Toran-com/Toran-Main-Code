@@ -49,7 +49,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   ]);
 
   const form = (
-    <form className="border-line bg-surface grid gap-4 rounded-2xl border p-5 sm:grid-cols-2 sm:items-end lg:grid-cols-[2fr_1fr_1.5fr_1.5fr_auto]">
+    <form className="border-line bg-surface shadow-card grid gap-4 rounded-2xl border p-5 sm:grid-cols-2 sm:items-end lg:grid-cols-[2fr_1fr_1.5fr_1.5fr_auto]">
       <label className="flex flex-col gap-2">
         <span className="font-semibold">{t("whatsOn.near")}</span>
         <input

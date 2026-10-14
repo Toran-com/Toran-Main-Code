@@ -19,6 +19,15 @@ export const gu: Record<MessageKey, string> = {
   "home.mandirs": "મંદિરો જુઓ",
   "home.festivals": "તહેવારોની તારીખો",
   "home.comingSoon": "ટૂંક સમયમાં",
+  "home.eventsTitle": "કાર્યક્રમો શોધો",
+  "home.eventsBody":
+    "તમારી નજીકના મંદિરોમાં આરતી, ભજન, વર્ગો અને તહેવારોની ઉજવણી, WhatsApp પર શેર કરવા તૈયાર.",
+  "home.committeesTitle": "સમિતિઓ માટે તે કેવી રીતે કામ કરે છે",
+  "home.committeesBody":
+    "સમિતિઓ જે પત્રિકા કે પોસ્ટર પહેલેથી શેર કરે છે તે મોકલે છે, અને પ્રકાશિત થાય તે પહેલાં તપાસે છે. મંદિરો માટે તે મફત છે.",
+  "home.festivalsTitle": "તહેવારોનું કેલેન્ડર",
+  "home.festivalsBody":
+    "નવરાત્રિ, દિવાળી, હોળી અને વધુ, યુકેના મંદિરો અનુસરે છે તે તારીખો સાથે.",
 
   "whatsOn.title": "કાર્યક્રમો",
   "whatsOn.intro":

@@ -60,7 +60,7 @@ async function Translations() {
         {keys.map((key, i) => (
           <li
             key={key}
-            className="border-line bg-surface grid gap-2 rounded-2xl border p-4 sm:grid-cols-[3rem_1fr_1fr]"
+            className="border-line bg-surface shadow-card grid gap-2 rounded-2xl border p-4 sm:grid-cols-[3rem_1fr_1fr]"
           >
             <span className="text-muted font-semibold">{i + 1}</span>
             <p>{en[key]}</p>

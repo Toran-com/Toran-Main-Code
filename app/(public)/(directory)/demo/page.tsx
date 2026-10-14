@@ -51,10 +51,10 @@ export default function DemoPage() {
         </div>
 
         <h2 className="font-display text-3xl font-bold">What&apos;s on</h2>
-        <ul className="flex flex-col gap-3">
+        <ul className="rise-list flex flex-col gap-3">
           {demoEvents.map((event) => (
             <li key={event.id}>
-              <article className="border-line bg-surface flex flex-col gap-2 rounded-2xl border p-5">
+              <article className="border-line bg-surface lift shadow-card flex flex-col gap-2 rounded-2xl border p-5">
                 <p className="text-marigold-ink font-semibold">{event.when}</p>
                 <h3
                   className={`text-xl font-bold ${event.cancelled ? "line-through" : ""}`}
@@ -91,11 +91,11 @@ export default function DemoPage() {
             for the volunteers&apos; WhatsApp group.
           </p>
         </div>
-        <ul className="flex flex-col gap-3">
+        <ul className="rise-list flex flex-col gap-3">
           {demoRota.map((role) => (
             <li
               key={role.name}
-              className="border-line bg-surface flex flex-col gap-2 rounded-2xl border p-5"
+              className="border-line bg-surface lift shadow-card flex flex-col gap-2 rounded-2xl border p-5"
             >
               <h3 className="text-xl font-bold">{role.name}</h3>
               {role.dbs && (

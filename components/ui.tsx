@@ -15,24 +15,38 @@ export function PageShell({
 }) {
   return (
     <main
-      className={`mx-auto flex w-full flex-1 flex-col gap-8 px-6 py-16 ${wide ? "max-w-3xl" : "max-w-lg"}`}
+      className={`rise mx-auto flex w-full flex-1 flex-col gap-8 px-6 py-16 ${wide ? "max-w-3xl" : "max-w-lg"}`}
     >
       <Link href="/" aria-label="Toran home" className="self-start">
         <ToranGarland className="h-8 w-36" />
       </Link>
-      <h1 className="font-display text-4xl font-extrabold tracking-tight">
-        {title}
-      </h1>
+      <div className="flex flex-col gap-3">
+        <h1 className="font-display text-4xl font-extrabold tracking-tight">
+          {title}
+        </h1>
+        <Ornament />
+      </div>
       {children}
     </main>
   );
 }
 
+// Two fading lines and a marigold diamond, under page headings.
+export function Ornament() {
+  return (
+    <span className="ornament" aria-hidden="true">
+      <span />
+    </span>
+  );
+}
+
+// The white (or, in dark mode, deep blue) panel used for cards and forms.
+export const cardClass =
+  "border-line bg-surface shadow-card rounded-2xl border";
+
 export function Card({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-surface border-line flex flex-col gap-5 rounded-2xl border p-6 shadow-sm">
-      {children}
-    </div>
+    <div className={`${cardClass} flex flex-col gap-5 p-6`}>{children}</div>
   );
 }
 
@@ -44,14 +58,14 @@ export function Notice({
   children: ReactNode;
 }) {
   const colours = {
-    info: "border-line bg-sunk",
+    info: "border-line border-l-marigold bg-sunk",
     error: "border-kumkum text-kumkum bg-surface",
     success: "border-peacock text-peacock bg-surface",
   }[tone];
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={`rounded-xl border px-4 py-3 ${colours}`}
+      className={`rise rounded-xl border border-l-4 px-4 py-3 ${colours}`}
     >
       {children}
     </p>
@@ -59,14 +73,24 @@ export function Notice({
 }
 
 export const inputClass =
-  "border-line bg-surface focus:outline-peacock w-full rounded-xl border px-4 py-3 text-lg focus:outline-2";
+  "border-line bg-surface focus:outline-peacock w-full rounded-xl border px-4 py-3 text-lg shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] transition-colors focus:outline-2 hover:border-peacock/40";
 
-export const buttonClass =
-  "bg-peacock w-full rounded-xl px-5 py-3 text-lg font-semibold text-on-peacock hover:opacity-90 disabled:opacity-60";
+// Buttons rise a little under the pointer and press in when tapped.
+const press =
+  "inline-flex items-center justify-center gap-2 text-center transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none";
 
-export const quietButtonClass =
-  "border-line text-ink hover:bg-sunk rounded-xl border px-5 py-3 text-lg font-semibold";
+export const buttonClass = `${press} bg-linear-to-b from-peacock to-peacock-deep w-full rounded-xl px-5 py-3 text-lg font-semibold text-on-peacock shadow-card hover:shadow-lift hover:brightness-110 disabled:opacity-60`;
+
+export const quietButtonClass = `${press} border-line bg-surface text-ink hover:border-marigold/60 shadow-card hover:shadow-lift rounded-xl border px-5 py-3 text-lg font-semibold`;
 
 export function Loading() {
-  return <p className="text-muted">Loading…</p>;
+  return (
+    <p className="text-muted flex items-center gap-3" role="status">
+      <span
+        aria-hidden="true"
+        className="border-marigold size-5 animate-spin rounded-full border-2 border-t-transparent"
+      />
+      Loading…
+    </p>
+  );
 }

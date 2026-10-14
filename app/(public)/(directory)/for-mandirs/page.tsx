@@ -43,11 +43,11 @@ export default function ForMandirsPage() {
         intro="Toran puts your mandir's events where families can find them, and helps with your seva rota. It's free for mandirs."
       />
 
-      <ul className="grid gap-4 sm:grid-cols-2">
+      <ul className="rise-list grid gap-4 sm:grid-cols-2">
         {HELPS.map((h) => (
           <li
             key={h.title}
-            className="border-line bg-surface flex flex-col gap-2 rounded-2xl border p-5"
+            className="border-line bg-surface lift shadow-card flex flex-col gap-2 rounded-2xl border p-5"
           >
             <h2 className="text-xl font-bold">{h.title}</h2>
             <p className="text-muted">{h.body}</p>

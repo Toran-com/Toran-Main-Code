@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
-import { Card, quietButtonClass } from "@/components/ui";
+import { Card, Ornament, quietButtonClass } from "@/components/ui";
 import {
   getMandir,
   listMandirs,
@@ -61,13 +61,17 @@ export default async function MandirPage({
 
   return (
     <>
-      <Link href="/mandirs" className="text-peacock self-start font-semibold">
+      <Link
+        href="/mandirs"
+        className="text-peacock self-start font-semibold hover:underline"
+      >
         ← All mandirs
       </Link>
-      <div className="flex flex-col gap-3">
+      <div className="rise flex flex-col gap-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           {mandir.name}
         </h1>
+        <Ornament />
         <p className="text-muted text-xl">
           {mandir.town}, {mandir.region}
         </p>
@@ -90,7 +94,7 @@ export default async function MandirPage({
           What&apos;s on
         </h2>
         {mandir.events.length ? (
-          <ul className="flex flex-col gap-3">
+          <ul className="rise-list flex flex-col gap-3">
             {mandir.events.map((event) => (
               <li key={event.id}>
                 <EventCard event={event} mandir={mandir} />
@@ -205,7 +209,7 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
   if (!rows.length) return null;
 
   return (
-    <dl className="border-line bg-surface grid gap-x-6 gap-y-3 rounded-2xl border p-5 sm:grid-cols-[auto_1fr]">
+    <dl className="border-line bg-surface shadow-card grid gap-x-6 gap-y-3 rounded-2xl border p-5 sm:grid-cols-[auto_1fr]">
       {rows.map(({ label, value }) => (
         <div key={label} className="contents">
           <dt className="text-muted text-base sm:text-lg">{label}</dt>
@@ -227,7 +231,7 @@ function EventCard({
   return (
     <article
       id={`event-${event.id}`}
-      className="border-line bg-surface flex scroll-mt-4 flex-col gap-2 rounded-2xl border p-5"
+      className="border-line bg-surface lift shadow-card flex scroll-mt-4 flex-col gap-2 rounded-2xl border p-5"
     >
       <p className="text-marigold-ink font-semibold">
         {event.recurrence && `${describeRule(event.recurrence)} · next `}

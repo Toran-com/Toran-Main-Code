@@ -1,16 +1,20 @@
 // A row of marigold and mango-leaf drops, the toran hung over a doorway.
 export function ToranGarland({
   className = "h-10 w-44",
+  decorative = false,
 }: {
   className?: string;
+  // Hidden from screen readers where it's only decoration.
+  decorative?: boolean;
 }) {
   const drops = Array.from({ length: 9 }, (_, i) => i);
   return (
     <svg
       viewBox="0 0 180 40"
       className={className}
-      role="img"
-      aria-label="A toran garland"
+      {...(decorative
+        ? { "aria-hidden": true }
+        : { role: "img", "aria-label": "A toran garland" })}
     >
       <path
         d="M2 6 Q90 18 178 6"
