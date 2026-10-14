@@ -38,7 +38,14 @@ type Row<T extends keyof Database["public"]["Tables"]> =
 
 export type MandirSummary = Pick<
   Row<"mandirs">,
-  "slug" | "name" | "town" | "region" | "tradition" | "status"
+  | "slug"
+  | "name"
+  | "town"
+  | "region"
+  | "tradition"
+  | "status"
+  | "latitude"
+  | "longitude"
 >;
 
 export type MandirEvent = Pick<
@@ -90,7 +97,7 @@ export async function listMandirs(): Promise<Loaded<MandirSummary[]>> {
   if (db === "misconfigured") return settle<never>(unavailable);
   const { data, error } = await db
     .from("mandirs")
-    .select("slug, name, town, region, tradition, status")
+    .select("slug, name, town, region, tradition, status, latitude, longitude")
     .order("name");
   return settle(error ? unavailable : { state: "ok", data });
 }

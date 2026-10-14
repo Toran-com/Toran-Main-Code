@@ -75,3 +75,79 @@ body {
     background: #fff;
   }
 }
+
+/* The mandirs map (components/mandir-map.tsx). Leaflet's own styles load
+   after these, so rules are scoped to .toran-map to take precedence. The
+   map pictures are always light, so dots keep a white edge in both modes;
+   popups follow the page colours. */
+.toran-map.leaflet-container {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+}
+
+.toran-map .leaflet-popup-content {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.toran-map .toran-dot {
+  background: var(--marigold);
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.toran-map .toran-cluster {
+  display: grid;
+  place-items: center;
+  background: var(--peacock);
+  color: var(--on-peacock);
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+}
+
+.toran-map .toran-dot:focus-visible,
+.toran-map .toran-cluster:focus-visible {
+  outline: 3px solid black;
+  outline-offset: 2px;
+}
+
+.toran-map .leaflet-interactive.toran-you {
+  fill: var(--kumkum);
+  fill-opacity: 1;
+  stroke: white;
+  stroke-width: 3;
+}
+
+.toran-map .leaflet-popup-content-wrapper,
+.toran-map .leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.toran-map a.leaflet-popup-close-button {
+  color: var(--muted);
+}
+
+.toran-map .toran-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.toran-map .toran-popup p {
+  margin: 0;
+}
+
+.toran-map .toran-popup-name {
+  font-weight: 700;
+}
+
+.toran-map .toran-popup a {
+  color: var(--peacock);
+  font-weight: 600;
+}
