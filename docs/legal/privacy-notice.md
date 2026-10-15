@@ -35,6 +35,10 @@ within one month.
   any website you visit does. If you press "Near me", your browser asks
   first; your location only moves the map on your screen and is never sent
   to us or kept.
+- **Calendars.** If you add a mandir's events or the festival dates to
+  your calendar, your calendar app checks Toran for changes every few
+  hours. Like any visit, that shows up briefly in the server logs; we
+  don't know who subscribes and need no account.
 - **Offline copies.** Your phone keeps copies of the public pages you've
   opened (What's on, mandir and festival pages), so they still open
   without signal. They stay on your phone; clearing the site's data in
