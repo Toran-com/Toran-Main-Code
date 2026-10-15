@@ -30,6 +30,11 @@ within one month.
 - **Error reports.** If a page breaks, an error report goes to Sentry so
   we can fix it. We set it up not to store IP addresses, cookies, browser
   headers or email addresses.
+- **The mandirs map.** The map pictures come from OpenStreetMap. Your
+  browser fetches them directly, so OpenStreetMap sees your IP address, as
+  any website you visit does. If you press "Near me", your browser asks
+  first; your location only moves the map on your screen and is never sent
+  to us or kept.
 - **Visitor numbers** (planned). If we count visits, we'll use a
   cookie-free tool (such as Plausible) that doesn't identify you.
 
