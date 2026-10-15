@@ -45,8 +45,9 @@ export async function generateStaticParams() {
 }
 
 function describe({ mandir, event }: MandirEventPage): string {
+  const rule = event.recurrence && describeRule(event.recurrence);
   const when = event.recurrence
-    ? `${describeRule(event.recurrence)}, next ${formatEventStart(event.next_starts_at, event.all_day)}`
+    ? `${rule ?? "Repeats"}, next ${formatEventStart(event.next_starts_at, event.all_day)}`
     : formatEventWhen(event.starts_at, event.ends_at, event.all_day);
   return [`${when} at ${mandir.name}, ${mandir.town}.`, event.summary]
     .filter(Boolean)
@@ -87,6 +88,7 @@ export default async function EventPage({
   if (!result.data) notFound();
   const { mandir, event, upcoming } = result.data;
   const cancelled = event.status === "cancelled";
+  const rule = event.recurrence && describeRule(event.recurrence);
   const mandirPath = `/mandirs/${mandir.slug}`;
   const path = eventPath(mandir.slug, event.id);
   const alsoOn =
@@ -116,7 +118,7 @@ export default async function EventPage({
 
       <div className="rise flex flex-col gap-3">
         <p className="text-marigold-ink text-xl font-semibold">
-          {event.recurrence && `${describeRule(event.recurrence)} · next `}
+          {event.recurrence && `${rule ?? "Repeats"} · next `}
           {formatEventStart(event.next_starts_at, event.all_day)}
         </p>
         <h1
@@ -231,6 +233,7 @@ export default async function EventPage({
 
 function Details({ page }: { page: MandirEventPage }) {
   const { mandir, event } = page;
+  const rule = event.recurrence && describeRule(event.recurrence);
   const directions = mandir.postcode
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         `${mandir.name} ${mandir.postcode}`,
@@ -241,7 +244,7 @@ function Details({ page }: { page: MandirEventPage }) {
       label: "When",
       value: event.recurrence ? (
         <>
-          {describeRule(event.recurrence)}
+          {rule ?? "Repeats"}
           <br />
           Next: {formatEventStart(event.next_starts_at, event.all_day)}
         </>

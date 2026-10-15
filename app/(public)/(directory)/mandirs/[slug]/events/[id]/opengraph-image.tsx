@@ -22,12 +22,13 @@ export default async function Image({
   }
   const { event, mandir } = page;
   const when = formatEventStart(event.next_starts_at, event.all_day);
+  const rule = event.recurrence && describeRule(event.recurrence);
   return shareCard({
     kicker:
       event.status === "cancelled"
         ? `Cancelled · ${when}`
         : event.recurrence
-          ? `${describeRule(event.recurrence)} · next ${when}`
+          ? `${rule ?? "Repeats"} · next ${when}`
           : when,
     title: event.title,
     detail: `${mandir.name}, ${mandir.town}`,
