@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Badge, LoadProblem, PageHeading } from "@/components/public-shell";
+import { SubscribeCalendar } from "@/components/subscribe-calendar";
 import { Loading, Notice } from "@/components/ui";
 import { listFestivalDates, type FestivalDate } from "@/lib/directory";
 import { calendarLabel, formatDateRange, monthOf } from "@/lib/format";
@@ -18,6 +19,11 @@ export default function FestivalsPage() {
       <PageHeading
         title="Festivals"
         intro="Dates for the UK. A few festivals fall on different days depending on the calendar a mandir follows, so check with your mandir too."
+      />
+      <SubscribeCalendar
+        path="/festivals/calendar.ics"
+        title="Festival dates in your calendar"
+        body="Add the festival dates to the calendar on your phone. Dates we check or add later appear there automatically."
       />
       <Suspense fallback={<Loading />}>
         <Festivals />

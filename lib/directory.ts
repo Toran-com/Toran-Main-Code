@@ -66,7 +66,11 @@ export type MandirEvent = Pick<
   | "confirmed_at"
   | "recurrence"
   | "origin"
-> & { next_starts_at: string };
+> & {
+  next_starts_at: string;
+  // Dates of a repeating event from today on (for calendar files).
+  event_occurrences?: { starts_at: string; cancelled: boolean }[] | null;
+};
 
 export type MandirDetails = Pick<
   Row<"mandirs">,
