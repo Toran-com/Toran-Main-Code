@@ -116,7 +116,7 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
         </p>
       </Card>
 
-      <ul className="border-line bg-surface divide-line divide-y rounded-2xl border">
+      <ul className="border-line bg-surface divide-line shadow-card divide-y rounded-2xl border">
         {rows.map((r) => {
           const last = r.check?.last_outcome as Outcome | null | undefined;
           return (

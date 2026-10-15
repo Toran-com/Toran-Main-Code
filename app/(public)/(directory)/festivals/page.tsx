@@ -46,7 +46,7 @@ async function Festivals() {
       {[...months.entries()].map(([month, dates]) => (
         <section key={month} className="flex flex-col gap-3">
           <h2 className="font-display text-3xl font-bold">{month}</h2>
-          <ul className="flex flex-col gap-3">
+          <ul className="rise-list flex flex-col gap-3">
             {dates.map((date) => (
               <li key={date.id}>
                 <FestivalCard date={date} />
@@ -62,7 +62,7 @@ async function Festivals() {
 function FestivalCard({ date }: { date: FestivalDate }) {
   const calendar = calendarLabel(date.calendar);
   return (
-    <article className="border-line bg-surface flex flex-col gap-2 rounded-2xl border p-5">
+    <article className="border-line bg-surface lift shadow-card flex flex-col gap-2 rounded-2xl border p-5">
       <p className="text-marigold-ink font-semibold">
         {formatDateRange(date.starts_on, date.ends_on)}
       </p>

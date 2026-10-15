@@ -26,10 +26,10 @@ export function EventList({
       {groupByDay(events, now).map(({ heading, events: day }) => (
         <section key={heading} className="flex flex-col gap-3">
           <h2 className="font-display text-2xl font-bold">{heading}</h2>
-          <ul className="flex flex-col gap-3">
+          <ul className="rise-list flex flex-col gap-3">
             {day.map((e) => (
               <li key={e.id}>
-                <article className="border-line bg-surface flex flex-col gap-1 rounded-2xl border p-5">
+                <article className="border-line bg-surface lift shadow-card flex flex-col gap-1 rounded-2xl border p-5">
                   <p className="text-marigold-ink font-semibold">
                     {e.recurrence && `${describeRule(e.recurrence)} · `}
                     {formatEventStart(e.next_starts_at, e.all_day)}

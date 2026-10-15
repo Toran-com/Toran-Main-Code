@@ -200,7 +200,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             {events.map((event) => (
               <li
                 key={event.id}
-                className="border-line bg-surface flex flex-col gap-3 rounded-2xl border p-5"
+                className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-5"
               >
                 <div className="flex flex-col gap-1">
                   <p className="text-marigold-ink font-semibold">

@@ -69,7 +69,7 @@ async function FestivalDates({ searchParams }: PageProps<"/ops/festivals">) {
         {(dates ?? []).map((d) => (
           <li
             key={d.id}
-            className="border-line bg-surface flex flex-col gap-3 rounded-2xl border p-5"
+            className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-5"
           >
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xl font-bold">

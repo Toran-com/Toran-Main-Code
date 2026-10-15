@@ -70,7 +70,7 @@ async function MandirList({ searchParams }: PageProps<"/ops/mandirs">) {
       <p className="text-muted">
         {mandirs.length} {mandirs.length === 1 ? "mandir" : "mandirs"}
       </p>
-      <ul className="border-line bg-surface divide-line divide-y rounded-2xl border">
+      <ul className="border-line bg-surface divide-line shadow-card divide-y rounded-2xl border">
         {mandirs.map((m) => (
           <li key={m.slug}>
             <Link

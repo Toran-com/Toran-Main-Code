@@ -125,7 +125,7 @@ async function EditMandir({
             {admins.map((a) => (
               <li
                 key={a.user_id}
-                className="border-line bg-surface flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4"
+                className="border-line bg-surface shadow-card flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4"
               >
                 <span className="break-all">{a.email}</span>
                 <form action={removeMandirAdmin}>

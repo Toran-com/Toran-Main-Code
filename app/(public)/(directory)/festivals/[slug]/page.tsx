@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Ornament } from "@/components/ui";
 import { notFound } from "next/navigation";
 import { EventList } from "@/components/event-list";
 import { Badge, LoadProblem } from "@/components/public-shell";
@@ -69,13 +70,17 @@ export default async function FestivalPage({
 
   return (
     <>
-      <Link href="/festivals" className="text-peacock self-start font-semibold">
+      <Link
+        href="/festivals"
+        className="text-peacock self-start font-semibold hover:underline"
+      >
         {t("festival.all")}
       </Link>
-      <div className="flex flex-col gap-3">
+      <div className="rise flex flex-col gap-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           {festival.name}
         </h1>
+        <Ornament />
         {festival.summary && (
           <p className="text-muted max-w-prose text-lg">{festival.summary}</p>
         )}
@@ -87,11 +92,11 @@ export default async function FestivalPage({
       </div>
 
       {festival.dates.length ? (
-        <ul className="flex flex-col gap-2">
+        <ul className="rise-list flex flex-col gap-2">
           {festival.dates.map((d) => (
             <li
               key={d.id}
-              className="border-line bg-surface flex flex-wrap items-center gap-2 rounded-2xl border p-4"
+              className="border-line bg-surface shadow-card flex flex-wrap items-center gap-2 rounded-2xl border p-4"
             >
               <span className="text-marigold-ink font-semibold">
                 {formatDateRange(d.starts_on, d.ends_on)}

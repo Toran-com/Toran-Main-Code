@@ -162,7 +162,7 @@ async function Posters({ searchParams }: PageProps<"/ops/posters">) {
             return (
               <li
                 key={c.id}
-                className="border-line bg-surface flex flex-col gap-3 rounded-2xl border p-5"
+                className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-5"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <Link

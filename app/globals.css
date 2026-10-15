@@ -17,6 +17,13 @@
   --marigold-ink: #8a5a00;
   --kumkum: #c21e3a;
   --leaf: #3f7d3a;
+  --peacock-deep: #08504e;
+  --card-shadow:
+    0 1px 2px rgba(27, 26, 44, 0.05), 0 10px 28px -16px rgba(27, 26, 44, 0.18);
+  --lift-shadow:
+    0 2px 4px rgba(27, 26, 44, 0.06), 0 22px 44px -18px rgba(27, 26, 44, 0.28);
+  --glow: rgba(240, 160, 10, 0.14);
+  --glow-cool: rgba(11, 107, 104, 0.08);
 }
 
 @media screen and (prefers-color-scheme: dark) {
@@ -34,6 +41,13 @@
     --marigold-ink: #ffc95c;
     --kumkum: #ff5c77;
     --leaf: #7dc46f;
+    --peacock-deep: #2aa39d;
+    --card-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 30px -18px rgba(0, 0, 0, 0.7);
+    --lift-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -18px rgba(0, 0, 0, 0.8);
+    --glow: rgba(255, 182, 39, 0.08);
+    --glow-cool: rgba(60, 198, 191, 0.07);
   }
 }
 
@@ -50,6 +64,9 @@
   --color-marigold-ink: var(--marigold-ink);
   --color-kumkum: var(--kumkum);
   --color-leaf: var(--leaf);
+  --color-peacock-deep: var(--peacock-deep);
+  --shadow-card: var(--card-shadow);
+  --shadow-lift: var(--lift-shadow);
   --font-display: var(--font-bricolage), "Segoe UI", sans-serif;
   --font-sans: var(--font-figtree), "Segoe UI", system-ui, sans-serif;
 }
@@ -57,11 +74,219 @@
 /* 18px body text minimum (docs/architecture.md, section 8). */
 html {
   font-size: 112.5%;
+  /* Room for the header, which stays at the top, when jumping to a section. */
+  scroll-padding-top: 6rem;
 }
 
 body {
-  background: var(--bg);
+  /* A warm glow of marigold and peacock behind the top of every page. */
+  background:
+    radial-gradient(70rem 36rem at 100% -8rem, var(--glow), transparent 70%),
+    radial-gradient(50rem 30rem at -10% 0, var(--glow-cool), transparent 70%),
+    var(--bg);
+  background-repeat: no-repeat;
   color: var(--ink);
+}
+
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  transition:
+    color 150ms ease,
+    text-decoration-color 150ms ease,
+    text-decoration-thickness 150ms ease;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--peacock);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--marigold) 35%, transparent);
+}
+
+/* Gentle movement: things rise into place as a page opens, cards lift
+   under the pointer, and the home page garland sways. Everything here is
+   switched off for anyone who has asked their device for less motion. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+
+.rise {
+  animation: rise 450ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Children of .rise-list come in one after another. */
+.rise-list > * {
+  animation: rise 450ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.rise-list > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.rise-list > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.rise-list > :nth-child(4) {
+  animation-delay: 180ms;
+}
+.rise-list > :nth-child(5) {
+  animation-delay: 240ms;
+}
+.rise-list > :nth-child(n + 6) {
+  animation-delay: 300ms;
+}
+
+.sway {
+  transform-origin: 50% 0;
+  animation: sway 6s ease-in-out infinite;
+}
+
+.lift {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--lift-shadow);
+    border-color: color-mix(in srgb, var(--marigold) 45%, var(--line));
+  }
+}
+
+/* A card anywhere inside can be opened by its main link (.card-link): the
+   link stretches over the whole card. */
+.has-card-link {
+  position: relative;
+}
+.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* The main menu: a marigold line slides in under the page you're on and
+   the link you point at. */
+.nav-link {
+  position: relative;
+  padding-block: 0.25rem;
+  text-decoration: none;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.1rem;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--marigold);
+  transform: scaleX(0);
+  transition: transform 220ms ease;
+}
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+/* The fringe of marigolds and mango leaves under the header, like a toran
+   over a doorway. */
+.toran-fringe {
+  height: 12px;
+  background:
+    radial-gradient(circle at 8px 4px, var(--marigold) 3.5px, transparent 4px) 0
+      0 / 32px 12px repeat-x,
+    radial-gradient(
+        ellipse 2.5px 5px at 24px 6px,
+        var(--leaf) 90%,
+        transparent 100%
+      )
+      0 0 / 32px 12px repeat-x;
+  opacity: 0.85;
+}
+
+/* Keeps the map's own layers (zoom buttons, popups) inside the map, so
+   they slide under the header rather than over it. */
+.leaflet-container {
+  isolation: isolate;
+}
+
+/* A small ornament under page headings: two fading lines and a diamond. */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 7rem;
+}
+.ornament::before,
+.ornament::after {
+  content: "";
+  height: 2px;
+  flex: 1;
+  border-radius: 2px;
+}
+.ornament::before {
+  background: linear-gradient(to right, transparent, var(--marigold));
+}
+.ornament::after {
+  background: linear-gradient(to left, transparent, var(--marigold));
+}
+.ornament > span {
+  width: 0.5rem;
+  height: 0.5rem;
+  transform: rotate(45deg);
+  background: var(--marigold);
+  border-radius: 1px;
+}
+
+/* A faint rangoli pattern for the home page's welcome section. */
+.rangoli {
+  background: var(--marigold);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='black' stroke-width='1.5'%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3Cpath d='M48 30c6 6 6 12 0 18-6-6-6-12 0-18zM48 66c6-6 6-12 0-18-6 6-6 12 0 18zM30 48c6-6 12-6 18 0-6 6-12 6-18 0zM66 48c-6-6-12-6-18 0 6 6 12 6 18 0z'/%3E%3Ccircle cx='48' cy='48' r='22' stroke-dasharray='2 5'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='96' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='96' r='2.5'/%3E%3Ccircle cx='96' cy='96' r='2.5'/%3E%3C/svg%3E")
+    0 0 / 96px 96px repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='black' stroke-width='1.5'%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3Cpath d='M48 30c6 6 6 12 0 18-6-6-6-12 0-18zM48 66c6-6 6-12 0-18-6 6-6 12 0 18zM30 48c6-6 12-6 18 0-6 6-12 6-18 0zM66 48c-6-6-12-6-18 0 6 6 12 6 18 0z'/%3E%3Ccircle cx='48' cy='48' r='22' stroke-dasharray='2 5'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='96' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='96' r='2.5'/%3E%3Ccircle cx='96' cy='96' r='2.5'/%3E%3C/svg%3E")
+    0 0 / 96px 96px repeat;
+  opacity: 0.16;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .lift:hover {
+    transform: none;
+  }
 }
 
 /* Notice-board printouts (/mandirs/<slug>/print): A4, white paper. */
@@ -73,6 +298,11 @@ body {
 
   body {
     background: #fff;
+  }
+
+  .rise,
+  .rise-list > * {
+    animation: none;
   }
 }
 
