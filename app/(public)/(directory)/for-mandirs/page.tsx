@@ -10,6 +10,7 @@ import { pageMetadata } from "@/lib/site";
 export const metadata: Metadata = pageMetadata(
   "For mandir committees",
   "Toran puts your mandir's events where families can find and share them, and helps with your seva rota. Free for mandirs.",
+  "/for-mandirs",
 );
 
 const HELPS = [

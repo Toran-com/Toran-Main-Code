@@ -15,6 +15,7 @@ import { translator } from "@/lib/i18n";
 export const metadata: Metadata = pageMetadata(
   "What's on",
   "Events at Hindu mandirs across the UK in the next eight weeks: festivals, aarti, bhajans, classes and more.",
+  "/whats-on",
 );
 
 export default function WhatsOnPage(props: PageProps<"/whats-on">) {

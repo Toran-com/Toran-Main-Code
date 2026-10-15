@@ -1,16 +1,24 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { JsonLd } from "@/components/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/public-shell";
 import { ToranGarland } from "@/components/toran-garland";
 import { buttonClass, cardClass, quietButtonClass } from "@/components/ui";
-import { site } from "@/lib/site";
+import { site, siteUrl } from "@/lib/site";
+import { siteData } from "@/lib/structured-data";
 import { translator } from "@/lib/i18n";
+
+// Only the address: the title, description and link preview picture come
+// from the root layout.
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 // The home page until launch: what Toran is, and the way in to each part.
 export default function ComingSoon() {
   const t = translator();
   return (
     <>
+      <JsonLd data={siteData(siteUrl())} />
       <SiteHeader />
       <main className="flex w-full flex-1 flex-col">
         <section className="relative overflow-hidden">

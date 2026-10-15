@@ -82,6 +82,8 @@ export type MandirDetails = Pick<
   | "phone"
   | "charity_number"
   | "status"
+  | "latitude"
+  | "longitude"
 > & { events: MandirEvent[] };
 
 export type FestivalDate = Pick<
@@ -114,7 +116,7 @@ export async function getMandir(
   const { data: mandir, error } = await db
     .from("mandirs")
     .select(
-      "id, slug, name, town, region, postcode, tradition, calendar, website, phone, charity_number, status",
+      "id, slug, name, town, region, postcode, tradition, calendar, website, phone, charity_number, status, latitude, longitude",
     )
     .eq("slug", slug)
     .maybeSingle();

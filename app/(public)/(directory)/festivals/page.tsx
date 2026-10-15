@@ -10,6 +10,7 @@ import { pageMetadata } from "@/lib/site";
 export const metadata: Metadata = pageMetadata(
   "Festivals",
   "Dates of Navratri, Diwali, Holi and other Hindu festivals in the UK.",
+  "/festivals",
 );
 
 export default function FestivalsPage() {
