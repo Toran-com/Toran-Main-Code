@@ -60,7 +60,24 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
 
   // It's on the public page at once, with the committee badge and the
   // Gujarati under the English.
-  await member.goto(`/mandirs/${SLUG}`);
+  const shown = await member.goto(`/mandirs/${SLUG}`);
+  // TEMPORARY diagnostic for #47, to be removed.
+  console.log(
+    "DIAG",
+    shown?.status(),
+    shown?.fromServiceWorker(),
+    JSON.stringify(shown?.headers()),
+    (await member.locator("main").innerText()).slice(0, 400),
+    await member.evaluate(async () => {
+      const keys = await caches.keys();
+      const out: string[] = [];
+      for (const k of keys) {
+        const c = await caches.open(k);
+        out.push(k, ...(await c.keys()).map((r) => r.url));
+      }
+      return out.join(" | ");
+    }),
+  );
   const event = member.getByRole("article").filter({ hasText: "Annakut" });
   await expect(event).toContainText("6:30pm");
   await expect(event.locator('[lang="gu"]').first()).toHaveText(
