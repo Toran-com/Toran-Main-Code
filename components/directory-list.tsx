@@ -1,18 +1,40 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import type { MandirSummary } from "@/lib/directory";
 import { anchorFor, groupByRegionAndTown, matchesSearch } from "@/lib/format";
+import { onTheMap } from "@/lib/map-clusters";
 import { inputClass } from "@/components/ui";
 
-// The mandir list with a search box. The full list is rendered on the
-// server, so it works before (and without) JavaScript; typing filters it.
+// The map code (Leaflet) is only downloaded when the map is shown.
+const MandirMap = dynamic(
+  () => import("@/components/mandir-map").then((m) => m.MandirMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="border-line bg-sunk h-[60vh] min-h-80 w-full rounded-2xl border" />
+    ),
+  },
+);
+
+type View = "map" | "list";
+
+// The mandirs as a map or a list, with one search box for both. The map is
+// the default once mandirs have map positions; the full list is still
+// rendered on the server for anyone without JavaScript, and typing filters
+// whichever view is showing.
 export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
   const [query, setQuery] = useState("");
+  const [view, setView] = useState<View>(() =>
+    onTheMap(mandirs).length > 0 ? "map" : "list",
+  );
   const inputId = useId();
-  const shown = mandirs.filter((m) => matchesSearch(m, query));
-  const groups = groupByRegionAndTown(shown);
+  const shown = useMemo(
+    () => mandirs.filter((m) => matchesSearch(m, query)),
+    [mandirs, query],
+  );
   const searching = query.trim().length > 0;
 
   return (
@@ -37,7 +59,64 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
         </p>
       </div>
 
-      {!searching && (
+      <div
+        role="group"
+        aria-label="Show mandirs as"
+        className="needs-js border-line bg-surface flex w-fit rounded-full border p-1"
+      >
+        {(["map", "list"] as const).map((v) => (
+          <button
+            key={v}
+            type="button"
+            aria-pressed={view === v}
+            onClick={() => setView(v)}
+            className={`rounded-full px-5 py-2 text-base font-semibold ${
+              view === v ? "bg-peacock text-on-peacock" : "hover:bg-sunk"
+            }`}
+          >
+            {v === "map" ? "Map" : "List"}
+          </button>
+        ))}
+      </div>
+
+      {shown.length === 0 && (
+        <p className="text-lg">
+          No mandirs match &ldquo;{query.trim()}&rdquo;. Try a nearby town, or
+          check the spelling.
+        </p>
+      )}
+
+      {view === "map" ? (
+        <>
+          {shown.length > 0 && (
+            <div className="needs-js">
+              <MandirMap mandirs={shown} />
+            </div>
+          )}
+          {/* Without JavaScript there's no map, so show the list instead. */}
+          <noscript>
+            <style>{".needs-js { display: none; }"}</style>
+            <MandirGroups mandirs={mandirs} withRegions />
+          </noscript>
+        </>
+      ) : (
+        <MandirGroups mandirs={shown} withRegions={!searching} />
+      )}
+    </div>
+  );
+}
+
+function MandirGroups({
+  mandirs,
+  withRegions,
+}: {
+  mandirs: MandirSummary[];
+  withRegions: boolean;
+}) {
+  const groups = groupByRegionAndTown(mandirs);
+  return (
+    <div className="flex flex-col gap-8">
+      {withRegions && (
         <nav aria-label="Regions">
           <ul className="flex flex-wrap gap-2">
             {groups.map(({ region }) => (
@@ -52,13 +131,6 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
             ))}
           </ul>
         </nav>
-      )}
-
-      {shown.length === 0 && (
-        <p className="text-lg">
-          No mandirs match &ldquo;{query.trim()}&rdquo;. Try a nearby town, or
-          check the spelling.
-        </p>
       )}
 
       {groups.map(({ region, towns }) => (

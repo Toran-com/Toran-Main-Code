@@ -29,3 +29,9 @@ export async function pageWeight(page: Page) {
 // about 220 KB of JavaScript and 300 KB in all; these leave a little room.
 // If a change needs more, raise them in the same pull request and say why.
 export const BUDGET = { js: 250, total: 350 };
+
+// The mandirs map (/mandirs, map view) also downloads Leaflet and the map
+// code, about 45 KB, only once the map is shown (decision 0011). The map
+// pictures from OpenStreetMap load after the page, are cached by the
+// browser and aren't counted here.
+export const MAP_JS = 50;
