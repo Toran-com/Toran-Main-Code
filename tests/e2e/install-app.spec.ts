@@ -55,3 +55,19 @@ test("pages already opened work offline; others say you're offline", async ({
     );
   }
 });
+
+test("the app always fetches a fresh page when there's signal", async ({
+  page,
+}) => {
+  // Pages may be kept by the browser and served old "while revalidating";
+  // the app must not show that old copy (a committee's new event would be
+  // missing). /festivals is such a page.
+  const first = await page.goto("/festivals");
+  const firstDate = Date.parse(first!.headers().date);
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.waitForTimeout(1100);
+  await page.goto("/for-mandirs");
+  const again = await page.goto("/festivals");
+  expect(again!.fromServiceWorker()).toBe(true);
+  expect(Date.parse(again!.headers().date)).toBeGreaterThan(firstDate);
+});

@@ -59,10 +59,13 @@ async function keepPage(request, response) {
 }
 
 // Pages: always try the network first, so visitors see the latest; fall
-// back to the kept copy, then to the offline page.
+// back to the kept copy, then to the offline page. "no-cache" makes the
+// browser check with the server: pages say a cache may serve an old copy
+// while it fetches a new one (stale-while-revalidate), which browsers
+// ignore when opening a page but honour for a service worker's fetch.
 async function page(request, url) {
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: "no-cache" });
     if (
       response.ok &&
       !response.redirected &&
