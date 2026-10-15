@@ -28,20 +28,26 @@ export function pageTitle(page?: string): string {
 
 // Title and description for the browser tab, search results and link
 // previews. WhatsApp and Facebook read the "og:" copies.
+// `path` is the page's one true address (for example "/whats-on" whatever
+// filters are chosen), so search engines don't treat copies as separate
+// pages.
 export function pageMetadata(
   page?: string,
   description: string = site.description,
+  path?: string,
 ): Metadata {
   const title = pageTitle(page);
   return {
     title,
     description,
+    ...(path && { alternates: { canonical: path } }),
     openGraph: {
       title,
       description,
       siteName: site.name,
       locale: "en_GB",
       type: "website",
+      ...(path && { url: path }),
     },
   };
 }

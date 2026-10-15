@@ -1,11 +1,106 @@
-// Descriptions of events in the schema.org format search engines read, so
-// a mandir's events can appear in Google's event listings after launch.
+// Descriptions of pages in the schema.org format search engines read: the
+// site itself, each mandir as a place, the trail of pages above a page, and
+// events, so a mandir's events can appear in Google's event listings after
+// launch.
 // See https://developers.google.com/search/docs/appearance/structured-data/event
 
 import type { MandirDetails, MandirEvent } from "@/lib/directory";
 import { londonDate } from "@/lib/format";
+import { site } from "@/lib/site";
 
-type Mandir = Pick<MandirDetails, "name" | "town" | "postcode" | "website">;
+type Mandir = Pick<MandirDetails, "name" | "town" | "postcode" | "website"> &
+  Partial<Pick<MandirDetails, "latitude" | "longitude">>;
+
+function address(
+  mandir: Pick<MandirDetails, "town" | "postcode"> &
+    Partial<Pick<MandirDetails, "region">>,
+) {
+  return {
+    "@type": "PostalAddress",
+    addressLocality: mandir.town,
+    ...(mandir.region && { addressRegion: mandir.region }),
+    ...(mandir.postcode && { postalCode: mandir.postcode }),
+    addressCountry: "GB",
+  };
+}
+
+function geo(mandir: Partial<Pick<MandirDetails, "latitude" | "longitude">>) {
+  return mandir.latitude != null && mandir.longitude != null
+    ? {
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: mandir.latitude,
+          longitude: mandir.longitude,
+        },
+      }
+    : {};
+}
+
+// The site, for the home page: its name and address.
+export function siteData(origin: string) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${origin}/#website`,
+        name: site.name,
+        description: site.description,
+        url: `${origin}/`,
+        inLanguage: "en-GB",
+      },
+      {
+        "@type": "Organization",
+        "@id": `${origin}/#organization`,
+        name: site.name,
+        url: `${origin}/`,
+      },
+    ],
+  };
+}
+
+// A mandir as a place of worship: name, address, map position, phone and
+// website. Only the mandir's public details, never a person's.
+export function mandirData(
+  mandir: Pick<
+    MandirDetails,
+    | "name"
+    | "town"
+    | "region"
+    | "postcode"
+    | "website"
+    | "phone"
+    | "latitude"
+    | "longitude"
+  >,
+  url: string,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HinduTemple",
+    "@id": `${url}#mandir`,
+    name: mandir.name,
+    url,
+    address: address(mandir),
+    ...geo(mandir),
+    ...(mandir.phone && { telephone: mandir.phone }),
+    ...(mandir.website && { sameAs: [mandir.website] }),
+  };
+}
+
+// "Toran › Mandirs › Shree Ram Mandir": the pages above this one.
+export function breadcrumbData(trail: { name: string; url: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
 
 export function eventData(
   event: Pick<
@@ -47,12 +142,8 @@ export function eventData(
     location: {
       "@type": "Place",
       name: mandir.name,
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: mandir.town,
-        ...(mandir.postcode && { postalCode: mandir.postcode }),
-        addressCountry: "GB",
-      },
+      address: address(mandir),
+      ...geo(mandir),
     },
     organizer: {
       "@type": "Organization",

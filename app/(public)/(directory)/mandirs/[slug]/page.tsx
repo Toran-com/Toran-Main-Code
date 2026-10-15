@@ -19,7 +19,7 @@ import { formatEventStart, websiteLabel } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath, eventShareText } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
-import { eventData } from "@/lib/structured-data";
+import { breadcrumbData, eventData, mandirData } from "@/lib/structured-data";
 
 // Every mandir page is fully static. A mandir added after the build is
 // rendered on its first visit (which waits for it), so an unknown address
@@ -46,6 +46,7 @@ export async function generateMetadata({
   return pageMetadata(
     `${name}, ${town}`,
     `What's on at ${name} in ${town}: events, festivals and how to find it.`,
+    `/mandirs/${slug}`,
   );
 }
 
@@ -63,6 +64,16 @@ export default async function MandirPage({
 
   return (
     <>
+      <JsonLd
+        data={mandirData(mandir, `${siteUrl()}/mandirs/${mandir.slug}`)}
+      />
+      <JsonLd
+        data={breadcrumbData([
+          { name: "Toran", url: `${siteUrl()}/` },
+          { name: "Mandirs", url: `${siteUrl()}/mandirs` },
+          { name: mandir.name, url: `${siteUrl()}/mandirs/${mandir.slug}` },
+        ])}
+      />
       <Link
         href="/mandirs"
         className="text-peacock self-start font-semibold hover:underline"

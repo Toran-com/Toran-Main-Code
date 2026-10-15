@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
-import { pageMetadata, site } from "@/lib/site";
+import { pageMetadata, site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -14,6 +14,8 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
+  // Page addresses in metadata are completed with the live site's address.
+  metadataBase: new URL(siteUrl()),
   ...pageMetadata(),
   robots: site.launched ? undefined : { index: false, follow: false },
   // The toran doorway icon, in the browser tab and on the home screen.

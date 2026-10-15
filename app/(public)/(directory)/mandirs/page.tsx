@@ -9,6 +9,7 @@ import { pageMetadata } from "@/lib/site";
 export const metadata: Metadata = pageMetadata(
   "Mandirs",
   "Hindu mandirs across the UK, by region and town.",
+  "/mandirs",
 );
 
 export default function MandirsPage() {

@@ -8,7 +8,9 @@ import { ShareButtons } from "@/components/share-buttons";
 import { getFestival, listFestivals } from "@/lib/directory";
 import { mentionsFestival } from "@/lib/festival-words";
 import { calendarLabel, formatDateRange, londonDate } from "@/lib/format";
-import { pageMetadata, pageTitle } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
+import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
+import { breadcrumbData } from "@/lib/structured-data";
 import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
 import { translator } from "@/lib/i18n";
@@ -36,6 +38,7 @@ export async function generateMetadata({
   return pageMetadata(
     `${name}${year ? ` ${year}` : ""} in the UK`,
     `${name} dates for the UK and events at mandirs near you.`,
+    `/festivals/${slug}`,
   );
 }
 
@@ -70,6 +73,13 @@ export default async function FestivalPage({
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbData([
+          { name: "Toran", url: `${siteUrl()}/` },
+          { name: "Festivals", url: `${siteUrl()}/festivals` },
+          { name: festival.name, url: `${siteUrl()}/festivals/${slug}` },
+        ])}
+      />
       <Link
         href="/festivals"
         className="text-peacock self-start font-semibold hover:underline"
