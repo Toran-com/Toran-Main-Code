@@ -257,7 +257,12 @@ function EventCard({
         {formatEventStart(event.next_starts_at, event.all_day)}
       </p>
       <h3 className={`text-xl font-bold ${cancelled ? "line-through" : ""}`}>
-        {event.title}
+        <Link
+          href={eventPath(mandir.slug, event.id)}
+          className="hover:text-peacock no-underline hover:underline"
+        >
+          {event.title}
+        </Link>
       </h3>
       {event.title_gu && (
         <p lang="gu" className="-mt-1 text-lg font-semibold">

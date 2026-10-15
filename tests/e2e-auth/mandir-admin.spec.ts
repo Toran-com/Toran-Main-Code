@@ -73,10 +73,25 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByRole("link", { name: "WhatsApp" })
     .getAttribute("href");
   expect(decodeURIComponent(whatsApp!)).toContain(`Annakut darshan at ${NAME}`);
+  const eventId = (await event.getAttribute("id"))!.replace(/^event-/, "");
+  const eventPage = `/mandirs/${SLUG}/events/${eventId}`;
+  expect(decodeURIComponent(whatsApp!)).toContain(eventPage);
+
+  // It has its own page, which its name links to. Older links to its card
+  // on the mandir's page still work.
+  await member.goto(`/mandirs/${SLUG}#event-${eventId}`);
+  await expect(member.locator(`#event-${eventId}`)).toBeInViewport();
+  await event.getByRole("link", { name: "Annakut darshan" }).click();
+  await expect(member).toHaveURL(new RegExp(`${eventPage}$`));
+  await expect(member.getByRole("heading", { level: 1 })).toHaveText(
+    "Annakut darshan",
+  );
+  await expect(member.locator("dl")).toContainText("6:30pm");
+  await expect(member.getByText(/Confirmed by the mandir/)).toBeVisible();
+  await member.goto(`/mandirs/${SLUG}`);
 
   // It can be added to a calendar: as a file, or in Google Calendar; and
   // it's in the mandir's calendar feed.
-  const eventId = (await event.getAttribute("id"))!.replace(/^event-/, "");
   await event.getByText("Add to calendar").click();
   const file = await member.request.get(
     await event
@@ -88,6 +103,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   const ics = (await file.text()).replace(/\r\n /g, "");
   expect(ics).toContain("SUMMARY:Annakut darshan");
   expect(ics).toContain(`UID:event-${eventId}@toran`);
+  expect(ics).toMatch(new RegExp(`URL:.*${eventPage}`));
   expect(ics).toMatch(/DTSTART;TZID=Europe\/London:\d{8}T183000/);
   const google = await member.request.get(
     `/mandirs/${SLUG}/add-to-calendar?event=${eventId}`,
@@ -183,6 +199,10 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByRole("article").filter({ hasText: "Annakut" }),
   ).toContainText("Cancelled");
+  await member.goto(eventPage);
+  await expect(
+    member.getByText("The mandir has cancelled this event."),
+  ).toBeVisible();
 
   // The committee corrects its own details.
   await member.goto(`/manage/${SLUG}`);

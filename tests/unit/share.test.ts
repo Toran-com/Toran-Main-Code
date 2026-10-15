@@ -35,9 +35,9 @@ describe("eventShareText", () => {
 });
 
 describe("links", () => {
-  it("points an event at its card on the mandir page", () => {
+  it("points an event at its own page", () => {
     expect(eventPath("reading-hindu-temple", "e1")).toBe(
-      "/mandirs/reading-hindu-temple#event-e1",
+      "/mandirs/reading-hindu-temple/events/e1",
     );
   });
 

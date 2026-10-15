@@ -186,7 +186,7 @@ describe("digestHtml", () => {
       "https://example.org",
     );
     expect(html).toContain(
-      '<a href="https://example.org/mandirs/geeta-bhavan-leicester#event-Garba night"',
+      '<a href="https://example.org/mandirs/geeta-bhavan-leicester/events/Garba night"',
     );
     expect(html).toContain('href="https://example.org/festivals/navratri"');
     expect(html).toContain("<em>(date not yet checked)</em>");

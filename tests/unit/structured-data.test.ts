@@ -22,7 +22,7 @@ const event = {
   recurrence: null,
   next_starts_at: "2026-11-08T18:30:00Z",
 };
-const url = "https://example.org/mandirs/reading-hindu-temple#event-e1";
+const url = "https://example.org/mandirs/reading-hindu-temple/events/e1";
 
 describe("eventData", () => {
   it("describes an event at a mandir", () => {

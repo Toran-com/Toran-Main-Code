@@ -64,6 +64,12 @@ test("a committee's pages are accessible", async ({ page }) => {
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/events/${event}`);
   await expectAccessible(page);
+  // The event's own public page.
+  await page.goto(`/mandirs/${slug}/events/${event}`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Accessibility check",
+  );
+  await expectAccessible(page);
 });
 
 test("the admin area is accessible", async ({ page }) => {
