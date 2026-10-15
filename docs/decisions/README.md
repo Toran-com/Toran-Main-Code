@@ -26,3 +26,4 @@ that replaces it and mark the old one Superseded.
 | 0009 | [Database changes only through migrations; one project until launch](0009-database-changes.md)      | Proposed |
 | 0010 | [Login by emailed link; admins need an authenticator app](0010-login.md)                            | Proposed |
 | 0011 | [A map of mandirs with Leaflet and OpenStreetMap](0011-mandir-map.md)                               | Proposed |
+| 0012 | [Every event has its own page and address](0012-event-pages.md)                                     | Proposed |
