@@ -35,6 +35,10 @@ within one month.
   any website you visit does. If you press "Near me", your browser asks
   first; your location only moves the map on your screen and is never sent
   to us or kept.
+- **Offline copies.** Your phone keeps copies of the public pages you've
+  opened (What's on, mandir and festival pages), so they still open
+  without signal. They stay on your phone; clearing the site's data in
+  your browser removes them. Nothing personal is kept.
 - **Visitor numbers** (planned). If we count visits, we'll use a
   cookie-free tool (such as Plausible) that doesn't identify you.
 
