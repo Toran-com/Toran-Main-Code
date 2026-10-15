@@ -226,6 +226,18 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
           disabled={!ready || finding === "finding"}
           className={`${quietButtonClass} px-4 py-2 text-base`}
         >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className={`size-5 ${finding === "finding" ? "animate-spin" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+          </svg>
           {finding === "finding" ? "Finding you…" : "Near me"}
         </button>
         <p className="text-muted text-base" aria-live="polite">
@@ -239,7 +251,7 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
         ref={box}
         role="region"
         aria-label="Map of mandirs. The list view has every mandir too."
-        className="toran-map border-line bg-sunk h-[60vh] min-h-80 w-full overflow-hidden rounded-2xl border"
+        className="toran-map border-line bg-sunk shadow-card h-[60vh] min-h-80 w-full overflow-hidden rounded-2xl border"
       />
       {missing > 0 && (
         <p className="text-muted text-base">

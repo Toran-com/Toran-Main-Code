@@ -6,7 +6,7 @@ import { useId, useMemo, useState } from "react";
 import type { MandirSummary } from "@/lib/directory";
 import { anchorFor, groupByRegionAndTown, matchesSearch } from "@/lib/format";
 import { onTheMap } from "@/lib/map-clusters";
-import { inputClass } from "@/components/ui";
+import { cardClass, inputClass } from "@/components/ui";
 
 // The map code (Leaflet) is only downloaded when the map is shown.
 const MandirMap = dynamic(
@@ -14,7 +14,7 @@ const MandirMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="border-line bg-sunk h-[60vh] min-h-80 w-full rounded-2xl border" />
+      <div className="border-line bg-sunk shadow-card h-[60vh] min-h-80 w-full animate-pulse rounded-2xl border" />
     ),
   },
 );
@@ -43,15 +43,18 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
         <label htmlFor={inputId} className="text-lg font-semibold">
           Find a mandir or town
         </label>
-        <input
-          id={inputId}
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="e.g. Leicester, BAPS, Harrow"
-          autoComplete="off"
-          className={inputClass}
-        />
+        <div className="relative">
+          <SearchIcon />
+          <input
+            id={inputId}
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="e.g. Leicester, BAPS, Harrow"
+            autoComplete="off"
+            className={`${inputClass} pl-12`}
+          />
+        </div>
         <p className="text-muted text-base" aria-live="polite">
           {searching
             ? `${shown.length} of ${mandirs.length} mandirs`
@@ -59,21 +62,29 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
         </p>
       </div>
 
+      {/* A switch whose peacock pill slides to the chosen view. */}
       <div
         role="group"
         aria-label="Show mandirs as"
-        className="needs-js border-line bg-surface flex w-fit rounded-full border p-1"
+        className="needs-js border-line bg-surface shadow-card relative grid w-fit grid-cols-2 rounded-full border p-1"
       >
+        <span
+          aria-hidden="true"
+          className={`from-peacock to-peacock-deep shadow-card absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-linear-to-b transition-transform duration-300 ease-out ${
+            view === "list" ? "translate-x-full" : ""
+          }`}
+        />
         {(["map", "list"] as const).map((v) => (
           <button
             key={v}
             type="button"
             aria-pressed={view === v}
             onClick={() => setView(v)}
-            className={`rounded-full px-5 py-2 text-base font-semibold ${
-              view === v ? "bg-peacock text-on-peacock" : "hover:bg-sunk"
+            className={`relative flex items-center justify-center gap-2 rounded-full px-5 py-2 text-base font-semibold transition-colors duration-300 ${
+              view === v ? "text-on-peacock" : "hover:text-peacock"
             }`}
           >
+            {v === "map" ? <PinIcon /> : <ListIcon />}
             {v === "map" ? "Map" : "List"}
           </button>
         ))}
@@ -115,7 +126,7 @@ function MandirGroups({
 }) {
   const groups = groupByRegionAndTown(mandirs);
   return (
-    <div className="flex flex-col gap-8">
+    <div className="rise-list flex flex-col gap-8">
       {withRegions && (
         <nav aria-label="Regions">
           <ul className="flex flex-wrap gap-2">
@@ -123,7 +134,7 @@ function MandirGroups({
               <li key={region}>
                 <a
                   href={`#${anchorFor(region)}`}
-                  className="border-line hover:bg-sunk inline-block rounded-full border px-3 py-1 text-base"
+                  className="border-line bg-surface hover:border-marigold/60 hover:text-peacock inline-block rounded-full border px-3 py-1 text-base no-underline shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition duration-200 hover:-translate-y-0.5"
                 >
                   {region}
                 </a>
@@ -148,22 +159,36 @@ function MandirGroups({
           </h2>
           {towns.map(({ town, mandirs: list }) => (
             <div key={town} className="flex flex-col gap-2">
-              <h3 className="text-muted text-lg font-semibold">{town}</h3>
-              <ul className="border-line bg-surface divide-line divide-y rounded-2xl border">
+              <h3 className="text-muted flex items-center gap-2 text-lg font-semibold">
+                <span
+                  aria-hidden="true"
+                  className="bg-marigold size-2 rotate-45 rounded-[1px]"
+                />
+                {town}
+              </h3>
+              <ul className={`${cardClass} divide-line divide-y`}>
                 {list.map((m) => (
                   <li key={m.slug}>
                     <Link
                       href={`/mandirs/${m.slug}`}
-                      className="hover:bg-sunk flex flex-col px-4 py-3 first:rounded-t-2xl last:rounded-b-2xl"
+                      className="group hover:bg-sunk flex items-center gap-3 px-4 py-3 no-underline transition-colors first:rounded-t-2xl last:rounded-b-2xl"
                     >
-                      <span className="text-peacock font-semibold">
-                        {m.name}
-                      </span>
-                      {m.tradition && (
-                        <span className="text-muted text-base">
-                          {m.tradition}
+                      <span className="flex flex-1 flex-col">
+                        <span className="text-peacock font-semibold">
+                          {m.name}
                         </span>
-                      )}
+                        {m.tradition && (
+                          <span className="text-muted text-base">
+                            {m.tradition}
+                          </span>
+                        )}
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="text-marigold-ink -translate-x-1 text-xl opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100"
+                      >
+                        →
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -173,5 +198,47 @@ function MandirGroups({
         </section>
       ))}
     </div>
+  );
+}
+
+const iconProps = {
+  "aria-hidden": true,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
+function SearchIcon() {
+  return (
+    <svg
+      {...iconProps}
+      className="text-muted pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
+    </svg>
+  );
+}
+
+function PinIcon() {
+  return (
+    <svg {...iconProps} className="size-5">
+      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </svg>
+  );
+}
+
+function ListIcon() {
+  return (
+    <svg {...iconProps} className="size-5">
+      <path d="M9 6h11M9 12h11M9 18h11" />
+      <circle cx="4.5" cy="6" r="1" fill="currentColor" />
+      <circle cx="4.5" cy="12" r="1" fill="currentColor" />
+      <circle cx="4.5" cy="18" r="1" fill="currentColor" />
+    </svg>
   );
 }
