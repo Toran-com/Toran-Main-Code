@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { AddToCalendar } from "@/components/add-to-calendar";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
+import { SubscribeCalendar } from "@/components/subscribe-calendar";
 import { Card, Ornament, quietButtonClass } from "@/components/ui";
 import {
   getMandir,
@@ -135,6 +137,12 @@ export default async function MandirPage({
           )}
         </div>
       </section>
+
+      <SubscribeCalendar
+        path={`/mandirs/${mandir.slug}/calendar.ics`}
+        title="Get these events in your calendar"
+        body={`Add ${mandir.name}'s events to the calendar on your phone. New events and changes appear there automatically.`}
+      />
 
       <Card>
         <h2 className="text-xl font-bold">
@@ -300,10 +308,17 @@ function EventCard({
         )}
       />
       {!cancelled && (
-        <ShareButtons
-          text={eventShareText(event, mandir)}
-          path={eventPath(mandir.slug, event.id)}
-        />
+        <>
+          <ShareButtons
+            text={eventShareText(event, mandir)}
+            path={eventPath(mandir.slug, event.id)}
+          />
+          <AddToCalendar
+            mandirSlug={mandir.slug}
+            eventId={event.id}
+            title={event.title}
+          />
+        </>
       )}
     </article>
   );

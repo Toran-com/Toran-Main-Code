@@ -73,6 +73,32 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByRole("link", { name: "WhatsApp" })
     .getAttribute("href");
   expect(decodeURIComponent(whatsApp!)).toContain(`Annakut darshan at ${NAME}`);
+
+  // It can be added to a calendar: as a file, or in Google Calendar; and
+  // it's in the mandir's calendar feed.
+  const eventId = (await event.getAttribute("id"))!.replace(/^event-/, "");
+  await event.getByText("Add to calendar").click();
+  const file = await member.request.get(
+    await event
+      .getByRole("link", { name: "Apple, Outlook or another calendar" })
+      .getAttribute("href")
+      .then((href) => href!),
+  );
+  expect(file.headers()["content-disposition"]).toContain("attachment");
+  const ics = (await file.text()).replace(/\r\n /g, "");
+  expect(ics).toContain("SUMMARY:Annakut darshan");
+  expect(ics).toContain(`UID:event-${eventId}@toran`);
+  expect(ics).toMatch(/DTSTART;TZID=Europe\/London:\d{8}T183000/);
+  const google = await member.request.get(
+    `/mandirs/${SLUG}/add-to-calendar?event=${eventId}`,
+    { maxRedirects: 0 },
+  );
+  expect(google.status()).toBe(303);
+  expect(google.headers().location).toMatch(
+    /^https:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE/,
+  );
+  const feed = await member.request.get(`/mandirs/${SLUG}/calendar.ics`);
+  expect(await feed.text()).toContain("SUMMARY:Annakut darshan");
   await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
 
   // And on What's on, under the mandir's name.
