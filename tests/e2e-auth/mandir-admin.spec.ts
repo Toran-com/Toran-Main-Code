@@ -86,8 +86,14 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(member.getByRole("heading", { level: 1 })).toHaveText(
     "Annakut darshan",
   );
-  await expect(member.locator("dl")).toContainText("6:30pm");
-  await expect(member.getByText(/Confirmed by the mandir/)).toBeVisible();
+  // Next.js keeps the mandir's page in the document, hidden, after moving
+  // on, so look only at what's shown.
+  await expect(member.locator("dl").filter({ visible: true })).toContainText(
+    "6:30pm",
+  );
+  await expect(
+    member.getByText(/Confirmed by the mandir/).filter({ visible: true }),
+  ).toBeVisible();
   await member.goto(`/mandirs/${SLUG}`);
 
   // It can be added to a calendar: as a file, or in Google Calendar; and

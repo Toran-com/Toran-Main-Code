@@ -38,8 +38,8 @@ test("an event's page has its details, sharing and search engine data", async ({
   await expect(details).toContainText("Colchester");
   await expect(details).toContainText("Free");
   await expect(
-    details.getByRole("link", { name: "Directions" }),
-  ).toHaveAttribute("href", /google\.com\/maps/);
+    details.getByRole("link", { name: "Colchester Hindu Society" }),
+  ).toHaveAttribute("href", `/mandirs/${SLUG}`);
   await expect(page.getByText("Garba under the full moon.")).toBeVisible();
   await expect(page.getByText(/Confirmed by the mandir/)).toBeVisible();
 
