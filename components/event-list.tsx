@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/public-shell";
+import { AddToCalendar } from "@/components/add-to-calendar";
 import { ShareButtons } from "@/components/share-buttons";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import { formatEventStart } from "@/lib/format";
@@ -71,10 +72,17 @@ export function EventList({
                     </p>
                   )}
                   {e.status !== "cancelled" && (
-                    <ShareButtons
-                      text={eventShareText(e, e.mandir)}
-                      path={eventPath(e.mandir.slug, e.id)}
-                    />
+                    <>
+                      <ShareButtons
+                        text={eventShareText(e, e.mandir)}
+                        path={eventPath(e.mandir.slug, e.id)}
+                      />
+                      <AddToCalendar
+                        mandirSlug={e.mandir.slug}
+                        eventId={e.id}
+                        title={e.title}
+                      />
+                    </>
                   )}
                 </article>
               </li>

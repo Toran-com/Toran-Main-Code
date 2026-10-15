@@ -1,16 +1,10 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { useOrigin } from "@/components/use-origin";
 import { whatsAppLink } from "@/lib/share";
 
 const noSubscribe = () => () => {};
-
-// Before the page's JavaScript runs, links use the live site's address
-// (Vercel provides it at build time); after, the address actually in use,
-// so preview links share the preview.
-const builtOrigin = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
-  : "";
 
 // "WhatsApp" opens a chat with the message ready to send. The second
 // button uses the phone's own share sheet where there is one, or copies
@@ -24,11 +18,7 @@ export function ShareButtons({
   path: string;
   label?: string;
 }) {
-  const origin = useSyncExternalStore(
-    noSubscribe,
-    () => window.location.origin,
-    () => builtOrigin,
-  );
+  const origin = useOrigin();
   const canShare = useSyncExternalStore(
     noSubscribe,
     () => typeof navigator.share === "function",
