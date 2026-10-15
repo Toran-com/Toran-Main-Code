@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Notice, Ornament } from "@/components/ui";
+import { InstallApp } from "@/components/install-app";
 import { SiteNav } from "@/components/site-nav";
 import { ToranGarland } from "@/components/toran-garland";
 import { translator } from "@/lib/i18n";
@@ -53,6 +54,7 @@ export function SiteFooter() {
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-8 text-base sm:px-6">
         <ToranGarland className="h-6 w-28" decorative />
         <p className="max-w-prose">{t("shell.footer")}</p>
+        <InstallApp />
         <p>
           <Link
             href="/for-mandirs"

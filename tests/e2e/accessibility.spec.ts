@@ -10,6 +10,7 @@ for (const path of [
   "/whats-on",
   "/demo",
   "/for-mandirs",
+  "/offline",
   "/login",
   "/no-such-page",
 ]) {

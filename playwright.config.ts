@@ -1,5 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// Lets tests block the app's service worker's network requests too, to see
+// what it does offline (tests/e2e/install-app.spec.ts).
+process.env.PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS = "1";
+
 const port = 3100;
 
 export default defineConfig({

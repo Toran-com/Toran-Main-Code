@@ -39,6 +39,10 @@ within one month.
   your calendar, your calendar app checks Toran for changes every few
   hours. Like any visit, that shows up briefly in the server logs; we
   don't know who subscribes and need no account.
+- **Offline copies.** Your phone keeps copies of the public pages you've
+  opened (What's on, mandir and festival pages), so they still open
+  without signal. They stay on your phone; clearing the site's data in
+  your browser removes them. Nothing personal is kept.
 - **Visitor numbers** (planned). If we count visits, we'll use a
   cookie-free tool (such as Plausible) that doesn't identify you.
 

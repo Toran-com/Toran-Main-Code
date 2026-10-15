@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import { pageMetadata, site, siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -18,6 +18,23 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   ...pageMetadata(),
   robots: site.launched ? undefined : { index: false, follow: false },
+  // The toran doorway icon, in the browser tab and on the home screen.
+  icons: {
+    icon: [
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/favicon-48.png", sizes: "48x48", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: { capable: true, title: site.name, statusBarStyle: "default" },
+};
+
+// The phone's status bar matches the page, in light and dark mode.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf8f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1120" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
