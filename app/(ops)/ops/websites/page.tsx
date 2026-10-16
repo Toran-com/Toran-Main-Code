@@ -58,7 +58,9 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
           .order("name"),
         supabase
           .from("sources")
-          .select("mandir_id, last_checked_at, last_outcome, last_found")
+          .select(
+            "mandir_id, last_checked_at, last_outcome, last_found, last_notes",
+          )
           .eq("kind", "crawler"),
       ])
     : [{ data: [] }, { data: [] }];
@@ -89,9 +91,12 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
 
       <Card>
         <p>
-          Reads each mandir&apos;s own website for events it publishes in a
-          standard, machine-readable form (event data in the page, or a calendar
-          feed). Anything new goes to the{" "}
+          Reads each mandir&apos;s own website for events it publishes in a form
+          Toran can read: event data in its pages, calendar feeds, Google
+          Calendars shown on the site, and WordPress&apos;s The Events Calendar.
+          Names and descriptions are cleaned into plain text, times found in the
+          description when the site gives none, and each event gets a likely
+          type. Anything new goes to the{" "}
           <Link href="/ops/posters" className="text-peacock underline">
             poster queue
           </Link>
@@ -112,7 +117,7 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
         </form>
         <p className="text-muted text-base">
           Starts with websites never checked, then the ones checked longest ago.
-          Takes up to a minute.
+          Takes up to a minute, and stops early if sites are slow.
         </p>
       </Card>
 
@@ -136,6 +141,11 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
                   {r.check?.last_checked_at &&
                     ` · checked ${formatEventStart(r.check.last_checked_at, true)}`}
                 </span>
+                {r.check?.last_notes && (
+                  <span className="text-muted text-base">
+                    {r.check.last_notes.split("\n").join(" ")}
+                  </span>
+                )}
               </div>
               {last && last in OUTCOMES && (
                 <Badge tone={OUTCOMES[last].tone}>

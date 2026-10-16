@@ -1,9 +1,13 @@
-// Reads events a mandir's own website already publishes in standard,
-// machine-readable forms: schema.org event data embedded in the page
-// (JSON-LD) and iCalendar (.ics) feeds. No guessing from page text; that
-// would need AI and is a later step. Pure functions, so the rules are
-// tested without fetching anything.
+// Reads events a mandir's own website already publishes in machine-readable
+// forms: schema.org event data in the page (JSON-LD or microdata), iCalendar
+// (.ics) feeds, Google Calendars embedded in the page, and the event list
+// of WordPress's The Events Calendar plugin. No guessing events from page
+// text; that would need AI and is a later step. Whatever it reads is
+// cleaned into plain text a family can read, then checked by a person in
+// the poster queue. Pure functions, so the rules are tested without
+// fetching anything.
 
+import { type EventKind, guessKind } from "@/lib/event-kinds";
 import { londonDate, londonTime } from "@/lib/format";
 
 export type FoundEvent = {
@@ -12,7 +16,10 @@ export type FoundEvent = {
   time: string; // HH:MM in London, or "" for all day
   summary: string;
   link: string;
+  kind: EventKind;
 };
+
+// ---- Cleaning text -----------------------------------------------------------
 
 const ENTITIES: Record<string, string> = {
   amp: "&",
@@ -21,35 +28,163 @@ const ENTITIES: Record<string, string> = {
   quot: '"',
   apos: "'",
   nbsp: " ",
-  "#39": "'",
+  ndash: "–",
+  mdash: "—",
+  lsquo: "‘",
+  rsquo: "’",
+  ldquo: "“",
+  rdquo: "”",
+  hellip: "…",
+  pound: "£",
+  copy: "©",
+  bull: "•",
+  middot: "·",
 };
 
-// Plain text from a snippet of HTML: tags removed, common entities decoded,
-// spaces tidied.
-export function plainText(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&(#\d+|#x[0-9a-f]+|\w+);/gi, (whole, name: string) => {
-      const lower = name.toLowerCase();
-      if (lower in ENTITIES) return ENTITIES[lower];
+const ENTITY = /&(#\d+|#x[0-9a-f]+|[a-z]+);/gi;
+
+function decodeEntities(text: string): string {
+  return text.replace(ENTITY, (whole, name: string) => {
+    const lower = name.toLowerCase();
+    if (lower in ENTITIES) return ENTITIES[lower];
+    try {
       if (lower.startsWith("#x")) {
         return String.fromCodePoint(parseInt(lower.slice(2), 16));
       }
       if (lower.startsWith("#")) {
         return String.fromCodePoint(Number(lower.slice(1)));
       }
-      return whole;
-    })
+    } catch {
+      // An impossible code point: leave it as it was.
+    }
+    return whole;
+  });
+}
+
+// Plain text from whatever a website put in an event's name or
+// description: HTML (even HTML that was encoded twice, so "&lt;p&gt;"
+// shows up as tags), escape sequences like "\n" left in by a plugin,
+// WordPress shortcodes and "Read more" links. Spaces tidied.
+export function plainText(html: string): string {
+  let text = html.replace(/\\[nrt]/g, " ").replace(/\\\//g, "/");
+  for (let i = 0; i < 2 && /&(#\d+|#x[0-9a-f]+|[a-z]+);/i.test(text); i++) {
+    text = decodeEntities(text);
+  }
+  text = text
+    .replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<\/?[a-z][^>]*>/gi, " ");
+  text = decodeEntities(text)
+    // Shortcodes from page builders: [vc_row], [/et_pb_text], [caption …].
+    .replace(
+      /\[\/?(?:[a-z]+_[a-z0-9_]*|caption|gallery|embed)(?:\s[^\]]*)?\]/gi,
+      " ",
+    )
     .replace(/\s+/g, " ")
+    .trim();
+  return text
+    .replace(/\s*\[(?:…|\.\.\.)\]$/, "…")
+    .replace(
+      /\s*(?:read more|continue reading|find out more|learn more|more info)\s*[»→›.…]*$/i,
+      "",
+    )
     .trim();
 }
 
-// At most 280 characters, cut at a word.
-function shorten(text: string, max: number): string {
+const SMALL_WORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "at",
+  "by",
+  "for",
+  "in",
+  "of",
+  "on",
+  "the",
+  "to",
+  "with",
+]);
+
+// Names written in capitals ("DIWALI MELA") in title case instead.
+function tidyTitle(title: string): string {
+  const letters = title.replace(/[^a-z]/gi, "");
+  if (letters.length < 5 || letters !== letters.toUpperCase()) return title;
+  return title
+    .toLowerCase()
+    .replace(/[a-z][a-z']*/g, (word, at: number) =>
+      at > 0 && SMALL_WORDS.has(word)
+        ? word
+        : word[0].toUpperCase() + word.slice(1),
+    );
+}
+
+// At most `max` characters: whole sentences if one ends late enough,
+// otherwise cut at a word.
+export function shorten(text: string, max: number): string {
   if (text.length <= max) return text;
   const cut = text.slice(0, max - 1);
+  const sentence = Math.max(
+    cut.lastIndexOf(". "),
+    cut.lastIndexOf("! "),
+    cut.lastIndexOf("? "),
+  );
+  if (sentence > max * 0.6) return cut.slice(0, sentence + 1);
   const space = cut.lastIndexOf(" ");
-  return `${(space > max / 2 ? cut.slice(0, space) : cut).trimEnd()}…`;
+  const kept = (space > max / 2 ? cut.slice(0, space) : cut)
+    .trimEnd()
+    .replace(/[,;:–-]$/, "");
+  return `${kept}…`;
+}
+
+// The first time of day written in some text: "11:30am", "6.30 pm",
+// "7pm", "18:30". "HH:MM", or null.
+export function timeIn(text: string): string | null {
+  const twelve =
+    /\b(1[0-2]|0?[1-9])(?:[:.]([0-5]\d))?\s*(a\.?m\.?|p\.?m\.?)(?![a-z])/i.exec(
+      text,
+    );
+  if (twelve) {
+    let hour = Number(twelve[1]) % 12;
+    if (/^p/i.test(twelve[3])) hour += 12;
+    const time = `${String(hour).padStart(2, "0")}:${twelve[2] ?? "00"}`;
+    return time === "00:00" ? null : time;
+  }
+  const day = /\b([01]\d|2[0-3]):([0-5]\d)\b/.exec(text);
+  if (day && `${day[1]}:${day[2]}` !== "00:00") return `${day[1]}:${day[2]}`;
+  return null;
+}
+
+type RawEvent = {
+  title: string;
+  date: string;
+  time: string;
+  summary: string;
+  link: string;
+};
+
+// A found event made ready for the queue: clean name and description, a
+// time (websites often give midnight when they mean "no time", with the
+// real time only in the description), and a guess at its kind.
+function finish(raw: RawEvent): FoundEvent | null {
+  const title = shorten(tidyTitle(plainText(raw.title)), 120);
+  if (title.length < 2) return null;
+  let summary = plainText(raw.summary);
+  if (summary.toLowerCase() === title.toLowerCase()) summary = "";
+  summary = shorten(summary, 280);
+  const time =
+    raw.time && raw.time !== "00:00"
+      ? raw.time
+      : (timeIn(`${title} ${summary}`) ?? "");
+  return {
+    title,
+    date: raw.date,
+    time,
+    summary,
+    link: raw.link,
+    // The name says more than the description.
+    kind: guessKind(title) === "other" ? guessKind(summary) : guessKind(title),
+  };
 }
 
 function absolute(href: string, base: string): string | null {
@@ -62,6 +197,8 @@ function absolute(href: string, base: string): string | null {
     return null;
   }
 }
+
+// ---- Dates -------------------------------------------------------------------
 
 // A start written as a date ("2026-11-08"), a time with an offset
 // ("2026-11-08T18:30:00+00:00") or a local time with none (taken as
@@ -81,6 +218,8 @@ export function parseStart(
   return { date: londonDate(at), time: londonTime(at) };
 }
 
+// ---- schema.org events in JSON-LD -------------------------------------------
+
 function isEventType(type: unknown): boolean {
   const types = Array.isArray(type) ? type : [type];
   return types.some(
@@ -89,8 +228,12 @@ function isEventType(type: unknown): boolean {
 }
 
 function text(value: unknown): string {
-  if (typeof value === "string") return plainText(value);
+  if (typeof value === "string") return value;
   if (Array.isArray(value)) return text(value[0]);
+  if (value && typeof value === "object" && "rendered" in value) {
+    // WordPress's REST API: { rendered: "<p>…</p>" }.
+    return text((value as { rendered: unknown }).rendered);
+  }
   return "";
 }
 
@@ -117,17 +260,17 @@ export function eventsFromJsonLd(html: string, pageUrl: string): FoundEvent[] {
     }
     const obj = node as Record<string, unknown>;
     if (isEventType(obj["@type"])) {
-      const title = text(obj.name);
       const start =
         typeof obj.startDate === "string" ? parseStart(obj.startDate) : null;
-      if (title && start) {
-        found.push({
-          title: shorten(title, 120),
-          ...start,
-          summary: shorten(text(obj.description), 280),
-          link: linkOf(obj.url, pageUrl) || pageUrl,
-        });
-      }
+      const event = start
+        ? finish({
+            title: text(obj.name),
+            ...start,
+            summary: text(obj.description),
+            link: linkOf(obj.url, pageUrl) || pageUrl,
+          })
+        : null;
+      if (event) found.push(event);
     }
     for (const key of [
       "@graph",
@@ -142,13 +285,115 @@ export function eventsFromJsonLd(html: string, pageUrl: string): FoundEvent[] {
   };
   for (const [, body] of blocks) {
     try {
-      visit(JSON.parse(body.trim()), 0);
+      // Some plugins leave raw line breaks inside strings, which JSON
+      // forbids; outside strings they're only spacing.
+      visit(JSON.parse(body.trim().replace(/[\u0000-\u001f]+/g, " ")), 0);
     } catch {
       // A broken block is skipped; the rest of the page may still be fine.
     }
   }
   return found;
 }
+
+// ---- schema.org events in microdata -----------------------------------------
+
+// The tag carrying itemprop="<prop>" in a piece of HTML, and the text inside
+// it.
+function itemProp(
+  html: string,
+  prop: string,
+): { attrs: string; inner: string } | null {
+  const tag = new RegExp(
+    `<([a-z0-9]+)\\b([^>]*\\bitemprop\\s*=\\s*["'][^"']*\\b${prop}\\b[^"']*["'][^>]*)>`,
+    "i",
+  ).exec(html);
+  if (!tag) return null;
+  const rest = html.slice(tag.index + tag[0].length);
+  const close = rest.search(new RegExp(`</${tag[1]}\\s*>`, "i"));
+  return { attrs: tag[2], inner: close >= 0 ? rest.slice(0, close) : "" };
+}
+
+function attr(attrs: string, name: string): string | null {
+  return (
+    new RegExp(`\\b${name}\\s*=\\s*["']([^"']*)["']`, "i").exec(attrs)?.[1] ??
+    null
+  );
+}
+
+// Events marked up with itemtype="https://schema.org/Event".
+export function eventsFromMicrodata(
+  html: string,
+  pageUrl: string,
+): FoundEvent[] {
+  const found: FoundEvent[] = [];
+  const starts = [
+    ...html.matchAll(
+      /\bitemtype\s*=\s*["']https?:\/\/schema\.org\/\w*(?:Event|Festival)["']/gi,
+    ),
+  ].map((m) => m.index);
+  starts.forEach((start, i) => {
+    const chunk = html.slice(start, starts[i + 1] ?? start + 8000);
+    const name = itemProp(chunk, "name");
+    const when = itemProp(chunk, "startDate");
+    const startValue =
+      when && (attr(when.attrs, "content") ?? attr(when.attrs, "datetime"));
+    const parsed = startValue ? parseStart(startValue) : null;
+    if (!name || !parsed) return;
+    const description = itemProp(chunk, "description");
+    const url = itemProp(chunk, "url");
+    const href = url
+      ? (attr(url.attrs, "href") ?? attr(url.attrs, "content") ?? "")
+      : "";
+    const event = finish({
+      title: attr(name.attrs, "content") ?? name.inner,
+      ...parsed,
+      summary: description
+        ? (attr(description.attrs, "content") ?? description.inner)
+        : "",
+      link: (href && absolute(href, pageUrl)) || pageUrl,
+    });
+    if (event) found.push(event);
+  });
+  return found;
+}
+
+// ---- WordPress: The Events Calendar's list of events ------------------------
+
+// The address of The Events Calendar's list of upcoming events on a
+// WordPress site.
+export function tribeEventsUrl(origin: string, today: string): string {
+  return `${origin}/wp-json/tribe/events/v1/events?per_page=50&start_date=${today}`;
+}
+
+// Its answer: { events: [{ title, description, start_date, all_day, url }] },
+// with times in the site's own time zone (a UK site: London).
+export function eventsFromTribeApi(json: string, base: string): FoundEvent[] {
+  let data: unknown;
+  try {
+    data = JSON.parse(json);
+  } catch {
+    return [];
+  }
+  const list = (data as { events?: unknown } | null)?.events;
+  if (!Array.isArray(list)) return [];
+  return list.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const e = item as Record<string, unknown>;
+    const start =
+      typeof e.start_date === "string" ? parseStart(e.start_date) : null;
+    if (!start) return [];
+    const event = finish({
+      title: text(e.title),
+      date: start.date,
+      time: e.all_day === true ? "" : start.time,
+      summary: text(e.excerpt) || text(e.description),
+      link: linkOf(e.url, base) || base,
+    });
+    return event ? [event] : [];
+  });
+}
+
+// ---- iCalendar feeds ---------------------------------------------------------
 
 // iCalendar text: long lines are folded onto the next line with a leading
 // space, and commas, semicolons and new lines are escaped.
@@ -203,14 +448,15 @@ export function eventsFromIcs(ics: string, feedUrl: string): FoundEvent[] {
         start &&
         !/CANCELLED/i.test(current?.STATUS?.value ?? "")
       ) {
-        found.push({
-          title: shorten(unescapeIcs(summary), 120),
+        const event = finish({
+          title: unescapeIcs(summary),
           ...start,
-          summary: shorten(unescapeIcs(current?.DESCRIPTION?.value ?? ""), 280),
+          summary: unescapeIcs(current?.DESCRIPTION?.value ?? ""),
           link:
             absolute(unescapeIcs(current?.URL?.value ?? ""), feedUrl) ??
             feedUrl,
         });
+        if (event) found.push(event);
       }
       current = null;
       continue;
@@ -222,8 +468,40 @@ export function eventsFromIcs(ics: string, feedUrl: string): FoundEvent[] {
   return found;
 }
 
+// ---- Finding what to read next ----------------------------------------------
+
+// Google Calendars shown on the page (an embedded calendar, or a "view our
+// calendar" link): each public one has an iCalendar feed.
+export function googleCalendarFeeds(html: string): string[] {
+  const feeds = new Set<string>();
+  const decoded = html.replace(/&amp;/g, "&");
+  for (const [, query] of decoded.matchAll(
+    /calendar\.google\.com\/calendar\/(?:u\/\d+\/?)?(?:embed|r)?\?([^"'\s<>]+)/gi,
+  )) {
+    const params = new URLSearchParams(query);
+    const ids = [
+      ...params.getAll("src"),
+      ...params
+        .getAll("cid")
+        .map((cid) => Buffer.from(cid, "base64").toString("utf8")),
+    ];
+    for (const id of ids) {
+      if (/^[\w.+-]+@[\w.-]+$/.test(id)) {
+        feeds.add(
+          `https://calendar.google.com/calendar/ical/${encodeURIComponent(id)}/public/basic.ics`,
+        );
+      }
+    }
+  }
+  return [...feeds];
+}
+
+const LIST_WORDS =
+  /event|calendar|programme|program|what-?s-?on|festival|diary|schedule|upcoming|activities|utsav|timetable/i;
+
 // Links on a page worth reading next: same-site pages that look like an
-// events list or calendar, and calendar feeds anywhere.
+// events list or calendar, and calendar feeds anywhere (including Google
+// Calendars embedded in the page).
 export function candidateLinks(
   html: string,
   pageUrl: string,
@@ -231,8 +509,8 @@ export function candidateLinks(
   const host = new URL(pageUrl).host;
   const pages = new Set<string>();
   const feeds = new Set<string>();
-  for (const [, attrs] of html.matchAll(/<(?:a|link)\b([^>]*)>/gi)) {
-    const href = /\bhref\s*=\s*["']([^"']+)["']/i.exec(attrs)?.[1];
+  for (const [, attrs] of html.matchAll(/<(?:a|link|iframe)\b([^>]*)>/gi)) {
+    const href = /\b(?:href|src)\s*=\s*["']([^"']+)["']/i.exec(attrs)?.[1];
     if (!href) continue;
     if (/^webcal:/i.test(href)) {
       feeds.add(href.replace(/^webcal:/i, "https:"));
@@ -241,7 +519,10 @@ export function candidateLinks(
     const url = absolute(href.replace(/&amp;/g, "&"), pageUrl);
     if (!url) continue;
     const isFeed =
-      /\.ics(\?|$)/i.test(url) || /type\s*=\s*["']text\/calendar/i.test(attrs);
+      /\.ics(\?|$)/i.test(url) ||
+      /[?&](?:ical|outlook-ical)=1\b/i.test(url) ||
+      /\/feed\/ical\/?$/i.test(url) ||
+      /type\s*=\s*["']text\/calendar/i.test(attrs);
     if (isFeed) {
       feeds.add(url);
       continue;
@@ -249,17 +530,81 @@ export function candidateLinks(
     const target = new URL(url);
     if (target.host !== host) continue;
     target.hash = "";
+    if (LIST_WORDS.test(target.pathname)) pages.add(target.toString());
+  }
+  for (const feed of googleCalendarFeeds(html)) feeds.add(feed);
+  pages.delete(new URL(pageUrl).toString());
+  return { pages: [...pages].slice(0, 5), feeds: [...feeds].slice(0, 3) };
+}
+
+// Links to single events from an events list ("/events/diwali-2026/"),
+// for sites that only describe each event on its own page.
+export function eventPageLinks(html: string, pageUrl: string): string[] {
+  const host = new URL(pageUrl).host;
+  const here = new URL(pageUrl).pathname.replace(/\/$/, "");
+  const links = new Set<string>();
+  for (const [, href] of html.matchAll(
+    /<a\b[^>]*\bhref\s*=\s*["']([^"']+)["']/gi,
+  )) {
+    const url = absolute(href.replace(/&amp;/g, "&"), pageUrl);
+    if (!url) continue;
+    const target = new URL(url);
+    target.hash = "";
+    target.search = "";
+    const path = target.pathname.replace(/\/$/, "");
     if (
-      /event|calendar|programme|program|what-?s-?on|festival|diary|schedule/i.test(
-        target.pathname,
-      )
+      target.host === host &&
+      path !== here &&
+      /\/(?:event|events|evento)\/[^/]+$/i.test(path) &&
+      !/\/(?:page|category|tag|list|month|week|day|today|feed)\b/i.test(path)
     ) {
-      pages.add(target.toString());
+      links.add(target.toString());
     }
   }
-  pages.delete(new URL(pageUrl).toString());
-  return { pages: [...pages].slice(0, 3), feeds: [...feeds].slice(0, 2) };
+  return [...links].slice(0, 6);
 }
+
+// ---- What kind of site it is ------------------------------------------------
+
+export type Platform =
+  | "wordpress"
+  | "wix"
+  | "squarespace"
+  | "weebly"
+  | "google-sites"
+  | "godaddy"
+  | null;
+
+export function platformOf(html: string): Platform {
+  if (/wp-content\/|wp-includes\/|api\.w\.org/i.test(html)) return "wordpress";
+  if (/static\.wixstatic\.com|wix\.com\/|wix-warmup-data/i.test(html)) {
+    return "wix";
+  }
+  if (/squarespace(?:-cdn)?\.com/i.test(html)) return "squarespace";
+  if (/weebly\.com|editmysite\.com/i.test(html)) return "weebly";
+  if (/sites\.google\.com|googleusercontent\.com\/sites/i.test(html)) {
+    return "google-sites";
+  }
+  if (/img1\.wsimg\.com/i.test(html)) return "godaddy";
+  return null;
+}
+
+// Whether the page names a few dates in its ordinary text: events written
+// out for people, which Toran can't read without AI.
+export function mentionsDates(html: string): boolean {
+  const words = plainText(html);
+  const months =
+    "jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
+  const dates = words.match(
+    new RegExp(
+      `\\b\\d{1,2}(?:st|nd|rd|th)?\\s+(?:${months})\\b|\\b(?:${months})\\s+\\d{1,2}(?:st|nd|rd|th)?\\b|\\b\\d{1,2}[/.]\\d{1,2}[/.](?:20)?\\d{2}\\b`,
+      "gi",
+    ),
+  );
+  return (dates?.length ?? 0) >= 2;
+}
+
+// ---- Choosing what to keep --------------------------------------------------
 
 // Upcoming events only (today to two years ahead), one per title and day.
 export function upcoming(events: FoundEvent[], now = new Date()): FoundEvent[] {
@@ -274,8 +619,10 @@ export function upcoming(events: FoundEvent[], now = new Date()): FoundEvent[] {
   });
 }
 
-// robots.txt: the rules for our user agent if it's named, otherwise for
-// everyone ("*"). The longest matching rule wins; Allow wins a tie.
+// ---- robots.txt --------------------------------------------------------------
+
+// The rules for our user agent if it's named, otherwise for everyone ("*").
+// The longest matching rule wins; Allow wins a tie.
 export function robotsAllows(
   robotsTxt: string,
   path: string,

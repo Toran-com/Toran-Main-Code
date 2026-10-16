@@ -84,6 +84,7 @@ export async function recordWebsiteCheck(
             date: e.date,
             time: e.time,
             summary: e.summary,
+            kind: e.kind,
             repeat: "none",
             until: "",
             from: "website",
@@ -106,6 +107,7 @@ export async function recordWebsiteCheck(
       last_checked_at: new Date().toISOString(),
       last_outcome: result.outcome,
       last_found: result.events.length,
+      last_notes: result.notes.join("\n").slice(0, 1000) || null,
     })
     .eq("id", sourceId);
   return { added };
