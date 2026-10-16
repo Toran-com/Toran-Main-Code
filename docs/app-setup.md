@@ -386,8 +386,36 @@ and shifts with how many people each needs. **Send the rota** turns it into
 a WhatsApp message for the volunteers' own group, where people reply as
 they do now.
 
-Toran keeps **no volunteer names or numbers**. Public sign-up waits for ICO
-registration and the DPIA (decision 0006).
+The committee can count people in (**+ / −**) and turn on **Let volunteers
+take slots on Toran**: the rota's public page then has "Take this slot",
+with no sign-up and no name (decision 0013). Toran keeps **no volunteer
+names or numbers**, only how many places are taken. Named sign-up waits for
+ICO registration and the DPIA (decision 0006).
+
+### Reading mandirs' websites (`/ops` → Websites)
+
+**Check** reads one mandir's website; **Check the next 5 websites** works
+through them, oldest check first. Each check reads the home page, up to
+five pages that look like an events list, and the event data they lead to:
+
+- event data in the pages (schema.org JSON-LD or microdata), including on
+  single event pages when the list itself has none;
+- calendar feeds (`.ics`, "Export events", `webcal:` links);
+- Google Calendars shown on the site (their public feed);
+- WordPress sites with The Events Calendar (its list of events).
+
+Names and descriptions are cleaned into plain text (HTML, codes like `\n`,
+page-builder shortcodes and "Read more" removed; names in capitals put in
+title case). When a site gives midnight or no time, the first time written
+in the description is used. Each event gets a likely type (festival,
+aarti, bhajans…) from its name. New events go to the poster queue, for a
+person to check before they're published.
+
+Under each mandir, notes say what was read and, if nothing was found, why:
+for example a Wix site (events load in the browser) or a site that only
+writes dates out in text or poster pictures. For those, ask the committee
+to add events themselves or forward their posters. It obeys robots.txt and
+never reads Facebook or Instagram (decision 0005).
 
 ### Weekly digest preview (`/ops` → Digest)
 

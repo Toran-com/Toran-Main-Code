@@ -67,6 +67,7 @@ describe("eventsFromJsonLd", () => {
         time: "18:00",
         summary: "Fireworks at 8pm.",
         link: "https://mandir.example.org/events/diwali",
+        kind: "festival",
       },
     ]);
   });
@@ -183,6 +184,7 @@ describe("eventsFromIcs", () => {
         time: "18:00",
         summary: "Bring your family. All welcome",
         link: "https://mandir.example.org/diwali",
+        kind: "festival",
       },
       {
         title: "A very long event name that has been folded onto the next line",
@@ -190,6 +192,7 @@ describe("eventsFromIcs", () => {
         time: "",
         summary: "",
         link: "https://mandir.example.org/cal.ics",
+        kind: "other",
       },
     ]);
   });
@@ -225,6 +228,7 @@ describe("upcoming", () => {
     time: "",
     summary: "",
     link: PAGE,
+    kind: "other" as const,
   });
 
   it("keeps today to two years ahead, once per title and day", () => {

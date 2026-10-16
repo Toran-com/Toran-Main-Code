@@ -11,8 +11,9 @@ import { recordWebsiteCheck } from "@/lib/website-claims";
 
 const BATCH = 5;
 // Stop starting new checks after this long, to finish inside the page's
-// time limit (maxDuration in page.tsx).
-const BUDGET_MS = 40_000;
+// time limit (maxDuration in page.tsx): one check can take about 33
+// seconds (lib/website-check.ts).
+const BUDGET_MS = 20_000;
 
 export async function checkOne(formData: FormData) {
   await requireToranAdmin("/ops/websites");

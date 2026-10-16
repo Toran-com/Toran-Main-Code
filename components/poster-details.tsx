@@ -1,5 +1,6 @@
 import { Badge } from "@/components/public-shell";
 import { checkEvent, EVENT_ERRORS } from "@/lib/event-form";
+import { kindLabel } from "@/lib/event-kinds";
 import { formatEventStart } from "@/lib/format";
 import { POSTER_SOURCES, type Poster } from "@/lib/posters";
 import { describeRule } from "@/lib/recurrence";
@@ -41,6 +42,9 @@ export function PosterDetails({ poster }: { poster: Poster }) {
       )}
       <p className="text-muted text-base">
         From: {POSTER_SOURCES[poster.from].label}
+        {poster.kind &&
+          kindLabel(poster.kind) &&
+          ` · ${kindLabel(poster.kind)}`}
       </p>
       {!checked.ok && (
         <p>

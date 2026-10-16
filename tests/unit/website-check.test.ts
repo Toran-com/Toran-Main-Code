@@ -86,6 +86,7 @@ describe("checkWebsite", () => {
       outcome: "none",
       events: [],
       pagesRead: 1,
+      notes: ["Read 1 page.", "No events found on the pages read."],
     });
   });
 
@@ -178,6 +179,7 @@ describe("newEvents", () => {
     time: "",
     summary: "",
     link: "",
+    kind: "other" as const,
   });
   it("skips events already listed or queued, ignoring case", () => {
     expect(

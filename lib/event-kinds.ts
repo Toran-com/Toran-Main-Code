@@ -52,3 +52,43 @@ export function sourceLabel(event: {
       return null;
   }
 }
+
+// A best guess at an event's kind from its name and description, for
+// events read from websites and posters. Whoever checks the event can
+// change it; anything unclear is "other".
+const KIND_WORDS: [EventKind, RegExp][] = [
+  [
+    "festival",
+    /\b(diwali|deepavali|navratri|navaratri|garba|dandiya|dussehra|dasara|holi|janmashtami|janmasthami|ram ?navami|shivaratri|shivratri|annakut|annakoot|ganesh chaturthi|ganesh utsav|raksha bandhan|rakhi|makar sankranti|pongal|vaisakhi|baisakhi|onam|sharad purnima|guru purnima|bhai dooj|new year|utsav|mahotsav|jayanti|festival|mela)\b/i,
+  ],
+  [
+    "aarti",
+    /\b(aarti|arti|arati|darshan|abhishek(am)?|puja|pooja|havan|yagna|yajna|mangala)\b/i,
+  ],
+  [
+    "bhajan",
+    /\b(bhajans?|kirtans?|keertan|satsang|sankirtan|chanting|kirtan)\b/i,
+  ],
+  [
+    "katha",
+    /\b(katha|pravachan|discourse|lecture|talk|gita|bhagavat|ramayan|ramayana|saptah)\b/i,
+  ],
+  [
+    "youth",
+    /\b(youth|yuva|kids|children'?s|teens?|students?|bal ?vihar|bala ?vihar)\b/i,
+  ],
+  [
+    "class",
+    /\b(class(es)?|course|lessons?|workshop|yoga|meditation|sanskrit|gujarati school|music school)\b/i,
+  ],
+  ["seva", /\b(seva|sewa|volunteer(ing)?|clean[- ]?up)\b/i],
+  [
+    "community",
+    /\b(lunch|dinner|meal|langar|bhandara|prasadam|feast|health|blood donation|fun ?run|walk|sports?|cricket|social)\b/i,
+  ],
+];
+
+export function guessKind(text: string): EventKind {
+  for (const [kind, words] of KIND_WORDS) if (words.test(text)) return kind;
+  return "other";
+}
