@@ -79,6 +79,32 @@ export function formatEventStart(startsAt: string, allDay: boolean): string {
   return `${day}, ${time}`;
 }
 
+// "7:30pm" in UK time.
+function clockLabel(at: Date): string {
+  return formatEventStart(at.toISOString(), false).split(", ")[1];
+}
+
+// When an event happens, start to finish, in UK time:
+// "Sat 24 Oct, 7:30pm – 11pm", "Sat 24 Oct, 10pm – Sun 25 Oct, 1am",
+// "Sun 8 Nov" or "Sat 7 Nov – Sun 8 Nov" for all-day events.
+export function formatEventWhen(
+  startsAt: string,
+  endsAt: string | null,
+  allDay: boolean,
+): string {
+  const start = formatEventStart(startsAt, allDay);
+  if (!endsAt || new Date(endsAt) <= new Date(startsAt)) return start;
+  if (allDay) {
+    const end = formatEventStart(endsAt, true);
+    return end === start ? start : `${start} – ${end}`;
+  }
+  const sameDay =
+    londonDate(new Date(startsAt)) === londonDate(new Date(endsAt));
+  return sameDay
+    ? `${start} – ${clockLabel(new Date(endsAt))}`
+    : `${start} – ${formatEventStart(endsAt, false)}`;
+}
+
 const CALENDARS: Record<string, string> = {
   gujarati: "Gujarati calendar",
   north_indian: "North Indian calendar",

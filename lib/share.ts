@@ -22,9 +22,10 @@ export function eventShareText(
   return `${event.title} at ${mandir.name}, ${mandir.town}: ${rule ? `${rule}, next ${when}` : when}`;
 }
 
-// Where an event lives: its card on the mandir's page.
+// Where an event lives: its own page. (Older links to its card on the
+// mandir's page, /mandirs/<slug>#event-<id>, still work.)
 export function eventPath(mandirSlug: string, eventId: string): string {
-  return `/mandirs/${mandirSlug}#event-${eventId}`;
+  return `/mandirs/${mandirSlug}/events/${eventId}`;
 }
 
 // Opens WhatsApp (the app on a phone, WhatsApp Web on a computer) with the

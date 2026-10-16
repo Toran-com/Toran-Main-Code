@@ -38,7 +38,12 @@ export function EventList({
                   <h3
                     className={`text-xl font-bold ${e.status === "cancelled" ? "line-through" : ""}`}
                   >
-                    {e.title}
+                    <Link
+                      href={eventPath(e.mandir.slug, e.id)}
+                      className="hover:text-peacock no-underline hover:underline"
+                    >
+                      {e.title}
+                    </Link>
                   </h3>
                   {e.title_gu && (
                     <p lang="gu" className="text-lg font-semibold">

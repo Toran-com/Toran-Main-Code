@@ -4,6 +4,7 @@ import {
   calendarLabel,
   formatDateRange,
   formatEventStart,
+  formatEventWhen,
   groupByRegionAndTown,
   londonDate,
   londonTime,
@@ -135,5 +136,37 @@ describe("londonToUtc", () => {
     expect(londonToUtc("2026-02-30", "10:00")).toBeNull();
     expect(londonToUtc("2026-10-11", "25:00")).toBeNull();
     expect(londonToUtc("11/10/2026", "10:00")).toBeNull();
+  });
+});
+
+describe("formatEventWhen", () => {
+  it("gives the end time on the same day", () => {
+    expect(
+      formatEventWhen("2026-10-24T18:30:00Z", "2026-10-24T22:00:00Z", false),
+    ).toBe("Sat 24 Oct, 7:30pm – 11pm");
+  });
+
+  it("gives the end day when it runs past midnight", () => {
+    expect(
+      formatEventWhen("2026-10-24T21:00:00Z", "2026-10-25T01:00:00Z", false),
+    ).toBe("Sat 24 Oct, 10pm – Sun 25 Oct, 1am");
+  });
+
+  it("shows only the start without an end, or with a muddled one", () => {
+    expect(formatEventWhen("2026-10-24T18:30:00Z", null, false)).toBe(
+      "Sat 24 Oct, 7:30pm",
+    );
+    expect(
+      formatEventWhen("2026-10-24T18:30:00Z", "2026-10-24T18:00:00Z", false),
+    ).toBe("Sat 24 Oct, 7:30pm");
+  });
+
+  it("gives dates for all-day events", () => {
+    expect(
+      formatEventWhen("2026-11-08T00:00:00Z", "2026-11-08T00:00:00Z", true),
+    ).toBe("Sun 8 Nov");
+    expect(
+      formatEventWhen("2026-11-07T00:00:00Z", "2026-11-08T00:00:00Z", true),
+    ).toBe("Sat 7 Nov – Sun 8 Nov");
   });
 });

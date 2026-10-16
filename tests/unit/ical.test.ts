@@ -17,7 +17,7 @@ const aarti: CalendarEvent = {
   title: "Sandhya aarti",
   description: "Everyone welcome",
   location: "Shree Ram Mandir, Leicester, LE4 6AR",
-  url: "https://toran.example/mandirs/ram#event-1",
+  url: "https://toran.example/mandirs/ram/events/1",
   start: "2026-10-20T18:00:00Z",
   end: "2026-10-20T19:00:00Z",
   allDay: false,

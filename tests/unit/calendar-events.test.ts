@@ -44,7 +44,7 @@ describe("mandirCalendarEvents", () => {
       uid: "event-e1@toran",
       title: "Diwali celebrations",
       location: "Shree Ram Mandir, Leicester, LE4 6AR",
-      url: "https://toran.example/mandirs/ram#event-e1",
+      url: "https://toran.example/mandirs/ram/events/e1",
       start: "2026-11-08T18:30:00Z",
       allDay: false,
       cancelled: false,
