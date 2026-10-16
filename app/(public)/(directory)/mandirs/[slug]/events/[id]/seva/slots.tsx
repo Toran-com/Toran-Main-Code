@@ -188,12 +188,16 @@ function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
     URL.revokeObjectURL(link.href);
   }
 
-  // Forget it on this phone first: the page refreshes when the slot is
-  // given back, which can happen before this function carries on.
+  // Give it back first, then forget it on this phone, so the rota already
+  // shows the freed place when "You're on" disappears.
   async function cantMakeIt() {
     setBusy(true);
-    write(read().filter((s) => s.slot !== slot.slot));
-    await giveBackSlot(slot.slot, slug);
+    try {
+      await giveBackSlot(slot.slot, slug);
+    } finally {
+      write(read().filter((s) => s.slot !== slot.slot));
+      setBusy(false);
+    }
   }
 
   const link = "text-peacock font-semibold underline cursor-pointer";
