@@ -1,7 +1,7 @@
 -- The starting directory and festival dates load, and visitors can see them.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(8);
+select plan(9);
 
 select is((select count(*)::int from public.mandirs), 106, 'the starting directory has 106 mandirs');
 select is((select count(*)::int from public.mandirs where status <> 'listed'), 0,
@@ -14,6 +14,11 @@ select is((select count(*)::int from public.festival_dates where verified), 0,
   'no festival date is marked checked yet');
 select is((select count(*)::int from public.festival_dates where source is null), 0,
   'every festival date says where it came from');
+select is((select fd.starts_on from public.festival_dates fd
+  join public.festivals f on f.id = fd.festival_id
+  where f.slug = 'annakut' and fd.calendar = 'gujarati' and fd.starts_on >= '2026-11-01'
+  order by fd.starts_on limit 1), '2026-11-10'::date,
+  'Annakut 2026 is on 10 November');
 
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
