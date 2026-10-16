@@ -20,7 +20,8 @@ What the database holds and who can do what. The tables are defined in
 | `sources`           | Where a mandir's information comes from (website, forward, admin, …), and how the last website check went                                                                         | No                      |
 | `event_claims`      | The review queue: what a source says about an event, with confidence                                                                                                              | No                      |
 | `seva_roles`        | Roles an event needs (kitchen, parking), and whether the mandir requires a DBS check                                                                                              | No                      |
-| `seva_shifts`       | Shift times and how many people each needs                                                                                                                                        | No                      |
+| `seva_shifts`       | Shift times, how many people each needs, and how many places are taken (counted by the committee, and taken on Toran)                                                             | No                      |
+| `seva_slots`        | One row per slot taken on Toran: a random id and the time, nothing about the person (decision 0013)                                                                               | No                      |
 
 Each event also records where it came from (`events.origin`): added by the
 mandir, typed up from a poster, read from the mandir's website, or sent in by
@@ -44,9 +45,10 @@ which shows who looks after a mandir with their login email, and
 `remove_mandir_admin()`. When the last person is removed, the mandir can be
 claimed again.
 
-Not yet built, on purpose (decision 0006): seva sign-ups and digest
-subscribers. They hold the public's personal data, so they arrive with the
-rota and digest features, after ICO registration and the DPIA.
+Not yet built, on purpose (decision 0006): named seva sign-ups and digest
+subscribers. They hold the public's personal data, so they wait for ICO
+registration and the DPIA. Until then volunteers can take a seva slot
+without giving a name (decision 0013).
 
 ## Who can do what
 

@@ -1,7 +1,8 @@
 // The seva rota a committee plans for an event: roles (Kitchen, Parking,
 // Shoes) and shifts with how many people each needs. No volunteers' names
-// are kept (decision 0006): the committee shares the rota with its own
-// WhatsApp group and people reply there, as they do now.
+// are kept (decisions 0006 and 0013): the committee counts people who say
+// yes in WhatsApp, and if it turns sign-up on, volunteers can take a slot
+// on Toran without giving a name.
 
 import { formatEventStart, londonToUtc } from "@/lib/format";
 
@@ -66,24 +67,51 @@ export function shiftLabel(startsAt: string, endsAt: string): string {
   return `${formatEventStart(startsAt, false)}–${end}`;
 }
 
+// How many of a shift's places are taken: people the committee counted in
+// plus slots taken on Toran, never more than it needs.
+export function placesTaken(shift: {
+  needed: number;
+  filled_offline?: number;
+  taken_online?: number;
+}): number {
+  return Math.min(
+    shift.needed,
+    (shift.filled_offline ?? 0) + (shift.taken_online ?? 0),
+  );
+}
+
 export type Rota = {
   name: string;
   description: string | null;
   needs_dbs: boolean;
-  shifts: { starts_at: string; ends_at: string; needed: number }[];
+  shifts: {
+    starts_at: string;
+    ends_at: string;
+    needed: number;
+    filled_offline?: number;
+    taken_online?: number;
+  }[];
 }[];
 
 // The rota as a message for the committee's volunteers' WhatsApp group.
-export function rotaMessage(eventTitle: string, when: string, rota: Rota) {
+// When volunteers can take slots on Toran (`open`), it says how many are
+// taken so far and points to the link sent with it.
+export function rotaMessage(
+  eventTitle: string,
+  when: string,
+  rota: Rota,
+  open = false,
+) {
   const roles = rota
     .filter((r) => r.shifts.length)
     .map((r) => {
       const heading = `*${r.name}*${r.needs_dbs ? " (DBS check needed)" : ""}`;
       const shifts = [...r.shifts]
         .sort((a, b) => a.starts_at.localeCompare(b.starts_at))
-        .map(
-          (s) =>
-            `• ${shiftLabel(s.starts_at, s.ends_at)}: ${s.needed} ${s.needed === 1 ? "person" : "people"}`,
+        .map((s) =>
+          open && !r.needs_dbs
+            ? `• ${shiftLabel(s.starts_at, s.ends_at)}: ${placesTaken(s)} of ${s.needed} taken`
+            : `• ${shiftLabel(s.starts_at, s.ends_at)}: ${s.needed} ${s.needed === 1 ? "person" : "people"}`,
         );
       return [
         heading,
@@ -94,6 +122,8 @@ export function rotaMessage(eventTitle: string, when: string, rota: Rota) {
   return [
     `Seva for ${eventTitle} (${when})`,
     ...roles,
-    "Reply here if you can help. 🙏",
+    open
+      ? "Take a slot at the link below, no sign-up needed. 🙏"
+      : "Reply here if you can help. 🙏",
   ].join("\n\n");
 }

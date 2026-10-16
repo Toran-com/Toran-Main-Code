@@ -59,14 +59,14 @@ isOneToOne: false
                   ]
                 },"events": {
                   Row: {
-                    "all_day": boolean,"confirmed_at": string | null,"confirmed_by": string | null,"cost_note": string | null,"created_at": string,"created_by": string | null,"ends_at": string | null,"festival_date_id": string | null,"id": string,"kind": string,"link": string | null,"location_note": string | null,"mandir_id": string,"origin": string | null,"recurrence": string | null,"starts_at": string,"status": string,"summary": string | null,"summary_gu": string | null,"timezone": string,"title": string,"title_gu": string | null,"updated_at": string
+                    "all_day": boolean,"confirmed_at": string | null,"confirmed_by": string | null,"cost_note": string | null,"created_at": string,"created_by": string | null,"ends_at": string | null,"festival_date_id": string | null,"id": string,"kind": string,"link": string | null,"location_note": string | null,"mandir_id": string,"origin": string | null,"recurrence": string | null,"seva_open": boolean,"starts_at": string,"status": string,"summary": string | null,"summary_gu": string | null,"timezone": string,"title": string,"title_gu": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "all_day"?: boolean,"confirmed_at"?: string | null,"confirmed_by"?: string | null,"cost_note"?: string | null,"created_at"?: string,"created_by"?: string | null,"ends_at"?: string | null,"festival_date_id"?: string | null,"id"?: string,"kind"?: string,"link"?: string | null,"location_note"?: string | null,"mandir_id": string,"origin"?: string | null,"recurrence"?: string | null,"starts_at": string,"status"?: string,"summary"?: string | null,"summary_gu"?: string | null,"timezone"?: string,"title": string,"title_gu"?: string | null,"updated_at"?: string
+                    "all_day"?: boolean,"confirmed_at"?: string | null,"confirmed_by"?: string | null,"cost_note"?: string | null,"created_at"?: string,"created_by"?: string | null,"ends_at"?: string | null,"festival_date_id"?: string | null,"id"?: string,"kind"?: string,"link"?: string | null,"location_note"?: string | null,"mandir_id": string,"origin"?: string | null,"recurrence"?: string | null,"seva_open"?: boolean,"starts_at": string,"status"?: string,"summary"?: string | null,"summary_gu"?: string | null,"timezone"?: string,"title": string,"title_gu"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "all_day"?: boolean,"confirmed_at"?: string | null,"confirmed_by"?: string | null,"cost_note"?: string | null,"created_at"?: string,"created_by"?: string | null,"ends_at"?: string | null,"festival_date_id"?: string | null,"id"?: string,"kind"?: string,"link"?: string | null,"location_note"?: string | null,"mandir_id"?: string,"origin"?: string | null,"recurrence"?: string | null,"starts_at"?: string,"status"?: string,"summary"?: string | null,"summary_gu"?: string | null,"timezone"?: string,"title"?: string,"title_gu"?: string | null,"updated_at"?: string
+                    "all_day"?: boolean,"confirmed_at"?: string | null,"confirmed_by"?: string | null,"cost_note"?: string | null,"created_at"?: string,"created_by"?: string | null,"ends_at"?: string | null,"festival_date_id"?: string | null,"id"?: string,"kind"?: string,"link"?: string | null,"location_note"?: string | null,"mandir_id"?: string,"origin"?: string | null,"recurrence"?: string | null,"seva_open"?: boolean,"starts_at"?: string,"status"?: string,"summary"?: string | null,"summary_gu"?: string | null,"timezone"?: string,"title"?: string,"title_gu"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -213,14 +213,14 @@ isOneToOne: false
                   ]
                 },"seva_shifts": {
                   Row: {
-                    "created_at": string,"ends_at": string,"id": string,"needed": number,"role_id": string,"starts_at": string
+                    "created_at": string,"ends_at": string,"filled_offline": number,"id": string,"needed": number,"role_id": string,"starts_at": string,"taken_online": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"ends_at": string,"id"?: string,"needed": number,"role_id": string,"starts_at": string
+                    "created_at"?: string,"ends_at": string,"filled_offline"?: number,"id"?: string,"needed": number,"role_id": string,"starts_at": string,"taken_online"?: number
                   }
                   Update: {
-                    "created_at"?: string,"ends_at"?: string,"id"?: string,"needed"?: number,"role_id"?: string,"starts_at"?: string
+                    "created_at"?: string,"ends_at"?: string,"filled_offline"?: number,"id"?: string,"needed"?: number,"role_id"?: string,"starts_at"?: string,"taken_online"?: number
                   }
                   Relationships: [
                     {
@@ -228,6 +228,26 @@ isOneToOne: false
       columns: ["role_id"]
 isOneToOne: false
       referencedRelation: "seva_roles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"seva_slots": {
+                  Row: {
+                    "created_at": string,"id": string,"shift_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"shift_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"shift_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "seva_slots_shift_id_fkey"
+      columns: ["shift_id"]
+isOneToOne: false
+      referencedRelation: "seva_shifts"
       referencedColumns: ["id"]
     }
                   ]
@@ -277,6 +297,9 @@ isOneToOne: false
 "edit_event":
 { Args: { "dates": (string)[],"details": Json,"target": string,"today": string }; Returns: undefined
                            },
+"give_back_seva_slot":
+{ Args: { "slot": string }; Returns: boolean
+                           },
 "health":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
@@ -301,6 +324,9 @@ isOneToOne: false
                            },
 "report_event":
 { Args: { "mandir_slug": string,"proposed": Json }; Returns: undefined
+                           },
+"take_seva_slot":
+{ Args: { "target_shift": string }; Returns: string
                            }
           }
           Enums: {

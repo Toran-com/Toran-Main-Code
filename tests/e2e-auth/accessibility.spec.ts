@@ -64,11 +64,26 @@ test("a committee's pages are accessible", async ({ page }) => {
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/events/${event}`);
   await expectAccessible(page);
+  // Give it a seva rota open for volunteers (before its pages are first
+  // seen, as they are saved).
+  sql(
+    `with role as (
+       insert into public.seva_roles (event_id, name)
+         values ('${event}', 'Kitchen') returning id)
+     insert into public.seva_shifts (role_id, starts_at, ends_at, needed, filled_offline)
+       select id, now() + interval '3 days', now() + interval '3 days 3 hours', 4, 1
+       from role`,
+  );
+  sql(`update public.events set seva_open = true where id = '${event}'`);
   // The event's own public page.
   await page.goto(`/mandirs/${slug}/events/${event}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Accessibility check",
   );
+  await expectAccessible(page);
+  // Its seva rota.
+  await page.goto(`/mandirs/${slug}/events/${event}/seva`);
+  await expect(page.getByText("1 of 4 taken")).toBeVisible();
   await expectAccessible(page);
 });
 

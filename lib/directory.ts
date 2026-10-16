@@ -198,6 +198,53 @@ export async function getMandirEvent(
   });
 }
 
+export type SevaShift = Pick<
+  Row<"seva_shifts">,
+  "id" | "starts_at" | "ends_at" | "needed" | "filled_offline" | "taken_online"
+>;
+export type SevaRole = Pick<
+  Row<"seva_roles">,
+  "id" | "name" | "description" | "needs_dbs"
+> & { shifts: SevaShift[] };
+export type EventSeva = { open: boolean; roles: SevaRole[] };
+
+// An event's seva rota, with how many places are taken, for its public
+// seva page. Refreshed with the mandir's other pages when the committee
+// changes it or a volunteer takes a slot.
+export async function getEventSeva(
+  slug: string,
+  eventId: string,
+): Promise<Loaded<EventSeva | null>> {
+  "use cache";
+  cacheTag("mandirs", `mandir:${slug}`);
+  if (!UUID.test(eventId)) return settle({ state: "ok", data: null });
+  const db = connect();
+  if (db === null) return settle<never>(notConnected);
+  if (db === "misconfigured") return settle<never>(unavailable);
+  const { data, error } = await db
+    .from("events")
+    .select(
+      "seva_open, mandir:mandirs!inner (slug), seva_roles (id, name, description, needs_dbs, created_at, seva_shifts (id, starts_at, ends_at, needed, filled_offline, taken_online))",
+    )
+    .eq("id", eventId)
+    .eq("mandir.slug", slug)
+    .maybeSingle();
+  if (error) return settle<never>(unavailable);
+  if (!data) return settle({ state: "ok", data: null });
+  const roles = [...data.seva_roles]
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      needs_dbs: r.needs_dbs,
+      shifts: [...r.seva_shifts].sort((a, b) =>
+        a.starts_at.localeCompare(b.starts_at),
+      ),
+    }));
+  return settle({ state: "ok", data: { open: data.seva_open, roles } });
+}
+
 export async function listFestivalDates(): Promise<Loaded<FestivalDate[]>> {
   "use cache";
   cacheTag("festivals");

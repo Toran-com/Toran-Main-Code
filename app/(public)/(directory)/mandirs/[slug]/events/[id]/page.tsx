@@ -6,17 +6,20 @@ import { AddToCalendar } from "@/components/add-to-calendar";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
-import { Notice, Ornament } from "@/components/ui";
+import { Card, Notice, Ornament, quietButtonClass } from "@/components/ui";
 import {
+  getEventSeva,
   getMandir,
   getMandirEvent,
   listMandirs,
+  type EventSeva,
   type MandirEventPage,
 } from "@/lib/directory";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import { formatEventStart, formatEventWhen } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
-import { eventPath, eventShareText } from "@/lib/share";
+import { placesTaken } from "@/lib/seva";
+import { eventPath, eventShareText, sevaPath } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData } from "@/lib/structured-data";
 
@@ -77,9 +80,10 @@ export default async function EventPage({
   params,
 }: PageProps<"/mandirs/[slug]/events/[id]">) {
   const { slug, id } = await params;
-  const [result, others] = await Promise.all([
+  const [result, others, seva] = await Promise.all([
     getMandirEvent(slug, id),
     getMandir(slug),
+    getEventSeva(slug, id),
   ]);
   if (result.state === "not connected") notFound();
   if (result.state === "unavailable") {
@@ -176,6 +180,10 @@ export default async function EventPage({
 
       <Details page={result.data} />
 
+      {upcoming && !cancelled && seva.state === "ok" && seva.data?.open && (
+        <SevaCard path={sevaPath(mandir.slug, event.id)} seva={seva.data} />
+      )}
+
       {(event.summary || event.summary_gu) && (
         <section aria-labelledby="about" className="flex flex-col gap-2">
           <h2 id="about" className="font-display text-2xl font-bold">
@@ -228,6 +236,28 @@ export default async function EventPage({
         </Link>
       </div>
     </>
+  );
+}
+
+// "Help with seva" when the committee lets volunteers take slots here.
+function SevaCard({ path, seva }: { path: string; seva: EventSeva }) {
+  const shifts = seva.roles.flatMap((r) => (r.needs_dbs ? [] : r.shifts));
+  if (!shifts.length) return null;
+  const taken = shifts.reduce((n, s) => n + placesTaken(s), 0);
+  const needed = shifts.reduce((n, s) => n + s.needed, 0);
+  return (
+    <Card>
+      <h2 className="text-2xl font-bold">Help with seva</h2>
+      <p>
+        <strong>
+          {taken} of {needed}
+        </strong>{" "}
+        places taken. Take a slot in a tap: no sign-up, and no name needed.
+      </p>
+      <Link href={path} className={`${quietButtonClass} self-start`}>
+        {taken < needed ? "Take a seva slot" : "See the seva rota"}
+      </Link>
+    </Card>
   );
 }
 
