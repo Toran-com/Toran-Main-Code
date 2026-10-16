@@ -43,6 +43,12 @@ within one month.
   opened (What's on, mandir and festival pages), so they still open
   without signal. They stay on your phone; clearing the site's data in
   your browser removes them. Nothing personal is kept.
+- **Seva slots.** If a mandir lets you take a seva slot on Toran, we
+  keep only that one more slot is taken, with the time. We don't ask for
+  or keep your name, contact details or anything about your phone. Your
+  phone remembers which slots you took, so you can see them, add them to
+  your calendar or give them back; clearing the site's data in your
+  browser forgets them.
 - **Visitor numbers** (planned). If we count visits, we'll use a
   cookie-free tool (such as Plausible) that doesn't identify you.
 

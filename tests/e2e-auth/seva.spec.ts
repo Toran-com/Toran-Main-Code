@@ -11,7 +11,10 @@ function nextWeek(): string {
   }).format(new Date(Date.now() + 7 * 86_400_000));
 }
 
-test("a committee plans a seva rota", async ({ page }) => {
+test("a committee plans a seva rota and volunteers take slots", async ({
+  page,
+  browser,
+}) => {
   test.setTimeout(90_000);
   const email = `seva-${Date.now()}@example.com`;
   await logIn(page, email);
@@ -47,7 +50,12 @@ test("a committee plans a seva rota", async ({ page }) => {
   await shift.getByLabel("People").fill("4");
   await shift.getByRole("button", { name: "Add shift" }).click();
   await expect(page.getByText("Shift added.")).toBeVisible();
-  await expect(page.getByText(/5pm–8pm · 4 people/)).toBeVisible();
+  await expect(page.getByText(/5pm–8pm · 0 of 4 taken/)).toBeVisible();
+
+  // Someone said yes in WhatsApp: the committee counts them in.
+  await page.getByRole("button", { name: /One more counted by you/ }).click();
+  await expect(page.getByText("Count updated.")).toBeVisible();
+  await expect(page.getByText(/5pm–8pm · 1 of 4 taken/)).toBeVisible();
 
   // Ready to send to the volunteers' group.
   const message = page.locator("pre");
@@ -60,6 +68,65 @@ test("a committee plans a seva rota", async ({ page }) => {
   expect(decodeURIComponent(whatsApp!)).toContain(
     "Seva for Diwali celebrations",
   );
+
+  // The committee lets volunteers take slots on Toran.
+  await page
+    .getByRole("button", { name: "Let volunteers take slots on Toran" })
+    .click();
+  await expect(page.getByText("Volunteers can now take slots")).toBeVisible();
+  await expect(message).toContainText("5pm–8pm: 1 of 4 taken");
+  await expect(message).toContainText("Take a slot at the link below");
+  const sevaPage = (await page
+    .getByRole("link", { name: "See the volunteers' page" })
+    .getAttribute("href"))!;
+  expect(sevaPage).toMatch(new RegExp(`^/mandirs/${SLUG}/events/[^/]+/seva$`));
+
+  // A volunteer takes a slot, with no login and no name.
+  const visitor = await browser.newPage();
+  await visitor.goto(sevaPage);
+  await expect(visitor.getByRole("heading", { level: 1 })).toHaveText(
+    "Help with seva",
+  );
+  await expect(visitor.getByText("1 of 4 taken")).toBeVisible();
+  await visitor
+    .getByRole("button", { name: /Take this slot: Kitchen/ })
+    .click();
+  await expect(visitor.getByText(/You're on Kitchen/)).toBeVisible();
+  await expect(
+    visitor.getByRole("link", { name: "Google Calendar" }),
+  ).toHaveAttribute("href", /calendar\.google\.com/);
+  // The count is shared; the slot is remembered by the volunteer's phone.
+  await visitor.reload();
+  await expect(visitor.getByText("2 of 4 taken")).toBeVisible();
+  await expect(visitor.getByText(/You're on Kitchen/)).toBeVisible();
+  // The event's own page points to the rota.
+  await visitor.goto(sevaPage.replace(/\/seva$/, ""));
+  await expect(
+    visitor.getByRole("link", { name: "Take a seva slot" }),
+  ).toBeVisible();
+
+  // The committee sees it, without a name.
+  await page.reload();
+  await expect(page.getByText("1 counted by you, 1 on Toran")).toBeVisible();
+
+  // The volunteer can't make it after all.
+  await visitor.goto(sevaPage);
+  await visitor.getByRole("button", { name: "I can't make it" }).click();
+  await expect(visitor.getByText(/You're on Kitchen/)).toHaveCount(0);
+  await visitor.reload();
+  await expect(visitor.getByText("1 of 4 taken")).toBeVisible();
+
+  // If slots look wrong (say, a joke), the committee can clear them.
+  await visitor
+    .getByRole("button", { name: /Take this slot: Kitchen/ })
+    .click();
+  await expect(visitor.getByText(/You're on Kitchen/)).toBeVisible();
+  await page.reload();
+  page.once("dialog", (dialog) => void dialog.accept());
+  await page.getByRole("button", { name: "Clear Toran slots" }).click();
+  await expect(page.getByText("were cleared")).toBeVisible();
+  await expect(page.getByText(/5pm–8pm · 1 of 4 taken/)).toBeVisible();
+  await visitor.close();
 
   // Removing a role asks first.
   page.once("dialog", (dialog) => void dialog.accept());

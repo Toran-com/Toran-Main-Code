@@ -17,10 +17,17 @@ import {
 import { withNextStart } from "@/lib/events";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { requireMandirAccess } from "@/lib/manage-access";
-import { eventPath } from "@/lib/share";
-import { rotaMessage, SEVA_ERRORS, shiftLabel } from "@/lib/seva";
+import { sevaPath } from "@/lib/share";
+import { placesTaken, rotaMessage, SEVA_ERRORS, shiftLabel } from "@/lib/seva";
 import { pageTitle } from "@/lib/site";
-import { addRole, addShift, removeFromRota } from "./actions";
+import {
+  addRole,
+  addShift,
+  changeCount,
+  clearOnlineSlots,
+  removeFromRota,
+  setSevaOpen,
+} from "./actions";
 
 export const metadata: Metadata = {
   title: pageTitle("Seva rota"),
@@ -36,6 +43,10 @@ const DONE: Record<string, string> = {
   role: "Role added. Now add its shifts.",
   shift: "Shift added.",
   removed: "Removed.",
+  open: "Volunteers can now take slots on Toran. Send them the rota below.",
+  closed: "Volunteers can no longer take slots on Toran.",
+  count: "Count updated.",
+  cleared: "Slots taken on Toran for that shift were cleared.",
 };
 
 export default function SevaPage(
@@ -64,7 +75,7 @@ async function Seva({
   const { data: row } = await supabase
     .from("events")
     .select(
-      "id, title, starts_at, all_day, recurrence, status, event_occurrences (starts_at, cancelled)",
+      "id, title, starts_at, all_day, recurrence, status, seva_open, event_occurrences (starts_at, cancelled)",
     )
     .eq("id", eventId)
     .eq("mandir_id", mandir.id)
@@ -78,7 +89,7 @@ async function Seva({
   const { data: roles } = await supabase
     .from("seva_roles")
     .select(
-      "id, name, description, needs_dbs, seva_shifts (id, starts_at, ends_at, needed)",
+      "id, name, description, needs_dbs, seva_shifts (id, starts_at, ends_at, needed, filled_offline, taken_online)",
     )
     .eq("event_id", event.id)
     .order("created_at");
@@ -114,12 +125,54 @@ async function Seva({
       </div>
       <p className="text-muted">
         Plan the seva this event needs, then send the rota to your
-        volunteers&apos; WhatsApp group. People reply there as usual: Toran
-        doesn&apos;t keep anyone&apos;s name.
+        volunteers&apos; WhatsApp group. Count in people who say yes there, or
+        let volunteers take a slot on Toran. Toran never keeps anyone&apos;s
+        name.
       </p>
 
       {error && <Notice tone="error">{error}</Notice>}
       {done && <Notice tone="success">{done}</Notice>}
+
+      <Card>
+        <h2 className="text-2xl font-bold">Taking slots on Toran</h2>
+        {event.seva_open ? (
+          <p>
+            <strong>On.</strong> Anyone with the link can take a slot without
+            giving a name, so you&apos;ll see how many are coming, not who.
+            Roles needing a DBS check stay with you.
+          </p>
+        ) : (
+          <p>
+            <strong>Off.</strong> Turn it on to let volunteers take a slot in
+            one tap from the rota link, with no sign-up and no name. You see how
+            many are coming, not who.
+          </p>
+        )}
+        <form action={setSevaOpen} className="flex flex-wrap gap-3">
+          {hidden}
+          <input
+            type="hidden"
+            name="open"
+            value={event.seva_open ? "no" : "yes"}
+          />
+          <button
+            type="submit"
+            className={`${event.seva_open ? quietButtonClass : buttonClass} w-auto`}
+          >
+            {event.seva_open
+              ? "Stop taking slots on Toran"
+              : "Let volunteers take slots on Toran"}
+          </button>
+          {event.seva_open && (
+            <Link
+              href={sevaPath(mandir.slug, event.id)}
+              className="text-peacock self-center font-semibold underline"
+            >
+              See the volunteers&apos; page
+            </Link>
+          )}
+        </form>
+      </Card>
 
       {rota.map((role) => (
         <Card key={role.id}>
@@ -135,11 +188,57 @@ async function Seva({
                   key={s.id}
                   className="border-line flex flex-wrap items-center justify-between gap-2 rounded-xl border px-4 py-2"
                 >
-                  <span>
-                    {shiftLabel(s.starts_at, s.ends_at)} ·{" "}
-                    <strong>
-                      {s.needed} {s.needed === 1 ? "person" : "people"}
-                    </strong>
+                  <span className="flex flex-col">
+                    <span>
+                      {shiftLabel(s.starts_at, s.ends_at)} ·{" "}
+                      <strong>
+                        {placesTaken(s)} of {s.needed} taken
+                      </strong>
+                    </span>
+                    <span className="text-muted text-base">
+                      {s.filled_offline} counted by you
+                      {s.taken_online > 0 && `, ${s.taken_online} on Toran`}
+                    </span>
+                  </span>
+                  <span className="flex flex-wrap items-center gap-2">
+                    <form action={changeCount}>
+                      {hidden}
+                      <input type="hidden" name="id" value={s.id} />
+                      <input type="hidden" name="step" value="down" />
+                      <button
+                        type="submit"
+                        disabled={s.filled_offline === 0}
+                        aria-label={`One fewer counted by you, ${shiftLabel(s.starts_at, s.ends_at)}`}
+                        className={`${quietButtonClass} px-3 py-1 text-base`}
+                      >
+                        −
+                      </button>
+                    </form>
+                    <form action={changeCount}>
+                      {hidden}
+                      <input type="hidden" name="id" value={s.id} />
+                      <input type="hidden" name="step" value="up" />
+                      <button
+                        type="submit"
+                        disabled={placesTaken(s) >= s.needed}
+                        aria-label={`One more counted by you, ${shiftLabel(s.starts_at, s.ends_at)}`}
+                        className={`${quietButtonClass} px-3 py-1 text-base`}
+                      >
+                        +
+                      </button>
+                    </form>
+                    {s.taken_online > 0 && (
+                      <form action={clearOnlineSlots}>
+                        {hidden}
+                        <input type="hidden" name="id" value={s.id} />
+                        <ConfirmButton
+                          question="Clear the slots taken on Toran for this shift? Do this only if they look wrong."
+                          className="text-kumkum cursor-pointer text-base font-semibold underline"
+                        >
+                          Clear Toran slots
+                        </ConfirmButton>
+                      </form>
+                    )}
                   </span>
                   <form action={removeFromRota}>
                     {hidden}
@@ -262,12 +361,12 @@ async function Seva({
             This is the message your volunteers&apos; group will see:
           </p>
           <pre className="bg-sunk rounded-xl p-4 font-sans text-base whitespace-pre-wrap">
-            {rotaMessage(event.title, when, rota)}
+            {rotaMessage(event.title, when, rota, event.seva_open)}
           </pre>
           <ShareButtons
             label="Send"
-            text={rotaMessage(event.title, when, rota)}
-            path={eventPath(mandir.slug, event.id)}
+            text={rotaMessage(event.title, when, rota, event.seva_open)}
+            path={sevaPath(mandir.slug, event.id)}
           />
         </Card>
       )}

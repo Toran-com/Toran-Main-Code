@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { checkRole, checkShift, rotaMessage, shiftLabel } from "@/lib/seva";
+import {
+  checkRole,
+  checkShift,
+  placesTaken,
+  rotaMessage,
+  shiftLabel,
+} from "@/lib/seva";
 
 describe("checkRole", () => {
   it("accepts a role, tidying spaces", () => {
@@ -109,5 +115,70 @@ describe("rotaMessage", () => {
     expect(shiftLabel("2026-10-17T16:00:00Z", "2026-10-17T18:30:00Z")).toBe(
       "Sat 17 Oct, 5pm–7:30pm",
     );
+  });
+});
+
+describe("placesTaken", () => {
+  it("adds the committee's count to slots taken on Toran", () => {
+    expect(placesTaken({ needed: 7, filled_offline: 2, taken_online: 1 })).toBe(
+      3,
+    );
+  });
+
+  it("never says more than the shift needs", () => {
+    expect(placesTaken({ needed: 2, filled_offline: 2, taken_online: 1 })).toBe(
+      2,
+    );
+  });
+
+  it("counts nothing for a shift without counts", () => {
+    expect(placesTaken({ needed: 4 })).toBe(0);
+  });
+});
+
+describe("rotaMessage when volunteers can take slots on Toran", () => {
+  const rota = [
+    {
+      name: "Kitchen",
+      description: null,
+      needs_dbs: false,
+      shifts: [
+        {
+          starts_at: "2026-11-08T17:00:00Z",
+          ends_at: "2026-11-08T20:00:00Z",
+          needed: 4,
+          filled_offline: 1,
+          taken_online: 2,
+        },
+      ],
+    },
+    {
+      name: "Children's corner",
+      description: null,
+      needs_dbs: true,
+      shifts: [
+        {
+          starts_at: "2026-11-08T17:00:00Z",
+          ends_at: "2026-11-08T20:00:00Z",
+          needed: 2,
+        },
+      ],
+    },
+  ];
+  const message = rotaMessage("Diwali", "Sun 8 Nov, 6:30pm", rota, true);
+
+  it("says how many places are taken", () => {
+    expect(message).toContain("• Sun 8 Nov, 5pm–8pm: 3 of 4 taken");
+  });
+
+  it("keeps the number needed for roles that need a DBS check", () => {
+    expect(message).toContain(
+      "*Children's corner* (DBS check needed)\n• Sun 8 Nov, 5pm–8pm: 2 people",
+    );
+  });
+
+  it("points to the link instead of asking for replies", () => {
+    expect(message).toMatch(/Take a slot at the link below/);
+    expect(message).not.toMatch(/Reply here/);
   });
 });
