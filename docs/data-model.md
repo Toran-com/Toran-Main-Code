@@ -12,6 +12,7 @@ What the database holds and who can do what. The tables are defined in
 | `mandir_contacts`   | The committee email Toran uses, and notes. Never public                                                                                                                           | Organisation contact    |
 | `mandir_admins`     | Which logged-in person runs which mandir                                                                                                                                          | Links to a login        |
 | `mandir_claims`     | "I'm on this mandir's committee" requests, with role and a short message                                                                                                          | Links to a login        |
+| `mandir_invites`    | A committee member's invite to a colleague: the colleague's email, for 14 days                                                                                                    | Email address           |
 | `toran_admins`      | People who run Toran                                                                                                                                                              | Links to a login        |
 | `festivals`         | Navratri, Diwali and so on                                                                                                                                                        | No                      |
 | `festival_dates`    | When each festival falls, per calendar tradition, with source and a verified flag                                                                                                 | No                      |
@@ -27,6 +28,12 @@ What the database holds and who can do what. The tables are defined in
 Each event also records where it came from (`events.origin`): added by the
 mandir, typed up from a poster, read from the mandir's website, or sent in by
 a visitor. Pages show this to families when the mandir hasn't confirmed it.
+
+Events a committee adds from "Festivals coming up" are linked to that
+festival's date (`events.festival_date_id`). A year later, "Again this
+year?" uses the link to move each event to the same day around the next
+festival date (lib/quick-events.ts); events without a link move 52 weeks on,
+or to the festival named in their title.
 
 ## Starting data
 
@@ -53,20 +60,21 @@ without giving a name (decision 0013).
 
 ## Who can do what
 
-| Table / action        | Visitor                       | Logged-in member | That mandir's admin                                     | Toran admin (with authenticator)                                                                   |
-| --------------------- | ----------------------------- | ---------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| See mandirs           | Listed only                   | Listed only      | + their hidden mandir                                   | All                                                                                                |
-| Edit a mandir         | No                            | No               | Practical details only (not name, town, region, status) | Everything                                                                                         |
-| Add a mandir          | No                            | No               | No                                                      | Yes                                                                                                |
-| See contact details   | No                            | No               | Their mandir                                            | All                                                                                                |
-| Claim a mandir        | No                            | For themselves   | For themselves                                          | Yes                                                                                                |
-| Approve a claim       | No                            | No               | No                                                      | Yes, from `/ops`, which lists pending claims with the claimant's email (`pending_mandir_claims()`) |
-| See events            | Published, at visible mandirs | Same             | + their drafts                                          | All                                                                                                |
-| Add or edit events    | No                            | No               | Their mandir only                                       | All                                                                                                |
-| Delete events         | Never (mark removed)          | Never            | Never                                                   | Never                                                                                              |
-| Festivals and dates   | See                           | See              | See                                                     | See and edit                                                                                       |
-| Sources, review queue | No                            | No               | Their mandir                                            | All                                                                                                |
-| Rota roles and shifts | See (for visible events)      | See              | Edit for their events                                   | All                                                                                                |
+| Table / action                        | Visitor                       | Logged-in member                         | That mandir's admin                                                                     | Toran admin (with authenticator)                                                                   |
+| ------------------------------------- | ----------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| See mandirs                           | Listed only                   | Listed only                              | + their hidden mandir                                                                   | All                                                                                                |
+| Edit a mandir                         | No                            | No                                       | Practical details only (not name, town, region, status)                                 | Everything                                                                                         |
+| Add a mandir                          | No                            | No                                       | No                                                                                      | Yes                                                                                                |
+| See contact details                   | No                            | No                                       | Their mandir                                                                            | All                                                                                                |
+| Claim a mandir                        | No                            | For themselves                           | For themselves                                                                          | Yes                                                                                                |
+| Invite a colleague onto the committee | No                            | Accept an invite sent to their own email | Invite, cancel invites, see colleagues' login emails, remove people they invited, leave | Everything                                                                                         |
+| Approve a claim                       | No                            | No                                       | No                                                                                      | Yes, from `/ops`, which lists pending claims with the claimant's email (`pending_mandir_claims()`) |
+| See events                            | Published, at visible mandirs | Same                                     | + their drafts                                                                          | All                                                                                                |
+| Add or edit events                    | No                            | No                                       | Their mandir only                                                                       | All                                                                                                |
+| Delete events                         | Never (mark removed)          | Never                                    | Never                                                                                   | Never                                                                                              |
+| Festivals and dates                   | See                           | See                                      | See                                                                                     | See and edit                                                                                       |
+| Sources, review queue                 | No                            | No                                       | Their mandir                                                                            | All                                                                                                |
+| Rota roles and shifts                 | See (for visible events)      | See                                      | Edit for their events                                                                   | All                                                                                                |
 
 "Confirmed by" on an event is always set to the person who confirmed it,
 whatever the app sends. A Toran admin without the authenticator step has no

@@ -58,21 +58,25 @@ within one month.
 
 ## If you look after a mandir's page
 
-| What we hold                                                    | Why                                                                       | Lawful basis                                             |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Your email address and login records                            | To let you log in by emailed link                                         | Contract: providing the service you asked for            |
-| Your role at the mandir and any note you send with your request | To check with the mandir that you're on its committee                     | Legitimate interests: keeping listings accurate and safe |
-| Which mandir(s) you look after                                  | So you can manage that page and no other                                  | Contract                                                 |
-| Which events you added or confirmed, and when                   | So listings can show "Confirmed by the mandir" and so we can fix mistakes | Legitimate interests                                     |
-| For Toran's own staff only: an authenticator app link           | To protect the admin area                                                 | Legitimate interests: security                           |
+| What we hold                                                      | Why                                                                       | Lawful basis                                             |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Your email address and login records                              | To let you log in by emailed link                                         | Contract: providing the service you asked for            |
+| Your role at the mandir and any note you send with your request   | To check with the mandir that you're on its committee                     | Legitimate interests: keeping listings accurate and safe |
+| Which mandir(s) you look after                                    | So you can manage that page and no other                                  | Contract                                                 |
+| If a colleague invites you: your email address, for up to 14 days | So you can accept and join your mandir's committee on Toran               | Legitimate interests: letting committees share the work  |
+| Which events you added or confirmed, and when                     | So listings can show "Confirmed by the mandir" and so we can fix mistakes | Legitimate interests                                     |
+| For Toran's own staff only: an authenticator app link             | To protect the admin area                                                 | Legitimate interests: security                           |
 
 Being on a mandir's committee can reveal your religious beliefs, which the
 law treats as **special category data**. [We rely on your explicit
-consent, which you give when you ask to look after a page, and which you
-can withdraw at any time by asking us to remove you. Confirm with the DPIA,
-section 5.]
+consent, which you give when you ask to look after a page or accept a
+colleague's invite, and which you can withdraw at any time by pressing
+"Leave" on your mandir's page or asking us to remove you. Confirm with the
+DPIA, section 5.]
 
-We don't show your name or email on the public site. Event listings say
+We don't show your name or email on the public site. Others on the same
+mandir's committee can see your login email on the committee page, so
+they know who else helps run it. Event listings say
 "Confirmed by the mandir", not who confirmed them.
 
 ## Mandirs' own details

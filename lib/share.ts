@@ -38,3 +38,12 @@ export function sevaPath(mandirSlug: string, eventId: string): string {
 export function whatsAppLink(text: string, url: string): string {
   return `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`;
 }
+
+// What a committee member sends a colleague they've invited: Toran sends
+// no email itself.
+export function inviteShareText(
+  mandir: { name: string; town: string },
+  email: string,
+): string {
+  return `I've invited you to help run ${mandir.name}, ${mandir.town} on Toran. Log in with ${email} and press "Accept" on your account page (the invite lasts 14 days):`;
+}
