@@ -5,7 +5,21 @@ export type Database = {
   
   "public": {
           Tables: {
-            "event_claims": {
+            "daily_counts": {
+                  Row: {
+                    "count": number,"day": string,"metric": string,"path": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "count"?: number,"day"?: string,"metric": string,"path": string
+                  }
+                  Update: {
+                    "count"?: number,"day"?: string,"metric"?: string,"path"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"event_claims": {
                   Row: {
                     "confidence": number,"created_at": string,"event_id": string | null,"id": string,"mandir_id": string,"note": string | null,"proposed": NonNullable<Json>,"reviewed_at": string | null,"reviewed_by": string | null,"source_id": string | null,"status": string
                   }
@@ -318,6 +332,12 @@ isOneToOne: false
 { Args: { "target": string }; Returns: {
               "added_at": string,"added_by_me": boolean,"email": string,"user_id": string
             }[]
+                           },
+"count_visit":
+{ Args: { "page": string,"what": string }; Returns: undefined
+                           },
+"daily_count_summary":
+{ Args: { "since": string }; Returns: Json
                            },
 "decide_mandir_claim":
 { Args: { "approve": boolean,"claim": string }; Returns: undefined

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { sendCount } from "@/components/count-visits";
 import { useOrigin } from "@/components/use-origin";
 import { whatsAppLink } from "@/lib/share";
 
@@ -28,6 +29,7 @@ export function ShareButtons({
   const url = `${origin}${path}`;
 
   async function shareOrCopy() {
+    sendCount("share", path);
     if (canShare) {
       try {
         await navigator.share({ text, url });
@@ -58,6 +60,7 @@ export function ShareButtons({
         href={whatsAppLink(text, url)}
         target="_blank"
         rel="noopener"
+        onClick={() => sendCount("share", path)}
         className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95"
       >
         <WhatsAppIcon />
