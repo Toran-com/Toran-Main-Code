@@ -1,5 +1,6 @@
 "use client";
 
+import { sendCount } from "@/components/count-visits";
 import { useOrigin } from "@/components/use-origin";
 import { cardClass, quietButtonClass } from "@/components/ui";
 
@@ -15,6 +16,8 @@ export function SubscribeCalendar({
   body: string;
 }) {
   const origin = useOrigin();
+  // One more subscription for the page it's on.
+  const counted = () => sendCount("subscribe", window.location.pathname);
   const host = origin.replace(/^https?:\/\//, "");
   // Before the page's JavaScript runs there may be no address yet; the
   // plain link still downloads the calendar.
@@ -27,13 +30,19 @@ export function SubscribeCalendar({
       <h2 className="font-display text-2xl font-bold">{title}</h2>
       <p className="text-muted">{body}</p>
       <div className="flex flex-wrap gap-3">
-        <a href={webcal} rel="nofollow" className={quietButtonClass}>
+        <a
+          href={webcal}
+          rel="nofollow"
+          onClick={counted}
+          className={quietButtonClass}
+        >
           Apple or Outlook calendar
         </a>
         <a
           href={google}
           target="_blank"
           rel="nofollow noopener"
+          onClick={counted}
           className={quietButtonClass}
         >
           Google Calendar
