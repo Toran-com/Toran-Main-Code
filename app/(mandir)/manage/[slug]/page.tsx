@@ -16,7 +16,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { upcomingFilter, withNextStart } from "@/lib/events";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
-import { pageTitle } from "@/lib/site";
+import { inviteShareText, whatsAppLink } from "@/lib/share";
+import { pageTitle, siteUrl } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { ConfirmButton } from "@/components/confirm-button";
 import { EventFields } from "@/components/event-fields";
@@ -26,7 +27,10 @@ import { posterFrom } from "@/lib/posters";
 import { PosterDetails } from "@/components/poster-details";
 import {
   addEvent,
+  cancelInvite,
   changeEvent,
+  inviteMember,
+  removeMember,
   reviewPosterAsCommittee,
   updatePracticalDetails,
 } from "./actions";
@@ -42,6 +46,10 @@ const ERRORS: Record<string, string> = {
   poster:
     "That poster can't be published as it is (for example, the date has passed). Choose \u201cNot right\u201d and add the event yourself.",
   done: "Someone has already dealt with that poster.",
+  "invite-email": "Please enter their email address.",
+  "invite-member": "They're already on your committee.",
+  "invite-too-many":
+    "You have five invites waiting. Cancel one, or wait for them to be accepted.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -55,6 +63,11 @@ const DONE: Record<string, string> = {
   details: "Saved. Your public page shows the new details.",
   published: "Published. It's on your public page now.",
   discarded: "Thanks. That poster won't be published.",
+  invited:
+    "Invited. Now send them the message under \u201cWaiting to accept\u201d so they know.",
+  uninvited: "Invite cancelled.",
+  removed: "Taken off your committee.",
+  joined: "Welcome. You now help run this mandir's page on Toran.",
 };
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
@@ -113,6 +126,17 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     const poster = posterFrom(c.proposed);
     return poster ? [{ id: c.id, poster }] : [];
   });
+
+  // Who runs the page, and who has been invited.
+  const [{ data: members }, { data: invites }] = await Promise.all([
+    supabase!.rpc("committee_members", { target: mandir.id }),
+    supabase!
+      .from("mandir_invites")
+      .select("id, email, expires_at")
+      .eq("mandir_id", mandir.id)
+      .gt("expires_at", new Date().toISOString())
+      .order("created_at"),
+  ]);
 
   const query = await searchParams;
   const error = ERRORS[String(query.error ?? "")];
@@ -264,6 +288,113 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           </p>
         )}
       </section>
+
+      <Card>
+        <h2 id="committee" className="scroll-mt-24 text-2xl font-bold">
+          Your committee on Toran
+        </h2>
+        <p className="text-muted">
+          Everyone here can add and change your mandir&apos;s events. Invite a
+          colleague so you&apos;re not the only one.
+        </p>
+        <ul className="flex flex-col gap-2">
+          {(members ?? []).map((member) => (
+            <li
+              key={member.user_id}
+              className="border-line flex flex-wrap items-center justify-between gap-2 rounded-2xl border p-4"
+            >
+              <span className="break-all">
+                <span className="font-semibold">{member.email}</span>
+                {member.user_id === user.id && (
+                  <span className="text-muted"> (you)</span>
+                )}
+              </span>
+              {(member.user_id === user.id || member.added_by_me) && (
+                <form action={removeMember}>
+                  <input type="hidden" name="slug" value={mandir.slug} />
+                  <input type="hidden" name="member" value={member.user_id} />
+                  <ConfirmButton
+                    question={
+                      member.user_id === user.id
+                        ? `Stop helping run ${mandir.name} on Toran?`
+                        : `Take ${member.email} off your committee?`
+                    }
+                    className={`${quietButtonClass} px-4 py-2 text-base`}
+                  >
+                    {member.user_id === user.id ? "Leave" : "Remove"}
+                  </ConfirmButton>
+                </form>
+              )}
+            </li>
+          ))}
+        </ul>
+        {invites && invites.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xl font-bold">Waiting to accept</h3>
+            <p className="text-muted text-base">
+              Toran doesn&apos;t email them, so send them the message yourself.
+            </p>
+            <ul className="flex flex-col gap-2">
+              {invites.map((invite) => (
+                <li
+                  key={invite.id}
+                  className="border-line flex flex-col gap-3 rounded-2xl border p-4"
+                >
+                  <p>
+                    <span className="font-semibold break-all">
+                      {invite.email}
+                    </span>
+                    <span className="text-muted text-base">
+                      {" "}
+                      · until {formatEventStart(invite.expires_at, true)}
+                    </span>
+                  </p>
+                  <form action={cancelInvite} className="flex flex-wrap gap-2">
+                    <input type="hidden" name="slug" value={mandir.slug} />
+                    <input type="hidden" name="invite" value={invite.id} />
+                    <a
+                      href={whatsAppLink(
+                        inviteShareText(mandir, invite.email),
+                        `${siteUrl()}/account`,
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${buttonClass} px-4 py-2 text-base`}
+                    >
+                      Send on WhatsApp
+                    </a>
+                    <button
+                      type="submit"
+                      className={`${quietButtonClass} px-4 py-2 text-base`}
+                    >
+                      Cancel invite
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <form action={inviteMember} className="flex flex-col gap-3">
+          <input type="hidden" name="slug" value={mandir.slug} />
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Their email address</span>
+            <span className="text-muted -mt-1 text-base">
+              They log in with this address to accept. The invite lasts 14 days.
+            </span>
+            <input
+              name="email"
+              type="email"
+              required
+              autoComplete="off"
+              className={inputClass}
+            />
+          </label>
+          <button type="submit" className={quietButtonClass}>
+            Invite
+          </button>
+        </form>
+      </Card>
 
       <Card>
         <h2 className="text-2xl font-bold">Your mandir&apos;s details</h2>
