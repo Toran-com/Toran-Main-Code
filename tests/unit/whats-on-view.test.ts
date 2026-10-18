@@ -3,6 +3,7 @@ import { mentionsFestival } from "@/lib/festival-words";
 import {
   dayHeading,
   groupByDay,
+  nearestFirstEachDay,
   nearTo,
   radiusFrom,
 } from "@/lib/whats-on-view";
@@ -84,5 +85,29 @@ describe("mentionsFestival", () => {
     );
     expect(mentionsFestival("diwali", "Deepavali celebrations")).toBe(true);
     expect(mentionsFestival("diwali", "Weekly aarti")).toBe(false);
+  });
+});
+
+describe("nearestFirstEachDay", () => {
+  it("keeps the days in order, nearest first within each", () => {
+    const at = { latitude: 52.64, longitude: -1.13 };
+    const sorted = nearestFirstEachDay(
+      nearTo(
+        [
+          event("london-sat", "2026-10-17T10:00:00Z", london),
+          event("leicester-sat", "2026-10-17T19:00:00Z", leicester),
+          event("london-sun", "2026-10-18T09:00:00Z", london),
+          event("leicester-sun", "2026-10-18T20:00:00Z", leicester),
+        ],
+        at,
+        200,
+      ),
+    );
+    expect(sorted.map((e) => e.id)).toEqual([
+      "leicester-sat",
+      "london-sat",
+      "leicester-sun",
+      "london-sun",
+    ]);
   });
 });

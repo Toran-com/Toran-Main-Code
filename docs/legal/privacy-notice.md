@@ -35,6 +35,11 @@ within one month.
   any website you visit does. If you press "Near me", your browser asks
   first; your location only moves the map on your screen and is never sent
   to us or kept.
+- **"Near me" on What's on.** If you press it, your browser asks first,
+  then sends your position (rounded to about a kilometre) to postcodes.io
+  to find your postcode district, such as "RG1". Only the district reaches
+  Toran, just as if you'd typed it; your position isn't sent to us or
+  kept. postcodes.io is a free public service run by Ideal Postcodes.
 - **Calendars.** If you add a mandir's events or the festival dates to
   your calendar, your calendar app checks Toran for changes every few
   hours. Like any visit, that shows up briefly in the server logs; we

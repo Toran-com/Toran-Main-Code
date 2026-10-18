@@ -81,6 +81,33 @@ export async function lookupPostcode(
     : null;
 }
 
+// The postcode district ("RG1") nearest a position, for What's on's "Near
+// me". Runs in the visitor's browser, so their position goes only to
+// postcodes.io, never to Toran; Toran gets the district, as if typed.
+export async function outcodeNear(
+  at: Position,
+  fetcher: Fetch = fetch,
+): Promise<string | null> {
+  const query = new URLSearchParams({
+    lat: at.latitude.toFixed(2),
+    lon: at.longitude.toFixed(2),
+    limit: "1",
+    radius: "25000",
+  });
+  const response = await fetcher(`${API}/outcodes?${query}`, {
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!response.ok) throw new Error(`postcodes.io answered ${response.status}`);
+  const body = (await response.json()) as {
+    result: { outcode?: unknown }[] | null;
+  };
+  const outcode = body.result?.[0]?.outcode;
+  return typeof outcode === "string" &&
+    /^[A-Z]{1,2}[0-9][A-Z0-9]?$/.test(outcode)
+    ? outcode
+    : null;
+}
+
 // Straight-line distance in miles (haversine).
 export function distanceMiles(a: Position, b: Position): number {
   const rad = (d: number) => (d * Math.PI) / 180;
