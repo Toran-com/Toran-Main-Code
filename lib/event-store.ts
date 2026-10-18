@@ -16,7 +16,14 @@ export async function saveEvent(
     confirmed,
     link = null,
     origin,
-  }: { confirmed: boolean; link?: string | null; origin: EventOrigin },
+    festivalDateId = null,
+  }: {
+    confirmed: boolean;
+    link?: string | null;
+    origin: EventOrigin;
+    // The festival date it belongs to, when added from a festival.
+    festivalDateId?: string | null;
+  },
 ): Promise<string | null> {
   const { data, error } = await db
     .from("events")
@@ -34,6 +41,7 @@ export async function saveEvent(
       status: "published",
       confirmed_at: confirmed ? new Date().toISOString() : null,
       link,
+      festival_date_id: festivalDateId,
     })
     .select("id")
     .single();
