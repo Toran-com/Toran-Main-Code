@@ -27,6 +27,12 @@ Each event also records where it came from (`events.origin`): added by the
 mandir, typed up from a poster, read from the mandir's website, or sent in by
 a visitor. Pages show this to families when the mandir hasn't confirmed it.
 
+Events a committee adds from "Festivals coming up" are linked to that
+festival's date (`events.festival_date_id`). A year later, "Again this
+year?" uses the link to move each event to the same day around the next
+festival date (lib/quick-events.ts); events without a link move 52 weeks on,
+or to the festival named in their title.
+
 ## Starting data
 
 - **106 mandirs**, from the outreach list (91) and the NW London and
