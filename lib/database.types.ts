@@ -177,6 +177,26 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
+                },"mandir_invites": {
+                  Row: {
+                    "created_at": string,"email": string,"expires_at": string,"id": string,"invited_by": string | null,"mandir_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"email": string,"expires_at"?: string,"id"?: string,"invited_by"?: string | null,"mandir_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"email"?: string,"expires_at"?: string,"id"?: string,"invited_by"?: string | null,"mandir_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mandir_invites_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"mandirs": {
                   Row: {
                     "calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"id": string,"latitude": number | null,"longitude": number | null,"name": string,"phone": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"website": string | null
@@ -291,8 +311,19 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "decide_mandir_claim":
+            "accept_committee_invite":
+{ Args: { "invite": string }; Returns: string
+                           },
+"committee_members":
+{ Args: { "target": string }; Returns: {
+              "added_at": string,"added_by_me": boolean,"email": string,"user_id": string
+            }[]
+                           },
+"decide_mandir_claim":
 { Args: { "approve": boolean,"claim": string }; Returns: undefined
+                           },
+"drop_committee_invite":
+{ Args: { "invite": string }; Returns: boolean
                            },
 "edit_event":
 { Args: { "dates": (string)[],"details": Json,"target": string,"today": string }; Returns: undefined
@@ -302,6 +333,9 @@ isOneToOne: false
                            },
 "health":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"invite_committee_member":
+{ Args: { "invitee": string,"target": string }; Returns: string
                            },
 "is_mandir_admin":
 { Args: { "target": string }; Returns: boolean
@@ -314,10 +348,16 @@ isOneToOne: false
               "added_at": string,"email": string,"user_id": string
             }[]
                            },
+"my_email":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
 "pending_mandir_claims":
 { Args: Record<PropertyKey, never>; Returns: {
               "claimant_email": string,"created_at": string,"id": string,"mandir_name": string,"mandir_phone": string,"mandir_slug": string,"mandir_town": string,"mandir_website": string,"message": string,"role_at_mandir": string
             }[]
+                           },
+"remove_committee_member":
+{ Args: { "member": string,"target": string }; Returns: boolean
                            },
 "remove_mandir_admin":
 { Args: { "member": string,"target": string }; Returns: undefined

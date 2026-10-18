@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { eventPath, eventShareText, whatsAppLink } from "@/lib/share";
+import {
+  eventPath,
+  eventShareText,
+  inviteShareText,
+  whatsAppLink,
+} from "@/lib/share";
 
 const mandir = { name: "Reading Hindu Temple", town: "Reading" };
 const event = {
@@ -46,6 +51,14 @@ describe("links", () => {
     expect(link.startsWith("https://wa.me/?text=")).toBe(true);
     expect(decodeURIComponent(link.split("text=")[1])).toBe(
       "Garba & aarti\nhttps://example.org/a?b=1",
+    );
+  });
+});
+
+describe("inviteShareText", () => {
+  it("tells the colleague which address to log in with", () => {
+    expect(inviteShareText(mandir, "b@example.com")).toBe(
+      'I\'ve invited you to help run Reading Hindu Temple, Reading on Toran. Log in with b@example.com and press "Accept" on your account page (the invite lasts 14 days):',
     );
   });
 });

@@ -28,3 +28,4 @@ that replaces it and mark the old one Superseded.
 | 0011 | [A map of mandirs with Leaflet and OpenStreetMap](0011-mandir-map.md)                               | Proposed |
 | 0012 | [Every event has its own page and address](0012-event-pages.md)                                     | Proposed |
 | 0013 | [Volunteers take seva slots without giving a name](0013-seva-slots-without-names.md)                | Proposed |
+| 0014 | [Committees invite colleagues themselves, by email address](0014-committee-invites.md)              | Proposed |

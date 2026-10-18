@@ -188,3 +188,70 @@ export async function reviewPosterAsCommittee(formData: FormData) {
   }
   back(`done=${decision === "publish" ? "published" : "discarded"}`);
 }
+
+// The committee on Toran: invite a colleague by email, cancel an invite,
+// take someone off or leave. The database functions decide who may.
+const INVITE_ERRORS: Record<string, string> = {
+  email: "invite-email",
+  member: "invite-member",
+  too_many: "invite-too-many",
+};
+
+export async function inviteMember(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const email = String(formData.get("email") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#committee`);
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  const { error } = await supabase.rpc("invite_committee_member", {
+    target: mandir.id,
+    invitee: email,
+  });
+  if (error) back(`error=${INVITE_ERRORS[error.message] ?? "failed"}`);
+  back("done=invited");
+}
+
+export async function cancelInvite(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#committee`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data, error } = await supabase.rpc("drop_committee_invite", {
+    invite: String(formData.get("invite") ?? ""),
+  });
+  if (error || !data) back("error=failed");
+  back("done=uninvited");
+}
+
+export async function removeMember(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const member = String(formData.get("member") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#committee`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const [{ data: mandir }, { data: auth }] = await Promise.all([
+    supabase.from("mandirs").select("id").eq("slug", slug).maybeSingle(),
+    supabase.auth.getUser(),
+  ]);
+  if (!mandir) back("error=failed");
+  const { data, error } = await supabase.rpc("remove_committee_member", {
+    target: mandir.id,
+    member,
+  });
+  if (error || !data) back("error=failed");
+  updateTag(`mandir:${slug}`);
+  updateTag("mandirs");
+  // Leaving: this page is no longer theirs.
+  if (member === auth.user?.id) redirect("/account?done=left");
+  back("done=removed");
+}
