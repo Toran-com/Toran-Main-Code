@@ -1,10 +1,11 @@
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { mandirCalendarEvents } from "@/lib/calendar-events";
 import {
   calendarProblem,
   calendarResponse,
   notFound,
 } from "@/lib/calendar-response";
+import { recordCount, wantsCounting } from "@/lib/count-visit";
 import { getMandir } from "@/lib/directory";
 import { calendarFile } from "@/lib/ical";
 
@@ -25,6 +26,10 @@ export async function GET(
   if (only) {
     const event = events.find((e) => e.uid === `event-${only}@toran`);
     if (!event) return notFound();
+    // One more "added to calendar" for the event's page.
+    if (wantsCounting(request)) {
+      after(() => recordCount("calendar", `/mandirs/${slug}/events/${only}`));
+    }
     return calendarResponse(
       calendarFile(mandir.name, [event]),
       `${mandir.slug}-event`,

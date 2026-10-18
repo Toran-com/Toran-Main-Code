@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
+import { Suspense } from "react";
+import { CountVisits } from "@/components/count-visits";
 import { pageMetadata, site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -43,7 +45,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en-GB"
       className={`${bricolage.variable} ${figtree.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">
+        {children}
+        <Suspense fallback={null}>
+          <CountVisits />
+        </Suspense>
+      </body>
     </html>
   );
 }

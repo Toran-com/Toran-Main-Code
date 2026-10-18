@@ -49,8 +49,12 @@ within one month.
   phone remembers which slots you took, so you can see them, add them to
   your calendar or give them back; clearing the site's data in your
   browser forgets them.
-- **Visitor numbers** (planned). If we count visits, we'll use a
-  cookie-free tool (such as Plausible) that doesn't identify you.
+- **Visitor numbers.** Toran counts how many times each public page is
+  seen each day, and how often events are added to calendars or shared,
+  with its own simple counter. It uses no cookies and keeps nothing about
+  you: no IP address, browser or device, only the page's address and a
+  running total. If your browser asks sites not to track you ("Do Not
+  Track" or "Global Privacy Control"), you aren't counted at all.
 
 ## If you look after a mandir's page
 
