@@ -22,11 +22,18 @@ import { createSessionClient } from "@/lib/supabase/session";
 import { ConfirmButton } from "@/components/confirm-button";
 import { EventFields } from "@/components/event-fields";
 import { FORM_ERRORS } from "@/lib/mandir-form";
-import { EVENT_ERRORS } from "@/lib/event-form";
+import { EVENT_ERRORS, eventInputFromEvent } from "@/lib/event-form";
 import { posterFrom } from "@/lib/posters";
 import { PosterDetails } from "@/components/poster-details";
+import { QuickPicks } from "@/components/quick-picks";
+import {
+  festivalPicks,
+  lastYearPicks,
+  lastYearWindow,
+} from "@/lib/quick-events";
 import {
   addEvent,
+  addPickedEvents,
   cancelInvite,
   changeEvent,
   inviteMember,
@@ -46,12 +53,15 @@ const ERRORS: Record<string, string> = {
   poster:
     "That poster can't be published as it is (for example, the date has passed). Choose \u201cNot right\u201d and add the event yourself.",
   done: "Someone has already dealt with that poster.",
+  none: "Tick at least one event to add.",
   "invite-email": "Please enter their email address.",
   "invite-member": "They're already on your committee.",
   "invite-too-many":
     "You have five invites waiting. Cancel one, or wait for them to be accepted.",
   failed: "Something went wrong. Please try again.",
 };
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const DONE: Record<string, string> = {
   added: "Added. It's on your public page now.",
@@ -89,7 +99,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const { data: mandir } = supabase
     ? await supabase
         .from("mandirs")
-        .select("id, slug, name, town, postcode, website, phone")
+        .select("id, slug, name, town, postcode, website, phone, calendar")
         .eq("slug", slug)
         .maybeSingle()
     : { data: null };
@@ -107,7 +117,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const { data: rows } = await supabase!
     .from("events")
     .select(
-      "id, title, summary, starts_at, all_day, status, confirmed_at, recurrence, event_occurrences (starts_at, cancelled)",
+      "id, title, summary, starts_at, all_day, status, confirmed_at, recurrence, festival_date_id, event_occurrences (starts_at, cancelled)",
     )
     .eq("mandir_id", mandir.id)
     .neq("status", "removed")
@@ -138,10 +148,73 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       .order("created_at"),
   ]);
 
+  // Festivals coming up and last year's events, ready to tick.
+  const today = londonDate();
+  const pastRange = lastYearWindow(today);
+  const [{ data: festivalDates }, { data: past }] = await Promise.all([
+    supabase!
+      .from("festival_dates")
+      .select(
+        "id, festival_id, calendar, starts_on, festival:festivals (slug, name)",
+      )
+      .gte("starts_on", pastRange.from.slice(0, 10))
+      .order("starts_on"),
+    supabase!
+      .from("events")
+      .select(
+        "title, summary, title_gu, summary_gu, kind, starts_at, all_day, festival_date:festival_dates (festival_id, starts_on)",
+      )
+      .eq("mandir_id", mandir.id)
+      .eq("status", "published")
+      .is("recurrence", null)
+      .gte("starts_at", pastRange.from)
+      .lt("starts_at", pastRange.to)
+      .order("starts_at")
+      .limit(100),
+  ]);
+  const festivals = festivalPicks(
+    festivalDates ?? [],
+    mandir.calendar,
+    events,
+    today,
+  );
+  const lastYear = lastYearPicks(
+    past ?? [],
+    festivalDates ?? [],
+    mandir.calendar,
+    events,
+    today,
+  );
+
   const query = await searchParams;
+  // "Duplicate": the add form starts with that event's details.
+  const copyId = String(query.copy ?? "");
+  const { data: copy } = UUID.test(copyId)
+    ? await supabase!
+        .from("events")
+        .select(
+          "title, summary, title_gu, summary_gu, kind, starts_at, all_day, recurrence",
+        )
+        .eq("id", copyId)
+        .eq("mandir_id", mandir.id)
+        .maybeSingle()
+    : { data: null };
+  const copyValues = copy
+    ? {
+        ...eventInputFromEvent({ ...copy, next_starts_at: copy.starts_at }),
+        date: "",
+        until: "",
+      }
+    : undefined;
+
   const error = ERRORS[String(query.error ?? "")];
+  const added = Number(query.added ?? 0);
   const done =
-    query.added === "1" ? DONE.added : DONE[String(query.done ?? "")];
+    added > 1
+      ? `Added ${added} events. They're on your public page now.`
+      : added === 1
+        ? DONE.added
+        : DONE[String(query.done ?? "")];
 
   return (
     <>
@@ -204,11 +277,61 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </Card>
       )}
 
+      {festivals.length > 0 && (
+        <Card>
+          <h2 className="text-2xl font-bold">Festivals coming up</h2>
+          <p className="text-muted">
+            Tick the ones your mandir is celebrating, change the name or add a
+            start time if you like, and add them all at once.
+          </p>
+          <QuickPicks
+            slug={mandir.slug}
+            picks={festivals}
+            action={addPickedEvents}
+            button="Add the ticked festivals"
+          />
+        </Card>
+      )}
+
+      {lastYear.length > 0 && (
+        <Card>
+          <h2 className="text-2xl font-bold">Again this year?</h2>
+          <p className="text-muted">
+            Your events from this time last year, moved to this year&apos;s
+            dates. Festival events follow this year&apos;s festival date. Check
+            each date, then tick the ones that are happening again.
+          </p>
+          <QuickPicks
+            slug={mandir.slug}
+            picks={lastYear}
+            action={addPickedEvents}
+            button="Add the ticked events"
+          />
+        </Card>
+      )}
+
       <Card>
-        <h2 className="text-2xl font-bold">Add an event</h2>
-        <form action={addEvent} className="flex flex-col gap-5">
+        <h2 id="add-event" className="scroll-mt-24 text-2xl font-bold">
+          {copy ? `Add a copy of \u201c${copy.title}\u201d` : "Add an event"}
+        </h2>
+        {copy && (
+          <p className="text-muted">
+            Everything is filled in from that event: choose the new date.{" "}
+            <Link
+              href={`/manage/${mandir.slug}#add-event`}
+              className="text-peacock font-semibold underline"
+            >
+              Start blank instead
+            </Link>
+          </p>
+        )}
+        <form
+          key={copy ? copyId : "blank"}
+          action={addEvent}
+          className="flex flex-col gap-5"
+        >
           <input type="hidden" name="slug" value={mandir.slug} />
-          <EventFields gujarati kinds />
+          <EventFields gujarati kinds values={copyValues} />
           <button type="submit" className={buttonClass}>
             Add event
           </button>
@@ -260,6 +383,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                     className={`${quietButtonClass} px-4 py-2 text-base`}
                   >
                     Edit
+                  </Link>
+                  <Link
+                    href={`/manage/${mandir.slug}?copy=${event.id}#add-event`}
+                    className={`${quietButtonClass} px-4 py-2 text-base`}
+                  >
+                    Duplicate
                   </Link>
                   {event.status !== "cancelled" && (
                     <Link

@@ -7,6 +7,7 @@ import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
 import { parsePracticalDetails } from "@/lib/mandir-form";
 import { reviewPoster } from "@/lib/poster-review";
+import { picksFromForm } from "@/lib/quick-events";
 import { createSessionClient } from "@/lib/supabase/session";
 
 // Changes a mandir admin makes to their mandir's events. The database's
@@ -39,6 +40,51 @@ export async function addEvent(formData: FormData) {
   updateTag(`mandir:${mandir.slug}`);
   updateTag("events");
   back("added=1");
+}
+
+// Several events at once: the festivals or last year's events the
+// committee ticked. Every one is checked before any is saved, so a mistake
+// in one row doesn't leave half of them added.
+export async function addPickedEvents(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
+
+  const picks = picksFromForm(formData);
+  if (!picks.length) back("error=none");
+  const checked = picks.map((pick) => ({
+    result: checkEvent(pick.input),
+    festivalDateId: pick.festivalDateId,
+  }));
+  for (const { result } of checked) {
+    if (!result.ok) back(`error=${result.error}`);
+  }
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, slug")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+
+  let added = 0;
+  for (const { result, festivalDateId } of checked) {
+    if (!result.ok) continue;
+    const id = await saveEvent(supabase, mandir.id, result.event, {
+      confirmed: true,
+      origin: "mandir",
+      festivalDateId,
+    });
+    if (id) added += 1;
+  }
+  if (added) {
+    updateTag(`mandir:${mandir.slug}`);
+    updateTag("events");
+  }
+  if (added < checked.length) back(`added=${added}&error=failed`);
+  back(`added=${added}`);
 }
 
 const CHANGES = {
