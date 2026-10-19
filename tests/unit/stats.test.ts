@@ -1,4 +1,6 @@
+import { readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { SEASONS } from "@/lib/seasons";
 import {
   countablePath,
   isBot,
@@ -134,5 +136,27 @@ describe("summarise", () => {
       days: [],
       paths: [],
     });
+  });
+});
+
+describe("festival season pages", () => {
+  it("are counted, by name", () => {
+    expect(countablePath("/holi")).toBe("/holi");
+    expect(pageKind("/navratri")).toBe("Navratri page");
+    expect(pageKind("/diwali")).toBe("Diwali page");
+  });
+
+  it("are the same pages the database will count", () => {
+    // The newest migration that defines count_visit lists the season pages.
+    const dir = "supabase/migrations";
+    const latest = readdirSync(dir)
+      .filter((f) =>
+        readFileSync(`${dir}/${f}`, "utf8").includes("count_visit"),
+      )
+      .sort()
+      .at(-1)!;
+    const sql = readFileSync(`${dir}/${latest}`, "utf8");
+    const listed = /'\^\/\(([a-z|-]+)\)\$'/.exec(sql)?.[1].split("|");
+    expect(listed?.sort()).toEqual(SEASONS.map((s) => s.slug).sort());
   });
 });

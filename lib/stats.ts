@@ -4,6 +4,8 @@
 // the page's address and a running total (decision 0015). Pure, so the
 // rules are tested on their own.
 
+import { SEASONS } from "@/lib/seasons";
+
 export const METRICS = ["view", "calendar", "subscribe", "share"] as const;
 export type Metric = (typeof METRICS)[number];
 
@@ -25,7 +27,10 @@ const PAGES: [RegExp, string][] = [
   [new RegExp(`^/mandirs/${SLUG}/events/${ID}$`), "Event pages"],
   [new RegExp(`^/mandirs/${SLUG}/events/${ID}/seva$`), "Seva sign-up pages"],
   [/^\/festivals$/, "Festival dates"],
-  [/^\/diwali$/, "Diwali page"],
+  ...SEASONS.map((s): [RegExp, string] => [
+    new RegExp(`^/${s.slug}$`),
+    `${s.name} page`,
+  ]),
   [new RegExp(`^/festivals/${SLUG}$`), "Festival pages"],
   [/^\/for-mandirs$/, "For mandirs"],
   [/^\/for-mandirs\/guide$/, "Committee guide"],
