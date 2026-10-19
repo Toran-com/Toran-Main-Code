@@ -23,6 +23,7 @@ describe("countablePath", () => {
     expect(countablePath(EVENT)).toBe(EVENT);
     expect(countablePath(`${EVENT}/seva`)).toBe(`${EVENT}/seva`);
     expect(countablePath("/festivals/diwali")).toBe("/festivals/diwali");
+    expect(countablePath("/for-mandirs/guide")).toBe("/for-mandirs/guide");
   });
 
   it("leaves out admin, committee and made-up pages", () => {
