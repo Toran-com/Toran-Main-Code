@@ -11,3 +11,14 @@ test("health check reports an unconnected database", async ({ request }) => {
     database: "not configured",
   });
 });
+
+// The nightly job only runs for Vercel Cron, which sends CRON_SECRET.
+test("the nightly job can't be started by anyone else", async ({ request }) => {
+  for (const headers of [{}, { authorization: "Bearer guess" }] as Record<
+    string,
+    string
+  >[]) {
+    const response = await request.get("/api/cron/nightly", { headers });
+    expect(response.status()).toBe(404);
+  }
+});
