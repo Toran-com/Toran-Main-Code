@@ -38,7 +38,7 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
   const searching = query.trim().length > 0;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-4 sm:gap-6">
       <div className="flex flex-col gap-2">
         <label htmlFor={inputId} className="text-lg font-semibold">
           Find a mandir or town
@@ -55,39 +55,41 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
             className={`${inputClass} pl-12`}
           />
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted text-base" aria-live="polite">
           {searching
             ? `${shown.length} of ${mandirs.length} mandirs`
             : `${mandirs.length} mandirs`}
         </p>
-      </div>
-
-      {/* A switch whose peacock pill slides to the chosen view. */}
-      <div
-        role="group"
-        aria-label="Show mandirs as"
-        className="needs-js border-line bg-surface shadow-card relative grid w-fit grid-cols-2 rounded-full border p-1"
-      >
-        <span
-          aria-hidden="true"
-          className={`from-peacock to-peacock-deep shadow-card absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-linear-to-b transition-transform duration-300 ease-out ${
-            view === "list" ? "translate-x-full" : ""
-          }`}
-        />
-        {(["map", "list"] as const).map((v) => (
-          <button
-            key={v}
-            type="button"
-            aria-pressed={view === v}
-            onClick={() => setView(v)}
-            className={`relative flex items-center justify-center gap-2 rounded-full px-5 py-2 text-base font-semibold transition-colors duration-300 ${
-              view === v ? "text-on-peacock" : "hover:text-peacock"
+        {/* A switch whose peacock pill slides to the chosen view. */}
+        <div
+          role="group"
+          aria-label="Show mandirs as"
+          className="needs-js border-line bg-surface shadow-card relative grid w-fit grid-cols-2 rounded-full border p-1"
+        >
+          <span
+            aria-hidden="true"
+            className={`from-peacock to-peacock-deep shadow-card absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-linear-to-b transition-transform duration-300 ease-out ${
+              view === "list" ? "translate-x-full" : ""
             }`}
-          >
-            {v === "map" ? <PinIcon /> : <ListIcon />}
-            {v === "map" ? "Map" : "List"}
-          </button>
-        ))}
+          />
+          {(["map", "list"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              aria-pressed={view === v}
+              onClick={() => setView(v)}
+              className={`relative flex items-center justify-center gap-2 rounded-full px-5 py-2 text-base font-semibold transition-colors duration-300 ${
+                view === v ? "text-on-peacock" : "hover:text-peacock"
+              }`}
+            >
+              {v === "map" ? <PinIcon /> : <ListIcon />}
+              {v === "map" ? "Map" : "List"}
+            </button>
+          ))}
+        </div>
       </div>
 
       {shown.length === 0 && (

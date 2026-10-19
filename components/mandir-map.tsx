@@ -3,7 +3,6 @@
 import "leaflet/dist/leaflet.css";
 import type { CircleMarker, LayerGroup, Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
-import { quietButtonClass } from "@/components/ui";
 import { clusterPoints, onTheMap } from "@/lib/map-clusters";
 
 // The mandirs on a map of the UK, from the map positions worked out from
@@ -224,12 +223,12 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
           type="button"
           onClick={nearMe}
           disabled={!ready || finding === "finding"}
-          className={`${quietButtonClass} px-4 py-2 text-base`}
+          className="border-peacock/30 text-peacock hover:bg-peacock/10 bg-surface inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-base font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-95 disabled:opacity-60"
         >
           <svg
             aria-hidden="true"
             viewBox="0 0 24 24"
-            className={`size-5 ${finding === "finding" ? "animate-spin" : ""}`}
+            className={`size-4 ${finding === "finding" ? "animate-spin" : ""}`}
             fill="none"
             stroke="currentColor"
             strokeWidth="2"

@@ -55,65 +55,105 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     near ? positionForSearch(near) : Promise.resolve(null),
   ]);
 
+  // Links for the type-of-event chips keep the other choices.
+  const typeHref = (value: string) => {
+    const params = new URLSearchParams();
+    if (near) params.set("near", near);
+    if (within !== 15) params.set("within", String(within));
+    if (region) params.set("region", region);
+    if (value) params.set("type", value);
+    const q = params.toString();
+    return q ? `/whats-on?${q}` : "/whats-on";
+  };
+
   const form = (
-    <form className="border-line bg-surface shadow-card grid gap-4 rounded-2xl border p-5 sm:grid-cols-2 sm:items-end lg:grid-cols-[2fr_1fr_1.5fr_1.5fr_auto]">
-      <NearMe
-        labels={{
-          field: t("whatsOn.near"),
-          button: t("whatsOn.nearMe"),
-          finding: t("whatsOn.finding"),
-          denied: t("whatsOn.locationDenied"),
-          failed: t("whatsOn.locationFailed"),
-        }}
-        input={
-          <input
-            id="near"
-            name="near"
-            defaultValue={near}
-            placeholder={t("whatsOn.nearExample")}
-            autoComplete="postal-code"
-            className={inputClass}
-          />
-        }
-      />
-      <label className="flex flex-col gap-2">
-        <span className="font-semibold">{t("whatsOn.within")}</span>
-        <select
-          name="within"
-          defaultValue={String(within)}
-          className={inputClass}
-        >
-          {RADII.map((r) => (
-            <option key={r} value={r}>
-              {t("whatsOn.miles", { miles: r })}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="flex flex-col gap-2">
-        <span className="font-semibold">{t("whatsOn.region")}</span>
-        <select name="region" defaultValue={region} className={inputClass}>
-          <option value="">{t("whatsOn.anywhere")}</option>
-          {REGIONS.map((r) => (
-            <option key={r}>{r}</option>
-          ))}
-        </select>
-      </label>
-      <label className="flex flex-col gap-2">
-        <span className="font-semibold">{t("whatsOn.type")}</span>
-        <select name="type" defaultValue={kind} className={inputClass}>
-          <option value="">{t("whatsOn.anyType")}</option>
-          {Object.entries(EVENT_KINDS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button type="submit" className={`${buttonClass} sm:w-auto`}>
-        {t("whatsOn.show")}
-      </button>
-    </form>
+    <div className="flex flex-col gap-3">
+      <form className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5">
+        <NearMe
+          labels={{
+            field: t("whatsOn.near"),
+            button: t("whatsOn.nearMe"),
+            finding: t("whatsOn.finding"),
+            denied: t("whatsOn.locationDenied"),
+            failed: t("whatsOn.locationFailed"),
+          }}
+          input={
+            <input
+              id="near"
+              name="near"
+              defaultValue={near}
+              placeholder={t("whatsOn.nearExample")}
+              autoComplete="postal-code"
+              className={inputClass}
+            />
+          }
+        />
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2">
+            <span className="font-semibold">{t("whatsOn.within")}</span>
+            <select
+              name="within"
+              defaultValue={String(within)}
+              className={`${inputClass} w-auto py-2`}
+            >
+              {RADII.map((r) => (
+                <option key={r} value={r}>
+                  {t("whatsOn.miles", { miles: r })}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="submit"
+            className={`${buttonClass} flex-1 basis-32 py-2 sm:max-w-48`}
+          >
+            {t("whatsOn.show")}
+          </button>
+        </div>
+        <details className="group" open={!!region}>
+          <summary className="text-peacock w-fit cursor-pointer font-semibold">
+            {t("whatsOn.moreOptions")}
+          </summary>
+          <label className="mt-3 flex flex-col gap-2">
+            <span className="font-semibold">{t("whatsOn.region")}</span>
+            <select name="region" defaultValue={region} className={inputClass}>
+              <option value="">{t("whatsOn.anywhere")}</option>
+              {REGIONS.map((r) => (
+                <option key={r}>{r}</option>
+              ))}
+            </select>
+          </label>
+        </details>
+        {kind && <input type="hidden" name="type" value={kind} />}
+      </form>
+      <nav
+        aria-label={t("whatsOn.type")}
+        className="-mx-4 px-4 sm:mx-0 sm:px-0"
+      >
+        <ul className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+          {[["", t("whatsOn.anyType")] as const, ...Object.entries(EVENT_KINDS)]
+            .filter(([value]) => value !== "other")
+            .map(([value, label]) => {
+              const here = value === kind;
+              return (
+                <li key={value || "any"} className="shrink-0">
+                  <Link
+                    href={typeHref(value)}
+                    aria-current={here ? "page" : undefined}
+                    className={`inline-block rounded-full border px-4 py-1.5 text-base font-semibold whitespace-nowrap no-underline transition-colors ${
+                      here
+                        ? "border-peacock bg-peacock text-on-peacock"
+                        : "border-line bg-surface hover:border-peacock/50"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+        </ul>
+      </nav>
+    </div>
   );
 
   if (result.state !== "ok") {

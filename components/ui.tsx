@@ -15,13 +15,13 @@ export function PageShell({
 }) {
   return (
     <main
-      className={`rise mx-auto flex w-full flex-1 flex-col gap-8 px-6 py-16 ${wide ? "max-w-3xl" : "max-w-lg"}`}
+      className={`rise mx-auto flex w-full flex-1 flex-col gap-6 px-4 py-8 sm:gap-8 sm:px-6 sm:py-14 ${wide ? "max-w-3xl" : "max-w-lg"}`}
     >
       <Link href="/" aria-label="Toran home" className="self-start">
         <ToranGarland className="h-8 w-36" />
       </Link>
-      <div className="flex flex-col gap-3">
-        <h1 className="font-display text-4xl font-extrabold tracking-tight">
+      <div className="flex flex-col gap-2 sm:gap-3">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
           {title}
         </h1>
         <Ornament />

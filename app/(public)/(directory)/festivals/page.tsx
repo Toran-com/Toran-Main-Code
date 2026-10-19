@@ -52,7 +52,9 @@ async function Festivals() {
     <div className="flex flex-col gap-8">
       {[...months.entries()].map(([month, dates]) => (
         <section key={month} className="flex flex-col gap-3">
-          <h2 className="font-display text-3xl font-bold">{month}</h2>
+          <h2 className="font-display text-2xl font-bold sm:text-3xl">
+            {month}
+          </h2>
           <ul className="rise-list flex flex-col gap-3">
             {dates.map((date) => (
               <li key={date.id}>
@@ -69,24 +71,31 @@ async function Festivals() {
 function FestivalCard({ date }: { date: FestivalDate }) {
   const calendar = calendarLabel(date.calendar);
   return (
-    <article className="border-line bg-surface lift shadow-card flex flex-col gap-2 rounded-2xl border p-5">
+    <article className="has-card-link group border-line bg-surface lift shadow-card flex flex-col gap-1 rounded-2xl border p-4 sm:p-5">
       <p className="text-marigold-ink font-semibold">
         {formatDateRange(date.starts_on, date.ends_on)}
       </p>
       <h3 className="text-xl font-bold">
         {date.festival ? (
-          <Link
-            href={`/festivals/${date.festival.slug}`}
-            className="text-peacock underline"
-          >
-            {date.festival.name}
-          </Link>
+          <>
+            <Link
+              href={`/festivals/${date.festival.slug}`}
+              className="card-link group-hover:text-peacock no-underline"
+            >
+              {date.festival.name}
+            </Link>
+            <span aria-hidden="true" className="text-peacock">
+              {"\u00a0→"}
+            </span>
+          </>
         ) : (
           "Festival"
         )}
       </h3>
-      {calendar && <p className="text-muted -mt-2">{calendar}</p>}
-      {date.festival?.summary && <p>{date.festival.summary}</p>}
+      {calendar && <p className="text-muted">{calendar}</p>}
+      {date.festival?.summary && (
+        <p className="text-muted">{date.festival.summary}</p>
+      )}
       {!date.verified && (
         <p>
           <Badge tone="marigold">Date not yet checked</Badge>

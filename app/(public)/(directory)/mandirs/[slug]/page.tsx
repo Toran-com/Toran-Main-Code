@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { AddToCalendar } from "@/components/add-to-calendar";
+import { EventActions } from "@/components/event-actions";
+import { GlobeIcon, PhoneIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
@@ -80,12 +81,12 @@ export default async function MandirPage({
       >
         ← All mandirs
       </Link>
-      <div className="rise flex flex-col gap-3">
+      <div className="rise flex flex-col gap-2 sm:gap-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           {mandir.name}
         </h1>
         <Ornament />
-        <p className="text-muted text-xl">
+        <p className="text-muted text-lg sm:text-xl">
           {mandir.town}, {mandir.region}
         </p>
         {mandir.status === "claimed" && (
@@ -93,14 +94,8 @@ export default async function MandirPage({
             <Badge tone="peacock">Run by the mandir&apos;s committee</Badge>
           </p>
         )}
-        <ShareButtons
-          label="Share this mandir"
-          text={`${mandir.name}, ${mandir.town}: what's on`}
-          path={`/mandirs/${mandir.slug}`}
-        />
+        <QuickLinks mandir={mandir} />
       </div>
-
-      <Facts mandir={mandir} />
 
       <section aria-labelledby="whats-on" className="flex flex-col gap-4">
         <h2 id="whats-on" className="font-display text-3xl font-bold">
@@ -138,6 +133,8 @@ export default async function MandirPage({
         </div>
       </section>
 
+      <Facts mandir={mandir} />
+
       <SubscribeCalendar
         path={`/mandirs/${mandir.slug}/calendar.ics`}
         title="Get these events in your calendar"
@@ -174,11 +171,7 @@ export default async function MandirPage({
 }
 
 function Facts({ mandir }: { mandir: MandirDetails }) {
-  const directions = mandir.postcode
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        `${mandir.name} ${mandir.postcode}`,
-      )}`
-    : null;
+  const directions = directionsTo(mandir);
   const rows: { label: string; value: ReactNode }[] = [];
   if (mandir.tradition)
     rows.push({ label: "Tradition", value: mandir.tradition });
@@ -228,14 +221,62 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
   if (!rows.length) return null;
 
   return (
-    <dl className="border-line bg-surface shadow-card grid gap-x-6 gap-y-3 rounded-2xl border p-5 sm:grid-cols-[auto_1fr]">
-      {rows.map(({ label, value }) => (
-        <div key={label} className="contents">
-          <dt className="text-muted text-base sm:text-lg">{label}</dt>
-          <dd className="-mt-2 sm:mt-0">{value}</dd>
-        </div>
-      ))}
-    </dl>
+    <section aria-labelledby="about" className="flex flex-col gap-3">
+      <h2 id="about" className="font-display text-2xl font-bold">
+        About the mandir
+      </h2>
+      <dl className="border-line bg-surface shadow-card grid gap-x-6 gap-y-3 rounded-2xl border p-5 sm:grid-cols-[auto_1fr]">
+        {rows.map(({ label, value }) => (
+          <div key={label} className="contents">
+            <dt className="text-muted text-base">{label}</dt>
+            <dd className="-mt-2 sm:mt-0">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function directionsTo(mandir: MandirDetails): string | null {
+  return mandir.postcode
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        `${mandir.name} ${mandir.postcode}`,
+      )}`
+    : null;
+}
+
+// The things people most often want, in one tap: directions, the
+// mandir's own website, a call, or sharing the page.
+function QuickLinks({ mandir }: { mandir: MandirDetails }) {
+  const directions = directionsTo(mandir);
+  const pill =
+    "border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-base font-semibold no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95";
+  return (
+    <div className="flex flex-wrap items-center gap-2 pt-1">
+      {directions && (
+        <a href={directions} rel="noopener" className={pill}>
+          <PinIcon />
+          Directions
+        </a>
+      )}
+      {mandir.website && (
+        <a href={mandir.website} rel="noopener" className={pill}>
+          <GlobeIcon />
+          Website
+        </a>
+      )}
+      {mandir.phone && (
+        <a href={`tel:${mandir.phone.replace(/\s/g, "")}`} className={pill}>
+          <PhoneIcon />
+          Call
+        </a>
+      )}
+      <ShareButtons
+        label="Share this mandir"
+        text={`${mandir.name}, ${mandir.town}: what's on`}
+        path={`/mandirs/${mandir.slug}`}
+      />
+    </div>
   );
 }
 
@@ -247,16 +288,25 @@ function EventCard({
   mandir: MandirDetails;
 }) {
   const cancelled = event.status === "cancelled";
+  const confirmed =
+    event.confirmed_at &&
+    `Confirmed by the mandir, ${new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/London",
+      day: "numeric",
+      month: "short",
+    }).format(new Date(event.confirmed_at))}`;
   return (
     <article
       id={`event-${event.id}`}
-      className="border-line bg-surface lift shadow-card flex scroll-mt-4 flex-col gap-2 rounded-2xl border p-5"
+      className="border-line bg-surface lift shadow-card flex scroll-mt-4 flex-col gap-2 rounded-2xl border p-4 sm:p-5"
     >
       <p className="text-marigold-ink font-semibold">
         {event.recurrence && `${describeRule(event.recurrence)} · next `}
         {formatEventStart(event.next_starts_at, event.all_day)}
       </p>
-      <h3 className={`text-xl font-bold ${cancelled ? "line-through" : ""}`}>
+      <h3
+        className={`text-xl leading-snug font-bold ${cancelled ? "line-through" : ""}`}
+      >
         <Link
           href={eventPath(mandir.slug, event.id)}
           className="hover:text-peacock no-underline hover:underline"
@@ -267,12 +317,6 @@ function EventCard({
       {event.title_gu && (
         <p lang="gu" className="-mt-1 text-lg font-semibold">
           {event.title_gu}
-        </p>
-      )}
-      {(cancelled || kindLabel(event.kind)) && (
-        <p className="flex flex-wrap gap-2">
-          {cancelled && <Badge tone="kumkum">Cancelled</Badge>}
-          {kindLabel(event.kind) && <Badge>{kindLabel(event.kind)}</Badge>}
         </p>
       )}
       {event.summary && <p>{event.summary}</p>}
@@ -286,25 +330,25 @@ function EventCard({
         <a
           href={event.link}
           rel="noopener"
-          className="text-peacock font-semibold underline"
+          className="text-peacock w-fit font-semibold underline"
         >
           More details
         </a>
       )}
-      {event.confirmed_at ? (
-        <p className="text-muted text-base">
-          Confirmed by the mandir,{" "}
-          {new Intl.DateTimeFormat("en-GB", {
-            timeZone: "Europe/London",
-            day: "numeric",
-            month: "short",
-          }).format(new Date(event.confirmed_at))}
-        </p>
-      ) : (
-        sourceLabel(event) && (
-          <p className="text-muted text-base">{sourceLabel(event)}</p>
-        )
-      )}
+      <p className="flex flex-wrap items-center gap-2">
+        {cancelled && <Badge tone="kumkum">Cancelled</Badge>}
+        {kindLabel(event.kind) && <Badge>{kindLabel(event.kind)}</Badge>}
+        {confirmed ? (
+          <span className="text-peacock text-base font-semibold">
+            <span aria-hidden="true">✓ </span>
+            {confirmed}
+          </span>
+        ) : (
+          sourceLabel(event) && (
+            <span className="text-muted text-base">{sourceLabel(event)}</span>
+          )
+        )}
+      </p>
       <JsonLd
         data={eventData(
           event,
@@ -313,17 +357,16 @@ function EventCard({
         )}
       />
       {!cancelled && (
-        <>
-          <ShareButtons
-            text={eventShareText(event, mandir)}
-            path={eventPath(mandir.slug, event.id)}
-          />
-          <AddToCalendar
+        <div className="pt-1">
+          <EventActions
             mandirSlug={mandir.slug}
             eventId={event.id}
             title={event.title}
+            shareText={eventShareText(event, mandir)}
+            path={eventPath(mandir.slug, event.id)}
+            copy={false}
           />
-        </>
+        </div>
       )}
     </article>
   );

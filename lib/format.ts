@@ -84,6 +84,13 @@ function clockLabel(at: Date): string {
   return formatEventStart(at.toISOString(), false).split(", ")[1];
 }
 
+// Just the time of day, for lists already grouped by day: "7pm",
+// "7:30pm", or "All day".
+export function formatTimeOfDay(startsAt: string, allDay: boolean): string {
+  if (allDay) return "All day";
+  return formatEventStart(startsAt, false).split(", ")[1] ?? "";
+}
+
 // When an event happens, start to finish, in UK time:
 // "Sat 24 Oct, 7:30pm – 11pm", "Sat 24 Oct, 10pm – Sun 25 Oct, 1am",
 // "Sun 8 Nov" or "Sat 7 Nov – Sun 8 Nov" for all-day events.

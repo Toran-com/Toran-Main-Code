@@ -130,7 +130,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .filter({ hasText: "Annakut darshan" });
   await expect(listed).toContainText(NAME);
   await expect(listed).toContainText("અન્નકૂટ દર્શન");
-  await expect(listed).toContainText("Festival · Confirmed by the mandir");
+  await expect(listed).toContainText("Festival");
+  await expect(listed).toContainText("Confirmed by the mandir");
+  // The card opens the event's page.
+  await expect(listed.getByRole("link")).toHaveAttribute(
+    "href",
+    /\/mandirs\/.+\/events\//,
+  );
   // Choosing a type of event narrows the list.
   await member.goto("/whats-on?type=festival");
   await expect(
