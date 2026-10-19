@@ -38,6 +38,9 @@ export function countablePath(value: unknown): string | null {
   if (typeof value !== "string" || value.length > 200) return null;
   let path = value.split(/[?#]/)[0].toLowerCase();
   if (path.length > 1) path = path.replace(/\/+$/, "");
+  // A Gujarati page counts as its English page.
+  if (path === "/gu") path = "/";
+  else if (path.startsWith("/gu/")) path = path.slice(3);
   return PAGES.some(([pattern]) => pattern.test(path)) ? path : null;
 }
 

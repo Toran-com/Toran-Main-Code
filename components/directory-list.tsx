@@ -4,7 +4,9 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useId, useMemo, useState } from "react";
 import type { MandirSummary } from "@/lib/directory";
+import { useLocale, useT } from "@/components/use-t";
 import { anchorFor, groupByRegionAndTown, matchesSearch } from "@/lib/format";
+import { withLocale } from "@/lib/i18n/paths";
 import { onTheMap } from "@/lib/map-clusters";
 import { cardClass, inputClass } from "@/components/ui";
 
@@ -26,6 +28,7 @@ type View = "map" | "list";
 // rendered on the server for anyone without JavaScript, and typing filters
 // whichever view is showing.
 export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
+  const t = useT();
   const [query, setQuery] = useState("");
   const [view, setView] = useState<View>(() =>
     onTheMap(mandirs).length > 0 ? "map" : "list",
@@ -41,7 +44,7 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
     <div className="flex flex-col gap-4 sm:gap-6">
       <div className="flex flex-col gap-2">
         <label htmlFor={inputId} className="text-lg font-semibold">
-          Find a mandir or town
+          {t("mandirs.find")}
         </label>
         <div className="relative">
           <SearchIcon />
@@ -50,7 +53,7 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g. Leicester, BAPS, Harrow"
+            placeholder={t("mandirs.findExample")}
             autoComplete="off"
             className={`${inputClass} pl-12`}
           />
@@ -60,13 +63,16 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted text-base" aria-live="polite">
           {searching
-            ? `${shown.length} of ${mandirs.length} mandirs`
-            : `${mandirs.length} mandirs`}
+            ? t("mandirs.countOf", {
+                shown: shown.length,
+                total: mandirs.length,
+              })
+            : t("mandirs.count", { total: mandirs.length })}
         </p>
         {/* A switch whose peacock pill slides to the chosen view. */}
         <div
           role="group"
-          aria-label="Show mandirs as"
+          aria-label={t("mandirs.showAs")}
           className="needs-js border-line bg-surface shadow-card relative grid w-fit grid-cols-2 rounded-full border p-1"
         >
           <span
@@ -86,7 +92,7 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
               }`}
             >
               {v === "map" ? <PinIcon /> : <ListIcon />}
-              {v === "map" ? "Map" : "List"}
+              {v === "map" ? t("mandirs.map") : t("mandirs.list")}
             </button>
           ))}
         </div>
@@ -94,8 +100,7 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
 
       {shown.length === 0 && (
         <p className="text-lg">
-          No mandirs match &ldquo;{query.trim()}&rdquo;. Try a nearby town, or
-          check the spelling.
+          {t("mandirs.noMatch", { query: query.trim() })}
         </p>
       )}
 
@@ -126,11 +131,13 @@ function MandirGroups({
   mandirs: MandirSummary[];
   withRegions: boolean;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const groups = groupByRegionAndTown(mandirs);
   return (
     <div className="rise-list flex flex-col gap-8">
       {withRegions && (
-        <nav aria-label="Regions">
+        <nav aria-label={t("mandirs.regions")}>
           <ul className="flex flex-wrap gap-2">
             {groups.map(({ region }) => (
               <li key={region}>
@@ -172,7 +179,7 @@ function MandirGroups({
                 {list.map((m) => (
                   <li key={m.slug}>
                     <Link
-                      href={`/mandirs/${m.slug}`}
+                      href={withLocale(`/mandirs/${m.slug}`, locale)}
                       className="group hover:bg-sunk flex items-center gap-3 px-4 py-3 no-underline transition-colors first:rounded-t-2xl last:rounded-b-2xl"
                     >
                       <span className="flex flex-1 flex-col">

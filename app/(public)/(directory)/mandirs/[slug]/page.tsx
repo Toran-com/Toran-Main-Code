@@ -21,6 +21,7 @@ import { describeRule } from "@/lib/recurrence";
 import { eventPath, eventShareText } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData, mandirData } from "@/lib/structured-data";
+import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
 
 // Every mandir page is fully static. A mandir added after the build is
 // rendered on its first visit (which waits for it), so an unknown address
@@ -46,8 +47,8 @@ export async function generateMetadata({
   const { name, town } = result.data;
   return pageMetadata(
     `${name}, ${town}`,
-    `What's on at ${name} in ${town}: events, festivals and how to find it.`,
-    `/mandirs/${slug}`,
+    pageT()("mandir.description", { name, town }),
+    localePath(`/mandirs/${slug}`),
   );
 }
 
@@ -55,10 +56,11 @@ export default async function MandirPage({
   params,
 }: PageProps<"/mandirs/[slug]">) {
   const { slug } = await params;
+  const t = pageT();
   const result = await getMandir(slug);
   if (result.state === "not connected") notFound();
   if (result.state === "unavailable") {
-    return <LoadProblem state="unavailable" what="mandir's page" />;
+    return <LoadProblem state="unavailable" what={t("load.mandirPage")} />;
   }
   if (!result.data) notFound();
   const mandir = result.data;
@@ -71,15 +73,15 @@ export default async function MandirPage({
       <JsonLd
         data={breadcrumbData([
           { name: "Toran", url: `${siteUrl()}/` },
-          { name: "Mandirs", url: `${siteUrl()}/mandirs` },
+          { name: t("shell.mandirs"), url: `${siteUrl()}/mandirs` },
           { name: mandir.name, url: `${siteUrl()}/mandirs/${mandir.slug}` },
         ])}
       />
       <Link
-        href="/mandirs"
+        href={localePath("/mandirs")}
         className="text-peacock self-start font-semibold hover:underline"
       >
-        ← All mandirs
+        {t("mandir.all")}
       </Link>
       <div className="rise flex flex-col gap-2 sm:gap-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
@@ -91,7 +93,7 @@ export default async function MandirPage({
         </p>
         {mandir.status === "claimed" && (
           <p>
-            <Badge tone="peacock">Run by the mandir&apos;s committee</Badge>
+            <Badge tone="peacock">{t("mandir.runByCommittee")}</Badge>
           </p>
         )}
         <QuickLinks mandir={mandir} />
@@ -99,7 +101,7 @@ export default async function MandirPage({
 
       <section aria-labelledby="whats-on" className="flex flex-col gap-4">
         <h2 id="whats-on" className="font-display text-3xl font-bold">
-          What&apos;s on
+          {t("shell.whatsOn")}
         </h2>
         {mandir.events.length ? (
           <ul className="rise-list flex flex-col gap-3">
@@ -114,20 +116,23 @@ export default async function MandirPage({
         )}
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           <Link
-            href={`/mandirs/${mandir.slug}/tell-us`}
+            href={localePath(`/mandirs/${mandir.slug}/tell-us`)}
             className="text-peacock font-semibold"
           >
-            Know about an event here? Tell us →
+            {t("mandir.tellUs")}
           </Link>
-          <Link href="/festivals" className="text-peacock font-semibold">
-            Festival dates for the UK →
+          <Link
+            href={localePath("/festivals")}
+            className="text-peacock font-semibold"
+          >
+            {t("mandir.festivalDates")}
           </Link>
           {mandir.events.length > 0 && (
             <Link
-              href={`/mandirs/${mandir.slug}/print`}
+              href={localePath(`/mandirs/${mandir.slug}/print`)}
               className="text-peacock font-semibold"
             >
-              Print for a noticeboard →
+              {t("mandir.print")}
             </Link>
           )}
         </div>
@@ -137,33 +142,28 @@ export default async function MandirPage({
 
       <SubscribeCalendar
         path={`/mandirs/${mandir.slug}/calendar.ics`}
-        title="Get these events in your calendar"
-        body={`Add ${mandir.name}'s events to the calendar on your phone. New events and changes appear there automatically.`}
+        title={t("mandir.calendarTitle")}
+        body={t("mandir.calendarBody", { name: mandir.name })}
       />
 
       <Card>
-        <h2 className="text-xl font-bold">
-          Are you on this mandir&apos;s committee?
-        </h2>
+        <h2 className="text-xl font-bold">{t("mandir.committeeTitle")}</h2>
         {mandir.status === "claimed" ? (
           <p className="text-muted">
-            This page is looked after by the committee.{" "}
+            {t("mandir.claimedBefore")}{" "}
             <Link href="/account" className="text-peacock underline">
-              Log in
+              {t("mandir.logIn")}
             </Link>{" "}
-            to update it, or ask to join them.
+            {t("mandir.claimedAfter")}
           </p>
         ) : (
-          <p className="text-muted">
-            Look after this page: add events in a minute and correct any
-            details.
-          </p>
+          <p className="text-muted">{t("mandir.lookAfterBody")}</p>
         )}
         <Link
-          href={`/mandirs/${mandir.slug}/claim`}
+          href={localePath(`/mandirs/${mandir.slug}/claim`)}
           className={`${quietButtonClass} self-start`}
         >
-          Look after this page
+          {t("mandir.lookAfter")}
         </Link>
       </Card>
     </>
@@ -171,18 +171,19 @@ export default async function MandirPage({
 }
 
 function Facts({ mandir }: { mandir: MandirDetails }) {
+  const t = pageT();
   const directions = directionsTo(mandir);
   const rows: { label: string; value: ReactNode }[] = [];
   if (mandir.tradition)
-    rows.push({ label: "Tradition", value: mandir.tradition });
+    rows.push({ label: t("mandir.tradition"), value: mandir.tradition });
   if (mandir.postcode && directions) {
     rows.push({
-      label: "Postcode",
+      label: t("mandir.postcode"),
       value: (
         <>
           {mandir.postcode} ·{" "}
           <a href={directions} className="text-peacock font-semibold underline">
-            Directions
+            {t("mandir.directions")}
           </a>
         </>
       ),
@@ -190,7 +191,7 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
   }
   if (mandir.website) {
     rows.push({
-      label: "Website",
+      label: t("mandir.website"),
       value: (
         <a
           href={mandir.website}
@@ -204,7 +205,7 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
   }
   if (mandir.phone) {
     rows.push({
-      label: "Phone",
+      label: t("mandir.phone"),
       value: (
         <a
           href={`tel:${mandir.phone.replace(/\s/g, "")}`}
@@ -216,14 +217,14 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
     });
   }
   if (mandir.charity_number) {
-    rows.push({ label: "Registered charity", value: mandir.charity_number });
+    rows.push({ label: t("mandir.charity"), value: mandir.charity_number });
   }
   if (!rows.length) return null;
 
   return (
     <section aria-labelledby="about" className="flex flex-col gap-3">
       <h2 id="about" className="font-display text-2xl font-bold">
-        About the mandir
+        {t("mandir.about")}
       </h2>
       <dl className="border-line bg-surface shadow-card grid gap-x-6 gap-y-3 rounded-2xl border p-5 sm:grid-cols-[auto_1fr]">
         {rows.map(({ label, value }) => (
@@ -248,6 +249,7 @@ function directionsTo(mandir: MandirDetails): string | null {
 // The things people most often want, in one tap: directions, the
 // mandir's own website, a call, or sharing the page.
 function QuickLinks({ mandir }: { mandir: MandirDetails }) {
+  const t = pageT();
   const directions = directionsTo(mandir);
   const pill =
     "border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-base font-semibold no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95";
@@ -256,25 +258,25 @@ function QuickLinks({ mandir }: { mandir: MandirDetails }) {
       {directions && (
         <a href={directions} rel="noopener" className={pill}>
           <PinIcon />
-          Directions
+          {t("mandir.directions")}
         </a>
       )}
       {mandir.website && (
         <a href={mandir.website} rel="noopener" className={pill}>
           <GlobeIcon />
-          Website
+          {t("mandir.website")}
         </a>
       )}
       {mandir.phone && (
         <a href={`tel:${mandir.phone.replace(/\s/g, "")}`} className={pill}>
           <PhoneIcon />
-          Call
+          {t("mandir.call")}
         </a>
       )}
       <ShareButtons
-        label="Share this mandir"
-        text={`${mandir.name}, ${mandir.town}: what's on`}
-        path={`/mandirs/${mandir.slug}`}
+        label={t("mandir.share")}
+        text={t("mandir.shareText", { name: mandir.name, town: mandir.town })}
+        path={localePath(`/mandirs/${mandir.slug}`)}
       />
     </div>
   );
@@ -287,28 +289,32 @@ function EventCard({
   event: MandirEvent;
   mandir: MandirDetails;
 }) {
+  const t = pageT();
   const cancelled = event.status === "cancelled";
   const confirmed =
     event.confirmed_at &&
-    `Confirmed by the mandir, ${new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Europe/London",
-      day: "numeric",
-      month: "short",
-    }).format(new Date(event.confirmed_at))}`;
+    t("mandir.confirmedOn", {
+      date: new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
+        timeZone: "Europe/London",
+        day: "numeric",
+        month: "short",
+      }).format(new Date(event.confirmed_at)),
+    });
   return (
     <article
       id={`event-${event.id}`}
       className="border-line bg-surface lift shadow-card flex scroll-mt-4 flex-col gap-2 rounded-2xl border p-4 sm:p-5"
     >
       <p className="text-marigold-ink font-semibold">
-        {event.recurrence && `${describeRule(event.recurrence)} · next `}
+        {event.recurrence &&
+          t("event.repeatNext", { rule: describeRule(event.recurrence) ?? "" })}
         {formatEventStart(event.next_starts_at, event.all_day)}
       </p>
       <h3
         className={`text-xl leading-snug font-bold ${cancelled ? "line-through" : ""}`}
       >
         <Link
-          href={eventPath(mandir.slug, event.id)}
+          href={localePath(eventPath(mandir.slug, event.id))}
           className="hover:text-peacock no-underline hover:underline"
         >
           {event.title}
@@ -332,11 +338,11 @@ function EventCard({
           rel="noopener"
           className="text-peacock w-fit font-semibold underline"
         >
-          More details
+          {t("event.moreDetails")}
         </a>
       )}
       <p className="flex flex-wrap items-center gap-2">
-        {cancelled && <Badge tone="kumkum">Cancelled</Badge>}
+        {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
         {kindLabel(event.kind) && <Badge>{kindLabel(event.kind)}</Badge>}
         {confirmed ? (
           <span className="text-peacock text-base font-semibold">
@@ -363,7 +369,7 @@ function EventCard({
             eventId={event.id}
             title={event.title}
             shareText={eventShareText(event, mandir)}
-            path={eventPath(mandir.slug, event.id)}
+            path={localePath(eventPath(mandir.slug, event.id))}
             copy={false}
           />
         </div>
@@ -373,21 +379,22 @@ function EventCard({
 }
 
 function NoEvents({ website }: { website: string | null }) {
+  const t = pageT();
   return (
     <div className="bg-sunk rounded-2xl p-5">
-      <p className="font-semibold">No events listed yet.</p>
+      <p className="font-semibold">{t("whatsOn.noneYet")}</p>
       <p className="text-muted">
-        We&apos;re asking mandirs to add their events.{" "}
+        {t("mandir.asking")}{" "}
         {website ? (
           <>
-            Until then, check{" "}
+            {t("mandir.untilThenCheck")}{" "}
             <a href={website} rel="noopener" className="text-peacock underline">
               {websiteLabel(website)}
             </a>{" "}
-            or the mandir&apos;s noticeboard.
+            {t("mandir.orNoticeboard")}
           </>
         ) : (
-          <>Until then, check the mandir&apos;s noticeboard.</>
+          <>{t("mandir.untilThenNoticeboard")}</>
         )}
       </p>
     </div>

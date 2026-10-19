@@ -15,6 +15,7 @@ import { placesTaken, shiftLabel } from "@/lib/seva";
 import { eventPath, sevaPath } from "@/lib/share";
 import { pageMetadata, pageTitle } from "@/lib/site";
 import { MySlots, TakeSlot } from "./slots";
+import { localePath, pageT } from "@/lib/i18n/page";
 
 // An event's seva rota for volunteers: what's needed, how many places are
 // taken, and (if the committee has turned it on) "Take this slot", with no
@@ -46,11 +47,16 @@ export async function generateMetadata({
   const result = await getMandirEvent(slug, id);
   if (result.state !== "ok" || !result.data) return { title: pageTitle() };
   const { event, mandir } = result.data;
+  const t = pageT();
   return {
     ...pageMetadata(
-      `Seva for ${event.title}, ${mandir.name}`,
-      `Help with seva for ${event.title} at ${mandir.name}, ${mandir.town}. Take a slot, no sign-up needed.`,
-      sevaPath(slug, id),
+      t("seva.pageTitle", { title: event.title, name: mandir.name }),
+      t("seva.pageDescription", {
+        title: event.title,
+        name: mandir.name,
+        town: mandir.town,
+      }),
+      localePath(sevaPath(slug, id)),
     ),
     robots: { index: false, follow: true },
   };
@@ -60,13 +66,14 @@ export default async function SevaPage({
   params,
 }: PageProps<"/mandirs/[slug]/events/[id]/seva">) {
   const { slug, id } = await params;
+  const t = pageT();
   const [result, seva] = await Promise.all([
     getMandirEvent(slug, id),
     getEventSeva(slug, id),
   ]);
   if (result.state === "not connected") notFound();
   if (result.state === "unavailable" || seva.state === "unavailable") {
-    return <LoadProblem state="unavailable" what="seva rota" />;
+    return <LoadProblem state="unavailable" what={t("load.sevaRota")} />;
   }
   if (!result.data || seva.state !== "ok" || !seva.data) notFound();
   const { mandir, event, upcoming } = result.data;
@@ -83,7 +90,7 @@ export default async function SevaPage({
   return (
     <>
       <Link
-        href={eventPath(mandir.slug, event.id)}
+        href={localePath(eventPath(mandir.slug, event.id))}
         className="text-peacock self-start font-semibold hover:underline"
       >
         ← {event.title}
@@ -94,21 +101,17 @@ export default async function SevaPage({
           {mandir.name}
         </p>
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Help with seva
+          {t("seva.help")}
         </h1>
         <Ornament />
         {open ? (
           <p className="text-xl">
-            <strong>
-              {taken} of {needed}
-            </strong>{" "}
-            places taken. Pick a slot below: no sign-up, and Toran doesn&apos;t
-            ask your name.
+            <strong>{t("seva.takenOf", { taken, needed })}</strong>{" "}
+            {t("seva.pickBelow")}
           </p>
         ) : (
           <p className="text-xl">
-            Here&apos;s what {mandir.name} needs. To help, reply in the
-            mandir&apos;s volunteers&apos; group or ask at the mandir.
+            {t("seva.closedNote", { name: mandir.name })}
           </p>
         )}
       </div>
@@ -119,7 +122,9 @@ export default async function SevaPage({
         <Card key={role.id}>
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-2xl font-bold">{role.name}</h2>
-            {role.needs_dbs && <Badge tone="marigold">DBS check needed</Badge>}
+            {role.needs_dbs && (
+              <Badge tone="marigold">{t("seva.dbsNeeded")}</Badge>
+            )}
           </div>
           {role.description && <p className="text-muted">{role.description}</p>}
           <ul className="flex flex-col gap-3">
@@ -144,7 +149,7 @@ export default async function SevaPage({
                       />
                     </span>
                     <span className="text-muted text-base">
-                      {done} of {shift.needed} taken
+                      {t("seva.shiftTaken", { done, needed: shift.needed })}
                     </span>
                   </div>
                   {open && !role.needs_dbs && (
@@ -160,13 +165,13 @@ export default async function SevaPage({
                         ends_at: shift.ends_at,
                         title: event.title,
                         place,
-                        path: sevaPath(mandir.slug, event.id),
+                        path: localePath(sevaPath(mandir.slug, event.id)),
                       }}
                     />
                   )}
                   {open && role.needs_dbs && (
                     <p className="text-muted text-base">
-                      Ask the committee: the mandir checks DBS
+                      {t("seva.askCommittee")}
                     </p>
                   )}
                 </li>
@@ -178,9 +183,13 @@ export default async function SevaPage({
 
       {open && (
         <ShareButtons
-          label="Share this rota"
-          text={`Seva for ${event.title} at ${mandir.name}: ${needed - taken} places still free. Take a slot, no sign-up needed:`}
-          path={sevaPath(mandir.slug, event.id)}
+          label={t("seva.share")}
+          text={t("seva.shareText", {
+            title: event.title,
+            name: mandir.name,
+            free: needed - taken,
+          })}
+          path={localePath(sevaPath(mandir.slug, event.id))}
         />
       )}
     </>

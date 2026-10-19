@@ -1,7 +1,13 @@
 // Small formatting and grouping helpers for the public pages. Dates are
 // shown in UK style and UK time, whatever the server's own time zone.
 
+import type { ClientKey } from "@/lib/i18n/client-messages";
+import { pageLocale, sharedT } from "@/lib/i18n/locale";
+
 const LONDON = "Europe/London";
+
+// The page's language for dates: English (UK) or Gujarati.
+const dateLocale = () => (pageLocale() === "gu" ? "gu-IN" : "en-GB");
 
 // Today's date in London as YYYY-MM-DD.
 export function londonDate(now: Date = new Date()): string {
@@ -30,9 +36,10 @@ function dateOnly(value: string): Date {
 }
 
 // "Sun 8 Nov" (and the year if asked), built from parts so the result
-// doesn't depend on how a given Node version punctuates dates.
+// doesn't depend on how a given Node version punctuates dates. In
+// Gujarati, "રવિ 8 નવે".
 function dayLabel(at: Date, timeZone: string, withYear = false): string {
-  const parts = new Intl.DateTimeFormat("en-GB", {
+  const parts = new Intl.DateTimeFormat(dateLocale(), {
     timeZone,
     weekday: "short",
     day: "numeric",
@@ -55,7 +62,7 @@ export function formatDateRange(startsOn: string, endsOn: string): string {
 
 // "November 2026" for a YYYY-MM-DD date.
 export function monthOf(value: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(dateLocale(), {
     timeZone: "UTC",
     month: "long",
     year: "numeric",
@@ -67,6 +74,7 @@ export function formatEventStart(startsAt: string, allDay: boolean): string {
   const at = new Date(startsAt);
   const day = dayLabel(at, LONDON);
   if (allDay) return day;
+  if (pageLocale() === "gu") return `${day}, ${gujaratiTime(at)}`;
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: LONDON,
     hour: "numeric",
@@ -79,6 +87,22 @@ export function formatEventStart(startsAt: string, allDay: boolean): string {
   return `${day}, ${time}`;
 }
 
+// "સાંજે 7:30" (evening 7:30) in UK time: Gujarati says the part of the
+// day rather than am or pm.
+function gujaratiTime(at: Date): string {
+  const [hour, minute] = londonTime(at).split(":").map(Number);
+  const part =
+    hour >= 4 && hour < 12
+      ? "time.morning"
+      : hour >= 12 && hour < 16
+        ? "time.afternoon"
+        : hour >= 16 && hour < 20
+          ? "time.evening"
+          : "time.night";
+  const clock = `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""}`;
+  return sharedT()(part, { time: clock });
+}
+
 // "7:30pm" in UK time.
 function clockLabel(at: Date): string {
   return formatEventStart(at.toISOString(), false).split(", ")[1];
@@ -87,7 +111,7 @@ function clockLabel(at: Date): string {
 // Just the time of day, for lists already grouped by day: "7pm",
 // "7:30pm", or "All day".
 export function formatTimeOfDay(startsAt: string, allDay: boolean): string {
-  if (allDay) return "All day";
+  if (allDay) return sharedT()("time.allDay");
   return formatEventStart(startsAt, false).split(", ")[1] ?? "";
 }
 
@@ -121,7 +145,10 @@ const CALENDARS: Record<string, string> = {
 };
 
 export function calendarLabel(calendar: string | null): string | null {
-  return calendar ? (CALENDARS[calendar] ?? null) : null;
+  if (!calendar || !(calendar in CALENDARS)) return null;
+  return pageLocale() === "gu"
+    ? sharedT()(`calendar.${calendar}` as ClientKey)
+    : CALENDARS[calendar];
 }
 
 // "derbyhindutemple.com" for https://www.derbyhindutemple.com/

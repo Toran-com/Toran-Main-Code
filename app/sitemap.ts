@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getMandir, listFestivals, listMandirs } from "@/lib/directory";
+import { LOCALES } from "@/lib/i18n";
+import { hasGujarati, withLocale } from "@/lib/i18n/paths";
 import { eventPath } from "@/lib/share";
 import { site, siteUrl } from "@/lib/site";
 
@@ -26,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     )
   ).flat();
-  return [
+  const english: MetadataRoute.Sitemap = [
     { url: base, changeFrequency: "daily", priority: 1 },
     { url: `${base}/whats-on`, changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/for-mandirs`, changeFrequency: "monthly", priority: 0.5 },
@@ -44,4 +46,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...events,
   ];
+  if (!LOCALES.gu.ready) return english;
+  // Once the Gujarati has been checked, its pages too.
+  const gujarati = english.flatMap((entry) => {
+    const path = entry.url.slice(base.length) || "/";
+    return hasGujarati(path)
+      ? [{ ...entry, url: `${base}${withLocale(path, "gu")}` }]
+      : [];
+  });
+  return [...english, ...gujarati];
 }

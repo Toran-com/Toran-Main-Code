@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { useT } from "@/components/use-t";
 import { londonDate } from "@/lib/format";
 
 const noSubscribe = () => () => {};
@@ -9,6 +10,7 @@ const noSubscribe = () => () => {};
 // on the visitor's phone so a saved page never shows a stale count. Shows
 // nothing before the page's JavaScript runs, or once the day has passed.
 export function Countdown({ date }: { date: string }) {
+  const t = useT();
   const today = useSyncExternalStore(
     noSubscribe,
     () => londonDate(),
@@ -22,7 +24,11 @@ export function Countdown({ date }: { date: string }) {
   );
   if (days < 0) return null;
   const text =
-    days === 0 ? "Today" : days === 1 ? "Tomorrow" : `In ${days} days`;
+    days === 0
+      ? t("day.today")
+      : days === 1
+        ? t("day.tomorrow")
+        : t("countdown.days", { days });
   return (
     <span className="bg-marigold/15 text-marigold-ink rounded-full px-3 py-0.5 text-base font-bold">
       {text}

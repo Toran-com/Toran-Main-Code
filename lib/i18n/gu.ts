@@ -1,9 +1,11 @@
+import { guClient } from "@/lib/i18n/client-messages";
 import type { MessageKey } from "@/lib/i18n/en";
 
 // Gujarati. A DRAFT, not yet checked by a native Gujarati speaker: not
 // shown to the public until it has been (see /ops/translations).
 // "Toran" is the brand name and stays in Latin letters.
 export const gu: Record<MessageKey, string> = {
+  ...guClient,
   "shell.home": "Toran મુખ્ય પાનું",
   "shell.whatsOn": "કાર્યક્રમો",
   "shell.mandirs": "મંદિરો",
@@ -46,8 +48,6 @@ export const gu: Record<MessageKey, string> = {
   "whatsOn.countRegion": ", {region}માં",
   "whatsOn.countType": " ({type})",
   "whatsOn.nearestFirst": ", દરરોજ સૌથી નજીકના પહેલા",
-  "whatsOn.nearMe": "મારી નજીક",
-  "whatsOn.finding": "તમને શોધી રહ્યા છીએ…",
   "whatsOn.locationDenied":
     "તમારા બ્રાઉઝરે તમારું સ્થાન શેર કર્યું નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
   "whatsOn.locationFailed":
@@ -70,4 +70,183 @@ export const gu: Record<MessageKey, string> = {
   "festival.noDate": "હજી કોઈ આગામી તારીખ નોંધાયેલ નથી.",
   "festival.atMandirs": "મંદિરોમાં {name}",
   "festival.noEvents": "હજી સુધી કોઈ મંદિરે {name}ના કાર્યક્રમો નોંધાવ્યા નથી.",
+
+  "load.notConnected":
+    "{what} હજી જોડાયેલ નથી. કૃપા કરીને થોડા સમય પછી ફરી જુઓ.",
+  "load.failed":
+    "અત્યારે {what} લાવી શકાયું નહીં. કૃપા કરીને એક મિનિટ પછી ફરી પ્રયત્ન કરો.",
+  "calendar.add": "કેલેન્ડરમાં ઉમેરો",
+  "calendar.addLabel": "કેલેન્ડરમાં ઉમેરો: {title}",
+  "calendar.file": "Apple, Outlook કે બીજું કેલેન્ડર",
+  "whatsOn.description":
+    "યુકેભરના હિન્દુ મંદિરોમાં આવનારા આઠ અઠવાડિયાના કાર્યક્રમો: તહેવારો, આરતી, ભજન, વર્ગો અને વધુ.",
+  "load.eventList": "કાર્યક્રમોની યાદી",
+  "mandirs.description": "યુકેભરના હિન્દુ મંદિરો, પ્રદેશ અને શહેર પ્રમાણે.",
+  "mandirs.intro":
+    "યુકેભરના હિન્દુ મંદિરો. તમારું મંદિર શોધો અને જુઓ કે ત્યાં શું થઈ રહ્યું છે.",
+  "mandirs.none": "હજી કોઈ મંદિર નોંધાયેલું નથી.",
+  "load.mandirList": "મંદિરોની યાદી",
+
+  "mandir.description":
+    "{town}માં {name}ના કાર્યક્રમો: પ્રસંગો, તહેવારો અને ત્યાં કેવી રીતે પહોંચવું.",
+  "load.mandirPage": "મંદિરનું પાનું",
+  "mandir.all": "← બધા મંદિરો",
+  "mandir.runByCommittee": "મંદિરની સમિતિ સંભાળે છે",
+  "mandir.tellUs": "અહીંના કોઈ કાર્યક્રમ વિશે જાણો છો? અમને જણાવો →",
+  "mandir.festivalDates": "યુકે માટે તહેવારોની તારીખો →",
+  "mandir.print": "નોટિસ બોર્ડ માટે છાપો →",
+  "mandir.calendarTitle": "આ કાર્યક્રમો તમારા કેલેન્ડરમાં મેળવો",
+  "mandir.calendarBody":
+    "{name}ના કાર્યક્રમો તમારા ફોનના કેલેન્ડરમાં ઉમેરો. નવા કાર્યક્રમો અને ફેરફારો આપમેળે દેખાશે.",
+  "mandir.committeeTitle": "શું તમે આ મંદિરની સમિતિમાં છો?",
+  "mandir.claimedBefore": "આ પાનું સમિતિ સંભાળે છે.",
+  "mandir.logIn": "લૉગ ઇન કરો",
+  "mandir.claimedAfter":
+    "અને તેમાં ફેરફાર કરો, અથવા તેમની સાથે જોડાવા માટે કહો.",
+  "mandir.lookAfterBody":
+    "આ પાનું સંભાળો: એક મિનિટમાં કાર્યક્રમો ઉમેરો અને કોઈપણ વિગત સુધારો.",
+  "mandir.lookAfter": "આ પાનું સંભાળો",
+  "mandir.tradition": "સંપ્રદાય",
+  "mandir.postcode": "પોસ્ટકોડ",
+  "mandir.directions": "રસ્તો",
+  "mandir.website": "વેબસાઇટ",
+  "mandir.phone": "ફોન",
+  "mandir.call": "ફોન કરો",
+  "mandir.charity": "નોંધાયેલ ચેરિટી",
+  "mandir.about": "મંદિર વિશે",
+  "mandir.share": "આ મંદિર શેર કરો",
+  "mandir.shareText": "{name}, {town}: કાર્યક્રમો",
+  "mandir.confirmedOn": "મંદિરે પુષ્ટિ કરી, {date}",
+  "event.repeatNext": "{rule} · હવે પછી ",
+  "event.moreDetails": "વધુ વિગતો",
+  "mandir.asking": "અમે મંદિરોને તેમના કાર્યક્રમો ઉમેરવા કહી રહ્યા છીએ.",
+  "mandir.untilThenCheck": "ત્યાં સુધી,",
+  "mandir.orNoticeboard": "અથવા મંદિરનું નોટિસ બોર્ડ જુઓ.",
+  "mandir.untilThenNoticeboard": "ત્યાં સુધી, મંદિરનું નોટિસ બોર્ડ જુઓ.",
+
+  "event.repeats": "દર વખતે",
+  "event.whenAt": "{when}, {name}, {town}માં.",
+  "load.event": "કાર્યક્રમ",
+  "event.finished": "પૂરો થયો",
+  "event.finishedNote": "આ કાર્યક્રમ પૂરો થઈ ગયો છે.",
+  "event.seeWhatsOnAt": "{name}ના કાર્યક્રમો જુઓ",
+  "event.cancelledNote": "મંદિરે આ કાર્યક્રમ રદ કર્યો છે.",
+  "event.seeElseAt": "{name}ના બીજા કાર્યક્રમો જુઓ",
+  "event.about": "આ કાર્યક્રમ વિશે",
+  "event.alsoAt": "{name}માં બીજા કાર્યક્રમો",
+  "event.everythingAt": "{name}ના બધા કાર્યક્રમો →",
+  "event.whatsOnNear": "તમારી નજીકના કાર્યક્રમો →",
+  "event.when": "ક્યારે",
+  "event.next": "હવે પછી: {when}",
+  "event.where": "ક્યાં",
+  "event.cost": "ખર્ચ",
+  "event.fromMandir": "મંદિર તરફથી",
+  "seva.help": "સેવામાં મદદ કરો",
+  "seva.takenOf": "{needed}માંથી {taken}",
+  "seva.placesTaken":
+    "જગ્યાઓ ભરાઈ ગઈ છે. એક ટૅપમાં જગ્યા લો: નોંધણી નહીં, નામ પણ નહીં.",
+  "seva.take": "સેવાની જગ્યા લો",
+  "seva.seeRota": "સેવાનું સમયપત્રક જુઓ",
+
+  "festivals.description":
+    "યુકેમાં નવરાત્રિ, દિવાળી, હોળી અને બીજા હિન્દુ તહેવારોની તારીખો.",
+  "festivals.intro":
+    "યુકે માટેની તારીખો. મંદિર કયું પંચાંગ અનુસરે છે તેના આધારે કેટલાક તહેવારો જુદા દિવસે આવે છે, તેથી તમારા મંદિરમાં પણ પૂછી લો.",
+  "festivals.calendarTitle": "તહેવારોની તારીખો તમારા કેલેન્ડરમાં",
+  "festivals.calendarBody":
+    "તહેવારોની તારીખો તમારા ફોનના કેલેન્ડરમાં ઉમેરો. અમે પછીથી તપાસેલી કે ઉમેરેલી તારીખો ત્યાં આપમેળે દેખાશે.",
+  "festivals.none": "હજી તહેવારોની કોઈ તારીખ નોંધાયેલી નથી.",
+  "load.festivalDates": "તહેવારોની તારીખો",
+  "load.festivalPage": "તહેવારનું પાનું",
+  "festival.title": "યુકેમાં {name}",
+  "festival.titleYear": "યુકેમાં {name} {year}",
+  "festival.description":
+    "યુકે માટે {name}ની તારીખો અને તમારી નજીકના મંદિરોના કાર્યક્રમો.",
+  "festival.share": "આ તહેવાર શેર કરો",
+  "festival.shareText": "યુકેમાં {name}: તારીખો અને મંદિરોના કાર્યક્રમો",
+  "festival.appearBefore": "મંદિરો ઉમેરશે તેમ તે અહીં દેખાશે.",
+  "festival.whatsOnLink": "કાર્યક્રમો જુઓ",
+  "festival.orFind": "અથવા તમારું",
+  "festival.nearestMandir": "નજીકનું મંદિર શોધો",
+  "festival.appearAfter": ".",
+  "festival.name.navratri": "નવરાત્રિ",
+  "festival.summary.navratri":
+    "માતાજીના નવ સ્વરૂપોની આરાધના સાથે ગરબા અને રાસની નવ રાત.",
+  "festival.name.dussehra": "દશેરા",
+  "festival.summary.dussehra":
+    "વિજયાદશમી: અસત્ય પર સત્યનો વિજય, નવરાત્રિ પૂરી થયા પછીનો દિવસ.",
+  "festival.name.dhanteras": "ધનતેરસ",
+  "festival.summary.dhanteras":
+    "દિવાળીનો પહેલો દિવસ, લક્ષ્મી પૂજન અને શુભ શરૂઆત માટે.",
+  "festival.name.diwali": "દિવાળી",
+  "festival.summary.diwali": "દીવાઓનો તહેવાર.",
+  "festival.name.annakut": "અન્નકૂટ અને નૂતન વર્ષ",
+  "festival.summary.annakut":
+    "ગુજરાતી નવું વર્ષ (બેસતું વર્ષ), મંદિરમાં ધરાવાતા અન્નકૂટ સાથે.",
+  "festival.name.bhai-dooj": "ભાઈબીજ",
+  "festival.summary.bhai-dooj": "ભાઈ-બહેનનો તહેવાર, દિવાળી પછી બે દિવસે.",
+  "festival.name.maha-shivaratri": "મહાશિવરાત્રિ",
+  "festival.summary.maha-shivaratri":
+    "શિવજીની મહાન રાત્રિ, આખી રાતની પૂજા સાથે.",
+  "festival.name.holi": "હોળી",
+  "festival.summary.holi": "રંગોનો તહેવાર, આગલી રાતના હોલિકા દહન પછી.",
+  "festival.name.sharad-purnima": "શરદ પૂર્ણિમા",
+  "festival.summary.sharad-purnima":
+    "નવરાત્રિ પછીની પૂનમ: ચાંદની નીચે રાસ-ગરબા અને દૂધ-પૌંઆ.",
+  "festival.name.labh-pancham": "લાભ પાંચમ",
+  "festival.summary.labh-pancham":
+    "ગુજરાતી નવા વર્ષનો પાંચમો દિવસ, કામકાજ અને વેપારની શુભ શરૂઆત માટે.",
+  "festival.name.dev-diwali": "દેવ દિવાળી",
+  "festival.summary.dev-diwali":
+    "કારતકી પૂનમ, દિવાળી પછીની પૂનમ, જ્યારે દેવો માટે દીવા પ્રગટાવાય છે.",
+  "festival.name.uttarayan": "ઉત્તરાયણ (મકરસંક્રાંતિ)",
+  "festival.summary.uttarayan":
+    "સૂર્ય ઉત્તર તરફ વળે છે: પતંગ, તલ-ગોળ અને ખીચડો.",
+  "festival.name.vasant-panchami": "વસંત પંચમી",
+  "festival.summary.vasant-panchami": "વસંતનો પહેલો દિવસ, સરસ્વતી પૂજન સાથે.",
+  "festival.name.holika-dahan": "હોલિકા દહન",
+  "festival.summary.holika-dahan": "હોળીની આગલી રાતે પ્રગટાવાતી હોળી.",
+  "festival.name.ram-navami": "રામ નવમી",
+  "festival.summary.ram-navami": "શ્રી રામનો જન્મોત્સવ.",
+  "festival.name.hanuman-jayanti": "હનુમાન જયંતી",
+  "festival.summary.hanuman-jayanti": "હનુમાનજીનો જન્મોત્સવ.",
+  "festival.name.guru-purnima": "ગુરુ પૂર્ણિમા",
+  "festival.summary.guru-purnima": "ગુરુને વંદન કરવાની પૂનમ.",
+  "festival.name.raksha-bandhan": "રક્ષાબંધન",
+  "festival.summary.raksha-bandhan": "બહેનો ભાઈના કાંડે રાખડી બાંધે છે.",
+  "festival.name.janmashtami": "જન્માષ્ટમી",
+  "festival.summary.janmashtami": "શ્રી કૃષ્ણનો જન્મોત્સવ, મધરાતે ઉજવાય છે.",
+  "festival.name.ganesh-chaturthi": "ગણેશ ચતુર્થી",
+  "festival.summary.ganesh-chaturthi":
+    "ગણેશજીનો જન્મોત્સવ, પૂજા અને વિસર્જન સાથે.",
+
+  "seva.pageTitle": "{title} માટે સેવા, {name}",
+  "seva.pageDescription":
+    "{name}, {town}માં {title} માટે સેવામાં મદદ કરો. જગ્યા લો, નોંધણીની જરૂર નથી.",
+  "load.sevaRota": "સેવાનું સમયપત્રક",
+  "seva.pickBelow":
+    "જગ્યાઓ ભરાઈ ગઈ છે. નીચેથી જગ્યા પસંદ કરો: નોંધણી નહીં, અને Toran તમારું નામ પૂછતું નથી.",
+  "seva.closedNote":
+    "{name}ને આની જરૂર છે. મદદ કરવા માટે મંદિરના સ્વયંસેવકોના ગ્રુપમાં જવાબ આપો અથવા મંદિરમાં પૂછો.",
+  "seva.dbsNeeded": "DBS ચકાસણી જરૂરી",
+  "seva.shiftTaken": "{needed}માંથી {done} ભરાઈ",
+  "seva.askCommittee": "સમિતિને પૂછો: મંદિર DBS તપાસે છે",
+  "seva.share": "આ સમયપત્રક શેર કરો",
+  "seva.shareText":
+    "{name}માં {title} માટે સેવા: હજી {free} જગ્યા ખાલી છે. જગ્યા લો, નોંધણીની જરૂર નથી:",
+
+  "report.title": "કાર્યક્રમ વિશે અમને જણાવો",
+  "report.intro":
+    "{name}, {town}. આવનારા કોઈ કાર્યક્રમનું પોસ્ટર કે WhatsApp સંદેશ જોયો છે? અમને જણાવો, અને પાના પર મૂકતા પહેલાં અમે મંદિર સાથે ખાતરી કરીશું.",
+  "report.what": "શું કાર્યક્રમ છે?",
+  "report.whatExample": "દા.ત. દિવાળીની ઉજવણી",
+  "report.date": "તારીખ",
+  "report.starts": "શરૂ થવાનો સમય (જરૂરી નથી)",
+  "report.more": "લોકોએ બીજું કંઈ જાણવું જોઈએ? (જરૂરી નથી)",
+  "report.moreExample": "દા.ત. રાત્રે 8 વાગ્યાથી ગરબા, આરતી પછી પ્રસાદ.",
+  "report.where": "તમે તે ક્યાં જોયું? (જરૂરી નથી)",
+  "report.whereHint": "પોસ્ટર કે પોસ્ટની લિંક, જો હોય તો.",
+  "report.privacy":
+    "અમે તમે કોણ છો તે પૂછતા નથી, અને તમારા વિશે કંઈ રાખતા નથી. કૃપા કરીને કોઈનો ફોન નંબર કે બીજી અંગત વિગતો લખશો નહીં.",
+  "report.send": "મોકલો",
 };

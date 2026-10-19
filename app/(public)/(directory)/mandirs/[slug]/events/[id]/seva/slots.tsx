@@ -11,6 +11,7 @@ import { useOrigin } from "@/components/use-origin";
 import { buttonClass } from "@/components/ui";
 import { calendarFile, googleCalendarLink } from "@/lib/ical";
 import { giveBackSlot, takeSlot } from "./actions";
+import { useT } from "@/components/use-t";
 
 // The slots this phone has taken. Toran keeps no names (decision 0013), so
 // the only record of who took a slot is here, in the browser's storage:
@@ -81,10 +82,10 @@ function useMySlots(): MySlot[] {
 }
 
 const MESSAGES = {
-  full: "Someone just took the last place.",
-  closed: "This slot can't be taken on Toran any more.",
-  failed: "Something went wrong. Please try again.",
-};
+  full: "slot.full",
+  closed: "slot.closed",
+  failed: "slot.failed",
+} as const;
 
 // "Take this slot" for one shift.
 export function TakeSlot({
@@ -96,6 +97,7 @@ export function TakeSlot({
   details: Omit<MySlot, "slot">;
   full: boolean;
 }) {
+  const t = useT();
   const mine = useMySlots().some((s) => s.shift === details.shift);
   const [state, action, pending] = useActionState(takeSlot, null);
   // Each slot is saved once, so giving it back later isn't undone when the
@@ -112,11 +114,12 @@ export function TakeSlot({
   if (mine) {
     return (
       <p className="text-peacock font-semibold" role="status">
-        ✓ You&apos;re on this
+        {t("slot.youreOn")}
       </p>
     );
   }
-  if (full) return <p className="text-muted font-semibold">Full</p>;
+  if (full)
+    return <p className="text-muted font-semibold">{t("slot.isFull")}</p>;
   return (
     <form action={action} className="flex flex-col gap-1">
       <input type="hidden" name="shift" value={details.shift} />
@@ -124,14 +127,17 @@ export function TakeSlot({
       <button
         type="submit"
         disabled={pending}
-        aria-label={`Take this slot: ${details.role}, ${details.label}`}
+        aria-label={t("slot.takeLabel", {
+          role: details.role,
+          label: details.label,
+        })}
         className={`${buttonClass} w-auto px-4 py-2 text-base`}
       >
-        {pending ? "Taking…" : "Take this slot"}
+        {pending ? t("slot.taking") : t("slot.take")}
       </button>
       {state && !state.ok && (
         <p className="text-kumkum text-base" role="alert">
-          {MESSAGES[state.error]}
+          {t(MESSAGES[state.error])}
         </p>
       )}
     </form>
@@ -141,6 +147,7 @@ export function TakeSlot({
 // The slots this phone has taken for one event, with calendar links and
 // "I can't make it".
 export function MySlots({ slug, event }: { slug: string; event: string }) {
+  const t = useT();
   const slots = useMySlots().filter((s) => s.event === event);
   if (!slots.length) return null;
   return (
@@ -149,22 +156,20 @@ export function MySlots({ slug, event }: { slug: string; event: string }) {
       className="border-peacock/30 bg-peacock/5 flex flex-col gap-3 rounded-2xl border p-5"
     >
       <h2 id="my-slots" className="font-display text-2xl font-bold">
-        Your seva
+        {t("slot.yours")}
       </h2>
       <ul className="flex flex-col gap-4">
         {slots.map((s) => (
           <MySlotItem key={s.slot} slug={slug} slot={s} />
         ))}
       </ul>
-      <p className="text-muted text-base">
-        Only your phone knows these are yours: Toran doesn&apos;t keep your
-        name. Add them to your calendar for a reminder.
-      </p>
+      <p className="text-muted text-base">{t("slot.onlyYourPhone")}</p>
     </section>
   );
 }
 
 function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
+  const t = useT();
   const origin = useOrigin();
   const [busy, setBusy] = useState(false);
   const entry = {
@@ -204,7 +209,7 @@ function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
   return (
     <li className="flex flex-col gap-1">
       <p className="text-lg font-bold">
-        ✓ You&apos;re on {slot.role}, {slot.label}
+        {t("slot.youreOnRole", { role: slot.role, label: slot.label })}
       </p>
       <p className="flex flex-wrap gap-x-4 gap-y-1 text-base">
         <a
@@ -213,10 +218,10 @@ function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
           rel="noopener"
           className={link}
         >
-          Google Calendar
+          {t("subscribe.google")}
         </a>
         <button type="button" onClick={downloadFile} className={link}>
-          Apple or Outlook calendar
+          {t("subscribe.apple")}
         </button>
         <button
           type="button"
@@ -224,7 +229,7 @@ function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
           disabled={busy}
           className="text-kumkum cursor-pointer font-semibold underline"
         >
-          {busy ? "Giving it back…" : "I can't make it"}
+          {busy ? t("slot.givingBack") : t("slot.cantMakeIt")}
         </button>
       </p>
     </li>

@@ -3,6 +3,7 @@
 
 import { formatEventStart } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
+import { sharedT } from "@/lib/i18n/locale";
 
 type ShareableEvent = {
   id: string;
@@ -17,9 +18,15 @@ export function eventShareText(
   event: ShareableEvent,
   mandir: { name: string; town: string },
 ): string {
-  const when = formatEventStart(event.next_starts_at, event.all_day);
+  const t = sharedT();
+  const next = formatEventStart(event.next_starts_at, event.all_day);
   const rule = event.recurrence && describeRule(event.recurrence);
-  return `${event.title} at ${mandir.name}, ${mandir.town}: ${rule ? `${rule}, next ${when}` : when}`;
+  return t("share.event", {
+    title: event.title,
+    name: mandir.name,
+    town: mandir.town,
+    when: rule ? t("event.repeatsNext", { rule, when: next }) : next,
+  });
 }
 
 // Where an event lives: its own page. (Older links to its card on the

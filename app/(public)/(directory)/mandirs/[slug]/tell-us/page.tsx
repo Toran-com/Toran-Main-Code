@@ -8,11 +8,14 @@ import { buttonClass, Card, inputClass } from "@/components/ui";
 import { getMandir, listMandirs } from "@/lib/directory";
 import { pageMetadata } from "@/lib/site";
 import { reportEvent } from "./actions";
+import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
 
-export const metadata: Metadata = {
-  ...pageMetadata("Tell us about an event"),
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    ...pageMetadata(pageT()("report.title")),
+    robots: { index: false },
+  };
+}
 
 // Static like the mandir page, so an unknown mandir is a proper 404. The
 // thanks or problem after sending is shown by ReportMessage.
@@ -30,30 +33,29 @@ export default async function TellUsPage({
   params,
 }: PageProps<"/mandirs/[slug]/tell-us">) {
   const { slug } = await params;
+  const t = pageT();
   const result = await getMandir(slug);
   if (result.state === "not connected") notFound();
   if (result.state === "unavailable") {
-    return <LoadProblem state="unavailable" what="mandir's page" />;
+    return <LoadProblem state="unavailable" what={t("load.mandirPage")} />;
   }
   if (!result.data) notFound();
   const mandir = result.data;
-  const here = `/mandirs/${mandir.slug}/tell-us`;
+  const here = localePath(`/mandirs/${mandir.slug}/tell-us`);
   return (
     <>
       <Link
-        href={`/mandirs/${mandir.slug}`}
+        href={localePath(`/mandirs/${mandir.slug}`)}
         className="text-peacock self-start font-semibold"
       >
         ← {mandir.name}
       </Link>
       <div className="flex flex-col gap-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Tell us about an event
+          {t("report.title")}
         </h1>
         <p className="text-muted text-lg">
-          At {mandir.name}, {mandir.town}. Seen a poster or a WhatsApp message
-          about something coming up? Tell us, and we&apos;ll check it with the
-          mandir before it goes on the page.
+          {t("report.intro", { name: mandir.name, town: mandir.town })}
         </p>
       </div>
 
@@ -64,45 +66,42 @@ export default async function TellUsPage({
       <Card>
         <form action={reportEvent} className="flex flex-col gap-5">
           <input type="hidden" name="slug" value={mandir.slug} />
+          <input type="hidden" name="lang" value={pageLocale()} />
           <label className="flex flex-col gap-2">
-            <span className="font-semibold">What&apos;s happening?</span>
+            <span className="font-semibold">{t("report.what")}</span>
             <input
               name="title"
               required
               minLength={2}
               maxLength={120}
-              placeholder="e.g. Diwali celebrations"
+              placeholder={t("report.whatExample")}
               className={inputClass}
             />
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-2">
-              <span className="font-semibold">Date</span>
+              <span className="font-semibold">{t("report.date")}</span>
               <input name="date" type="date" required className={inputClass} />
             </label>
             <label className="flex flex-col gap-2">
-              <span className="font-semibold">Starts (optional)</span>
+              <span className="font-semibold">{t("report.starts")}</span>
               <input name="time" type="time" className={inputClass} />
             </label>
           </div>
           <label className="flex flex-col gap-2">
-            <span className="font-semibold">
-              Anything else people should know? (optional)
-            </span>
+            <span className="font-semibold">{t("report.more")}</span>
             <textarea
               name="summary"
               maxLength={280}
               rows={3}
-              placeholder="e.g. Garba from 8pm, prasad after aarti."
+              placeholder={t("report.moreExample")}
               className={inputClass}
             />
           </label>
           <label className="flex flex-col gap-2">
-            <span className="font-semibold">
-              Where did you see it? (optional)
-            </span>
+            <span className="font-semibold">{t("report.where")}</span>
             <span className="text-muted -mt-1 text-base">
-              A link to the poster or post, if there is one.
+              {t("report.whereHint")}
             </span>
             <input
               name="link"
@@ -128,13 +127,9 @@ export default async function TellUsPage({
               />
             </label>
           </div>
-          <p className="text-muted text-base">
-            We don&apos;t ask who you are, and we don&apos;t keep anything about
-            you. Please don&apos;t include anyone&apos;s phone number or other
-            personal details.
-          </p>
+          <p className="text-muted text-base">{t("report.privacy")}</p>
           <button type="submit" className={buttonClass}>
-            Send
+            {t("report.send")}
           </button>
         </form>
       </Card>

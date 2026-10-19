@@ -2,6 +2,7 @@
 
 import { sendCount } from "@/components/count-visits";
 import { useOrigin } from "@/components/use-origin";
+import { useT } from "@/components/use-t";
 import { cardClass, quietButtonClass } from "@/components/ui";
 
 // Subscribing puts every event in the visitor's own calendar app, and keeps
@@ -15,6 +16,7 @@ export function SubscribeCalendar({
   title: string;
   body: string;
 }) {
+  const t = useT();
   const origin = useOrigin();
   // One more subscription for the page it's on.
   const counted = () => sendCount("subscribe", window.location.pathname);
@@ -36,7 +38,7 @@ export function SubscribeCalendar({
           onClick={counted}
           className={quietButtonClass}
         >
-          Apple or Outlook calendar
+          {t("subscribe.apple")}
         </a>
         <a
           href={google}
@@ -45,12 +47,10 @@ export function SubscribeCalendar({
           onClick={counted}
           className={quietButtonClass}
         >
-          Google Calendar
+          {t("subscribe.google")}
         </a>
       </div>
-      <p className="text-muted text-base">
-        No account needed. You can remove it from your calendar at any time.
-      </p>
+      <p className="text-muted text-base">{t("subscribe.note")}</p>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { NearMe } from "@/components/near-me";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
-import { EVENT_KINDS, isEventKind } from "@/lib/event-kinds";
+import { EVENT_KINDS, isEventKind, kindLabel } from "@/lib/event-kinds";
 import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
@@ -16,16 +16,19 @@ import {
   RADII,
   radiusFrom,
 } from "@/lib/whats-on-view";
-import { translator } from "@/lib/i18n";
+import { pageT, localePath } from "@/lib/i18n/page";
 
-export const metadata: Metadata = pageMetadata(
-  "What's on",
-  "Events at Hindu mandirs across the UK in the next eight weeks: festivals, aarti, bhajans, classes and more.",
-  "/whats-on",
-);
+export async function generateMetadata(): Promise<Metadata> {
+  const t = pageT();
+  return pageMetadata(
+    t("whatsOn.title"),
+    t("whatsOn.description"),
+    localePath("/whats-on"),
+  );
+}
 
 export default function WhatsOnPage(props: PageProps<"/whats-on">) {
-  const t = translator();
+  const t = pageT();
   return (
     <>
       <PageHeading title={t("whatsOn.title")} intro={t("whatsOn.intro")} />
@@ -37,7 +40,7 @@ export default function WhatsOnPage(props: PageProps<"/whats-on">) {
 }
 
 async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
-  const t = translator();
+  const t = pageT();
   const query = await searchParams;
   // The list says "Today" and "Tomorrow", so it's worked out per visit,
   // never ahead of time (for example when a link to it is prefetched).
@@ -63,13 +66,14 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     if (region) params.set("region", region);
     if (value) params.set("type", value);
     const q = params.toString();
-    return q ? `/whats-on?${q}` : "/whats-on";
+    return q ? `${localePath("/whats-on")}?${q}` : localePath("/whats-on");
   };
 
   const form = (
     <div className="flex flex-col gap-3">
       <form className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5">
         <NearMe
+          page={localePath("/whats-on")}
           labels={{
             field: t("whatsOn.near"),
             button: t("whatsOn.nearMe"),
@@ -133,7 +137,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
         <ul className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
           {[["", t("whatsOn.anyType")] as const, ...Object.entries(EVENT_KINDS)]
             .filter(([value]) => value !== "other")
-            .map(([value, label]) => {
+            .map(([value, english]) => {
+              const label = value ? (kindLabel(value) ?? english) : english;
               const here = value === kind;
               return (
                 <li key={value || "any"} className="shrink-0">
@@ -160,7 +165,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     return (
       <>
         {form}
-        <LoadProblem state={result.state} what="event list" />
+        <LoadProblem state={result.state} what={t("load.eventList")} />
       </>
     );
   }
@@ -211,7 +216,10 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
           </p>
           <p className="text-muted">
             {t("whatsOn.emptyBefore")}
-            <Link href="/mandirs" className="text-peacock underline">
+            <Link
+              href={localePath("/mandirs")}
+              className="text-peacock underline"
+            >
               {t("whatsOn.emptyLink")}
             </Link>
             {t("whatsOn.emptyAfter")}

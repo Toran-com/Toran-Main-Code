@@ -3,6 +3,8 @@
 // Government Licence). Only mandirs' postcodes and a visitor's typed
 // postcode are looked up; neither is stored with anyone's name.
 
+import { sharedT } from "@/lib/i18n/locale";
+
 export type Position = { latitude: number; longitude: number };
 
 const API = "https://api.postcodes.io";
@@ -123,7 +125,10 @@ export function distanceMiles(a: Position, b: Position): number {
 
 // "0.4 miles", "3 miles", "12 miles".
 export function formatMiles(miles: number): string {
-  if (miles < 1) return `${miles.toFixed(1)} miles`;
+  const t = sharedT();
+  if (miles < 1) return t("distance.miles", { miles: miles.toFixed(1) });
   const rounded = Math.round(miles);
-  return `${rounded} ${rounded === 1 ? "mile" : "miles"}`;
+  return t(rounded === 1 ? "distance.mile" : "distance.miles", {
+    miles: rounded,
+  });
 }

@@ -3,6 +3,7 @@
 
 import { londonDate } from "@/lib/format";
 import { distanceMiles, type Position } from "@/lib/geo";
+import { pageLocale, sharedT } from "@/lib/i18n/locale";
 import type { ListedEvent } from "@/lib/whats-on";
 
 export type EventNear = ListedEvent & { miles: number | null };
@@ -42,13 +43,13 @@ export function dayHeading(iso: string, now: Date | null): string {
   if (!now) return longDay(day);
   const today = londonDate(now);
   const tomorrow = londonDate(new Date(now.getTime() + 86_400_000));
-  if (day === today) return "Today";
-  if (day === tomorrow) return "Tomorrow";
+  if (day === today) return sharedT()("day.today");
+  if (day === tomorrow) return sharedT()("day.tomorrow");
   return longDay(day);
 }
 
 function longDay(day: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
     timeZone: "UTC",
     weekday: "long",
     day: "numeric",

@@ -431,20 +431,35 @@ Sending it for real is a later step.
 
 Public text comes from `lib/i18n/en.ts` (English) through a small
 translation layer (`lib/i18n/index.ts`), so other languages can follow.
-**Gujarati** (`lib/i18n/gu.ts`) is a first draft and is **not shown on the
-site**.
+**Gujarati** (`lib/i18n/gu.ts`) is a first draft, not yet checked.
 
-**Before Gujarati can go live:**
+Every page families use has a Gujarati version at the same address with
+`/gu` in front: `/gu` (home), `/gu/whats-on`, `/gu/mandirs` and each
+mandir, event, seva rota and "Tell us" page, and `/gu/festivals`. Dates
+are in Gujarati ("શનિ 24 ઑક્ટો, સાંજે 6"), as are "Every Saturday", kinds
+of event, the map and the share buttons. Festival names and descriptions
+are translated too (`festival.name.*` in the translations). Mandir names,
+and events' own titles and descriptions, stay as the committee wrote them;
+a Gujarati title shows under the English when the committee gives one.
+Committee and admin pages, "For mandirs" and the guide stay in English.
+Visits to a Gujarati page count towards its English page in Stats.
+
+**While it's a draft** (`ready: false` in `lib/i18n/index.ts`), the
+Gujarati pages say so at the top, aren't linked from the English pages,
+and ask search engines to leave them out. Send a reviewer straight to a
+page, for example `/gu/mandirs/<a mandir>`, to read it in place.
+
+**To switch Gujarati on:**
 
 1. A native Gujarati speaker checks every line. On Translations, **Copy the
    list** gives numbered English and Gujarati pairs to send them; they reply
-   with numbers and corrections.
-2. Decide how visitors choose it: a "ગુજરાતી" link to `/gu/…` addresses is
-   the usual way and keeps pages fast.
-3. Add a Gujarati font (Noto Sans Gujarati) and check the speed budget.
-4. Translate the remaining text: dates ("Sat 17 Oct"), "Every Saturday",
-   share buttons, and the mandir and festival lists. Admin pages stay in
-   English.
+   with numbers and corrections, which go into `lib/i18n/gu.ts` (and
+   `lib/i18n/client-messages.ts` for the lines the browser shows).
+2. Set `ready: true` for `gu` in `lib/i18n/index.ts`. The draft notice goes,
+   a "ગુજરાતી" / "English" switch appears in the header, and the Gujarati
+   pages join the sitemap.
+3. Optional: add a Gujarati font (Noto Sans Gujarati) and check the speed
+   budget. Phones' own Gujarati fonts are used until then.
 
 ### Ready for Google (switched off until launch)
 

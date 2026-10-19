@@ -7,24 +7,26 @@ import { Loading, Notice } from "@/components/ui";
 import { listFestivalDates, type FestivalDate } from "@/lib/directory";
 import { calendarLabel, formatDateRange, monthOf } from "@/lib/format";
 import { pageMetadata } from "@/lib/site";
+import { festivalText, localePath, pageT } from "@/lib/i18n/page";
 
-export const metadata: Metadata = pageMetadata(
-  "Festivals",
-  "Dates of Navratri, Diwali, Holi and other Hindu festivals in the UK.",
-  "/festivals",
-);
+export async function generateMetadata(): Promise<Metadata> {
+  const t = pageT();
+  return pageMetadata(
+    t("shell.festivals"),
+    t("festivals.description"),
+    localePath("/festivals"),
+  );
+}
 
 export default function FestivalsPage() {
+  const t = pageT();
   return (
     <>
-      <PageHeading
-        title="Festivals"
-        intro="Dates for the UK. A few festivals fall on different days depending on the calendar a mandir follows, so check with your mandir too."
-      />
+      <PageHeading title={t("shell.festivals")} intro={t("festivals.intro")} />
       <SubscribeCalendar
         path="/festivals/calendar.ics"
-        title="Festival dates in your calendar"
-        body="Add the festival dates to the calendar on your phone. Dates we check or add later appear there automatically."
+        title={t("festivals.calendarTitle")}
+        body={t("festivals.calendarBody")}
       />
       <Suspense fallback={<Loading />}>
         <Festivals />
@@ -34,12 +36,13 @@ export default function FestivalsPage() {
 }
 
 async function Festivals() {
+  const t = pageT();
   const result = await listFestivalDates();
   if (result.state !== "ok") {
-    return <LoadProblem state={result.state} what="festival dates" />;
+    return <LoadProblem state={result.state} what={t("load.festivalDates")} />;
   }
   if (result.data.length === 0) {
-    return <Notice>No festival dates are listed yet.</Notice>;
+    return <Notice>{t("festivals.none")}</Notice>;
   }
 
   const months = new Map<string, FestivalDate[]>();
@@ -69,36 +72,39 @@ async function Festivals() {
 }
 
 function FestivalCard({ date }: { date: FestivalDate }) {
+  const t = pageT();
   const calendar = calendarLabel(date.calendar);
+  const festival = date.festival && {
+    slug: date.festival.slug,
+    ...festivalText(date.festival.slug, date.festival),
+  };
   return (
     <article className="has-card-link group border-line bg-surface lift shadow-card flex flex-col gap-1 rounded-2xl border p-4 sm:p-5">
       <p className="text-marigold-ink font-semibold">
         {formatDateRange(date.starts_on, date.ends_on)}
       </p>
       <h3 className="text-xl font-bold">
-        {date.festival ? (
+        {festival ? (
           <>
             <Link
-              href={`/festivals/${date.festival.slug}`}
+              href={localePath(`/festivals/${festival.slug}`)}
               className="card-link group-hover:text-peacock no-underline"
             >
-              {date.festival.name}
+              {festival.name}
             </Link>
             <span aria-hidden="true" className="text-peacock">
               {"\u00a0→"}
             </span>
           </>
         ) : (
-          "Festival"
+          t("kind.festival")
         )}
       </h3>
       {calendar && <p className="text-muted">{calendar}</p>}
-      {date.festival?.summary && (
-        <p className="text-muted">{date.festival.summary}</p>
-      )}
+      {festival?.summary && <p className="text-muted">{festival.summary}</p>}
       {!date.verified && (
         <p>
-          <Badge tone="marigold">Date not yet checked</Badge>
+          <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge>
         </p>
       )}
     </article>
