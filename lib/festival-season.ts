@@ -1,30 +1,18 @@
-// A festival season: several festivals close together that families think
-// of as one, like Diwali week (Dhanteras, Diwali, Annakut and New Year,
-// Bhai Dooj). One page gathers every mandir's events across those days.
-// Pure, so the date rules are tested on their own.
+// A festival season (lib/seasons.ts): several festivals close together
+// that families think of as one, like Diwali week (Dhanteras, Diwali,
+// Annakut and New Year, Bhai Dooj), or one big festival. One page gathers
+// every mandir's events across those days. Pure, so the date rules are
+// tested on their own.
 
 import type { FestivalDate } from "@/lib/directory";
 import { mentionsFestival } from "@/lib/festival-words";
 import { londonDate } from "@/lib/format";
 import type { CalendarEvent } from "@/lib/ical";
 import { eventPath } from "@/lib/share";
+import { SEASONS, type Season } from "@/lib/seasons";
 import type { ListedEvent } from "@/lib/whats-on";
 
-export type Season = {
-  // The page's address: /<slug>.
-  slug: string;
-  name: string;
-  // The festival the season is named after; the others are found near it.
-  main: string;
-  festivals: string[];
-};
-
-export const DIWALI: Season = {
-  slug: "diwali",
-  name: "Diwali",
-  main: "diwali",
-  festivals: ["dhanteras", "diwali", "annakut", "bhai-dooj"],
-};
+export { DIWALI, type Season } from "@/lib/seasons";
 
 export type SeasonDay = {
   slug: string;
@@ -34,7 +22,7 @@ export type SeasonDay = {
   verified: boolean;
 };
 
-// How far from the main festival the others can be.
+// How far before or after the main festival the others can be.
 const NEAR_DAYS = 10;
 // How long before the main festival the season is announced on the home page.
 export const BANNER_DAYS = 45;
@@ -79,7 +67,8 @@ export function seasonDays(
       const near = upcoming.filter(
         (d) =>
           d.festival!.slug === slug &&
-          Math.abs(daysBetween(main.starts_on, d.starts_on)) <= NEAR_DAYS,
+          daysBetween(d.starts_on, main.starts_on) <= NEAR_DAYS &&
+          daysBetween(main.ends_on, d.starts_on) <= NEAR_DAYS,
       );
       const date = slug === season.main ? main : preferred(near);
       return date
@@ -171,4 +160,22 @@ export function seasonCalendarEvents(
         allDay: e.all_day,
       };
     });
+}
+
+// The season the home page points to: of those whose banner is showing,
+// the one whose main festival comes first.
+export function bannerSeason(
+  dates: FestivalDate[],
+  today: string = londonDate(),
+): { season: Season; days: SeasonDay[] } | null {
+  const showing = SEASONS.map((season) => ({
+    season,
+    days: seasonDays(dates, season, today),
+  })).filter(({ season, days }) => showSeasonBanner(days, season, today));
+  const start = (days: SeasonDay[], season: Season) =>
+    days.find((d) => d.slug === season.main)!.starts_on;
+  showing.sort((a, b) =>
+    start(a.days, a.season).localeCompare(start(b.days, b.season)),
+  );
+  return showing[0] ?? null;
 }

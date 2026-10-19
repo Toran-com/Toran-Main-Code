@@ -30,3 +30,4 @@ that replaces it and mark the old one Superseded.
 | 0013 | [Volunteers take seva slots without giving a name](0013-seva-slots-without-names.md)                | Proposed |
 | 0014 | [Committees invite colleagues themselves, by email address](0014-committee-invites.md)              | Proposed |
 | 0015 | [Count visits with Toran's own counter, not an analytics service](0015-own-visit-counter.md)        | Proposed |
+| 0016 | [A nightly job, run by Vercel Cron with the database's secret key](0016-nightly-job.md)             | Proposed |

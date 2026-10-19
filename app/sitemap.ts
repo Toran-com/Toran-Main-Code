@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getMandir, listFestivals, listMandirs } from "@/lib/directory";
 import { LOCALES } from "@/lib/i18n";
 import { hasGujarati, withLocale } from "@/lib/i18n/paths";
+import { SEASONS } from "@/lib/seasons";
 import { eventPath } from "@/lib/share";
 import { site, siteUrl } from "@/lib/site";
 
@@ -35,7 +36,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/for-mandirs/guide`, changeFrequency: "monthly" },
     { url: `${base}/mandirs`, changeFrequency: "weekly" },
     { url: `${base}/festivals`, changeFrequency: "weekly" },
-    { url: `${base}/diwali`, changeFrequency: "daily", priority: 0.8 },
+    ...SEASONS.map((s) => ({
+      url: `${base}/${s.slug}`,
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    })),
     ...mandirList.map((m) => ({
       url: `${base}/mandirs/${m.slug}`,
       changeFrequency: "daily" as const,

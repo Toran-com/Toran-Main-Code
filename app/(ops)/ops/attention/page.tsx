@@ -6,6 +6,7 @@ import { cardClass, Loading, Notice, PageShell } from "@/components/ui";
 import {
   attentionCount,
   daysSince,
+  nightlyStatus,
   readAttention,
   type List,
 } from "@/lib/attention";
@@ -38,13 +39,25 @@ const WEBSITE_OUTCOMES: Record<string, string> = {
 async function NeedsAttention() {
   await requireToranAdmin("/ops/attention");
   const supabase = await createSessionClient();
-  const answer = supabase ? await supabase.rpc("needs_attention") : null;
+  const [answer, lastRun] = supabase
+    ? await Promise.all([
+        supabase.rpc("needs_attention"),
+        supabase
+          .from("job_runs")
+          .select("ran_at, summary")
+          .eq("job", "nightly")
+          .order("ran_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ])
+    : [null, null];
   if (!answer || answer.error) {
     return <Notice tone="error">Couldn&apos;t load the list.</Notice>;
   }
   const a = readAttention(answer.data);
   const total = attentionCount(a);
   const now = new Date();
+  const nightly = nightlyStatus(lastRun?.data ?? null, now);
 
   return (
     <>
@@ -53,6 +66,23 @@ async function NeedsAttention() {
         lately, committees gone quiet, websites the checker can&apos;t read, and
         things left waiting. Each list shows the first 50.
       </p>
+      {nightly.state === "never" ? (
+        <Notice tone="error">
+          The nightly job hasn&apos;t run yet. It needs CRON_SECRET and
+          SUPABASE_SECRET_KEY set in Vercel (see &ldquo;Nightly job&rdquo; in
+          docs/app-setup.md).
+        </Notice>
+      ) : nightly.state === "late" ? (
+        <Notice tone="error">
+          The nightly job last ran {formatEventStart(nightly.ranAt, false)}. It
+          should run every night: check Vercel&apos;s Cron Jobs page.
+        </Notice>
+      ) : (
+        <p className="text-muted text-base">
+          Nightly job last ran {formatEventStart(nightly.ranAt, false)}:{" "}
+          {nightly.text}.
+        </p>
+      )}
       {total === 0 && (
         <Notice tone="success">Nothing needs attention. All clear.</Notice>
       )}

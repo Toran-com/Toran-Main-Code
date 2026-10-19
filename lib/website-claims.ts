@@ -112,3 +112,30 @@ export async function recordWebsiteCheck(
     .eq("id", sourceId);
   return { added };
 }
+
+// The mandir websites checked longest ago, never-checked first.
+export async function websiteQueue(
+  db: SupabaseClient<Database>,
+  limit: number,
+): Promise<{ id: string; website: string }[]> {
+  const [{ data: mandirs }, { data: sources }] = await Promise.all([
+    db
+      .from("mandirs")
+      .select("id, website")
+      .not("website", "is", null)
+      .neq("status", "hidden"),
+    db
+      .from("sources")
+      .select("mandir_id, last_checked_at")
+      .eq("kind", SOURCE.kind),
+  ]);
+  const lastChecked = new Map(
+    (sources ?? []).map((s) => [s.mandir_id, s.last_checked_at ?? ""]),
+  );
+  return (mandirs ?? [])
+    .flatMap((m) => (m.website ? [{ id: m.id, website: m.website }] : []))
+    .sort((a, b) =>
+      (lastChecked.get(a.id) ?? "").localeCompare(lastChecked.get(b.id) ?? ""),
+    )
+    .slice(0, limit);
+}

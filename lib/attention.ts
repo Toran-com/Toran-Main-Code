@@ -142,3 +142,39 @@ export function daysSince(from: string, now: Date = new Date()): number {
     Math.floor((now.getTime() - new Date(from).getTime()) / 86_400_000),
   );
 }
+
+// How the nightly job (lib/nightly.ts) is doing, from its latest run.
+export type NightlyStatus =
+  { state: "never" } | { state: "late" | "ok"; ranAt: string; text: string };
+
+// A run more than this long ago means the job has stopped.
+const LATE_HOURS = 36;
+
+export function nightlyStatus(
+  run: { ran_at: string; summary: unknown } | null,
+  now: Date = new Date(),
+): NightlyStatus {
+  if (!run) return { state: "never" };
+  const s = (run.summary ?? {}) as {
+    retention?: Record<string, unknown> | null;
+    websites?: { checked?: unknown; added?: unknown; failed?: unknown };
+  };
+  const n = (v: unknown) => (typeof v === "number" ? v : 0);
+  const deleted = Object.values(s.retention ?? {}).reduce<number>(
+    (sum, v) => sum + n(v),
+    0,
+  );
+  const checked = n(s.websites?.checked);
+  const added = n(s.websites?.added);
+  const failed = n(s.websites?.failed);
+  const text = [
+    `checked ${checked} ${checked === 1 ? "website" : "websites"}`,
+    ...(failed ? [`${failed} couldn't be saved`] : []),
+    `${added} new ${added === 1 ? "event" : "events"} to the poster queue`,
+    s.retention
+      ? `${deleted} old ${deleted === 1 ? "record" : "records"} deleted`
+      : "the clean-up failed",
+  ].join(", ");
+  const hours = (now.getTime() - new Date(run.ran_at).getTime()) / 3_600_000;
+  return { state: hours > LATE_HOURS ? "late" : "ok", ranAt: run.ran_at, text };
+}

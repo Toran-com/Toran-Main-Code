@@ -85,6 +85,17 @@ describe("mentionsFestival", () => {
     );
     expect(mentionsFestival("diwali", "Deepavali celebrations")).toBe(true);
     expect(mentionsFestival("diwali", "Weekly aarti")).toBe(false);
+    expect(mentionsFestival("navratri", "Three Garbas this week")).toBe(true);
+  });
+
+  it("matches whole words only", () => {
+    expect(mentionsFestival("holi", "Holi milan")).toBe(true);
+    expect(mentionsFestival("holi", "School holiday club")).toBe(false);
+    expect(mentionsFestival("holi", "Holidays")).toBe(false);
+    expect(mentionsFestival("navratri", "Garbage collection")).toBe(false);
+    expect(
+      mentionsFestival("raksha-bandhan", "Rakhi making for children"),
+    ).toBe(true);
   });
 });
 
