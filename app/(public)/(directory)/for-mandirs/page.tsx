@@ -98,6 +98,29 @@ export default function ForMandirsPage() {
       </section>
 
       <Card>
+        <h2 className="text-2xl font-bold">The committee guide</h2>
+        <p>
+          Every step, from adding your first event to planning seva and inviting
+          a colleague. With a one-page handout to print for your next committee
+          meeting.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/for-mandirs/guide"
+            className={`${quietButtonClass} text-center sm:w-auto`}
+          >
+            Read the committee guide
+          </Link>
+          <Link
+            href="/for-mandirs/guide/print"
+            className={`${quietButtonClass} text-center sm:w-auto`}
+          >
+            Print the handout
+          </Link>
+        </div>
+      </Card>
+
+      <Card>
         <h2 className="text-2xl font-bold">
           What we keep, and what we don&apos;t
         </h2>

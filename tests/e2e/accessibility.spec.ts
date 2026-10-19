@@ -11,6 +11,8 @@ for (const path of [
   "/diwali",
   "/demo",
   "/for-mandirs",
+  "/for-mandirs/guide",
+  "/for-mandirs/guide/print",
   "/offline",
   "/login",
   "/no-such-page",
