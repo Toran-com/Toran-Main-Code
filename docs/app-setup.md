@@ -424,6 +424,31 @@ writes dates out in text or poster pictures. For those, ask the committee
 to add events themselves or forward their posters. It obeys robots.txt and
 never reads Facebook or Instagram (decision 0005).
 
+### Nightly job (decision 0016)
+
+Every night at about 02:15 UTC, Vercel runs `/api/cron/nightly`. It
+deletes what the retention policy says to delete (expired invites, old
+committee requests, visit totals over three years old), then checks up to
+12 mandir websites, oldest check first, like **Check the next 5 websites**.
+`/ops` → Needs attention shows when it last ran and what it did, and warns
+if it hasn't run for a day and a half.
+
+It needs two settings in **Vercel → Project → Settings → Environment
+Variables**, for **Production** only. Type them there yourself; never
+paste them into the chat:
+
+1. `CRON_SECRET`: a long random password (at least 32 characters, for
+   example from your password manager). Vercel sends it with each run, so
+   nobody else can start the job.
+2. `SUPABASE_SECRET_KEY`: in **Supabase → Project Settings → API Keys →
+   Secret keys**, create a key called `vercel-nightly` and copy it in. It
+   passes every database rule, so keep it only here. If it ever leaks,
+   delete it in Supabase and create a new one.
+
+Then redeploy. **Vercel → Project → Settings → Cron Jobs** lists the job,
+with a **Run** button to try it straight away; afterwards Needs attention
+shows "Nightly job last ran …".
+
 ### Weekly digest preview (`/ops` → Digest)
 
 Shows what the weekly email would say: every event in the next seven days,

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { requireToranAdmin } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/session";
 import { checkWebsite } from "@/lib/website-check";
-import { recordWebsiteCheck } from "@/lib/website-claims";
+import { recordWebsiteCheck, websiteQueue } from "@/lib/website-claims";
 
 // Toran admins read mandirs' websites for events (lib/website-check.ts).
 // Checked as an admin first, so nobody else can make Toran fetch sites.
@@ -45,26 +45,7 @@ export async function checkNext() {
   const started = Date.now();
   const supabase = await createSessionClient();
   if (!supabase) redirect("/ops/websites?error=failed");
-  const [{ data: mandirs }, { data: sources }] = await Promise.all([
-    supabase
-      .from("mandirs")
-      .select("id, website")
-      .not("website", "is", null)
-      .neq("status", "hidden"),
-    supabase
-      .from("sources")
-      .select("mandir_id, last_checked_at")
-      .eq("kind", "crawler"),
-  ]);
-  const lastChecked = new Map(
-    (sources ?? []).map((s) => [s.mandir_id, s.last_checked_at ?? ""]),
-  );
-  const queue = (mandirs ?? [])
-    .flatMap((m) => (m.website ? [{ id: m.id, website: m.website }] : []))
-    .sort((a, b) =>
-      (lastChecked.get(a.id) ?? "").localeCompare(lastChecked.get(b.id) ?? ""),
-    )
-    .slice(0, BATCH);
+  const queue = await websiteQueue(supabase, BATCH);
 
   let checked = 0;
   let added = 0;

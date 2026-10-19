@@ -131,6 +131,20 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"job_runs": {
+                  Row: {
+                    "id": number,"job": string,"ran_at": string,"summary": NonNullable<Json>
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: never,"job": string,"ran_at"?: string,"summary"?: NonNullable<Json>
+                  }
+                  Update: {
+                    "id"?: never,"job"?: string,"ran_at"?: string,"summary"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"mandir_admins": {
                   Row: {
                     "added_at": string,"added_by": string | null,"mandir_id": string,"user_id": string
@@ -387,6 +401,9 @@ isOneToOne: false
                            },
 "report_event":
 { Args: { "mandir_slug": string,"proposed": Json }; Returns: undefined
+                           },
+"run_retention":
+{ Args: Record<PropertyKey, never>; Returns: Json
                            },
 "take_seva_slot":
 { Args: { "target_shift": string }; Returns: string
