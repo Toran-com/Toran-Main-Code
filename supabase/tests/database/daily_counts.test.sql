@@ -2,7 +2,7 @@
 -- nothing else gets counted, and only Toran admins can read the totals.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(16);
+select plan(17);
 
 insert into auth.users (id, email) values
   ('cccccccc-0000-0000-0000-000000000003', 'c@example.com'),
@@ -32,6 +32,8 @@ select lives_ok($$select public.count_visit(m, p) from (values
     ('view', '/manage/mandir-one'),
     (null, null)
   ) v (m, p)$$, 'nothing odd makes it fail');
+select lives_ok($$select public.count_visit('view', '/diwali')$$,
+  'the Diwali page can be counted');
 select throws_ok($$select * from public.daily_counts$$, '42501', null,
   'visitors can''t read the counts');
 
@@ -49,7 +51,7 @@ select is((select count(*)::int from public.daily_counts where path = '/mandirs/
   'made-up mandirs aren''t');
 select is((select count(*)::int from public.daily_counts where path in ('/mandirs/e1000000', '/manage/mandir-one')), 0,
   'nor other pages');
-select is((select count(*)::int from public.daily_counts), 3,
+select is((select count(*)::int from public.daily_counts), 4,
   'nor unknown kinds of count or badly written addresses');
 select is((select day from public.daily_counts limit 1), (now() at time zone 'Europe/London')::date,
   'counted on today''s UK date');
@@ -73,7 +75,7 @@ select is((
     select sum((p ->> 'count')::int)::int
     from jsonb_array_elements(public.daily_count_summary(current_date - 30) -> 'paths') p
     where p ->> 'metric' = 'view'
-  ), 3, 'with the views added up per page');
+  ), 4, 'with the views added up per page');
 
 select * from finish();
 rollback;

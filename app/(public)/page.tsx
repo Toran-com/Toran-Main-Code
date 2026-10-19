@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Countdown } from "@/components/countdown";
 import { EventList } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
 import { NearMe } from "@/components/near-me";
@@ -13,6 +14,7 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { listFestivalDates } from "@/lib/directory";
+import { getSeasonBanner } from "@/lib/season-banner";
 import { formatDateRange } from "@/lib/format";
 import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
@@ -99,6 +101,9 @@ export default function ComingSoon() {
 
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pb-16 sm:px-6">
           <Suspense fallback={null}>
+            <SeasonBanner />
+          </Suspense>
+          <Suspense fallback={null}>
             <ComingUp />
           </Suspense>
           <Suspense fallback={null}>
@@ -139,6 +144,38 @@ export default function ComingSoon() {
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+// In the weeks before Diwali, a way straight to Diwali week at mandirs.
+async function SeasonBanner() {
+  const diwali = await getSeasonBanner();
+  if (!diwali) return null;
+  return (
+    <section
+      className={`${cardClass} lift has-card-link group border-marigold/50 bg-marigold/10 flex items-center gap-4 p-5`}
+    >
+      <span className="bg-marigold/20 text-marigold-ink grid size-12 shrink-0 place-items-center rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+        <DiyaIcon />
+      </span>
+      <div className="flex flex-1 flex-col gap-1">
+        <h2 className="font-display text-xl font-bold">
+          <Link
+            href="/diwali"
+            className="card-link group-hover:text-peacock no-underline"
+          >
+            Diwali at mandirs
+          </Link>
+          <span aria-hidden="true" className="text-peacock">
+            {"\u00a0→"}
+          </span>
+        </h2>
+        <p className="text-muted flex flex-wrap items-center gap-2">
+          {formatDateRange(diwali.starts_on, diwali.ends_on)}
+          <Countdown date={diwali.starts_on} />
+        </p>
+      </div>
+    </section>
   );
 }
 

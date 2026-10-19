@@ -99,3 +99,11 @@ test("telling us about an event at an unknown mandir is not found", async ({
   const response = await page.goto("/mandirs/no-such-mandir/tell-us");
   expect(response?.status()).toBe(404);
 });
+
+test("the Diwali page explains it isn't connected yet", async ({ page }) => {
+  await page.goto("/diwali");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Diwali at UK mandirs",
+  );
+  await expect(page.getByText("isn't connected yet")).toBeVisible();
+});

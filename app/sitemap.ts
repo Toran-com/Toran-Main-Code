@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/for-mandirs`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/mandirs`, changeFrequency: "weekly" },
     { url: `${base}/festivals`, changeFrequency: "weekly" },
+    { url: `${base}/diwali`, changeFrequency: "daily", priority: 0.8 },
     ...mandirList.map((m) => ({
       url: `${base}/mandirs/${m.slug}`,
       changeFrequency: "daily" as const,
