@@ -133,14 +133,14 @@ isOneToOne: false
                   ]
                 },"job_runs": {
                   Row: {
-                    "id": number,"job": string,"ran_at": string,"summary": Json
+                    "id": number,"job": string,"ran_at": string,"summary": NonNullable<Json>
                   }
                   ComputedFields: never
                   Insert: {
-                    "id"?: never,"job": string,"ran_at"?: string,"summary"?: Json
+                    "id"?: never,"job": string,"ran_at"?: string,"summary"?: NonNullable<Json>
                   }
                   Update: {
-                    "id"?: never,"job"?: string,"ran_at"?: string,"summary"?: Json
+                    "id"?: never,"job"?: string,"ran_at"?: string,"summary"?: NonNullable<Json>
                   }
                   Relationships: [
                     
