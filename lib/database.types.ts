@@ -371,6 +371,9 @@ isOneToOne: false
 "my_email":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"needs_attention":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "pending_mandir_claims":
 { Args: Record<PropertyKey, never>; Returns: {
               "claimant_email": string,"created_at": string,"id": string,"mandir_name": string,"mandir_phone": string,"mandir_slug": string,"mandir_town": string,"mandir_website": string,"message": string,"role_at_mandir": string
