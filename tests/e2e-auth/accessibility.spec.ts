@@ -23,6 +23,7 @@ test("public pages are accessible", async ({ page }) => {
     "/festivals",
     "/whats-on",
     "/whats-on?near=ZZ99&within=15",
+    "/diwali",
     "/login",
   ]) {
     await page.goto(path);

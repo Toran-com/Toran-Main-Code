@@ -22,9 +22,12 @@ type Labels = {
 export function NearMe({
   labels,
   input,
+  page = "/whats-on",
 }: {
   labels: Labels;
   input: ReactNode;
+  // Which page to search: What's on, or a festival season's page.
+  page?: string;
 }) {
   const router = useRouter();
   const supported = useSyncExternalStore(
@@ -54,7 +57,7 @@ export function NearMe({
           }
           query.set("near", outcode);
           setState("idle");
-          router.push(`/whats-on?${query}`);
+          router.push(`${page}?${query}`);
         } catch {
           setState("failed");
         }

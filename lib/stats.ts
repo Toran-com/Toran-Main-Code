@@ -25,6 +25,7 @@ const PAGES: [RegExp, string][] = [
   [new RegExp(`^/mandirs/${SLUG}/events/${ID}$`), "Event pages"],
   [new RegExp(`^/mandirs/${SLUG}/events/${ID}/seva$`), "Seva sign-up pages"],
   [/^\/festivals$/, "Festival dates"],
+  [/^\/diwali$/, "Diwali page"],
   [new RegExp(`^/festivals/${SLUG}$`), "Festival pages"],
   [/^\/for-mandirs$/, "For mandirs"],
   [/^\/demo$/, "Demo"],
