@@ -3,13 +3,19 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
+import { NearMe } from "@/components/near-me";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
 import { EVENT_KINDS, isEventKind } from "@/lib/event-kinds";
 import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
-import { nearTo, RADII, radiusFrom } from "@/lib/whats-on-view";
+import {
+  nearestFirstEachDay,
+  nearTo,
+  RADII,
+  radiusFrom,
+} from "@/lib/whats-on-view";
 import { translator } from "@/lib/i18n";
 
 export const metadata: Metadata = pageMetadata(
@@ -51,16 +57,25 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
 
   const form = (
     <form className="border-line bg-surface shadow-card grid gap-4 rounded-2xl border p-5 sm:grid-cols-2 sm:items-end lg:grid-cols-[2fr_1fr_1.5fr_1.5fr_auto]">
-      <label className="flex flex-col gap-2">
-        <span className="font-semibold">{t("whatsOn.near")}</span>
-        <input
-          name="near"
-          defaultValue={near}
-          placeholder={t("whatsOn.nearExample")}
-          autoComplete="postal-code"
-          className={inputClass}
-        />
-      </label>
+      <NearMe
+        labels={{
+          field: t("whatsOn.near"),
+          button: t("whatsOn.nearMe"),
+          finding: t("whatsOn.finding"),
+          denied: t("whatsOn.locationDenied"),
+          failed: t("whatsOn.locationFailed"),
+        }}
+        input={
+          <input
+            id="near"
+            name="near"
+            defaultValue={near}
+            placeholder={t("whatsOn.nearExample")}
+            autoComplete="postal-code"
+            className={inputClass}
+          />
+        }
+      />
       <label className="flex flex-col gap-2">
         <span className="font-semibold">{t("whatsOn.within")}</span>
         <select
@@ -124,7 +139,9 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     (e) =>
       (!region || e.mandir.region === region) && (!kind || e.kind === kind),
   );
-  const events = nearTo(chosen, position, within);
+  // Near a place: each day's events nearest first.
+  const nearby = nearTo(chosen, position, within);
+  const events = position ? nearestFirstEachDay(nearby) : nearby;
 
   return (
     <>
@@ -141,6 +158,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
               })}
             {region && t("whatsOn.countRegion", { region })}
             {kind && t("whatsOn.countType", { type: EVENT_KINDS[kind] })}
+            {position && t("whatsOn.nearestFirst")}
           </p>
           <EventList events={events} now={new Date()} />
         </>

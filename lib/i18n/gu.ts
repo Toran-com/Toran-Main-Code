@@ -31,7 +31,7 @@ export const gu: Record<MessageKey, string> = {
 
   "whatsOn.title": "કાર્યક્રમો",
   "whatsOn.intro":
-    "આગામી આઠ અઠવાડિયામાં યુકેભરના મંદિરોના કાર્યક્રમો. તમારી નજીક શું છે તે જોવા તમારો પોસ્ટકોડ લખો.",
+    "આગામી આઠ અઠવાડિયામાં યુકેભરના મંદિરોના કાર્યક્રમો. તમારી નજીક શું છે તે જોવા તમારો પોસ્ટકોડ લખો, અથવા \u201cમારી નજીક\u201d દબાવો.",
   "whatsOn.near": "તમારો પોસ્ટકોડ અથવા વિસ્તાર",
   "whatsOn.nearExample": "દા.ત. HA9 અથવા LE4 6AR",
   "whatsOn.within": "કેટલા અંતરમાં",
@@ -46,6 +46,13 @@ export const gu: Record<MessageKey, string> = {
   "whatsOn.countNear": ", {place} થી {miles} માઇલની અંદર",
   "whatsOn.countRegion": ", {region}માં",
   "whatsOn.countType": " ({type})",
+  "whatsOn.nearestFirst": ", દરરોજ સૌથી નજીકના પહેલા",
+  "whatsOn.nearMe": "મારી નજીક",
+  "whatsOn.finding": "તમને શોધી રહ્યા છીએ…",
+  "whatsOn.locationDenied":
+    "તમારા બ્રાઉઝરે તમારું સ્થાન શેર કર્યું નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
+  "whatsOn.locationFailed":
+    "અમે અત્યારે તમારો વિસ્તાર શોધી શક્યા નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
   "whatsOn.lookupFailed":
     "અમે અત્યારે એ પોસ્ટકોડ શોધી શક્યા નથી, તેથી બધા કાર્યક્રમો બતાવ્યા છે.",
   "whatsOn.notFound":

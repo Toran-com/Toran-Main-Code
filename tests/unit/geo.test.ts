@@ -5,6 +5,7 @@ import {
   lookupPostcode,
   lookupPostcodes,
   normalisePostcode,
+  outcodeNear,
 } from "@/lib/geo";
 
 const json = (body: unknown, status = 200) =>
@@ -91,5 +92,43 @@ describe("distances", () => {
     expect(formatMiles(0.42)).toBe("0.4 miles");
     expect(formatMiles(1.2)).toBe("1 mile");
     expect(formatMiles(12.6)).toBe("13 miles");
+  });
+});
+
+describe("outcodeNear", () => {
+  it("finds the nearest postcode district, sending a rounded position", async () => {
+    const fetcher = vi.fn<typeof fetch>(async () =>
+      json({ result: [{ outcode: "RG1" }] }),
+    );
+    expect(
+      await outcodeNear(
+        { latitude: 51.454265123, longitude: -0.97813 },
+        fetcher,
+      ),
+    ).toBe("RG1");
+    const url = String(fetcher.mock.calls[0][0]);
+    expect(url).toContain("/outcodes?");
+    expect(url).toContain("lat=51.45&");
+    expect(url).toContain("lon=-0.98&");
+  });
+
+  it("returns null when there's no district nearby (say, abroad)", async () => {
+    const fetcher = vi.fn(async () => json({ result: null }));
+    expect(
+      await outcodeNear(
+        { latitude: 48.85, longitude: 2.35 },
+        fetcher as unknown as typeof fetch,
+      ),
+    ).toBeNull();
+  });
+
+  it("fails when postcodes.io does", async () => {
+    const fetcher = vi.fn(async () => json({}, 500));
+    await expect(
+      outcodeNear(
+        { latitude: 51.5, longitude: -0.1 },
+        fetcher as unknown as typeof fetch,
+      ),
+    ).rejects.toThrow();
   });
 });

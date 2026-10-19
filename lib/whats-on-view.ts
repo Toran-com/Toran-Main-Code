@@ -21,6 +21,20 @@ export function nearTo(
   });
 }
 
+// When searching near a place: each day's events nearest first (the days
+// stay in order, so "Today" still comes first).
+export function nearestFirstEachDay(events: readonly EventNear[]): EventNear[] {
+  return events
+    .map((e, i) => ({ e, i, day: londonDate(new Date(e.next_starts_at)) }))
+    .sort(
+      (a, b) =>
+        a.day.localeCompare(b.day) ||
+        (a.e.miles ?? Infinity) - (b.e.miles ?? Infinity) ||
+        a.i - b.i,
+    )
+    .map(({ e }) => e);
+}
+
 // "Today", "Tomorrow", or "Saturday 17 October". Static pages pass null
 // for "now", so they never say "Today" on a page saved yesterday.
 export function dayHeading(iso: string, now: Date | null): string {

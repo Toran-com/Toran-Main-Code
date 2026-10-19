@@ -28,7 +28,7 @@ export const en = {
 
   "whatsOn.title": "What's on",
   "whatsOn.intro":
-    "Events at mandirs across the UK in the next eight weeks. Type your postcode to see what's near you.",
+    "Events at mandirs across the UK in the next eight weeks. Type your postcode, or press \u201cNear me\u201d, to see what's near you.",
   "whatsOn.near": "Your postcode or area",
   "whatsOn.nearExample": "e.g. HA9 or LE4 6AR",
   "whatsOn.within": "Within",
@@ -43,6 +43,13 @@ export const en = {
   "whatsOn.countNear": " within {miles} miles of {place}",
   "whatsOn.countRegion": " in {region}",
   "whatsOn.countType": " ({type})",
+  "whatsOn.nearestFirst": ", nearest first each day",
+  "whatsOn.nearMe": "Near me",
+  "whatsOn.finding": "Finding you…",
+  "whatsOn.locationDenied":
+    "Your browser didn't share your location. Type your postcode instead.",
+  "whatsOn.locationFailed":
+    "We couldn't find your area just now. Type your postcode instead.",
   "whatsOn.lookupFailed":
     "We couldn't look up that postcode just now, so all events are shown.",
   "whatsOn.notFound":
