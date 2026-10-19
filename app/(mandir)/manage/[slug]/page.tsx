@@ -10,6 +10,8 @@ import {
   Loading,
   Notice,
   PageShell,
+  pillButtonClass,
+  pillPrimaryClass,
   quietButtonClass,
 } from "@/components/ui";
 import { getCurrentUser } from "@/lib/auth";
@@ -218,16 +220,35 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
 
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <p className="text-xl font-semibold">
-          {mandir.name}, {mandir.town}
-        </p>
-        <Link
-          href={`/mandirs/${mandir.slug}`}
-          className="text-peacock font-semibold underline"
-        >
-          See your public page
-        </Link>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <p className="text-xl font-semibold">
+            {mandir.name}, {mandir.town}
+          </p>
+          <Link
+            href={`/mandirs/${mandir.slug}`}
+            className="text-peacock w-fit font-semibold underline"
+          >
+            See your public page
+          </Link>
+        </div>
+        <nav aria-label="On this page">
+          <ul className="flex flex-wrap gap-2">
+            {[
+              ["#upcoming", `Coming up (${events.length})`],
+              ...(festivals.length ? [["#festivals", "Festivals"]] : []),
+              ["#add-event", "Add an event"],
+              ["#committee", "Committee"],
+              ["#details", "Details"],
+            ].map(([href, label]) => (
+              <li key={href}>
+                <a href={href} className={pillButtonClass}>
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
 
       {error && <Notice tone="error">{error}</Notice>}
@@ -235,7 +256,9 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
 
       {posters.length > 0 && (
         <Card>
-          <h2 className="text-2xl font-bold">Posters waiting for you</h2>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            Posters waiting for you
+          </h2>
           <p className="text-muted">
             Someone sent Toran {posters.length === 1 ? "this" : "these"} for
             your mandir. If the details are right, publish; if not, choose
@@ -277,9 +300,99 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </Card>
       )}
 
+      <section className="flex flex-col gap-3" aria-labelledby="upcoming">
+        <h2
+          id="upcoming"
+          className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+        >
+          Coming up
+        </h2>
+        {events?.length ? (
+          <ul className="flex flex-col gap-3">
+            {events.map((event) => (
+              <li
+                key={event.id}
+                className="border-line bg-surface shadow-card flex flex-col gap-2 rounded-2xl border p-4"
+              >
+                <div className="flex flex-col gap-1">
+                  <p className="text-marigold-ink font-semibold">
+                    {event.recurrence && (
+                      <span className="text-ink">
+                        {describeRule(event.recurrence)} · next{" "}
+                      </span>
+                    )}
+                    {formatEventStart(event.next_starts_at, event.all_day)}
+                  </p>
+                  <p className="text-lg leading-snug font-bold">
+                    {event.title}
+                  </p>
+                  {event.status === "cancelled" && (
+                    <p>
+                      <Badge tone="kumkum">Cancelled</Badge>
+                    </p>
+                  )}
+                </div>
+                <form action={changeEvent} className="flex flex-wrap gap-2">
+                  <input type="hidden" name="slug" value={mandir.slug} />
+                  <input type="hidden" name="event" value={event.id} />
+                  {event.status === "cancelled" ? (
+                    <EventButton intent="restore">
+                      It&apos;s back on
+                    </EventButton>
+                  ) : (
+                    <>
+                      <EventButton intent="confirm">Still on</EventButton>
+                      <EventButton intent="cancel">Cancel</EventButton>
+                    </>
+                  )}
+                  <Link
+                    href={`/manage/${mandir.slug}/events/${event.id}`}
+                    className={pillButtonClass}
+                  >
+                    Edit
+                  </Link>
+                  <Link
+                    href={`/manage/${mandir.slug}?copy=${event.id}#add-event`}
+                    className={pillButtonClass}
+                  >
+                    Duplicate
+                  </Link>
+                  {event.status !== "cancelled" && (
+                    <Link
+                      href={`/manage/${mandir.slug}/seva/${event.id}`}
+                      className={pillButtonClass}
+                    >
+                      Seva rota
+                    </Link>
+                  )}
+                  <ConfirmButton
+                    name="intent"
+                    value="remove"
+                    question={`Remove "${event.title}" from your page?`}
+                    className={pillButtonClass}
+                  >
+                    Remove
+                  </ConfirmButton>
+                </form>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted">
+            Nothing coming up yet. Events you add appear here and on your public
+            page.
+          </p>
+        )}
+      </section>
+
       {festivals.length > 0 && (
         <Card>
-          <h2 className="text-2xl font-bold">Festivals coming up</h2>
+          <h2
+            id="festivals"
+            className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+          >
+            Festivals coming up
+          </h2>
           <p className="text-muted">
             Tick the ones your mandir is celebrating, change the name or add a
             start time if you like, and add them all at once.
@@ -295,7 +408,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
 
       {lastYear.length > 0 && (
         <Card>
-          <h2 className="text-2xl font-bold">Again this year?</h2>
+          <h2 className="text-xl font-bold sm:text-2xl">Again this year?</h2>
           <p className="text-muted">
             Your events from this time last year, moved to this year&apos;s
             dates. Festival events follow this year&apos;s festival date. Check
@@ -311,7 +424,10 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       )}
 
       <Card>
-        <h2 id="add-event" className="scroll-mt-24 text-2xl font-bold">
+        <h2
+          id="add-event"
+          className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+        >
           {copy ? `Add a copy of \u201c${copy.title}\u201d` : "Add an event"}
         </h2>
         {copy && (
@@ -338,88 +454,11 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </form>
       </Card>
 
-      <section className="flex flex-col gap-3" aria-labelledby="upcoming">
-        <h2 id="upcoming" className="text-2xl font-bold">
-          Coming up
-        </h2>
-        {events?.length ? (
-          <ul className="flex flex-col gap-3">
-            {events.map((event) => (
-              <li
-                key={event.id}
-                className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-5"
-              >
-                <div className="flex flex-col gap-1">
-                  <p className="text-marigold-ink font-semibold">
-                    {event.recurrence && (
-                      <span className="text-ink">
-                        {describeRule(event.recurrence)} · next{" "}
-                      </span>
-                    )}
-                    {formatEventStart(event.next_starts_at, event.all_day)}
-                  </p>
-                  <p className="text-xl font-bold">{event.title}</p>
-                  {event.status === "cancelled" && (
-                    <p>
-                      <Badge tone="kumkum">Cancelled</Badge>
-                    </p>
-                  )}
-                </div>
-                <form action={changeEvent} className="flex flex-wrap gap-2">
-                  <input type="hidden" name="slug" value={mandir.slug} />
-                  <input type="hidden" name="event" value={event.id} />
-                  {event.status === "cancelled" ? (
-                    <EventButton intent="restore">
-                      It&apos;s back on
-                    </EventButton>
-                  ) : (
-                    <>
-                      <EventButton intent="confirm">Still on</EventButton>
-                      <EventButton intent="cancel">Cancel</EventButton>
-                    </>
-                  )}
-                  <Link
-                    href={`/manage/${mandir.slug}/events/${event.id}`}
-                    className={`${quietButtonClass} px-4 py-2 text-base`}
-                  >
-                    Edit
-                  </Link>
-                  <Link
-                    href={`/manage/${mandir.slug}?copy=${event.id}#add-event`}
-                    className={`${quietButtonClass} px-4 py-2 text-base`}
-                  >
-                    Duplicate
-                  </Link>
-                  {event.status !== "cancelled" && (
-                    <Link
-                      href={`/manage/${mandir.slug}/seva/${event.id}`}
-                      className={`${quietButtonClass} px-4 py-2 text-base`}
-                    >
-                      Seva rota
-                    </Link>
-                  )}
-                  <ConfirmButton
-                    name="intent"
-                    value="remove"
-                    question={`Remove "${event.title}" from your page?`}
-                    className={`${quietButtonClass} px-4 py-2 text-base`}
-                  >
-                    Remove
-                  </ConfirmButton>
-                </form>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted">
-            Nothing coming up yet. Events you add appear here and on your public
-            page.
-          </p>
-        )}
-      </section>
-
       <Card>
-        <h2 id="committee" className="scroll-mt-24 text-2xl font-bold">
+        <h2
+          id="committee"
+          className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+        >
           Your committee on Toran
         </h2>
         <p className="text-muted">
@@ -448,7 +487,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                         ? `Stop helping run ${mandir.name} on Toran?`
                         : `Take ${member.email} off your committee?`
                     }
-                    className={`${quietButtonClass} px-4 py-2 text-base`}
+                    className={pillButtonClass}
                   >
                     {member.user_id === user.id ? "Leave" : "Remove"}
                   </ConfirmButton>
@@ -488,14 +527,11 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                       )}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`${buttonClass} px-4 py-2 text-base`}
+                      className={pillPrimaryClass}
                     >
                       Send on WhatsApp
                     </a>
-                    <button
-                      type="submit"
-                      className={`${quietButtonClass} px-4 py-2 text-base`}
-                    >
+                    <button type="submit" className={pillButtonClass}>
                       Cancel invite
                     </button>
                   </form>
@@ -526,7 +562,9 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       </Card>
 
       <Card>
-        <h2 className="text-2xl font-bold">Your mandir&apos;s details</h2>
+        <h2 id="details" className="scroll-mt-24 text-xl font-bold sm:text-2xl">
+          Your mandir&apos;s details
+        </h2>
         <p className="text-muted">
           Shown on your public page. To change the mandir&apos;s name or town,
           ask Toran.
@@ -585,7 +623,7 @@ function EventButton({
       type="submit"
       name="intent"
       value={intent}
-      className={`${quietButtonClass} px-4 py-2 text-base`}
+      className={pillButtonClass}
     >
       {children}
     </button>

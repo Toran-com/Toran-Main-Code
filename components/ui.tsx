@@ -46,7 +46,9 @@ export const cardClass =
 
 export function Card({ children }: { children: ReactNode }) {
   return (
-    <div className={`${cardClass} flex flex-col gap-5 p-6`}>{children}</div>
+    <div className={`${cardClass} flex flex-col gap-4 p-4 sm:gap-5 sm:p-6`}>
+      {children}
+    </div>
   );
 }
 
@@ -80,6 +82,14 @@ const press =
   "inline-flex items-center justify-center gap-2 text-center transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none";
 
 export const buttonClass = `${press} bg-linear-to-b from-peacock to-peacock-deep w-full rounded-xl px-5 py-3 text-lg font-semibold text-on-peacock shadow-card hover:shadow-lift hover:brightness-110 disabled:opacity-60`;
+
+// Small rounded buttons for actions on an item in a list (Edit, Cancel…),
+// so a row of them fits on a phone.
+export const pillButtonClass =
+  "border-line bg-surface text-ink hover:border-peacock/50 hover:text-peacock inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-base font-semibold no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95";
+
+export const pillPrimaryClass =
+  "bg-peacock text-on-peacock hover:brightness-110 inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-base font-semibold no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95";
 
 export const quietButtonClass = `${press} border-line bg-surface text-ink hover:border-marigold/60 shadow-card hover:shadow-lift rounded-xl border px-5 py-3 text-lg font-semibold`;
 
