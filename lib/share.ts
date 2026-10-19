@@ -4,6 +4,9 @@
 import { formatEventStart } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { sharedT } from "@/lib/i18n/locale";
+import { whatsAppLink } from "@/lib/whatsapp";
+
+export { whatsAppLink };
 
 type ShareableEvent = {
   id: string;
@@ -38,12 +41,6 @@ export function eventPath(mandirSlug: string, eventId: string): string {
 // An event's seva rota, where volunteers can take a slot.
 export function sevaPath(mandirSlug: string, eventId: string): string {
   return `${eventPath(mandirSlug, eventId)}/seva`;
-}
-
-// Opens WhatsApp (the app on a phone, WhatsApp Web on a computer) with the
-// message ready to send to a chat or group.
-export function whatsAppLink(text: string, url: string): string {
-  return `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`;
 }
 
 // What a committee member sends a colleague they've invited: Toran sends

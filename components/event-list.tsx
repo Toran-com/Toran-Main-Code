@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/public-shell";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
-import { formatTimeOfDay } from "@/lib/format";
-import { formatMiles } from "@/lib/geo";
+import { formatMiles, formatTimeOfDay } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";

@@ -43,8 +43,8 @@ export function dayHeading(iso: string, now: Date | null): string {
   if (!now) return longDay(day);
   const today = londonDate(now);
   const tomorrow = londonDate(new Date(now.getTime() + 86_400_000));
-  if (day === today) return sharedT()("day.today");
-  if (day === tomorrow) return sharedT()("day.tomorrow");
+  if (day === today) return sharedT()("heading.today");
+  if (day === tomorrow) return sharedT()("heading.tomorrow");
   return longDay(day);
 }
 

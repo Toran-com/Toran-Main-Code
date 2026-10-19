@@ -7,7 +7,7 @@ export type Repeat =
   | { kind: "weekly"; interval: 1 | 2 }
   | { kind: "monthly"; week: 1 | 2 | 3 | 4 | -1 }; // -1 = last
 
-import type { ClientKey } from "@/lib/i18n/client-messages";
+import type { SharedKey } from "@/lib/i18n/shared-messages";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
 
 const DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
@@ -91,7 +91,7 @@ export function describeRule(rule: string): string | null {
   if (pageLocale() === "gu") {
     // Gujarati wording, from the translations (lib/i18n).
     const t = sharedT();
-    const day = t(`repeat.day.${parsed.weekday}` as ClientKey);
+    const day = t(`repeat.day.${parsed.weekday}` as SharedKey);
     if (parsed.repeat.kind === "weekly") {
       return t(
         parsed.repeat.interval === 1 ? "repeat.weekly" : "repeat.fortnightly",
@@ -100,7 +100,7 @@ export function describeRule(rule: string): string | null {
     }
     return t("repeat.monthly", {
       day,
-      ordinal: t(`repeat.ordinal.${parsed.repeat.week}` as ClientKey),
+      ordinal: t(`repeat.ordinal.${parsed.repeat.week}` as SharedKey),
     });
   }
   const day = DAY_NAMES[parsed.weekday];

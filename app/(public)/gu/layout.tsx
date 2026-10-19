@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { MessagesProvider } from "@/components/messages-provider";
 import { LOCALES } from "@/lib/i18n";
+import { guClient } from "@/lib/i18n/client-messages-gu";
 import { setPageLocale } from "@/lib/i18n/page";
 
 // The Gujarati pages (/gu/…): the same pages as English, in Gujarati. Until
@@ -20,7 +22,7 @@ export default function GujaratiLayout({ children }: LayoutProps<"/gu">) {
           being checked.
         </p>
       )}
-      {children}
+      <MessagesProvider messages={guClient}>{children}</MessagesProvider>
     </div>
   );
 }

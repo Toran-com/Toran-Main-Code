@@ -4,9 +4,10 @@ import "leaflet/dist/leaflet.css";
 import type { CircleMarker, LayerGroup, Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useT, type Locale } from "@/components/use-t";
+import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { withLocale } from "@/lib/i18n/paths";
 
-type Translate = ReturnType<typeof useT>;
+type Translate = ReturnType<typeof useT<keyof typeof enMandirs>>;
 import { clusterPoints, onTheMap } from "@/lib/map-clusters";
 
 // The mandirs on a map of the UK, from the map positions worked out from
@@ -58,7 +59,7 @@ function card(mandirs: Placed[], t: Translate, locale: Locale): HTMLElement {
 }
 
 export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
-  const t = useT();
+  const t = useT(enMandirs);
   const locale = useLocale();
   const box = useRef<HTMLDivElement>(null);
   const live = useRef<Live | null>(null);

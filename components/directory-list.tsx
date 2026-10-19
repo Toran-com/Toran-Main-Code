@@ -5,7 +5,12 @@ import Link from "next/link";
 import { useId, useMemo, useState } from "react";
 import type { MandirSummary } from "@/lib/directory";
 import { useLocale, useT } from "@/components/use-t";
-import { anchorFor, groupByRegionAndTown, matchesSearch } from "@/lib/format";
+import { enMandirs } from "@/lib/i18n/client/mandirs";
+import {
+  anchorFor,
+  groupByRegionAndTown,
+  matchesSearch,
+} from "@/lib/directory-format";
 import { withLocale } from "@/lib/i18n/paths";
 import { onTheMap } from "@/lib/map-clusters";
 import { cardClass, inputClass } from "@/components/ui";
@@ -28,7 +33,7 @@ type View = "map" | "list";
 // rendered on the server for anyone without JavaScript, and typing filters
 // whichever view is showing.
 export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
-  const t = useT();
+  const t = useT(enMandirs);
   const [query, setQuery] = useState("");
   const [view, setView] = useState<View>(() =>
     onTheMap(mandirs).length > 0 ? "map" : "list",
@@ -131,7 +136,7 @@ function MandirGroups({
   mandirs: MandirSummary[];
   withRegions: boolean;
 }) {
-  const t = useT();
+  const t = useT(enMandirs);
   const locale = useLocale();
   const groups = groupByRegionAndTown(mandirs);
   return (

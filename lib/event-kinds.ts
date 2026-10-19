@@ -2,7 +2,7 @@
 // the order people choose from, and where an event came from
 // (events.origin), for the label families see on it.
 
-import type { ClientKey } from "@/lib/i18n/client-messages";
+import type { SharedKey } from "@/lib/i18n/shared-messages";
 import { sharedT } from "@/lib/i18n/locale";
 
 export const EVENT_KINDS = {
@@ -26,7 +26,7 @@ export function isEventKind(value: string): value is EventKind {
 // A kind's name, or null for "other" (not worth a label).
 export function kindLabel(kind: string): string | null {
   return isEventKind(kind) && kind !== "other"
-    ? sharedT()(`kind.${kind}` as ClientKey)
+    ? sharedT()(`kind.${kind}` as SharedKey)
     : null;
 }
 

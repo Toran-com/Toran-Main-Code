@@ -12,6 +12,7 @@ import { buttonClass } from "@/components/ui";
 import { calendarFile, googleCalendarLink } from "@/lib/ical";
 import { giveBackSlot, takeSlot } from "./actions";
 import { useT } from "@/components/use-t";
+import { enSlots } from "@/lib/i18n/client/slots";
 
 // The slots this phone has taken. Toran keeps no names (decision 0013), so
 // the only record of who took a slot is here, in the browser's storage:
@@ -97,7 +98,7 @@ export function TakeSlot({
   details: Omit<MySlot, "slot">;
   full: boolean;
 }) {
-  const t = useT();
+  const t = useT(enSlots);
   const mine = useMySlots().some((s) => s.shift === details.shift);
   const [state, action, pending] = useActionState(takeSlot, null);
   // Each slot is saved once, so giving it back later isn't undone when the
@@ -147,7 +148,7 @@ export function TakeSlot({
 // The slots this phone has taken for one event, with calendar links and
 // "I can't make it".
 export function MySlots({ slug, event }: { slug: string; event: string }) {
-  const t = useT();
+  const t = useT(enSlots);
   const slots = useMySlots().filter((s) => s.event === event);
   if (!slots.length) return null;
   return (
@@ -169,7 +170,7 @@ export function MySlots({ slug, event }: { slug: string; event: string }) {
 }
 
 function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
-  const t = useT();
+  const t = useT(enSlots);
   const origin = useOrigin();
   const [busy, setBusy] = useState(false);
   const entry = {
@@ -218,10 +219,10 @@ function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
           rel="noopener"
           className={link}
         >
-          {t("subscribe.google")}
+          {t("slot.google")}
         </a>
         <button type="button" onClick={downloadFile} className={link}>
-          {t("subscribe.apple")}
+          {t("slot.apple")}
         </button>
         <button
           type="button"

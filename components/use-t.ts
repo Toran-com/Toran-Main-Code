@@ -1,8 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useMemo } from "react";
-import { enClient, guClient, type ClientKey } from "@/lib/i18n/client-messages";
+import { useContext, useMemo } from "react";
+import { MessagesContext } from "@/components/messages-provider";
 import { fill, type Values } from "@/lib/i18n/core";
 
 export type Locale = "en" | "gu";
@@ -14,14 +14,17 @@ export function useLocale(): Locale {
   return path === "/gu" || path.startsWith("/gu/") ? "gu" : "en";
 }
 
-// The browser's few lines of text (lib/i18n/client-messages.ts) in that
-// language: the same function while the language stays the same, so
-// effects can depend on it.
-export function useT() {
-  const locale = useLocale();
-  return useMemo(() => {
-    const messages = locale === "gu" ? guClient : enClient;
-    return (key: ClientKey, values?: Values) =>
-      fill(messages, enClient, key, values);
-  }, [locale]);
+// A browser component's lines in the page's language: pass its English
+// (from lib/i18n/client/); the Gujarati comes with Gujarati pages
+// (components/messages-provider.tsx). The same function while the
+// language stays the same, so effects can depend on it.
+export function useT<K extends string>(english: Record<K, string>) {
+  const translated = useContext(MessagesContext) as Partial<
+    Record<K, string>
+  > | null;
+  return useMemo(
+    () => (key: K, values?: Values) =>
+      fill(translated ?? english, english, key, values),
+    [translated, english],
+  );
 }

@@ -2,7 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 import { useT } from "@/components/use-t";
-import { londonDate } from "@/lib/format";
+import { enShare } from "@/lib/i18n/client/share";
+import { londonDate } from "@/lib/london";
 
 const noSubscribe = () => () => {};
 
@@ -10,7 +11,7 @@ const noSubscribe = () => () => {};
 // on the visitor's phone so a saved page never shows a stale count. Shows
 // nothing before the page's JavaScript runs, or once the day has passed.
 export function Countdown({ date }: { date: string }) {
-  const t = useT();
+  const t = useT(enShare);
   const today = useSyncExternalStore(
     noSubscribe,
     () => londonDate(),

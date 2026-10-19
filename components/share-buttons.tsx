@@ -4,7 +4,8 @@ import { useState, useSyncExternalStore } from "react";
 import { sendCount } from "@/components/count-visits";
 import { useOrigin } from "@/components/use-origin";
 import { useT } from "@/components/use-t";
-import { whatsAppLink } from "@/lib/share";
+import { enShare } from "@/lib/i18n/client/share";
+import { whatsAppLink } from "@/lib/whatsapp";
 
 const noSubscribe = () => () => {};
 
@@ -25,7 +26,7 @@ export function ShareButtons({
   // event's own page has it.
   copy?: boolean;
 }) {
-  const t = useT();
+  const t = useT(enShare);
   const origin = useOrigin();
   const canShare = useSyncExternalStore(
     noSubscribe,

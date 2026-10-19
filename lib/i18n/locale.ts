@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { enClient, guClient, type ClientKey } from "@/lib/i18n/client-messages";
+import { enShared, guShared, type SharedKey } from "@/lib/i18n/shared-messages";
 import { fill, type Values } from "@/lib/i18n/core";
 
 export type Locale = "en" | "gu";
@@ -21,9 +21,9 @@ export function pageLocale(): Locale {
 
 // The shared lines (dates, kinds of event, distances…) in the page's
 // language, for helpers that the browser loads too: only the few lines in
-// lib/i18n/client-messages.ts, not every translation.
+// lib/i18n/shared-messages.ts, not every translation.
 export function sharedT() {
-  const messages = pageLocale() === "gu" ? guClient : enClient;
-  return (key: ClientKey, values?: Values) =>
-    fill(messages, enClient, key, values);
+  const messages = pageLocale() === "gu" ? guShared : enShared;
+  return (key: SharedKey, values?: Values) =>
+    fill(messages, enShared, key, values);
 }

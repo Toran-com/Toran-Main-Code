@@ -3,6 +3,7 @@
 import { sendCount } from "@/components/count-visits";
 import { useOrigin } from "@/components/use-origin";
 import { useT } from "@/components/use-t";
+import { enShare } from "@/lib/i18n/client/share";
 import { cardClass, quietButtonClass } from "@/components/ui";
 
 // Subscribing puts every event in the visitor's own calendar app, and keeps
@@ -16,7 +17,7 @@ export function SubscribeCalendar({
   title: string;
   body: string;
 }) {
-  const t = useT();
+  const t = useT(enShare);
   const origin = useOrigin();
   // One more subscription for the page it's on.
   const counted = () => sendCount("subscribe", window.location.pathname);

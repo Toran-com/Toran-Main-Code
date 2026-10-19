@@ -1,33 +1,21 @@
 // Small formatting and grouping helpers for the public pages. Dates are
 // shown in UK style and UK time, whatever the server's own time zone.
 
-import type { ClientKey } from "@/lib/i18n/client-messages";
+import {
+  anchorFor,
+  groupByRegionAndTown,
+  matchesSearch,
+  type RegionGroup,
+  type TownGroup,
+} from "@/lib/directory-format";
+import type { SharedKey } from "@/lib/i18n/shared-messages";
+import { londonDate, londonTime } from "@/lib/london";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
 
 const LONDON = "Europe/London";
 
 // The page's language for dates: English (UK) or Gujarati.
 const dateLocale = () => (pageLocale() === "gu" ? "gu-IN" : "en-GB");
-
-// Today's date in London as YYYY-MM-DD.
-export function londonDate(now: Date = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: LONDON,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(now);
-}
-
-// The time in London as HH:MM (24-hour), as a time input wants it.
-export function londonTime(at: Date): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: LONDON,
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).format(at);
-}
 
 // A date-only value (YYYY-MM-DD) as a Date at midnight UTC, so formatting in
 // UTC never shifts it a day.
@@ -147,7 +135,7 @@ const CALENDARS: Record<string, string> = {
 export function calendarLabel(calendar: string | null): string | null {
   if (!calendar || !(calendar in CALENDARS)) return null;
   return pageLocale() === "gu"
-    ? sharedT()(`calendar.${calendar}` as ClientKey)
+    ? sharedT()(`calendar.${calendar}` as SharedKey)
     : CALENDARS[calendar];
 }
 
@@ -158,52 +146,6 @@ export function websiteLabel(url: string): string {
   } catch {
     return url;
   }
-}
-
-// "east-midlands" for "East Midlands", for in-page links.
-export function anchorFor(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-export type TownGroup<T> = { town: string; mandirs: T[] };
-export type RegionGroup<T> = { region: string; towns: TownGroup<T>[] };
-
-// Groups mandirs by region, then town, each sorted alphabetically.
-export function groupByRegionAndTown<
-  T extends { region: string; town: string; name: string },
->(mandirs: readonly T[]): RegionGroup<T>[] {
-  const regions = new Map<string, Map<string, T[]>>();
-  for (const m of mandirs) {
-    const towns = regions.get(m.region) ?? new Map<string, T[]>();
-    regions.set(m.region, towns);
-    towns.set(m.town, [...(towns.get(m.town) ?? []), m]);
-  }
-  const byName = (a: string, b: string) => a.localeCompare(b, "en-GB");
-  return [...regions.entries()]
-    .sort(([a], [b]) => byName(a, b))
-    .map(([region, towns]) => ({
-      region,
-      towns: [...towns.entries()]
-        .sort(([a], [b]) => byName(a, b))
-        .map(([town, list]) => ({
-          town,
-          mandirs: [...list].sort((a, b) => byName(a.name, b.name)),
-        })),
-    }));
-}
-
-// Keeps mandirs whose name, town or region contains every word typed.
-export function matchesSearch(
-  m: { name: string; town: string; region: string; tradition?: string | null },
-  query: string,
-): boolean {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const text =
-    `${m.name} ${m.town} ${m.region} ${m.tradition ?? ""}`.toLowerCase();
-  return words.every((w) => text.includes(w));
 }
 
 // The UTC instant for a UK wall-clock date and time ("2026-10-11", "19:00"),
@@ -231,3 +173,23 @@ export function londonToUtc(date: string, time: string): Date | null {
   // A time skipped when the clocks go forward: use the hour after.
   return new Date(wall);
 }
+
+// "0.4 miles", "3 miles", "12 miles".
+export function formatMiles(miles: number): string {
+  const t = sharedT();
+  if (miles < 1) return t("distance.miles", { miles: miles.toFixed(1) });
+  const rounded = Math.round(miles);
+  return t(rounded === 1 ? "distance.mile" : "distance.miles", {
+    miles: rounded,
+  });
+}
+
+export {
+  anchorFor,
+  groupByRegionAndTown,
+  londonDate,
+  londonTime,
+  matchesSearch,
+  type RegionGroup,
+  type TownGroup,
+};

@@ -1,4 +1,5 @@
-import { guClient } from "@/lib/i18n/client-messages";
+import { guShared } from "@/lib/i18n/shared-messages";
+import { guClient } from "@/lib/i18n/client-messages-gu";
 import type { MessageKey } from "@/lib/i18n/en";
 
 // Gujarati. A DRAFT, not yet checked by a native Gujarati speaker: not
@@ -6,6 +7,7 @@ import type { MessageKey } from "@/lib/i18n/en";
 // "Toran" is the brand name and stays in Latin letters.
 export const gu: Record<MessageKey, string> = {
   ...guClient,
+  ...guShared,
   "shell.home": "Toran મુખ્ય પાનું",
   "shell.whatsOn": "કાર્યક્રમો",
   "shell.mandirs": "મંદિરો",

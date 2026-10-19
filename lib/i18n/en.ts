@@ -1,9 +1,11 @@
+import { enShared } from "@/lib/i18n/shared-messages";
 import { enClient } from "@/lib/i18n/client-messages";
 
 // Every piece of public text that has a translation, in English (the
 // source). Keys group text by page. "{name}" marks a value filled in later.
 export const en = {
   ...enClient,
+  ...enShared,
   "shell.home": "Toran home",
   "shell.whatsOn": "What's on",
   "shell.mandirs": "Mandirs",
