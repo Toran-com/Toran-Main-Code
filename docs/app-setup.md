@@ -467,10 +467,13 @@ translation layer (`lib/i18n/index.ts`), so other languages can follow.
 
 Every page families use has a Gujarati version at the same address with
 `/gu` in front: `/gu` (home), `/gu/whats-on`, `/gu/mandirs` and each
-mandir, event, seva rota and "Tell us" page, and `/gu/festivals`. Dates
+mandir, event, seva rota and "Tell us" page, `/gu/festivals`, and each
+festival season page (`/gu/holi`, `/gu/diwali` and so on). Dates
 are in Gujarati ("શનિ 24 ઑક્ટો, સાંજે 6"), as are "Every Saturday", kinds
 of event, the map and the share buttons. Festival names and descriptions
-are translated too (`festival.name.*` in the translations). Mandir names,
+are translated too (`festival.name.*` in the translations), and so are
+the season pages' words (`season.*`; the English there must match
+`lib/seasons.ts`, which a test checks). Mandir names,
 and events' own titles and descriptions, stay as the committee wrote them;
 a Gujarati title shows under the English when the committee gives one.
 Committee and admin pages, "For mandirs" and the guide stay in English.

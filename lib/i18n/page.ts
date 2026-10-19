@@ -1,6 +1,7 @@
-import { MESSAGES, translator } from "@/lib/i18n";
+import { MESSAGES, type MessageKey, translator } from "@/lib/i18n";
 import { pageLocale } from "@/lib/i18n/locale";
 import { withLocale } from "@/lib/i18n/paths";
+import type { Season } from "@/lib/seasons";
 
 export { pageLocale, setPageLocale } from "@/lib/i18n/locale";
 
@@ -29,5 +30,28 @@ export function festivalText(
     summary: english.summary
       ? (gu[`festival.summary.${slug}`] ?? english.summary)
       : null,
+  };
+}
+
+// A festival season's words (lib/seasons.ts) in the page's language. The
+// English is kept in the translations too, so it can be checked alongside
+// the Gujarati.
+export function seasonText(season: Season): {
+  name: string;
+  period: string;
+  title: string;
+  description: string;
+  intro: string;
+  shareText: string;
+} {
+  const t = pageT();
+  const key = (field: string) => `season.${season.slug}.${field}` as MessageKey;
+  return {
+    name: festivalText(season.main, { name: season.name, summary: null }).name,
+    period: t(key("period")),
+    title: t(key("title")),
+    description: t(key("description")),
+    intro: t(key("intro")),
+    shareText: t(key("shareText")),
   };
 }

@@ -14,7 +14,7 @@ import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData } from "@/lib/structured-data";
 import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
-import { festivalText, localePath, pageT } from "@/lib/i18n/page";
+import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
 
 // Every festival page is fully static, refreshed when festival dates or
 // events change.
@@ -134,10 +134,12 @@ export default async function FestivalPage({
 
       {season && (
         <Link
-          href={`/${season.slug}`}
+          href={localePath(`/${season.slug}`)}
           className="border-marigold/50 bg-marigold/10 lift text-ink flex items-center justify-between gap-3 rounded-2xl border p-4 font-semibold no-underline"
         >
-          <span>All of {season.period} at mandirs, in one place</span>
+          <span>
+            {t("season.allOf", { period: seasonText(season).period })}
+          </span>
           <span aria-hidden="true" className="text-peacock">
             →
           </span>

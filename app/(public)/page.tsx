@@ -20,7 +20,8 @@ import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
 import { site, siteUrl } from "@/lib/site";
 import { siteData } from "@/lib/structured-data";
-import { festivalText, localePath, pageT } from "@/lib/i18n/page";
+import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
+import { seasonBySlug } from "@/lib/seasons";
 
 // Only the address: the title, description and link preview picture come
 // from the root layout.
@@ -148,10 +149,12 @@ export default function ComingSoon() {
   );
 }
 
-// In the weeks before Diwali, a way straight to Diwali week at mandirs.
+// In the weeks before a festival season, a way straight to its page.
 async function SeasonBanner() {
   const season = await getSeasonBanner();
   if (!season) return null;
+  const t = pageT();
+  const { name } = seasonText(seasonBySlug(season.slug)!);
   return (
     <section
       className={`${cardClass} lift has-card-link group border-marigold/50 bg-marigold/10 flex items-center gap-4 p-5`}
@@ -162,10 +165,10 @@ async function SeasonBanner() {
       <div className="flex flex-1 flex-col gap-1">
         <h2 className="font-display text-xl font-bold">
           <Link
-            href={`/${season.slug}`}
+            href={localePath(`/${season.slug}`)}
             className="card-link group-hover:text-peacock no-underline"
           >
-            {season.name} at mandirs
+            {t("festival.atMandirs", { name })}
           </Link>
           <span aria-hidden="true" className="text-peacock">
             {"\u00a0→"}

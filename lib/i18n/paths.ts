@@ -11,6 +11,8 @@ const GUJARATI_PATHS = [
   /^\/whats-on$/,
   /^\/mandirs(\/[^/]+(\/events\/[^/]+(\/seva)?)?(\/tell-us)?)?$/,
   /^\/festivals(\/[^/]+)?$/,
+  // The festival season pages (lib/seasons.ts; a test checks they match).
+  /^\/(maha-shivaratri|holi|ram-navami|janmashtami|ganesh-chaturthi|navratri|diwali)$/,
 ];
 
 export function hasGujarati(path: string): boolean {

@@ -13,7 +13,7 @@ import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
 import { listFestivalDates } from "@/lib/directory";
 import { seasonDays, seasonEvents, seasonWindow } from "@/lib/festival-season";
 import { formatDateRange, formatEventStart } from "@/lib/format";
-import { translator } from "@/lib/i18n";
+import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
 import type { Season } from "@/lib/seasons";
 import { pageMetadata, siteUrl } from "@/lib/site";
 import { breadcrumbData } from "@/lib/structured-data";
@@ -27,10 +27,12 @@ import {
 
 // A festival season's page (/diwali, /holi and so on): the festival days,
 // and every mandir's events across them, near you if you like. Each
-// season's route renders this with its own words from lib/seasons.ts.
+// season's route renders this with its own words from lib/seasons.ts, in
+// English or (at /gu/<slug>) Gujarati.
 
 export function seasonMetadata(season: Season): Metadata {
-  return pageMetadata(season.title, season.description, `/${season.slug}`);
+  const { title, description } = seasonText(season);
+  return pageMetadata(title, description, localePath(`/${season.slug}`));
 }
 
 export function SeasonPage({
@@ -40,15 +42,19 @@ export function SeasonPage({
   season: Season;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const text = seasonText(season);
   return (
     <>
       <JsonLd
         data={breadcrumbData([
-          { name: "Toran", url: `${siteUrl()}/` },
-          { name: season.name, url: `${siteUrl()}/${season.slug}` },
+          { name: "Toran", url: `${siteUrl()}${localePath("/")}` },
+          {
+            name: text.name,
+            url: `${siteUrl()}${localePath(`/${season.slug}`)}`,
+          },
         ])}
       />
-      <PageHeading title={season.title} intro={season.intro} />
+      <PageHeading title={text.title} intro={text.intro} />
       <Suspense fallback={<Loading />}>
         <SeasonBody season={season} searchParams={searchParams} />
       </Suspense>
@@ -63,7 +69,8 @@ async function SeasonBody({
   season: Season;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const t = translator();
+  const t = pageT();
+  const text = seasonText(season);
   const query = await searchParams;
   // Says "Today" and "Tomorrow", so worked out per visit.
   await connection();
@@ -78,18 +85,23 @@ async function SeasonBody({
     near ? positionForSearch(near) : Promise.resolve(null),
   ]);
   if (dates.state !== "ok") {
-    return <LoadProblem state={dates.state} what={`${season.name} dates`} />;
+    return (
+      <LoadProblem
+        state={dates.state}
+        what={t("season.loadDates", { name: text.name })}
+      />
+    );
   }
   const days = seasonDays(dates.data, season);
   const window = seasonWindow(days);
   if (!window) {
     return (
       <Notice>
-        Next year&apos;s {season.name} dates aren&apos;t listed yet. See all the{" "}
-        <Link href="/festivals" className="underline">
-          festival dates
+        {t("season.notListed", { name: text.name })}{" "}
+        <Link href={localePath("/festivals")} className="underline">
+          {t("season.festivalDates")}
         </Link>
-        .
+        {t("festival.appearAfter")}
       </Notice>
     );
   }
@@ -117,7 +129,10 @@ async function SeasonBody({
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 id="days" className="font-display text-xl font-bold">
-            {season.name} is on {formatDateRange(main.starts_on, main.ends_on)}
+            {t("season.isOn", {
+              name: text.name,
+              dates: formatDateRange(main.starts_on, main.ends_on),
+            })}
           </h2>
           <Countdown date={main.starts_on} />
         </div>
@@ -125,10 +140,12 @@ async function SeasonBody({
           {days.map((d) => (
             <li key={d.slug}>
               <Link
-                href={`/festivals/${d.slug}`}
+                href={localePath(`/festivals/${d.slug}`)}
                 className="hover:bg-sunk flex flex-col rounded-xl px-2 py-1.5 leading-snug no-underline"
               >
-                <span className="font-semibold">{d.name}</span>
+                <span className="font-semibold">
+                  {festivalText(d.slug, { name: d.name, summary: null }).name}
+                </span>
                 <span className="text-marigold-ink">
                   {formatEventStart(`${d.starts_on}T12:00:00Z`, true)}
                 </span>
@@ -138,15 +155,15 @@ async function SeasonBody({
         </ul>
         {days.some((d) => !d.verified) && (
           <p className="text-muted text-base">
-            <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge> Some
-            mandirs follow a different calendar, so check with yours.
+            <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge>{" "}
+            {t("season.otherCalendars")}
           </p>
         )}
       </section>
 
       <form className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5">
         <NearMe
-          page={`/${season.slug}`}
+          page={localePath(`/${season.slug}`)}
           labels={{
             field: t("whatsOn.near"),
             button: t("whatsOn.nearMe"),
@@ -191,14 +208,14 @@ async function SeasonBody({
 
       {problem && <Notice tone="error">{problem}</Notice>}
       {events.state !== "ok" ? (
-        <LoadProblem state={events.state} what="event list" />
+        <LoadProblem state={events.state} what={t("load.eventList")} />
       ) : shown.length ? (
         <section aria-labelledby="events" className="flex flex-col gap-4">
           <h2
             id="events"
             className="font-display text-2xl font-bold sm:text-3xl"
           >
-            {season.name} at mandirs
+            {t("festival.atMandirs", { name: text.name })}
           </h2>
           <p className="text-muted" aria-live="polite">
             {t.count("whatsOn.count", shown.length)}
@@ -214,21 +231,23 @@ async function SeasonBody({
       ) : (
         <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-5">
           <p className="font-semibold">
-            {position
-              ? `No ${season.name} events listed near there yet.`
-              : `No ${season.name} events listed yet.`}
+            {t(position ? "season.noneNear" : "season.none", {
+              name: text.name,
+            })}
           </p>
           <p className="text-muted">
-            Mandirs are adding their {season.name} programmes. Check back soon,
-            or find your{" "}
-            <Link href="/mandirs" className="text-peacock underline">
-              nearest mandir
+            {t("season.adding", { name: text.name })}{" "}
+            <Link
+              href={localePath("/mandirs")}
+              className="text-peacock underline"
+            >
+              {t("festival.nearestMandir")}
             </Link>
-            . On a mandir committee?{" "}
+            {t("festival.appearAfter")} {t("season.committee")}{" "}
             <Link href="/for-mandirs" className="text-peacock underline">
-              Add your programme in a few minutes
+              {t("season.addProgramme")}
             </Link>
-            .
+            {t("festival.appearAfter")}
           </p>
         </div>
       )}
@@ -236,15 +255,15 @@ async function SeasonBody({
 
       <SubscribeCalendar
         path={`/${season.slug}/calendar.ics`}
-        title={`Put ${season.name} events in your calendar`}
-        body={`Every mandir's ${season.name} events in the calendar on your phone. New events and changes appear there automatically.`}
+        title={t("season.calendarTitle", { name: text.name })}
+        body={t("season.calendarBody", { name: text.name })}
       />
       <div className="flex flex-col gap-2">
-        <p className="font-semibold">Tell family and friends</p>
+        <p className="font-semibold">{t("season.tellFamily")}</p>
         <ShareButtons
-          label={`Share the ${season.name} page`}
-          text={season.shareText}
-          path={`/${season.slug}`}
+          label={t("season.share", { name: text.name })}
+          text={text.shareText}
+          path={localePath(`/${season.slug}`)}
         />
       </div>
     </>

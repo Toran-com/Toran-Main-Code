@@ -221,6 +221,79 @@ export const en = {
   "festival.name.ganesh-chaturthi": "Ganesh Chaturthi",
   "festival.summary.ganesh-chaturthi":
     "The birth of Ganeshji, with puja and visarjan.",
+  "season.isOn": "{name} is on {dates}",
+  "season.otherCalendars":
+    "Some mandirs follow a different calendar, so check with yours.",
+  "season.notListed": "Next year's {name} dates aren't listed yet. See all the",
+  "season.festivalDates": "festival dates",
+  "season.loadDates": "{name} dates",
+  "season.none": "No {name} events listed yet.",
+  "season.noneNear": "No {name} events listed near there yet.",
+  "season.adding":
+    "Mandirs are adding their {name} programmes. Check back soon, or find your",
+  "season.committee": "On a mandir committee?",
+  "season.addProgramme": "Add your programme in a few minutes",
+  "season.calendarTitle": "Put {name} events in your calendar",
+  "season.calendarBody":
+    "Every mandir's {name} events in the calendar on your phone. New events and changes appear there automatically.",
+  "season.tellFamily": "Tell family and friends",
+  "season.share": "Share the {name} page",
+  "season.allOf": "All of {period} at mandirs, in one place",
+  "season.diwali.period": "Diwali week",
+  "season.diwali.title": "Diwali at UK mandirs",
+  "season.diwali.description":
+    "Diwali week at Hindu mandirs across the UK: Dhanteras, Lakshmi puja, Annakut and New Year, and Bhai Dooj. Find what's on near you.",
+  "season.diwali.intro":
+    "Lakshmi puja, fireworks, Annakut and the New Year: what mandirs across the UK are doing for Diwali week, all in one place.",
+  "season.diwali.shareText":
+    "Diwali at mandirs across the UK: what's on near you",
+  "season.navratri.period": "Navratri",
+  "season.navratri.title": "Navratri at UK mandirs",
+  "season.navratri.description":
+    "Navratri at Hindu mandirs across the UK: nine nights of Garba and Raas, Dussehra and Sharad Purnima. Find what's on near you.",
+  "season.navratri.intro":
+    "Nine nights of Garba and Raas, then Dussehra and Sharad Purnima: what mandirs across the UK are doing for Navratri, all in one place.",
+  "season.navratri.shareText":
+    "Navratri Garba at mandirs across the UK: what's on near you",
+  "season.maha-shivaratri.period": "Maha Shivaratri",
+  "season.maha-shivaratri.title": "Maha Shivaratri at UK mandirs",
+  "season.maha-shivaratri.description":
+    "Maha Shivaratri at Hindu mandirs across the UK: abhishek, bhajans and all-night worship of Shiva. Find what's on near you.",
+  "season.maha-shivaratri.intro":
+    "Abhishek, bhajans and the all-night jagran: what mandirs across the UK are doing for Maha Shivaratri, all in one place.",
+  "season.maha-shivaratri.shareText":
+    "Maha Shivaratri at mandirs across the UK: what's on near you",
+  "season.holi.period": "Holi",
+  "season.holi.title": "Holi at UK mandirs",
+  "season.holi.description":
+    "Holi at Hindu mandirs across the UK: the Holika Dahan bonfire and the festival of colours. Find what's on near you.",
+  "season.holi.intro":
+    "The Holika Dahan bonfire, then a day of colours: what mandirs across the UK are doing for Holi, all in one place.",
+  "season.holi.shareText": "Holi at mandirs across the UK: what's on near you",
+  "season.ram-navami.period": "Ram Navami",
+  "season.ram-navami.title": "Ram Navami at UK mandirs",
+  "season.ram-navami.description":
+    "Ram Navami and Hanuman Jayanti at Hindu mandirs across the UK: the birth of Shri Ram, with puja, katha and bhajans. Find what's on near you.",
+  "season.ram-navami.intro":
+    "The birth of Shri Ram, and Hanuman Jayanti a few days later: what mandirs across the UK are doing, all in one place.",
+  "season.ram-navami.shareText":
+    "Ram Navami at mandirs across the UK: what's on near you",
+  "season.janmashtami.period": "Janmashtami",
+  "season.janmashtami.title": "Janmashtami at UK mandirs",
+  "season.janmashtami.description":
+    "Janmashtami at Hindu mandirs across the UK: the birth of Shri Krishna, with bhajans, the midnight aarti and the cradle. Find what's on near you.",
+  "season.janmashtami.intro":
+    "Bhajans, the cradle and the midnight aarti for the birth of Shri Krishna: what mandirs across the UK are doing, all in one place.",
+  "season.janmashtami.shareText":
+    "Janmashtami at mandirs across the UK: what's on near you",
+  "season.ganesh-chaturthi.period": "Ganesh Chaturthi",
+  "season.ganesh-chaturthi.title": "Ganesh Chaturthi at UK mandirs",
+  "season.ganesh-chaturthi.description":
+    "Ganesh Chaturthi at Hindu mandirs across the UK: Ganesh puja, aarti and visarjan. Find what's on near you.",
+  "season.ganesh-chaturthi.intro":
+    "Ganesh puja, modak and visarjan: what mandirs across the UK are doing for Ganesh Chaturthi, all in one place.",
+  "season.ganesh-chaturthi.shareText":
+    "Ganesh Chaturthi at mandirs across the UK: what's on near you",
 
   "seva.pageTitle": "Seva for {title}, {name}",
   "seva.pageDescription":

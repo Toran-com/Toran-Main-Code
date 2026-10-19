@@ -27,6 +27,10 @@ test("the Gujarati pages are there, marked as a draft", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("તહેવારો");
   await page.goto("/gu/mandirs");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("મંદિરો");
+  await page.goto("/gu/holi");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "યુકેનાં મંદિરોમાં હોળી",
+  );
 });
 
 test("English pages don't offer Gujarati yet", async ({ page }) => {
