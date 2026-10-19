@@ -12,3 +12,35 @@ test("committees can find out what Toran does for them", async ({ page }) => {
     page.getByRole("link", { name: "Try the example" }),
   ).toHaveAttribute("href", "/demo");
 });
+
+// The committee guide, and its one-page handout to print.
+test("committees can read the guide and print the handout", async ({
+  page,
+}) => {
+  await page.goto("/for-mandirs");
+  await page.getByRole("link", { name: "Read the committee guide" }).click();
+  await expect(page).toHaveURL(/\/for-mandirs\/guide$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Committee guide",
+  );
+  // The contents jump to each section.
+  const contents = page.getByRole("navigation", { name: "In this guide" });
+  await contents.getByRole("link", { name: "Seva rotas" }).click();
+  await expect(page).toHaveURL(/#seva$/);
+  await expect(
+    page.getByRole("heading", { level: 2, name: /Seva rotas/ }),
+  ).toBeInViewport();
+
+  await page.getByRole("link", { name: "Print a one-page handout" }).click();
+  await expect(page).toHaveURL(/\/for-mandirs\/guide\/print$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Your mandir's events on Toran",
+  );
+  await expect(page.getByRole("listitem")).toHaveCount(6);
+  await expect(
+    page.getByRole("img", { name: /QR code for .*\/for-mandirs\/guide$/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Print this page" }),
+  ).toBeVisible();
+});

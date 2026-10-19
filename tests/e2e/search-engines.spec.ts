@@ -24,6 +24,7 @@ test("pages name their one true address", async ({ page }) => {
     ["/mandirs", /\/mandirs$/],
     ["/festivals", /\/festivals$/],
     ["/for-mandirs", /\/for-mandirs$/],
+    ["/for-mandirs/guide", /\/for-mandirs\/guide$/],
     // Filters don't make a separate page.
     ["/whats-on?near=LE4&within=15", /\/whats-on$/],
   ] as const) {
