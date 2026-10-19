@@ -1,3 +1,4 @@
+import { DIWALI } from "@/lib/festival-season";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Ornament } from "@/components/ui";
@@ -125,6 +126,18 @@ export default async function FestivalPage({
           />
         </div>
       </div>
+
+      {DIWALI.festivals.includes(festival.slug) && (
+        <Link
+          href="/diwali"
+          className="border-marigold/50 bg-marigold/10 lift text-ink flex items-center justify-between gap-3 rounded-2xl border p-4 font-semibold no-underline"
+        >
+          <span>All of Diwali week at mandirs, in one place</span>
+          <span aria-hidden="true" className="text-peacock">
+            →
+          </span>
+        </Link>
+      )}
 
       <section aria-labelledby="events" className="flex flex-col gap-4">
         <h2 id="events" className="font-display text-2xl font-bold sm:text-3xl">

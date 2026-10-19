@@ -35,7 +35,7 @@ within one month.
   any website you visit does. If you press "Near me", your browser asks
   first; your location only moves the map on your screen and is never sent
   to us or kept.
-- **"Near me" on What's on.** If you press it, your browser asks first,
+- **"Near me" on What's on and the Diwali page.** If you press it, your browser asks first,
   then sends your position (rounded to about a kilometre) to postcodes.io
   to find your postcode district, such as "RG1". Only the district reaches
   Toran, just as if you'd typed it; your position isn't sent to us or
