@@ -14,7 +14,7 @@ export function AddToCalendar({
   const item =
     "hover:bg-sunk text-peacock rounded-lg px-3 py-2 font-semibold no-underline";
   return (
-    <details className="group text-base">
+    <details className="group relative text-base">
       <summary
         aria-label={`Add to calendar: ${title}`}
         className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border px-3 py-1 font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-95 [&::-webkit-details-marker]:hidden"
@@ -33,7 +33,7 @@ export function AddToCalendar({
         </svg>
         Add to calendar
       </summary>
-      <div className="border-line bg-surface shadow-lift mt-2 flex w-fit flex-col rounded-xl border p-1">
+      <div className="border-line bg-surface shadow-lift absolute top-full left-0 z-20 mt-2 flex w-max flex-col rounded-xl border p-1">
         <a
           href={`/mandirs/${mandirSlug}/add-to-calendar${query}`}
           target="_blank"

@@ -86,48 +86,48 @@ export default async function FestivalPage({
       >
         {t("festival.all")}
       </Link>
-      <div className="rise flex flex-col gap-3">
+      <div className="rise flex flex-col gap-2 sm:gap-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           {festival.name}
         </h1>
         <Ornament />
         {festival.summary && (
-          <p className="text-muted max-w-prose text-lg">{festival.summary}</p>
+          <p className="text-muted max-w-prose text-base sm:text-lg">
+            {festival.summary}
+          </p>
         )}
-        <ShareButtons
-          label="Share this festival"
-          text={`${festival.name} in the UK: dates and events at mandirs`}
-          path={`/festivals/${festival.slug}`}
-        />
+        {festival.dates.length ? (
+          <ul className="flex flex-col gap-1">
+            {festival.dates.map((d) => (
+              <li key={d.id} className="flex flex-wrap items-center gap-2">
+                <span className="text-marigold-ink text-lg font-bold sm:text-xl">
+                  {formatDateRange(d.starts_on, d.ends_on)}
+                </span>
+                {calendarLabel(d.calendar) && (
+                  <span className="text-muted">
+                    · {calendarLabel(d.calendar)}
+                  </span>
+                )}
+                {!d.verified && (
+                  <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted">{t("festival.noDate")}</p>
+        )}
+        <div className="pt-1">
+          <ShareButtons
+            label="Share this festival"
+            text={`${festival.name} in the UK: dates and events at mandirs`}
+            path={`/festivals/${festival.slug}`}
+          />
+        </div>
       </div>
 
-      {festival.dates.length ? (
-        <ul className="rise-list flex flex-col gap-2">
-          {festival.dates.map((d) => (
-            <li
-              key={d.id}
-              className="border-line bg-surface shadow-card flex flex-wrap items-center gap-2 rounded-2xl border p-4"
-            >
-              <span className="text-marigold-ink font-semibold">
-                {formatDateRange(d.starts_on, d.ends_on)}
-              </span>
-              {calendarLabel(d.calendar) && (
-                <span className="text-muted">
-                  · {calendarLabel(d.calendar)}
-                </span>
-              )}
-              {!d.verified && (
-                <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-muted">{t("festival.noDate")}</p>
-      )}
-
       <section aria-labelledby="events" className="flex flex-col gap-4">
-        <h2 id="events" className="font-display text-3xl font-bold">
+        <h2 id="events" className="font-display text-2xl font-bold sm:text-3xl">
           {t("festival.atMandirs", { name: festival.name })}
         </h2>
         {during.length ? (

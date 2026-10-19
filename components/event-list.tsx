@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { Badge } from "@/components/public-shell";
-import { AddToCalendar } from "@/components/add-to-calendar";
-import { ShareButtons } from "@/components/share-buttons";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
-import { formatEventStart } from "@/lib/format";
+import { formatTimeOfDay } from "@/lib/format";
 import { formatMiles } from "@/lib/geo";
 import { describeRule } from "@/lib/recurrence";
-import { eventPath, eventShareText } from "@/lib/share";
+import { eventPath } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";
 import { groupByDay } from "@/lib/whats-on-view";
 import { translator } from "@/lib/i18n";
 
-// Events across mandirs, grouped by day.
+// Events across mandirs, grouped by day. Each card opens the event's own
+// page, which has "Add to calendar" and sharing; the list stays easy to
+// scan on a phone.
 // Pass "now" on pages rendered per visit, so headings can say "Today";
 // leave it out on saved (static) pages.
 export function EventList({
@@ -21,81 +21,73 @@ export function EventList({
   events: EventNear[];
   now?: Date | null;
 }) {
-  const t = translator();
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 sm:gap-8">
       {groupByDay(events, now).map(({ heading, events: day }) => (
         <section key={heading} className="flex flex-col gap-3">
-          <h2 className="font-display text-2xl font-bold">{heading}</h2>
+          <h2 className="font-display text-xl font-bold sm:text-2xl">
+            {heading}
+          </h2>
           <ul className="rise-list flex flex-col gap-3">
             {day.map((e) => (
               <li key={e.id}>
-                <article className="border-line bg-surface lift shadow-card flex flex-col gap-1 rounded-2xl border p-5">
-                  <p className="text-marigold-ink font-semibold">
-                    {e.recurrence && `${describeRule(e.recurrence)} · `}
-                    {formatEventStart(e.next_starts_at, e.all_day)}
-                  </p>
-                  <h3
-                    className={`text-xl font-bold ${e.status === "cancelled" ? "line-through" : ""}`}
-                  >
-                    <Link
-                      href={eventPath(e.mandir.slug, e.id)}
-                      className="hover:text-peacock no-underline hover:underline"
-                    >
-                      {e.title}
-                    </Link>
-                  </h3>
-                  {e.title_gu && (
-                    <p lang="gu" className="text-lg font-semibold">
-                      {e.title_gu}
-                    </p>
-                  )}
-                  {e.status === "cancelled" && (
-                    <p>
-                      <Badge tone="kumkum">{t("event.cancelled")}</Badge>
-                    </p>
-                  )}
-                  <p>
-                    <Link
-                      href={`/mandirs/${e.mandir.slug}`}
-                      className="text-peacock font-semibold underline"
-                    >
-                      {e.mandir.name}
-                    </Link>
-                    <span className="text-muted">
-                      {" "}
-                      · {e.mandir.town}
-                      {e.miles !== null && ` · ${formatMiles(e.miles)}`}
-                    </span>
-                  </p>
-                  {e.summary && <p className="text-muted">{e.summary}</p>}
-                  {(kindLabel(e.kind) || sourceLabel(e)) && (
-                    <p className="text-muted text-base">
-                      {[kindLabel(e.kind), sourceLabel(e)]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                  )}
-                  {e.status !== "cancelled" && (
-                    <>
-                      <ShareButtons
-                        text={eventShareText(e, e.mandir)}
-                        path={eventPath(e.mandir.slug, e.id)}
-                      />
-                      <AddToCalendar
-                        mandirSlug={e.mandir.slug}
-                        eventId={e.id}
-                        title={e.title}
-                      />
-                    </>
-                  )}
-                </article>
+                <EventCard event={e} />
               </li>
             ))}
           </ul>
         </section>
       ))}
     </div>
+  );
+}
+
+export function EventCard({ event: e }: { event: EventNear }) {
+  const t = translator();
+  const cancelled = e.status === "cancelled";
+  const rule = e.recurrence && describeRule(e.recurrence);
+  const source = sourceLabel(e);
+  return (
+    <article className="has-card-link group border-line bg-surface lift shadow-card flex gap-3 rounded-2xl border p-4 sm:gap-5 sm:p-5">
+      <p className="text-marigold-ink w-14 shrink-0 pt-0.5 leading-tight font-bold sm:w-20 sm:text-lg">
+        {formatTimeOfDay(e.next_starts_at, e.all_day)}
+      </p>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <h3
+          className={`text-lg leading-snug font-bold sm:text-xl ${cancelled ? "line-through" : ""}`}
+        >
+          <Link
+            href={eventPath(e.mandir.slug, e.id)}
+            className="card-link group-hover:text-peacock no-underline"
+          >
+            {e.title}
+          </Link>
+        </h3>
+        {e.title_gu && (
+          <p lang="gu" className="font-semibold">
+            {e.title_gu}
+          </p>
+        )}
+        <p className="text-muted">
+          <span className="text-ink font-semibold">{e.mandir.name}</span>
+          {` · ${e.mandir.town}`}
+          {e.miles !== null && ` · ${formatMiles(e.miles)}`}
+        </p>
+        {e.summary && <p className="text-muted line-clamp-2">{e.summary}</p>}
+        <p className="mt-1 flex flex-wrap items-center gap-2">
+          {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
+          {rule && <Badge tone="marigold">{rule}</Badge>}
+          {kindLabel(e.kind) && <Badge>{kindLabel(e.kind)}</Badge>}
+          {source && (
+            <span
+              className={`text-base ${e.confirmed_at ? "text-peacock font-semibold" : "text-muted"}`}
+            >
+              {e.confirmed_at && <span aria-hidden="true">✓ </span>}
+              {source}
+            </span>
+          )}
+        </p>
+      </div>
+    </article>
   );
 }
 

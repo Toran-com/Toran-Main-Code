@@ -11,7 +11,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 pt-6 pb-10 sm:gap-8 sm:px-6 sm:pt-10">
         {children}
       </main>
       <SiteFooter />
@@ -76,12 +76,14 @@ export function PageHeading({
   intro?: ReactNode;
 }) {
   return (
-    <div className="rise flex flex-col gap-3">
+    <div className="rise flex flex-col gap-2 sm:gap-3">
       <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
         {title}
       </h1>
       <Ornament />
-      {intro && <p className="text-muted max-w-prose text-lg">{intro}</p>}
+      {intro && (
+        <p className="text-muted max-w-prose text-base sm:text-lg">{intro}</p>
+      )}
     </div>
   );
 }

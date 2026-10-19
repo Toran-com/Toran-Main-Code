@@ -12,19 +12,17 @@ export const en = {
   "home.tagline": "What's on at mandirs near you",
   "home.intro":
     "Events from mandirs across the UK in one place, and a simple way for committees to organise seva. We are talking to mandir committees now and will open in 2027.",
-  "home.whatsOn": "What's on",
   "home.mandirs": "Browse mandirs",
-  "home.festivals": "Festival dates",
+  "home.searchTitle": "Find what's on near you",
+  "home.comingUp": "Coming up",
+  "home.seeAll": "See everything that's on",
+  "home.festivalsSoon": "Festivals coming up",
+  "home.allFestivals": "All festival dates",
+  "home.committeesCta": "Run a mandir? Put your events on Toran",
   "home.comingSoon": "Coming soon",
-  "home.eventsTitle": "Find what's on",
-  "home.eventsBody":
-    "Aarti, bhajans, classes and festival celebrations at mandirs near you, ready to share on WhatsApp.",
   "home.committeesTitle": "How it works for committees",
   "home.committeesBody":
     "Committees send the patrika or poster they already share, and check it before it goes live. It's free for mandirs.",
-  "home.festivalsTitle": "Festival calendar",
-  "home.festivalsBody":
-    "Navratri, Diwali, Holi and more, with the dates UK mandirs follow.",
 
   "whatsOn.title": "What's on",
   "whatsOn.intro":
@@ -36,7 +34,8 @@ export const en = {
   "whatsOn.region": "Region",
   "whatsOn.anywhere": "Anywhere",
   "whatsOn.type": "Type of event",
-  "whatsOn.anyType": "Any type",
+  "whatsOn.anyType": "Everything",
+  "whatsOn.moreOptions": "Choose a region",
   "whatsOn.show": "Show",
   "whatsOn.count.one": "{count} event",
   "whatsOn.count.other": "{count} events",

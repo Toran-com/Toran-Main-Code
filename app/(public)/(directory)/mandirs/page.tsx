@@ -17,7 +17,7 @@ export default function MandirsPage() {
     <>
       <PageHeading
         title="Mandirs"
-        intro="Hindu mandirs across the UK, on a map or as a list by region and town. Choose one to see what's on."
+        intro="Hindu mandirs across the UK. Find yours to see what's on."
       />
       <Suspense fallback={<Loading />}>
         <Directory />

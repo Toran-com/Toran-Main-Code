@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Suspense } from "react";
+import { EventList } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
+import { NearMe } from "@/components/near-me";
 import { SiteFooter, SiteHeader } from "@/components/public-shell";
 import { ToranGarland } from "@/components/toran-garland";
-import { buttonClass, cardClass, quietButtonClass } from "@/components/ui";
+import {
+  buttonClass,
+  cardClass,
+  inputClass,
+  quietButtonClass,
+} from "@/components/ui";
+import { listFestivalDates } from "@/lib/directory";
+import { formatDateRange } from "@/lib/format";
+import { listUpcomingEvents } from "@/lib/whats-on";
+import { nearTo } from "@/lib/whats-on-view";
 import { site, siteUrl } from "@/lib/site";
 import { siteData } from "@/lib/structured-data";
 import { translator } from "@/lib/i18n";
@@ -13,7 +24,9 @@ import { translator } from "@/lib/i18n";
 // from the root layout.
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
-// The home page until launch: what Toran is, and the way in to each part.
+// The home page until launch: what Toran is, a way straight in to what's
+// on near you, the next few events and festivals, and a word for
+// committees.
 export default function ComingSoon() {
   const t = translator();
   return (
@@ -26,8 +39,11 @@ export default function ComingSoon() {
             aria-hidden="true"
             className="rangoli absolute top-0 right-0 h-44 w-1/2 sm:h-full"
           />
-          <div className="rise relative mx-auto flex w-full max-w-3xl flex-col gap-7 px-4 pt-12 pb-12 sm:px-6 sm:pt-20">
-            <ToranGarland className="sway h-12 w-56" decorative />
+          <div className="rise relative mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 pt-8 pb-8 sm:gap-7 sm:px-6 sm:pt-16">
+            <ToranGarland
+              className="sway h-10 w-48 sm:h-12 sm:w-56"
+              decorative
+            />
             <p className="border-marigold/40 bg-surface/80 text-marigold-ink inline-flex w-fit items-center gap-2 rounded-full border px-4 py-1 text-base font-semibold">
               <span
                 aria-hidden="true"
@@ -35,98 +51,168 @@ export default function ComingSoon() {
               />
               {t("home.comingSoon")}
             </p>
-            <div className="flex flex-col gap-4">
-              <h1 className="font-display text-6xl font-extrabold tracking-tight sm:text-7xl">
+            <div className="flex flex-col gap-3">
+              <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-7xl">
                 {site.name}
               </h1>
               <p className="font-display text-peacock text-2xl font-bold sm:text-3xl">
                 {t("home.tagline")}
               </p>
-              <p className="text-muted max-w-prose text-lg leading-relaxed">
+              <p className="text-muted max-w-prose leading-relaxed sm:text-lg">
                 {t("home.intro")}
               </p>
             </div>
-            <nav aria-label="Explore" className="flex flex-wrap gap-3">
-              <Link href="/whats-on" className={`${buttonClass} sm:w-auto`}>
-                {t("home.whatsOn")}
-              </Link>
-              <Link
-                href="/mandirs"
-                className={`${quietButtonClass} w-full sm:w-auto`}
-              >
-                {t("home.mandirs")}
-              </Link>
-              <Link
-                href="/festivals"
-                className={`${quietButtonClass} w-full sm:w-auto`}
-              >
-                {t("home.festivals")}
-              </Link>
-            </nav>
+
+            <form
+              action="/whats-on"
+              className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5"
+            >
+              <h2 className="font-display text-xl font-bold">
+                {t("home.searchTitle")}
+              </h2>
+              <NearMe
+                labels={{
+                  field: t("whatsOn.near"),
+                  button: t("whatsOn.nearMe"),
+                  finding: t("whatsOn.finding"),
+                  denied: t("whatsOn.locationDenied"),
+                  failed: t("whatsOn.locationFailed"),
+                }}
+                input={
+                  <div className="grid grid-cols-[1fr_auto] gap-2">
+                    <input
+                      id="near"
+                      name="near"
+                      placeholder={t("whatsOn.nearExample")}
+                      autoComplete="postal-code"
+                      className={`${inputClass} min-w-0`}
+                    />
+                    <button type="submit" className={`${buttonClass} px-6`}>
+                      {t("whatsOn.show")}
+                    </button>
+                  </div>
+                }
+              />
+            </form>
           </div>
         </section>
 
-        <ul className="rise-list mx-auto grid w-full max-w-3xl gap-4 px-4 pb-16 sm:grid-cols-3 sm:px-6">
-          <Feature
-            href="/whats-on"
-            title={t("home.eventsTitle")}
-            body={t("home.eventsBody")}
-            icon={<CalendarIcon />}
-          />
-          <Feature
-            href="/for-mandirs"
-            title={t("home.committeesTitle")}
-            body={t("home.committeesBody")}
-            icon={<MandirIcon />}
-          />
-          <Feature
-            href="/festivals"
-            title={t("home.festivalsTitle")}
-            body={t("home.festivalsBody")}
-            icon={<DiyaIcon />}
-          />
-        </ul>
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pb-16 sm:px-6">
+          <Suspense fallback={null}>
+            <ComingUp />
+          </Suspense>
+          <Suspense fallback={null}>
+            <FestivalsSoon />
+          </Suspense>
+
+          <section
+            className={`${cardClass} lift has-card-link group flex items-start gap-4 p-5`}
+          >
+            <span className="bg-marigold/15 text-marigold-ink grid size-12 shrink-0 place-items-center rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <MandirIcon />
+            </span>
+            <div className="flex flex-col gap-1">
+              <h2 className="font-display text-xl font-bold">
+                <Link
+                  href="/for-mandirs"
+                  className="card-link group-hover:text-peacock no-underline"
+                >
+                  {t("home.committeesCta")}
+                </Link>
+                <span aria-hidden="true" className="text-peacock">
+                  {"\u00a0→"}
+                </span>
+              </h2>
+              <p className="text-muted">{t("home.committeesBody")}</p>
+            </div>
+          </section>
+
+          <p>
+            <Link
+              href="/mandirs"
+              className={`${quietButtonClass} w-full sm:w-auto`}
+            >
+              {t("home.mandirs")}
+            </Link>
+          </p>
+        </div>
       </main>
       <SiteFooter />
     </>
   );
 }
 
-function Feature({
-  href,
-  title,
-  body,
-  icon,
-}: {
-  href: string;
-  title: string;
-  body: string;
-  icon: ReactNode;
-}) {
+// The next few events anywhere, straight from What's on.
+async function ComingUp() {
+  const t = translator();
+  const result = await listUpcomingEvents();
+  if (result.state !== "ok" || result.data.length === 0) return null;
+  const next = result.data.filter((e) => e.status === "published").slice(0, 4);
   return (
-    <li
-      className={`${cardClass} lift has-card-link group flex flex-col gap-3 p-5`}
-    >
-      <span className="bg-marigold/15 text-marigold-ink grid size-12 place-items-center rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-        {icon}
-      </span>
-      <h2 className="font-display text-xl font-bold">
-        <Link
-          href={href}
-          className="card-link group-hover:text-peacock no-underline"
-        >
-          {title}
-          {/* Kept on the same line as the last word, and nudged on hover. */}
-          <span
-            aria-hidden="true"
-            className="relative left-0 transition-[left] duration-200 group-hover:left-1"
-          >
-            {"\u00a0→"}
-          </span>
-        </Link>
+    <section aria-labelledby="coming-up" className="flex flex-col gap-4">
+      <h2
+        id="coming-up"
+        className="font-display text-2xl font-bold sm:text-3xl"
+      >
+        {t("home.comingUp")}
       </h2>
-      <p className="text-muted">{body}</p>
-    </li>
+      <EventList events={nearTo(next, null, 0)} />
+      <Link href="/whats-on" className="text-peacock w-fit font-semibold">
+        {t("home.seeAll")} →
+      </Link>
+    </section>
+  );
+}
+
+// The next three festivals, each once.
+async function FestivalsSoon() {
+  const t = translator();
+  const result = await listFestivalDates();
+  if (result.state !== "ok") return null;
+  const seen = new Set<string>();
+  const next = result.data
+    .filter((d) => {
+      if (!d.festival || seen.has(d.festival.slug)) return false;
+      seen.add(d.festival.slug);
+      return true;
+    })
+    .slice(0, 3);
+  if (!next.length) return null;
+  return (
+    <section aria-labelledby="festivals-soon" className="flex flex-col gap-4">
+      <h2
+        id="festivals-soon"
+        className="font-display text-2xl font-bold sm:text-3xl"
+      >
+        {t("home.festivalsSoon")}
+      </h2>
+      <ul className="rise-list grid gap-3 sm:grid-cols-3">
+        {next.map((d) => (
+          <li
+            key={d.id}
+            className={`${cardClass} lift has-card-link group flex items-start gap-3 p-4`}
+          >
+            <span className="bg-marigold/15 text-marigold-ink grid size-10 shrink-0 place-items-center rounded-xl">
+              <DiyaIcon />
+            </span>
+            <span className="flex flex-col">
+              <Link
+                href={`/festivals/${d.festival!.slug}`}
+                className="card-link group-hover:text-peacock text-lg font-bold no-underline"
+              >
+                {d.festival!.name}
+              </Link>
+              <span className="text-marigold-ink font-semibold">
+                {formatDateRange(d.starts_on, d.ends_on)}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <Link href="/festivals" className="text-peacock w-fit font-semibold">
+        {t("home.allFestivals")} →
+      </Link>
+    </section>
   );
 }
 
@@ -140,16 +226,6 @@ const iconProps = {
   strokeLinecap: "round",
   strokeLinejoin: "round",
 } as const;
-
-function CalendarIcon() {
-  return (
-    <svg {...iconProps}>
-      <rect x="3.5" y="5" width="17" height="15" rx="3" />
-      <path d="M3.5 10h17M8 3v4M16 3v4" />
-      <circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
 
 // A mandir: a shikhara with a flag over a doorway.
 function MandirIcon() {

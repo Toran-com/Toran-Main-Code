@@ -9,15 +9,20 @@ const noSubscribe = () => () => {};
 
 // "WhatsApp" opens a chat with the message ready to send. The second
 // button uses the phone's own share sheet where there is one, or copies
-// the link on a computer.
+// the link on a computer. The label is for screen readers; the buttons say
+// what they do.
 export function ShareButtons({
   text,
   path,
   label = "Share",
+  copy = true,
 }: {
   text: string;
   path: string;
   label?: string;
+  // Lists of events leave out "Copy link" to keep each card short; the
+  // event's own page has it.
+  copy?: boolean;
 }) {
   const origin = useOrigin();
   const canShare = useSyncExternalStore(
@@ -51,11 +56,8 @@ export function ShareButtons({
     <div
       role="group"
       aria-label={label === "Share" ? `Share: ${text}` : label}
-      className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1 text-base font-semibold"
+      className="inline-flex flex-wrap items-center gap-2 text-base font-semibold"
     >
-      <span className="text-muted" aria-hidden="true">
-        {label}:
-      </span>
       <a
         href={whatsAppLink(text, url)}
         target="_blank"
@@ -66,13 +68,15 @@ export function ShareButtons({
         <WhatsAppIcon />
         WhatsApp
       </a>
-      <button
-        type="button"
-        onClick={shareOrCopy}
-        className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95"
-      >
-        {canShare ? "Other apps" : "Copy link"}
-      </button>
+      {copy && (
+        <button
+          type="button"
+          onClick={shareOrCopy}
+          className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95"
+        >
+          {canShare ? "Other apps" : "Copy link"}
+        </button>
+      )}
       <span aria-live="polite" className="text-leaf">
         {copied ? "Link copied" : ""}
       </span>

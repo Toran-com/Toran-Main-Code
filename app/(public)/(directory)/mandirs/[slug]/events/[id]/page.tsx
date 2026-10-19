@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { AddToCalendar } from "@/components/add-to-calendar";
+import { EventActions } from "@/components/event-actions";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
-import { ShareButtons } from "@/components/share-buttons";
 import { Card, Notice, Ornament, quietButtonClass } from "@/components/ui";
 import {
   getEventSeva,
@@ -120,8 +119,8 @@ export default async function EventPage({
         ← {mandir.name}
       </Link>
 
-      <div className="rise flex flex-col gap-3">
-        <p className="text-marigold-ink text-xl font-semibold">
+      <div className="rise flex flex-col gap-2 sm:gap-3">
+        <p className="text-marigold-ink text-lg font-semibold sm:text-xl">
           {event.recurrence && `${rule ?? "Repeats"} · next `}
           {formatEventStart(event.next_starts_at, event.all_day)}
         </p>
@@ -131,7 +130,7 @@ export default async function EventPage({
           {event.title}
         </h1>
         {event.title_gu && (
-          <p lang="gu" className="text-2xl font-semibold">
+          <p lang="gu" className="text-xl font-semibold sm:text-2xl">
             {event.title_gu}
           </p>
         )}
@@ -144,16 +143,13 @@ export default async function EventPage({
           </p>
         )}
         {upcoming && !cancelled && (
-          <div className="flex flex-col gap-3">
-            <ShareButtons
-              label="Share this event"
-              text={eventShareText(event, mandir)}
-              path={path}
-            />
-            <AddToCalendar
+          <div className="pt-1">
+            <EventActions
               mandirSlug={mandir.slug}
               eventId={event.id}
               title={event.title}
+              shareText={eventShareText(event, mandir)}
+              path={path}
             />
           </div>
         )}

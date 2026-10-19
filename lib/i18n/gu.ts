@@ -15,19 +15,17 @@ export const gu: Record<MessageKey, string> = {
   "home.tagline": "તમારી નજીકના મંદિરોમાં શું થઈ રહ્યું છે",
   "home.intro":
     "યુકેભરના મંદિરોના કાર્યક્રમો એક જ જગ્યાએ, અને સમિતિઓ માટે સેવાનું આયોજન કરવાની સરળ રીત. અમે હાલમાં મંદિર સમિતિઓ સાથે વાત કરી રહ્યા છીએ અને 2027માં શરૂ કરીશું.",
-  "home.whatsOn": "કાર્યક્રમો",
   "home.mandirs": "મંદિરો જુઓ",
-  "home.festivals": "તહેવારોની તારીખો",
+  "home.searchTitle": "તમારી નજીક શું છે તે શોધો",
+  "home.comingUp": "આવનારા કાર્યક્રમો",
+  "home.seeAll": "બધા કાર્યક્રમો જુઓ",
+  "home.festivalsSoon": "આવનારા તહેવારો",
+  "home.allFestivals": "તહેવારોની બધી તારીખો",
+  "home.committeesCta": "મંદિર ચલાવો છો? તમારા કાર્યક્રમો Toran પર મૂકો",
   "home.comingSoon": "ટૂંક સમયમાં",
-  "home.eventsTitle": "કાર્યક્રમો શોધો",
-  "home.eventsBody":
-    "તમારી નજીકના મંદિરોમાં આરતી, ભજન, વર્ગો અને તહેવારોની ઉજવણી, WhatsApp પર શેર કરવા તૈયાર.",
   "home.committeesTitle": "સમિતિઓ માટે તે કેવી રીતે કામ કરે છે",
   "home.committeesBody":
     "સમિતિઓ જે પત્રિકા કે પોસ્ટર પહેલેથી શેર કરે છે તે મોકલે છે, અને પ્રકાશિત થાય તે પહેલાં તપાસે છે. મંદિરો માટે તે મફત છે.",
-  "home.festivalsTitle": "તહેવારોનું કેલેન્ડર",
-  "home.festivalsBody":
-    "નવરાત્રિ, દિવાળી, હોળી અને વધુ, યુકેના મંદિરો અનુસરે છે તે તારીખો સાથે.",
 
   "whatsOn.title": "કાર્યક્રમો",
   "whatsOn.intro":
@@ -39,7 +37,8 @@ export const gu: Record<MessageKey, string> = {
   "whatsOn.region": "પ્રદેશ",
   "whatsOn.anywhere": "ગમે ત્યાં",
   "whatsOn.type": "કાર્યક્રમનો પ્રકાર",
-  "whatsOn.anyType": "કોઈ પણ પ્રકાર",
+  "whatsOn.anyType": "બધું",
+  "whatsOn.moreOptions": "પ્રદેશ પસંદ કરો",
   "whatsOn.show": "બતાવો",
   "whatsOn.count.one": "{count} કાર્યક્રમ",
   "whatsOn.count.other": "{count} કાર્યક્રમો",
