@@ -152,6 +152,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByLabel("What's happening?").fill("Weekly aarti");
   await member.getByLabel("Date").fill(nextWeek());
   await member.getByLabel("Starts").fill("19:00");
+  await member.getByText("Happens every week or month?").click();
   await member
     .getByRole("combobox", { name: /^Repeats/ })
     .selectOption("weekly");

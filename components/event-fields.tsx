@@ -71,37 +71,44 @@ export function EventFields({
       <p className="text-muted -mt-3 text-base">
         Leave the start time empty for an all-day event.
       </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="flex flex-col gap-2">
-          <span className="font-semibold">Repeats</span>
-          <select
-            name="repeat"
-            defaultValue={values?.repeat ?? "none"}
-            className={inputClass}
-          >
-            <option value="none">Doesn&apos;t repeat</option>
-            <option value="weekly">Every week</option>
-            <option value="fortnightly">Every other week</option>
-            <option value="monthly">Once a month (e.g. 2nd Saturday)</option>
-            <option value="monthly-last">
-              Once a month, the last one (e.g. last Friday)
-            </option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-2">
-          <span className="font-semibold">Repeats until</span>
-          <input
-            name="until"
-            type="date"
-            defaultValue={values?.until}
-            className={inputClass}
-          />
-        </label>
-      </div>
-      <p className="text-muted -mt-3 text-base">
-        For repeating events, leave &ldquo;until&rdquo; empty for six months. Up
-        to a year.
-      </p>
+      <details
+        className="flex flex-col gap-2"
+        open={!!values?.repeat && values.repeat !== "none"}
+      >
+        <summary className="cursor-pointer font-semibold">
+          Happens every week or month?
+        </summary>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Repeats</span>
+            <select
+              name="repeat"
+              defaultValue={values?.repeat ?? "none"}
+              className={inputClass}
+            >
+              <option value="none">Doesn&apos;t repeat</option>
+              <option value="weekly">Every week</option>
+              <option value="fortnightly">Every other week</option>
+              <option value="monthly">Once a month (e.g. 2nd Saturday)</option>
+              <option value="monthly-last">
+                Once a month, the last one (e.g. last Friday)
+              </option>
+            </select>
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Repeats until</span>
+            <input
+              name="until"
+              type="date"
+              defaultValue={values?.until}
+              className={inputClass}
+            />
+          </label>
+        </div>
+        <p className="text-muted mt-2 text-base">
+          Leave &ldquo;until&rdquo; empty for six months. Up to a year.
+        </p>
+      </details>
       <details className="flex flex-col gap-2" open={!!values?.summary}>
         <summary className="cursor-pointer font-semibold">
           Add a short description (optional)

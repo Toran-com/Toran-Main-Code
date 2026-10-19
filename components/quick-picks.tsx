@@ -4,7 +4,8 @@ import type { QuickPick } from "@/lib/quick-events";
 
 // Events a committee can add in one go by ticking them: the festivals
 // coming up, or last year's events on this year's dates. Each can be
-// renamed, moved or given a time before adding. The fields are labelled
+// given a time, or renamed and moved under "Change the name or day", before
+// adding. The fields are labelled
 // Event, Day and Time so they don't clash with the "Add an event" form.
 export function QuickPicks({
   slug,
@@ -24,51 +25,26 @@ export function QuickPicks({
         {picks.map((pick, i) => (
           <li
             key={`${pick.festivalDateId ?? pick.title}-${pick.date}`}
-            className="border-line flex flex-col gap-3 rounded-2xl border p-4"
+            className="border-line flex flex-col gap-2 rounded-2xl border p-3 sm:p-4"
           >
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                name="pick"
-                value={i}
-                className="accent-marigold mt-1 size-5 shrink-0"
-              />
-              <span className="flex flex-col">
-                <span className="font-semibold">
-                  {pick.title}, {formatDateRange(pick.date, pick.date)}
-                </span>
-                {pick.note && (
-                  <span className="text-muted text-base">{pick.note}</span>
-                )}
-              </span>
-            </label>
-            <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr]">
-              <label className="flex flex-col gap-1">
-                <span className="text-base font-semibold">
-                  Event
-                  <span className="sr-only"> for {pick.title}</span>
-                </span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <label className="flex min-w-48 flex-1 items-start gap-3">
                 <input
-                  name={`title-${i}`}
-                  defaultValue={pick.title}
-                  maxLength={120}
-                  className={inputClass}
+                  type="checkbox"
+                  name="pick"
+                  value={i}
+                  className="accent-marigold mt-1 size-5 shrink-0"
                 />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-base font-semibold">
-                  Day
-                  <span className="sr-only"> for {pick.title}</span>
+                <span className="flex flex-col">
+                  <span className="font-semibold">
+                    {pick.title}, {formatDateRange(pick.date, pick.date)}
+                  </span>
+                  {pick.note && (
+                    <span className="text-muted text-base">{pick.note}</span>
+                  )}
                 </span>
-                <input
-                  name={`date-${i}`}
-                  type="date"
-                  defaultValue={pick.date}
-                  min={londonDate()}
-                  className={inputClass}
-                />
               </label>
-              <label className="flex flex-col gap-1">
+              <label className="flex items-center gap-2 pl-8 sm:pl-0">
                 <span className="text-base font-semibold">
                   Time
                   <span className="sr-only"> for {pick.title}</span>
@@ -77,10 +53,42 @@ export function QuickPicks({
                   name={`time-${i}`}
                   type="time"
                   defaultValue={pick.time}
-                  className={inputClass}
+                  className={`${inputClass} w-auto py-2`}
                 />
               </label>
             </div>
+            <details className="pl-8">
+              <summary className="text-peacock w-fit cursor-pointer text-base font-semibold">
+                Change the name or day
+              </summary>
+              <div className="mt-2 grid gap-3 sm:grid-cols-[2fr_1fr]">
+                <label className="flex flex-col gap-1">
+                  <span className="text-base font-semibold">
+                    Event
+                    <span className="sr-only"> for {pick.title}</span>
+                  </span>
+                  <input
+                    name={`title-${i}`}
+                    defaultValue={pick.title}
+                    maxLength={120}
+                    className={inputClass}
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-base font-semibold">
+                    Day
+                    <span className="sr-only"> for {pick.title}</span>
+                  </span>
+                  <input
+                    name={`date-${i}`}
+                    type="date"
+                    defaultValue={pick.date}
+                    min={londonDate()}
+                    className={inputClass}
+                  />
+                </label>
+              </div>
+            </details>
             <input type="hidden" name={`kind-${i}`} value={pick.kind} />
             <input type="hidden" name={`summary-${i}`} value={pick.summary} />
             <input type="hidden" name={`title_gu-${i}`} value={pick.title_gu} />
