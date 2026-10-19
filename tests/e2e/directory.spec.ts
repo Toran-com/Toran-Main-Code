@@ -100,10 +100,14 @@ test("telling us about an event at an unknown mandir is not found", async ({
   expect(response?.status()).toBe(404);
 });
 
-test("the Diwali page explains it isn't connected yet", async ({ page }) => {
-  await page.goto("/diwali");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Diwali at UK mandirs",
-  );
-  await expect(page.getByText("isn't connected yet")).toBeVisible();
-});
+for (const [path, title] of [
+  ["/diwali", "Diwali at UK mandirs"],
+  ["/holi", "Holi at UK mandirs"],
+  ["/navratri", "Navratri at UK mandirs"],
+]) {
+  test(`${path} explains it isn't connected yet`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
+    await expect(page.getByText("isn't connected yet")).toBeVisible();
+  });
+}

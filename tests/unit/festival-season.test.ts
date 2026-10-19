@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { FestivalDate } from "@/lib/directory";
 import {
+  bannerSeason,
   DIWALI,
   seasonCalendarEvents,
   seasonDays,
@@ -8,6 +9,7 @@ import {
   seasonWindow,
   showSeasonBanner,
 } from "@/lib/festival-season";
+import { HOLI, NAVRATRI, seasonOf, SEASONS } from "@/lib/seasons";
 import type { ListedEvent } from "@/lib/whats-on";
 
 function date(
@@ -147,5 +149,64 @@ describe("seasonCalendarEvents", () => {
       allDay: false,
     });
     expect(allDay).toMatchObject({ start: "2026-11-10", allDay: true });
+  });
+});
+
+describe("other seasons", () => {
+  const navratri = {
+    ...date("navratri", "Navratri", "2026-10-11"),
+    ends_on: "2026-10-19",
+  };
+  const dates = [
+    navratri,
+    date("dussehra", "Dussehra", "2026-10-20"),
+    date("sharad-purnima", "Sharad Purnima", "2026-10-25"),
+    date("holika-dahan", "Holika Dahan", "2027-03-21"),
+    date("holi", "Holi", "2027-03-22"),
+    date("ram-navami", "Ram Navami", "2027-04-15"),
+    ...DATES.slice(1),
+  ];
+
+  it("counts nearness from the end of a festival that lasts several days", () => {
+    const days = seasonDays(dates, NAVRATRI, "2026-10-12");
+    expect(days.map((d) => d.slug)).toEqual([
+      "navratri",
+      "dussehra",
+      "sharad-purnima",
+    ]);
+    expect(seasonWindow(days)).toEqual({
+      from: "2026-10-11",
+      to: "2026-10-25",
+    });
+  });
+
+  it("finds the night before as part of Holi", () => {
+    expect(
+      seasonDays(dates, HOLI, "2027-01-01").map((d) => [d.slug, d.starts_on]),
+    ).toEqual([
+      ["holika-dahan", "2027-03-21"],
+      ["holi", "2027-03-22"],
+    ]);
+  });
+
+  it("points the home page to the season that comes first", () => {
+    expect(bannerSeason(dates, "2026-10-12")?.season.slug).toBe("navratri");
+    // Diwali's banner takes over once Navratri's days are over.
+    expect(bannerSeason(dates, "2026-10-26")?.season.slug).toBe("diwali");
+    // Both Holi and Ram Navami are within six weeks: Holi comes first.
+    expect(bannerSeason(dates, "2027-03-10")?.season.slug).toBe("holi");
+    expect(bannerSeason(dates, "2027-03-23")?.season.slug).toBe("ram-navami");
+    expect(bannerSeason(dates, "2027-01-10")).toBeNull();
+  });
+
+  it("knows which season each festival belongs to", () => {
+    expect(seasonOf("bhai-dooj")?.slug).toBe("diwali");
+    expect(seasonOf("holika-dahan")?.slug).toBe("holi");
+    expect(seasonOf("guru-purnima")).toBeUndefined();
+    // Each festival is in one season at most, and each season's main
+    // festival is one of its own.
+    const all = SEASONS.flatMap((s) => s.festivals);
+    expect(new Set(all).size).toBe(all.length);
+    for (const s of SEASONS) expect(s.festivals).toContain(s.main);
   });
 });

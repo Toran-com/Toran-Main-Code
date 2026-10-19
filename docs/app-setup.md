@@ -344,6 +344,13 @@ After your authenticator code, `/ops` has three tabs:
   festival's UK dates and the events during those dates whose title or
   description mentions it (for example "Garba" counts for Navratri). The
   festivals list links to each one.
+- **Festival season pages**: `/diwali`, `/navratri`, `/maha-shivaratri`,
+  `/holi`, `/ram-navami`, `/janmashtami` and `/ganesh-chaturthi` gather a
+  season's festival days (Diwali week, or Holika Dahan and Holi) and every
+  mandir's events across them, with Near me and a calendar to subscribe
+  to. The home page points to whichever season is within six weeks. The
+  seasons and their words are in `lib/seasons.ts`; a new one also needs its
+  folder under `app/(public)/(directory)/` and adding to `count_visit`.
 
 A repeating event shows once, at its next date, labelled "Every Saturday".
 New and changed events show on these pages straight away.

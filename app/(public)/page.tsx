@@ -149,8 +149,8 @@ export default function ComingSoon() {
 
 // In the weeks before Diwali, a way straight to Diwali week at mandirs.
 async function SeasonBanner() {
-  const diwali = await getSeasonBanner();
-  if (!diwali) return null;
+  const season = await getSeasonBanner();
+  if (!season) return null;
   return (
     <section
       className={`${cardClass} lift has-card-link group border-marigold/50 bg-marigold/10 flex items-center gap-4 p-5`}
@@ -161,18 +161,18 @@ async function SeasonBanner() {
       <div className="flex flex-1 flex-col gap-1">
         <h2 className="font-display text-xl font-bold">
           <Link
-            href="/diwali"
+            href={`/${season.slug}`}
             className="card-link group-hover:text-peacock no-underline"
           >
-            Diwali at mandirs
+            {season.name} at mandirs
           </Link>
           <span aria-hidden="true" className="text-peacock">
             {"\u00a0→"}
           </span>
         </h2>
         <p className="text-muted flex flex-wrap items-center gap-2">
-          {formatDateRange(diwali.starts_on, diwali.ends_on)}
-          <Countdown date={diwali.starts_on} />
+          {formatDateRange(season.starts_on, season.ends_on)}
+          <Countdown date={season.starts_on} />
         </p>
       </div>
     </section>
