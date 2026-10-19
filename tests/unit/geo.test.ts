@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   distanceMiles,
-  formatMiles,
   lookupPostcode,
   lookupPostcodes,
   normalisePostcode,
   outcodeNear,
 } from "@/lib/geo";
+import { formatMiles } from "@/lib/format";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {

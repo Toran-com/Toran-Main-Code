@@ -20,7 +20,8 @@ import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
 import { site, siteUrl } from "@/lib/site";
 import { siteData } from "@/lib/structured-data";
-import { translator } from "@/lib/i18n";
+import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
+import { seasonBySlug } from "@/lib/seasons";
 
 // Only the address: the title, description and link preview picture come
 // from the root layout.
@@ -30,7 +31,7 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 // on near you, the next few events and festivals, and a word for
 // committees.
 export default function ComingSoon() {
-  const t = translator();
+  const t = pageT();
   return (
     <>
       <JsonLd data={siteData(siteUrl())} />
@@ -66,13 +67,14 @@ export default function ComingSoon() {
             </div>
 
             <form
-              action="/whats-on"
+              action={localePath("/whats-on")}
               className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5"
             >
               <h2 className="font-display text-xl font-bold">
                 {t("home.searchTitle")}
               </h2>
               <NearMe
+                page={localePath("/whats-on")}
                 labels={{
                   field: t("whatsOn.near"),
                   button: t("whatsOn.nearMe"),
@@ -134,7 +136,7 @@ export default function ComingSoon() {
 
           <p>
             <Link
-              href="/mandirs"
+              href={localePath("/mandirs")}
               className={`${quietButtonClass} w-full sm:w-auto`}
             >
               {t("home.mandirs")}
@@ -147,10 +149,12 @@ export default function ComingSoon() {
   );
 }
 
-// In the weeks before Diwali, a way straight to Diwali week at mandirs.
+// In the weeks before a festival season, a way straight to its page.
 async function SeasonBanner() {
   const season = await getSeasonBanner();
   if (!season) return null;
+  const t = pageT();
+  const { name } = seasonText(seasonBySlug(season.slug)!);
   return (
     <section
       className={`${cardClass} lift has-card-link group border-marigold/50 bg-marigold/10 flex items-center gap-4 p-5`}
@@ -161,10 +165,10 @@ async function SeasonBanner() {
       <div className="flex flex-1 flex-col gap-1">
         <h2 className="font-display text-xl font-bold">
           <Link
-            href={`/${season.slug}`}
+            href={localePath(`/${season.slug}`)}
             className="card-link group-hover:text-peacock no-underline"
           >
-            {season.name} at mandirs
+            {t("festival.atMandirs", { name })}
           </Link>
           <span aria-hidden="true" className="text-peacock">
             {"\u00a0→"}
@@ -181,7 +185,7 @@ async function SeasonBanner() {
 
 // The next few events anywhere, straight from What's on.
 async function ComingUp() {
-  const t = translator();
+  const t = pageT();
   const result = await listUpcomingEvents();
   if (result.state !== "ok" || result.data.length === 0) return null;
   const next = result.data.filter((e) => e.status === "published").slice(0, 4);
@@ -194,7 +198,10 @@ async function ComingUp() {
         {t("home.comingUp")}
       </h2>
       <EventList events={nearTo(next, null, 0)} />
-      <Link href="/whats-on" className="text-peacock w-fit font-semibold">
+      <Link
+        href={localePath("/whats-on")}
+        className="text-peacock w-fit font-semibold"
+      >
         {t("home.seeAll")} →
       </Link>
     </section>
@@ -203,7 +210,7 @@ async function ComingUp() {
 
 // The next three festivals, each once.
 async function FestivalsSoon() {
-  const t = translator();
+  const t = pageT();
   const result = await listFestivalDates();
   if (result.state !== "ok") return null;
   const seen = new Set<string>();
@@ -234,10 +241,10 @@ async function FestivalsSoon() {
             </span>
             <span className="flex flex-col">
               <Link
-                href={`/festivals/${d.festival!.slug}`}
+                href={localePath(`/festivals/${d.festival!.slug}`)}
                 className="card-link group-hover:text-peacock text-lg font-bold no-underline"
               >
-                {d.festival!.name}
+                {festivalText(d.festival!.slug, d.festival!).name}
               </Link>
               <span className="text-marigold-ink font-semibold">
                 {formatDateRange(d.starts_on, d.ends_on)}
@@ -246,7 +253,10 @@ async function FestivalsSoon() {
           </li>
         ))}
       </ul>
-      <Link href="/festivals" className="text-peacock w-fit font-semibold">
+      <Link
+        href={localePath("/festivals")}
+        className="text-peacock w-fit font-semibold"
+      >
         {t("home.allFestivals")} →
       </Link>
     </section>

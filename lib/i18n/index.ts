@@ -1,5 +1,6 @@
 import { en, type MessageKey } from "@/lib/i18n/en";
 import { gu } from "@/lib/i18n/gu";
+import { fill, type Values } from "@/lib/i18n/core";
 
 // A small translation layer: typed keys, "{name}" values, and English
 // whenever a translation is missing. The site uses English only until a
@@ -23,15 +24,10 @@ export const MESSAGES: Record<Locale, Partial<Record<MessageKey, string>>> = {
 
 export const DEFAULT_LOCALE: Locale = "en";
 
-type Values = Record<string, string | number>;
-
 export function translator(locale: Locale = DEFAULT_LOCALE) {
   const messages = MESSAGES[locale];
   function t(key: MessageKey, values: Values = {}): string {
-    const text = messages[key] ?? en[key];
-    return text.replace(/\{(\w+)\}/g, (whole, name: string) =>
-      name in values ? String(values[name]) : whole,
-    );
+    return fill(messages, en, key, values);
   }
   // "1 event", "3 events": English and Gujarati only need one and other.
   t.count = (key: "whatsOn.count", count: number) =>

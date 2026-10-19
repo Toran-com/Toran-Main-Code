@@ -21,6 +21,7 @@ import { placesTaken } from "@/lib/seva";
 import { eventPath, eventShareText, sevaPath } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData } from "@/lib/structured-data";
+import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
 
 // Every event has its own page: the link people share, with the details,
 // directions and calendar buttons in one place. Fully static; an event
@@ -47,11 +48,18 @@ export async function generateStaticParams() {
 }
 
 function describe({ mandir, event }: MandirEventPage): string {
+  const t = pageT();
   const rule = event.recurrence && describeRule(event.recurrence);
   const when = event.recurrence
-    ? `${rule ?? "Repeats"}, next ${formatEventStart(event.next_starts_at, event.all_day)}`
+    ? t("event.repeatsNext", {
+        rule: rule ?? t("event.repeats"),
+        when: formatEventStart(event.next_starts_at, event.all_day),
+      })
     : formatEventWhen(event.starts_at, event.ends_at, event.all_day);
-  return [`${when} at ${mandir.name}, ${mandir.town}.`, event.summary]
+  return [
+    t("event.whenAt", { when, name: mandir.name, town: mandir.town }),
+    event.summary,
+  ]
     .filter(Boolean)
     .join(" ");
 }
@@ -66,7 +74,7 @@ export async function generateMetadata({
   const metadata = pageMetadata(
     `${page.event.title}, ${page.mandir.name}`,
     describe(page),
-    eventPath(slug, id),
+    localePath(eventPath(slug, id)),
   );
   // A finished event stays reachable from old links but isn't offered to
   // search engines.
@@ -79,6 +87,7 @@ export default async function EventPage({
   params,
 }: PageProps<"/mandirs/[slug]/events/[id]">) {
   const { slug, id } = await params;
+  const t = pageT();
   const [result, others, seva] = await Promise.all([
     getMandirEvent(slug, id),
     getMandir(slug),
@@ -86,13 +95,13 @@ export default async function EventPage({
   ]);
   if (result.state === "not connected") notFound();
   if (result.state === "unavailable") {
-    return <LoadProblem state="unavailable" what="event" />;
+    return <LoadProblem state="unavailable" what={t("load.event")} />;
   }
   if (!result.data) notFound();
   const { mandir, event, upcoming } = result.data;
   const cancelled = event.status === "cancelled";
   const rule = event.recurrence && describeRule(event.recurrence);
-  const mandirPath = `/mandirs/${mandir.slug}`;
+  const mandirPath = localePath(`/mandirs/${mandir.slug}`);
   const path = eventPath(mandir.slug, event.id);
   const alsoOn =
     others.state === "ok" && others.data
@@ -107,8 +116,8 @@ export default async function EventPage({
       <JsonLd
         data={breadcrumbData([
           { name: "Toran", url: `${siteUrl()}/` },
-          { name: "Mandirs", url: `${siteUrl()}/mandirs` },
-          { name: mandir.name, url: `${siteUrl()}${mandirPath}` },
+          { name: t("shell.mandirs"), url: `${siteUrl()}/mandirs` },
+          { name: mandir.name, url: `${siteUrl()}/mandirs/${mandir.slug}` },
           { name: event.title, url: `${siteUrl()}${path}` },
         ])}
       />
@@ -121,7 +130,8 @@ export default async function EventPage({
 
       <div className="rise flex flex-col gap-2 sm:gap-3">
         <p className="text-marigold-ink text-lg font-semibold sm:text-xl">
-          {event.recurrence && `${rule ?? "Repeats"} · next `}
+          {event.recurrence &&
+            t("event.repeatNext", { rule: rule ?? t("event.repeats") })}
           {formatEventStart(event.next_starts_at, event.all_day)}
         </p>
         <h1
@@ -137,8 +147,8 @@ export default async function EventPage({
         <Ornament />
         {(cancelled || !upcoming || kindLabel(event.kind)) && (
           <p className="flex flex-wrap gap-2">
-            {cancelled && <Badge tone="kumkum">Cancelled</Badge>}
-            {!upcoming && <Badge>Finished</Badge>}
+            {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
+            {!upcoming && <Badge>{t("event.finished")}</Badge>}
             {kindLabel(event.kind) && <Badge>{kindLabel(event.kind)}</Badge>}
           </p>
         )}
@@ -149,7 +159,7 @@ export default async function EventPage({
               eventId={event.id}
               title={event.title}
               shareText={eventShareText(event, mandir)}
-              path={path}
+              path={localePath(path)}
             />
           </div>
         )}
@@ -157,18 +167,18 @@ export default async function EventPage({
 
       {!upcoming && (
         <Notice>
-          This event has finished.{" "}
+          {t("event.finishedNote")}{" "}
           <Link href={mandirPath} className="underline">
-            See what&apos;s on at {mandir.name}
+            {t("event.seeWhatsOnAt", { name: mandir.name })}
           </Link>
           .
         </Notice>
       )}
       {cancelled && upcoming && (
         <Notice>
-          The mandir has cancelled this event.{" "}
+          {t("event.cancelledNote")}{" "}
           <Link href={mandirPath} className="underline">
-            See what else is on at {mandir.name}
+            {t("event.seeElseAt", { name: mandir.name })}
           </Link>
           .
         </Notice>
@@ -177,13 +187,16 @@ export default async function EventPage({
       <Details page={result.data} />
 
       {upcoming && !cancelled && seva.state === "ok" && seva.data?.open && (
-        <SevaCard path={sevaPath(mandir.slug, event.id)} seva={seva.data} />
+        <SevaCard
+          path={localePath(sevaPath(mandir.slug, event.id))}
+          seva={seva.data}
+        />
       )}
 
       {(event.summary || event.summary_gu) && (
         <section aria-labelledby="about" className="flex flex-col gap-2">
           <h2 id="about" className="font-display text-2xl font-bold">
-            About this event
+            {t("event.about")}
           </h2>
           {event.summary && <p>{event.summary}</p>}
           {event.summary_gu && <p lang="gu">{event.summary_gu}</p>}
@@ -192,24 +205,25 @@ export default async function EventPage({
 
       <p className="text-muted text-base">
         {event.confirmed_at
-          ? `Confirmed by the mandir, ${new Intl.DateTimeFormat("en-GB", {
-              timeZone: "Europe/London",
-              day: "numeric",
-              month: "short",
-            }).format(new Date(event.confirmed_at))}`
+          ? t("mandir.confirmedOn", {
+              date: new Intl.DateTimeFormat(
+                pageLocale() === "gu" ? "gu-IN" : "en-GB",
+                { timeZone: "Europe/London", day: "numeric", month: "short" },
+              ).format(new Date(event.confirmed_at)),
+            })
           : sourceLabel(event)}
       </p>
 
       {alsoOn.length > 0 && (
         <section aria-labelledby="also-on" className="flex flex-col gap-3">
           <h2 id="also-on" className="font-display text-2xl font-bold">
-            Also at {mandir.name}
+            {t("event.alsoAt", { name: mandir.name })}
           </h2>
           <ul className="rise-list flex flex-col gap-3">
             {alsoOn.map((e) => (
               <li key={e.id}>
                 <Link
-                  href={eventPath(mandir.slug, e.id)}
+                  href={localePath(eventPath(mandir.slug, e.id))}
                   className="border-line bg-surface lift shadow-card flex flex-col rounded-2xl border p-4 no-underline"
                 >
                   <span className="text-marigold-ink font-semibold">
@@ -225,10 +239,13 @@ export default async function EventPage({
 
       <div className="flex flex-wrap gap-x-6 gap-y-2">
         <Link href={mandirPath} className="text-peacock font-semibold">
-          Everything at {mandir.name} →
+          {t("event.everythingAt", { name: mandir.name })}
         </Link>
-        <Link href="/whats-on" className="text-peacock font-semibold">
-          What&apos;s on near you →
+        <Link
+          href={localePath("/whats-on")}
+          className="text-peacock font-semibold"
+        >
+          {t("event.whatsOnNear")}
         </Link>
       </div>
     </>
@@ -241,17 +258,16 @@ function SevaCard({ path, seva }: { path: string; seva: EventSeva }) {
   if (!shifts.length) return null;
   const taken = shifts.reduce((n, s) => n + placesTaken(s), 0);
   const needed = shifts.reduce((n, s) => n + s.needed, 0);
+  const t = pageT();
   return (
     <Card>
-      <h2 className="text-2xl font-bold">Help with seva</h2>
+      <h2 className="text-2xl font-bold">{t("seva.help")}</h2>
       <p>
-        <strong>
-          {taken} of {needed}
-        </strong>{" "}
-        places taken. Take a slot in a tap: no sign-up, and no name needed.
+        <strong>{t("seva.takenOf", { taken, needed })}</strong>{" "}
+        {t("seva.placesTaken")}
       </p>
       <Link href={path} className={`${quietButtonClass} self-start`}>
-        {taken < needed ? "Take a seva slot" : "See the seva rota"}
+        {taken < needed ? t("seva.take") : t("seva.seeRota")}
       </Link>
     </Card>
   );
@@ -259,6 +275,7 @@ function SevaCard({ path, seva }: { path: string; seva: EventSeva }) {
 
 function Details({ page }: { page: MandirEventPage }) {
   const { mandir, event } = page;
+  const t = pageT();
   const rule = event.recurrence && describeRule(event.recurrence);
   const directions = mandir.postcode
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -267,23 +284,25 @@ function Details({ page }: { page: MandirEventPage }) {
     : null;
   const rows: { label: string; value: ReactNode }[] = [
     {
-      label: "When",
+      label: t("event.when"),
       value: event.recurrence ? (
         <>
-          {rule ?? "Repeats"}
+          {rule ?? t("event.repeats")}
           <br />
-          Next: {formatEventStart(event.next_starts_at, event.all_day)}
+          {t("event.next", {
+            when: formatEventStart(event.next_starts_at, event.all_day),
+          })}
         </>
       ) : (
         formatEventWhen(event.starts_at, event.ends_at, event.all_day)
       ),
     },
     {
-      label: "Where",
+      label: t("event.where"),
       value: (
         <>
           <Link
-            href={`/mandirs/${mandir.slug}`}
+            href={localePath(`/mandirs/${mandir.slug}`)}
             className="text-peacock font-semibold underline"
           >
             {mandir.name}
@@ -303,7 +322,7 @@ function Details({ page }: { page: MandirEventPage }) {
                 href={directions}
                 className="text-peacock font-semibold underline"
               >
-                Directions
+                {t("mandir.directions")}
               </a>
             </>
           )}
@@ -311,17 +330,18 @@ function Details({ page }: { page: MandirEventPage }) {
       ),
     },
   ];
-  if (event.cost_note) rows.push({ label: "Cost", value: event.cost_note });
+  if (event.cost_note)
+    rows.push({ label: t("event.cost"), value: event.cost_note });
   if (event.link) {
     rows.push({
-      label: "More details",
+      label: t("event.moreDetails"),
       value: (
         <a
           href={event.link}
           rel="noopener"
           className="text-peacock font-semibold break-all underline"
         >
-          From the mandir
+          {t("event.fromMandir")}
         </a>
       ),
     });

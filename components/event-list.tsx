@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { Badge } from "@/components/public-shell";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
-import { formatTimeOfDay } from "@/lib/format";
-import { formatMiles } from "@/lib/geo";
+import { formatMiles, formatTimeOfDay } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";
 import { groupByDay } from "@/lib/whats-on-view";
-import { translator } from "@/lib/i18n";
+import { pageT, localePath } from "@/lib/i18n/page";
 
 // Events across mandirs, grouped by day. Each card opens the event's own
 // page, which has "Add to calendar" and sharing; the list stays easy to
@@ -42,7 +41,7 @@ export function EventList({
 }
 
 export function EventCard({ event: e }: { event: EventNear }) {
-  const t = translator();
+  const t = pageT();
   const cancelled = e.status === "cancelled";
   const rule = e.recurrence && describeRule(e.recurrence);
   const source = sourceLabel(e);
@@ -56,7 +55,7 @@ export function EventCard({ event: e }: { event: EventNear }) {
           className={`text-lg leading-snug font-bold sm:text-xl ${cancelled ? "line-through" : ""}`}
         >
           <Link
-            href={eventPath(e.mandir.slug, e.id)}
+            href={localePath(eventPath(e.mandir.slug, e.id))}
             className="card-link group-hover:text-peacock no-underline"
           >
             {e.title}

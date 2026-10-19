@@ -3,7 +3,9 @@
 import { useState, useSyncExternalStore } from "react";
 import { sendCount } from "@/components/count-visits";
 import { useOrigin } from "@/components/use-origin";
-import { whatsAppLink } from "@/lib/share";
+import { useT } from "@/components/use-t";
+import { enShare } from "@/lib/i18n/client/share";
+import { whatsAppLink } from "@/lib/whatsapp";
 
 const noSubscribe = () => () => {};
 
@@ -14,7 +16,7 @@ const noSubscribe = () => () => {};
 export function ShareButtons({
   text,
   path,
-  label = "Share",
+  label,
   copy = true,
 }: {
   text: string;
@@ -24,6 +26,7 @@ export function ShareButtons({
   // event's own page has it.
   copy?: boolean;
 }) {
+  const t = useT(enShare);
   const origin = useOrigin();
   const canShare = useSyncExternalStore(
     noSubscribe,
@@ -48,14 +51,14 @@ export function ShareButtons({
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      window.prompt("Copy this link:", url);
+      window.prompt(t("share.copyPrompt"), url);
     }
   }
 
   return (
     <div
       role="group"
-      aria-label={label === "Share" ? `Share: ${text}` : label}
+      aria-label={label ?? t("share.label", { text })}
       className="inline-flex flex-wrap items-center gap-2 text-base font-semibold"
     >
       <a
@@ -74,11 +77,11 @@ export function ShareButtons({
           onClick={shareOrCopy}
           className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95"
         >
-          {canShare ? "Other apps" : "Copy link"}
+          {canShare ? t("share.otherApps") : t("share.copyLink")}
         </button>
       )}
       <span aria-live="polite" className="text-leaf">
-        {copied ? "Link copied" : ""}
+        {copied ? t("share.copied") : ""}
       </span>
     </div>
   );

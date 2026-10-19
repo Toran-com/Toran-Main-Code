@@ -14,7 +14,7 @@ import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData } from "@/lib/structured-data";
 import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
-import { translator } from "@/lib/i18n";
+import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
 
 // Every festival page is fully static, refreshed when festival dates or
 // events change.
@@ -34,12 +34,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const result = await getFestival(slug);
   if (result.state !== "ok" || !result.data) return { title: pageTitle() };
-  const { name, dates } = result.data;
+  const { dates } = result.data;
+  const { name } = festivalText(slug, result.data);
   const year = dates[0]?.starts_on.slice(0, 4);
+  const t = pageT();
   return pageMetadata(
-    `${name}${year ? ` ${year}` : ""} in the UK`,
-    `${name} dates for the UK and events at mandirs near you.`,
-    `/festivals/${slug}`,
+    year
+      ? t("festival.titleYear", { name, year })
+      : t("festival.title", { name }),
+    t("festival.description", { name }),
+    localePath(`/festivals/${slug}`),
   );
 }
 
@@ -52,12 +56,12 @@ export default async function FestivalPage({
     listUpcomingEvents(),
   ]);
   if (result.state === "not connected") notFound();
+  const t = pageT();
   if (result.state === "unavailable") {
-    return <LoadProblem state="unavailable" what="festival page" />;
+    return <LoadProblem state="unavailable" what={t("load.festivalPage")} />;
   }
   if (!result.data) notFound();
-  const festival = result.data;
-  const t = translator();
+  const festival = { ...result.data, ...festivalText(slug, result.data) };
   const season = seasonOf(festival.slug);
 
   // Events during the festival whose title or description mentions it.
@@ -78,12 +82,12 @@ export default async function FestivalPage({
       <JsonLd
         data={breadcrumbData([
           { name: "Toran", url: `${siteUrl()}/` },
-          { name: "Festivals", url: `${siteUrl()}/festivals` },
+          { name: t("shell.festivals"), url: `${siteUrl()}/festivals` },
           { name: festival.name, url: `${siteUrl()}/festivals/${slug}` },
         ])}
       />
       <Link
-        href="/festivals"
+        href={localePath("/festivals")}
         className="text-peacock self-start font-semibold hover:underline"
       >
         {t("festival.all")}
@@ -121,19 +125,21 @@ export default async function FestivalPage({
         )}
         <div className="pt-1">
           <ShareButtons
-            label="Share this festival"
-            text={`${festival.name} in the UK: dates and events at mandirs`}
-            path={`/festivals/${festival.slug}`}
+            label={t("festival.share")}
+            text={t("festival.shareText", { name: festival.name })}
+            path={localePath(`/festivals/${festival.slug}`)}
           />
         </div>
       </div>
 
       {season && (
         <Link
-          href={`/${season.slug}`}
+          href={localePath(`/${season.slug}`)}
           className="border-marigold/50 bg-marigold/10 lift text-ink flex items-center justify-between gap-3 rounded-2xl border p-4 font-semibold no-underline"
         >
-          <span>All of {season.period} at mandirs, in one place</span>
+          <span>
+            {t("season.allOf", { period: seasonText(season).period })}
+          </span>
           <span aria-hidden="true" className="text-peacock">
             →
           </span>
@@ -152,15 +158,21 @@ export default async function FestivalPage({
               {t("festival.noEvents", { name: festival.name })}
             </p>
             <p className="text-muted">
-              They appear here as mandirs add them. Check{" "}
-              <Link href="/whats-on" className="text-peacock underline">
-                what&apos;s on
+              {t("festival.appearBefore")}{" "}
+              <Link
+                href={localePath("/whats-on")}
+                className="text-peacock underline"
+              >
+                {t("festival.whatsOnLink")}
               </Link>{" "}
-              or find your{" "}
-              <Link href="/mandirs" className="text-peacock underline">
-                nearest mandir
+              {t("festival.orFind")}{" "}
+              <Link
+                href={localePath("/mandirs")}
+                className="text-peacock underline"
+              >
+                {t("festival.nearestMandir")}
               </Link>
-              .
+              {t("festival.appearAfter")}
             </p>
           </div>
         )}

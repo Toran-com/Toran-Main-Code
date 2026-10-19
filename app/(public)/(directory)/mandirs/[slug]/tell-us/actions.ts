@@ -9,8 +9,10 @@ import { createPublicServerClient } from "@/lib/supabase/server";
 // queue (report_event in the database); nothing about them is kept.
 export async function reportEvent(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
+  // Back to the form in the language it was sent from.
+  const base = formData.get("lang") === "gu" ? "/gu/mandirs" : "/mandirs";
   const back: (query: string) => never = (query) =>
-    redirect(`/mandirs/${encodeURIComponent(slug)}/tell-us?${query}`);
+    redirect(`${base}/${encodeURIComponent(slug)}/tell-us?${query}`);
 
   // A hidden field only automated spam fills in: pretend it worked.
   if (String(formData.get("company") ?? "") !== "") back("sent=1");

@@ -3,6 +3,10 @@
 
 import { formatEventStart } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
+import { sharedT } from "@/lib/i18n/locale";
+import { whatsAppLink } from "@/lib/whatsapp";
+
+export { whatsAppLink };
 
 type ShareableEvent = {
   id: string;
@@ -17,9 +21,15 @@ export function eventShareText(
   event: ShareableEvent,
   mandir: { name: string; town: string },
 ): string {
-  const when = formatEventStart(event.next_starts_at, event.all_day);
+  const t = sharedT();
+  const next = formatEventStart(event.next_starts_at, event.all_day);
   const rule = event.recurrence && describeRule(event.recurrence);
-  return `${event.title} at ${mandir.name}, ${mandir.town}: ${rule ? `${rule}, next ${when}` : when}`;
+  return t("share.event", {
+    title: event.title,
+    name: mandir.name,
+    town: mandir.town,
+    when: rule ? t("event.repeatsNext", { rule, when: next }) : next,
+  });
 }
 
 // Where an event lives: its own page. (Older links to its card on the
@@ -31,12 +41,6 @@ export function eventPath(mandirSlug: string, eventId: string): string {
 // An event's seva rota, where volunteers can take a slot.
 export function sevaPath(mandirSlug: string, eventId: string): string {
   return `${eventPath(mandirSlug, eventId)}/seva`;
-}
-
-// Opens WhatsApp (the app on a phone, WhatsApp Web on a computer) with the
-// message ready to send to a chat or group.
-export function whatsAppLink(text: string, url: string): string {
-  return `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`;
 }
 
 // What a committee member sends a colleague they've invited: Toran sends

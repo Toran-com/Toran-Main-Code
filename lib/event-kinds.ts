@@ -2,6 +2,9 @@
 // the order people choose from, and where an event came from
 // (events.origin), for the label families see on it.
 
+import type { SharedKey } from "@/lib/i18n/shared-messages";
+import { sharedT } from "@/lib/i18n/locale";
+
 export const EVENT_KINDS = {
   festival: "Festival",
   aarti: "Aarti or darshan",
@@ -22,7 +25,9 @@ export function isEventKind(value: string): value is EventKind {
 
 // A kind's name, or null for "other" (not worth a label).
 export function kindLabel(kind: string): string | null {
-  return isEventKind(kind) && kind !== "other" ? EVENT_KINDS[kind] : null;
+  return isEventKind(kind) && kind !== "other"
+    ? sharedT()(`kind.${kind}` as SharedKey)
+    : null;
 }
 
 export type EventOrigin = "mandir" | "poster" | "website" | "visitor";
@@ -40,14 +45,15 @@ export function sourceLabel(event: {
   confirmed_at: string | null;
   origin: string | null;
 }): string | null {
-  if (event.confirmed_at) return "Confirmed by the mandir";
+  const t = sharedT();
+  if (event.confirmed_at) return t("source.confirmed");
   switch (event.origin) {
     case "website":
-      return "From the mandir's website";
+      return t("source.website");
     case "visitor":
-      return "Sent in by a visitor";
+      return t("source.visitor");
     case "poster":
-      return "From a poster or message";
+      return t("source.poster");
     default:
       return null;
   }

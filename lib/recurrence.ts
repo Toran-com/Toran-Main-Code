@@ -7,6 +7,9 @@ export type Repeat =
   | { kind: "weekly"; interval: 1 | 2 }
   | { kind: "monthly"; week: 1 | 2 | 3 | 4 | -1 }; // -1 = last
 
+import type { SharedKey } from "@/lib/i18n/shared-messages";
+import { pageLocale, sharedT } from "@/lib/i18n/locale";
+
 const DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
 const DAY_NAMES = [
   "Sunday",
@@ -85,6 +88,21 @@ export function parseRule(rule: string): Parsed | null {
 export function describeRule(rule: string): string | null {
   const parsed = parseRule(rule);
   if (!parsed) return null;
+  if (pageLocale() === "gu") {
+    // Gujarati wording, from the translations (lib/i18n).
+    const t = sharedT();
+    const day = t(`repeat.day.${parsed.weekday}` as SharedKey);
+    if (parsed.repeat.kind === "weekly") {
+      return t(
+        parsed.repeat.interval === 1 ? "repeat.weekly" : "repeat.fortnightly",
+        { day },
+      );
+    }
+    return t("repeat.monthly", {
+      day,
+      ordinal: t(`repeat.ordinal.${parsed.repeat.week}` as SharedKey),
+    });
+  }
   const day = DAY_NAMES[parsed.weekday];
   if (parsed.repeat.kind === "weekly") {
     return parsed.repeat.interval === 1 ? `Every ${day}` : `Every other ${day}`;
