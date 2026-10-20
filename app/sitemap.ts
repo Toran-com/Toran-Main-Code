@@ -34,6 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/whats-on`, changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/for-mandirs`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/for-mandirs/guide`, changeFrequency: "monthly" },
+    ...["/about", "/contact", "/privacy", "/terms", "/accessibility"].map(
+      (path) => ({
+        url: `${base}${path}`,
+        changeFrequency: "monthly" as const,
+      }),
+    ),
     { url: `${base}/mandirs`, changeFrequency: "weekly" },
     { url: `${base}/festivals`, changeFrequency: "weekly" },
     ...SEASONS.map((s) => ({

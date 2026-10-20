@@ -127,7 +127,12 @@ export default async function TellUsPage({
               />
             </label>
           </div>
-          <p className="text-muted text-base">{t("report.privacy")}</p>
+          <p className="text-muted text-base">
+            {t("report.privacy")}{" "}
+            <Link href="/privacy" className="text-peacock underline">
+              {t("page.privacyNotice")}
+            </Link>
+          </p>
           <button type="submit" className={buttonClass}>
             {t("report.send")}
           </button>

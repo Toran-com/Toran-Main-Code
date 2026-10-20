@@ -59,7 +59,9 @@ test("a committee's pages are accessible", async ({ page }) => {
        returning id`,
   );
   await page.goto(`/manage/${slug}`);
-  await expect(page.getByText("Accessibility check")).toBeVisible();
+  await expect(
+    page.getByText("Accessibility check", { exact: true }),
+  ).toBeVisible();
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/seva/${event}`);
   await expectAccessible(page);

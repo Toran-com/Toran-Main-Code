@@ -247,6 +247,13 @@ export default async function EventPage({
         >
           {t("event.whatsOnNear")}
         </Link>
+        <Link
+          prefetch={false}
+          href={`/corrections?page=${encodeURIComponent(path)}`}
+          className="text-peacock font-semibold"
+        >
+          {t("page.somethingWrong")}
+        </Link>
       </div>
     </>
   );

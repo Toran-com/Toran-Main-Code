@@ -415,6 +415,23 @@ with no sign-up and no name (decision 0013). Toran keeps **no volunteer
 names or numbers**, only how many places are taken. Named sign-up waits for
 ICO registration and the DPIA (decision 0006).
 
+### What needs doing (committees)
+
+The top of each mandir's committee page (`/manage/<mandir>`) says what to
+do next, worked out from the page itself (`lib/committee-tasks.ts`):
+
+- posters or messages waiting to be checked;
+- events in the next 30 days nobody has confirmed for 30 days ("Still on");
+- seva shifts in the next fortnight with places still free (not those
+  needing a DBS check);
+- a festival in the next 21 days with nothing added for it;
+- nothing coming up at all.
+
+New committees also see **Getting started**: check the mandir's details,
+add a first event, invite a colleague. Each step ticks itself off. The
+account page shows each mandir with how many things need doing and a link
+to the first.
+
 ### Reading mandirs' websites (`/ops` → Websites)
 
 **Check** reads one mandir's website; **Check the next 5 websites** works
@@ -511,6 +528,26 @@ page, for example `/gu/mandirs/<a mandir>`, to read it in place.
    pages join the sitemap.
 3. Optional: add a Gujarati font (Noto Sans Gujarati) and check the speed
    budget. Phones' own Gujarati fonts are used until then.
+
+### Pages about Toran (footer)
+
+Every public page's footer links to **About**, **Contact**, **Correct or
+remove something**, **Privacy**, **Terms** and **Accessibility**. Login,
+committee and admin pages link to Privacy, Terms and Contact.
+
+- `/privacy` and `/terms` show `docs/legal/privacy-notice.md` and
+  `docs/legal/terms.md` as they are, so edit those files to change the
+  pages. While `legalChecked` in `lib/site.ts` is `false`, both say they
+  are drafts and highlight every [bracket] still to fill in.
+- `/corrections` lets anyone ask for a mistake to be fixed, a mandir's page
+  to be hidden or personal details to be taken down, without giving their
+  name. Mandir and event pages link to it with the page filled in.
+  Requests appear under **Corrections and removals** on `/ops/attention`;
+  press **Done** once each is dealt with. The terms promise mandirs that
+  ask to be hidden it happens the same day.
+- `/contact` points people to the right form. Once Toran has its own email
+  address, put it in `CONTACT_EMAIL` in `lib/site.ts` and the page shows
+  it for privacy requests.
 
 ### Ready for Google (switched off until launch)
 

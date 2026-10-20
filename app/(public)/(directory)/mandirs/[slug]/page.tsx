@@ -122,6 +122,13 @@ export default async function MandirPage({
             {t("mandir.tellUs")}
           </Link>
           <Link
+            prefetch={false}
+            href={`/corrections?page=${encodeURIComponent(`/mandirs/${mandir.slug}`)}`}
+            className="text-peacock font-semibold"
+          >
+            {t("page.somethingWrong")}
+          </Link>
+          <Link
             href={localePath("/festivals")}
             className="text-peacock font-semibold"
           >

@@ -28,6 +28,13 @@ export type Attention = {
     Mandir & { waiting: number; oldest: string; has_committee: boolean }
   >;
   claims: List<Mandir & { created_at: string }>;
+  requests: List<{
+    id: number;
+    kind: string;
+    page: string;
+    details: string;
+    created_at: string;
+  }>;
 };
 
 export type List<T> = { total: number; items: T[] };
@@ -40,6 +47,7 @@ export const ATTENTION_KEYS = [
   "festival_dates",
   "posters",
   "claims",
+  "requests",
 ] as const satisfies readonly (keyof Attention)[];
 
 type Row = Record<string, unknown>;
@@ -126,6 +134,15 @@ export function readAttention(value: unknown): Attention {
       const m = mandir(r);
       const created_at = text(r, "created_at");
       return m && created_at ? { ...m, created_at } : null;
+    }),
+    requests: list(v.requests, (r) => {
+      const kind = text(r, "kind");
+      const page = text(r, "page");
+      const details = text(r, "details");
+      const created_at = text(r, "created_at");
+      return typeof r.id === "number" && kind && page && details && created_at
+        ? { id: r.id, kind, page, details, created_at }
+        : null;
     }),
   };
 }

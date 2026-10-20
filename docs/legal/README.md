@@ -1,7 +1,8 @@
 # Legal drafts
 
-**Status: drafts for the founders to review. Not legal advice, not yet
-published, and not yet checked by a solicitor.**
+**Status: drafts for the founders to review. Not legal advice, and not
+yet checked by a solicitor. The privacy notice and terms are on the site
+(`/privacy`, `/terms`) marked as drafts, with every [bracket] highlighted.**
 
 These cover what Toran does with personal data and the rules for using the
 site. Decision 0006 says no personal data from the public (digest, rota)
@@ -10,8 +11,8 @@ done. This folder is the paperwork for that.
 
 | File                                   | What it is                                                      | Published where                            |
 | -------------------------------------- | --------------------------------------------------------------- | ------------------------------------------ |
-| [privacy-notice.md](privacy-notice.md) | What we collect, why, who we share it with, people's rights     | `/privacy` (not built yet)                 |
-| [terms.md](terms.md)                   | Rules for using the site and for committees adding information  | `/terms` (not built yet)                   |
+| [privacy-notice.md](privacy-notice.md) | What we collect, why, who we share it with, people's rights     | `/privacy`, shown from this file           |
+| [terms.md](terms.md)                   | Rules for using the site and for committees adding information  | `/terms`, shown from this file             |
 | [dpia.md](dpia.md)                     | Data protection impact assessment: risks and how we reduce them | Internal; shown to the ICO if asked        |
 | [retention.md](retention.md)           | How long each kind of data is kept, and how it is deleted       | Internal; summarised in the privacy notice |
 
@@ -34,9 +35,13 @@ before publishing anything.
    (ico.org.uk/for-organisations/advice-for-small-organisations). A
    solicitor's fixed-fee review of the privacy notice and terms is worth
    it before the public digest or rota launch.
-6. **Publish** the privacy notice and terms as `/privacy` and `/terms`,
-   linked from every page footer and from the login and claim pages.
-   Claude can build these pages once the text is agreed.
+6. **Mark them checked.** The site shows these two files as they are, at
+   `/privacy` and `/terms` (linked from every page's footer, and from the
+   login, claim and "Tell us" pages), with a draft notice and the
+   [brackets] highlighted. Once the text is agreed and every bracket is
+   filled in, set `legalChecked: true` in `lib/site.ts`; a test refuses
+   that while any bracket is left. Put Toran's email address in
+   `CONTACT_EMAIL` in the same file, and the contact page shows it.
 
 ## Review dates
 
