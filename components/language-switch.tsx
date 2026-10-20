@@ -16,7 +16,7 @@ export function LanguageSwitch() {
       href={target === path ? "/gu" : target}
       lang={gujarati ? "en-GB" : "gu"}
       hrefLang={gujarati ? "en-GB" : "gu"}
-      className="text-peacock shrink-0 text-base font-semibold"
+      className="text-ink hover:bg-sunk shrink-0 rounded-full px-3 py-2 text-base font-medium no-underline"
     >
       {gujarati ? "English" : "ગુજરાતી"}
     </Link>

@@ -57,7 +57,7 @@ export default function ContactPage() {
         ))}
       </ul>
       <section aria-labelledby="data" className="flex flex-col gap-3">
-        <h2 id="data" className="font-display text-2xl font-bold">
+        <h2 id="data" className="font-display text-3xl leading-tight">
           Your data
         </h2>
         {CONTACT_EMAIL ? (

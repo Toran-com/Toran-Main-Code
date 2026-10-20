@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { EventActions } from "@/components/event-actions";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
-import { Card, Notice, Ornament, quietButtonClass } from "@/components/ui";
+import { Card, Notice, quietButtonClass } from "@/components/ui";
 import {
   getEventSeva,
   getMandir,
@@ -144,7 +144,6 @@ export default async function EventPage({
             {event.title_gu}
           </p>
         )}
-        <Ornament />
         {(cancelled || !upcoming || kindLabel(event.kind)) && (
           <p className="flex flex-wrap gap-2">
             {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
@@ -195,7 +194,7 @@ export default async function EventPage({
 
       {(event.summary || event.summary_gu) && (
         <section aria-labelledby="about" className="flex flex-col gap-2">
-          <h2 id="about" className="font-display text-2xl font-bold">
+          <h2 id="about" className="font-display text-3xl leading-tight">
             {t("event.about")}
           </h2>
           {event.summary && <p>{event.summary}</p>}
@@ -216,7 +215,7 @@ export default async function EventPage({
 
       {alsoOn.length > 0 && (
         <section aria-labelledby="also-on" className="flex flex-col gap-3">
-          <h2 id="also-on" className="font-display text-2xl font-bold">
+          <h2 id="also-on" className="font-display text-3xl leading-tight">
             {t("event.alsoAt", { name: mandir.name })}
           </h2>
           <ul className="rise-list flex flex-col gap-3">

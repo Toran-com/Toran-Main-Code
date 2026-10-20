@@ -30,7 +30,7 @@ export function SubscribeCalendar({
     : path;
   return (
     <div className={`${cardClass} flex flex-col gap-3 p-5`}>
-      <h2 className="font-display text-2xl font-bold">{title}</h2>
+      <h2 className="font-display text-3xl leading-tight">{title}</h2>
       <p className="text-muted">{body}</p>
       <div className="flex flex-wrap gap-3">
         <a

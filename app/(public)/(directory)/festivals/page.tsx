@@ -69,7 +69,7 @@ async function Festivals() {
         <section aria-labelledby="seasons" className="flex flex-col gap-3">
           <h2
             id="seasons"
-            className="font-display text-2xl font-bold sm:text-3xl"
+            className="font-display text-3xl leading-tight sm:text-4xl"
           >
             {t("festivals.seasons")}
           </h2>
@@ -100,7 +100,7 @@ async function Festivals() {
       )}
       {[...months.entries()].map(([month, dates]) => (
         <section key={month} className="flex flex-col gap-3">
-          <h2 className="font-display text-2xl font-bold sm:text-3xl">
+          <h2 className="font-display text-3xl leading-tight sm:text-4xl">
             {month}
           </h2>
           <ul className="rise-list flex flex-col gap-3">

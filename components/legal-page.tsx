@@ -68,7 +68,7 @@ function LegalBlock({ block }: { block: Block }) {
       return block.level === 2 ? (
         <h2
           id={block.id}
-          className="font-display mt-4 scroll-mt-24 text-2xl font-bold"
+          className="font-display mt-4 scroll-mt-24 text-3xl leading-tight"
         >
           <Inlines items={block.children} />
         </h2>
