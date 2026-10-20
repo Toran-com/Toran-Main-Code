@@ -13,6 +13,15 @@ export const gu: Record<MessageKey, string> = {
   "shell.mandirs": "મંદિરો",
   "shell.festivals": "તહેવારો",
   "shell.forMandirs": "મંદિર સમિતિઓ માટે",
+  "shell.footerLinks": "Toran વિશેનાં પાનાં",
+  "shell.about": "અમારા વિશે",
+  "shell.contact": "સંપર્ક",
+  "shell.corrections": "સુધારો કે દૂર કરાવો",
+  "shell.privacy": "ગોપનીયતા",
+  "shell.terms": "શરતો",
+  "shell.accessibility": "સુલભતા",
+  "page.somethingWrong": "અહીં કંઈ ખોટું છે? અમને જણાવો",
+  "page.privacyNotice": "ગોપનીયતા નોંધ",
   "shell.footer":
     "Toranનું મંદિર સમિતિઓ સાથે પરીક્ષણ ચાલી રહ્યું છે અને તે 2027માં શરૂ થશે. વિગતો મંદિરોની પોતાની વેબસાઇટ્સ અને અમારા સંશોધનમાંથી આવે છે; જો કંઈ ખોટું હોય, તો મંદિરની સમિતિ તેને સુધારી શકે છે.",
 

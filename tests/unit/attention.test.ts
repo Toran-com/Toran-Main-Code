@@ -54,6 +54,19 @@ describe("readAttention", () => {
         total: 1,
         items: [{ ...MANDIR, created_at: "2026-10-15T09:00:00+00:00" }],
       },
+      requests: {
+        total: 2,
+        items: [
+          {
+            id: 7,
+            kind: "remove_mandir",
+            page: "/mandirs/busy-mandir",
+            details: "Please hide our page",
+            created_at: "2026-10-19T09:00:00+00:00",
+          },
+          { id: "not a number", kind: "wrong", page: "/", details: "x" },
+        ],
+      },
     });
     expect(attention.unconfirmed.total).toBe(3);
     expect(attention.unconfirmed.items[0]).toMatchObject({
@@ -68,7 +81,16 @@ describe("readAttention", () => {
       waiting: 2,
       has_committee: false,
     });
-    expect(attentionCount(attention)).toBe(10);
+    expect(attention.requests.items).toEqual([
+      {
+        id: 7,
+        kind: "remove_mandir",
+        page: "/mandirs/busy-mandir",
+        details: "Please hide our page",
+        created_at: "2026-10-19T09:00:00+00:00",
+      },
+    ]);
+    expect(attentionCount(attention)).toBe(12);
   });
 
   it("copes with nothing, or something malformed", () => {

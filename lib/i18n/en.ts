@@ -11,6 +11,15 @@ export const en = {
   "shell.mandirs": "Mandirs",
   "shell.festivals": "Festivals",
   "shell.forMandirs": "For mandir committees",
+  "shell.footerLinks": "Pages about Toran",
+  "shell.about": "About",
+  "shell.contact": "Contact",
+  "shell.corrections": "Correct or remove something",
+  "shell.privacy": "Privacy",
+  "shell.terms": "Terms",
+  "shell.accessibility": "Accessibility",
+  "page.somethingWrong": "Something wrong here? Tell us",
+  "page.privacyNotice": "Privacy notice",
   "shell.footer":
     "Toran is being tested with mandir committees and opens in 2027. Details come from mandirs' own websites and our research; if something is wrong, the mandir's committee can correct it.",
 

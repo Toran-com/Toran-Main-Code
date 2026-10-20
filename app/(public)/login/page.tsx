@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import {
   buttonClass,
@@ -102,6 +103,17 @@ async function LoginForm({
           Email me a login link
         </button>
       </form>
+      <p className="text-muted text-base">
+        By logging in you agree to our{" "}
+        <Link href="/terms" className="text-peacock underline">
+          terms
+        </Link>
+        . Our{" "}
+        <Link href="/privacy" className="text-peacock underline">
+          privacy notice
+        </Link>{" "}
+        says what we keep: your email address and which mandir you help run.
+      </p>
     </Card>
   );
 }

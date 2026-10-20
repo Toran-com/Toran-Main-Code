@@ -146,6 +146,17 @@ async function Claim({
             listing.
           </span>
         </label>
+        <p className="text-muted text-base">
+          Our{" "}
+          <Link href="/privacy" className="text-peacock underline">
+            privacy notice
+          </Link>{" "}
+          says what we keep and why, and the{" "}
+          <Link href="/terms" className="text-peacock underline">
+            terms
+          </Link>{" "}
+          say what you agree to when you look after a page.
+        </p>
         <button type="submit" className={buttonClass}>
           Send request
         </button>

@@ -299,6 +299,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"site_requests": {
+                  Row: {
+                    "created_at": string,"details": string,"done_at": string | null,"id": number,"kind": string,"page": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"details": string,"done_at"?: string | null,"id"?: never,"kind": string,"page": string
+                  }
+                  Update: {
+                    "created_at"?: string,"details"?: string,"done_at"?: string | null,"id"?: never,"kind"?: string,"page"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"sources": {
                   Row: {
                     "created_at": string,"id": string,"kind": string,"label": string | null,"last_checked_at": string | null,"last_found": number | null,"last_notes": string | null,"last_outcome": string | null,"mandir_id": string,"url": string | null
@@ -401,6 +415,9 @@ isOneToOne: false
                            },
 "report_event":
 { Args: { "mandir_slug": string,"proposed": Json }; Returns: undefined
+                           },
+"request_correction":
+{ Args: { "details": string,"kind": string,"page": string }; Returns: undefined
                            },
 "run_retention":
 { Args: Record<PropertyKey, never>; Returns: Json
