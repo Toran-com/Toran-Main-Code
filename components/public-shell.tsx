@@ -50,6 +50,16 @@ export function SiteHeader() {
   );
 }
 
+// Pages about Toran itself, in English only.
+const FOOTER_LINKS = [
+  { href: "/about", key: "shell.about" },
+  { href: "/contact", key: "shell.contact" },
+  { href: "/corrections", key: "shell.corrections" },
+  { href: "/privacy", key: "shell.privacy" },
+  { href: "/terms", key: "shell.terms" },
+  { href: "/accessibility", key: "shell.accessibility" },
+] as const;
+
 export function SiteFooter() {
   const t = pageT();
   return (
@@ -66,6 +76,18 @@ export function SiteFooter() {
             {t("shell.forMandirs")}
           </Link>
         </p>
+        <nav aria-label={t("shell.footerLinks")}>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            {FOOTER_LINKS.map(({ href, key }) => (
+              <li key={href}>
+                {/* Rarely opened, so not fetched ahead (speed budget). */}
+                <Link href={href} prefetch={false} className="underline">
+                  {t(key)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </footer>
   );

@@ -35,7 +35,7 @@ within one month.
   any website you visit does. If you press "Near me", your browser asks
   first; your location only moves the map on your screen and is never sent
   to us or kept.
-- **"Near me" on What's on and the Diwali page.** If you press it, your browser asks first,
+- **"Near me" on What's on and the festival pages.** If you press it, your browser asks first,
   then sends your position (rounded to about a kilometre) to postcodes.io
   to find your postcode district, such as "RG1". Only the district reaches
   Toran, just as if you'd typed it; your position isn't sent to us or
@@ -54,6 +54,11 @@ within one month.
   phone remembers which slots you took, so you can see them, add them to
   your calendar or give them back; clearing the site's data in your
   browser forgets them.
+- **Telling us about an event, or asking for a correction.** We keep only
+  what you type into the form: the event's details, or what's wrong and on
+  which page. We don't ask who you are or record your IP address, so please
+  don't type anyone's name or contact details. Correction and removal
+  requests are deleted 90 days after we've dealt with them.
 - **Visitor numbers.** Toran counts how many times each public page is
   seen each day, and how often events are added to calendars or shared,
   with its own simple counter. It uses no cookies and keeps nothing about
@@ -127,7 +132,7 @@ it.
 
 ## How long we keep it
 
-See the summary table in our [retention schedule](retention.md). In short:
+In short:
 logins until you ask us to delete them, or 24 months after your last login
 (we email first); decided page requests for 2 years; error reports for
 about 30 days.

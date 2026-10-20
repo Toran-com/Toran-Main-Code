@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { OpsNav } from "@/components/ops-nav";
-import { cardClass, Loading, Notice, PageShell } from "@/components/ui";
+import {
+  cardClass,
+  Loading,
+  Notice,
+  PageShell,
+  pillButtonClass,
+} from "@/components/ui";
 import {
   attentionCount,
   daysSince,
@@ -11,9 +17,11 @@ import {
   type List,
 } from "@/lib/attention";
 import { requireToranAdmin } from "@/lib/auth";
+import { CORRECTION_KINDS } from "@/lib/corrections";
 import { calendarLabel, formatEventStart } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
+import { markRequestDone } from "./actions";
 
 export const metadata: Metadata = {
   title: pageTitle("Needs attention · Admin"),
@@ -225,6 +233,34 @@ async function NeedsAttention() {
           </>
         )}
       />
+
+      <Section
+        id="requests"
+        list={a.requests}
+        intro="Sent with the “Correct or remove something” form. Removals are promised the same day. Mark each one done when it's dealt with."
+        empty="No requests waiting."
+        render={(r) => (
+          <>
+            <span className="font-semibold">
+              {CORRECTION_KINDS.find((k) => k.value === r.kind)?.label ??
+                r.kind}
+            </span>
+            <Link href={r.page} className="text-peacock self-start break-all">
+              {r.page}
+            </Link>
+            <span className="whitespace-pre-line">{r.details}</span>
+            <span className="text-muted text-base">
+              Sent {formatEventStart(r.created_at, false)}
+            </span>
+            <form action={markRequestDone} className="pt-1">
+              <input type="hidden" name="id" value={r.id} />
+              <button type="submit" className={pillButtonClass}>
+                Done
+              </button>
+            </form>
+          </>
+        )}
+      />
     </>
   );
 }
@@ -237,6 +273,7 @@ const SECTIONS = [
   { id: "festival_dates", title: "Festival dates to check" },
   { id: "posters", title: "Posters waiting long" },
   { id: "claims", title: "Committee requests waiting" },
+  { id: "requests", title: "Corrections and removals" },
 ] as const;
 
 function Section<T>({

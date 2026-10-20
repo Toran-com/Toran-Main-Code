@@ -11,7 +11,15 @@ export const site = {
   // Until launch, ask search engines not to list any page, so half-finished
   // listings don't appear in search results. Set to true at launch.
   launched: false,
+  // The privacy notice and terms (docs/legal) are drafts until the founders
+  // and a solicitor have checked them; until then their pages say so. Set
+  // to true once checked, and every [bracket] in them is filled in.
+  legalChecked: false,
 } as const;
+
+// Toran's own email address, for questions and privacy requests. None yet:
+// the contact page explains the other ways to reach Toran until there is.
+export const CONTACT_EMAIL: string | null = null;
 
 // The live site's address, for links that must be complete (the sitemap,
 // search engine data). Vercel provides it; elsewhere it's this computer.

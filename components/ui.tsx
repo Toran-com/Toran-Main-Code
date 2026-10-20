@@ -27,6 +27,20 @@ export function PageShell({
         <Ornament />
       </div>
       {children}
+      <nav
+        aria-label="About Toran"
+        className="text-muted mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-6 text-base"
+      >
+        <Link href="/privacy" prefetch={false} className="underline">
+          Privacy
+        </Link>
+        <Link href="/terms" prefetch={false} className="underline">
+          Terms
+        </Link>
+        <Link href="/contact" prefetch={false} className="underline">
+          Contact
+        </Link>
+      </nav>
     </main>
   );
 }

@@ -49,7 +49,7 @@ create temporary table done on commit drop as select public.run_retention() as r
 reset role;
 
 select is((select r from done),
-  '{"invites": 1, "approved_claims": 1, "rejected_claims": 1, "daily_counts": 1, "job_runs": 1}'::jsonb,
+  '{"invites": 1, "approved_claims": 1, "rejected_claims": 1, "daily_counts": 1, "job_runs": 1, "site_requests": 0}'::jsonb,
   'it says how many of each it deleted');
 select is((select array_agg(email) from public.mandir_invites), array['new@example.com'],
   'expired invites go');
