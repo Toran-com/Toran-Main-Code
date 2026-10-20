@@ -77,9 +77,9 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
   const notice = query.error
     ? null
     : query.batch !== undefined
-      ? `Checked ${query.batch} websites. ${added} new ${added === 1 ? "event" : "events"} added to the poster queue.`
+      ? `Checked ${query.batch} websites. ${added} new ${added === 1 ? "event" : "events"} added to the review queue.`
       : query.checked && outcome in OUTCOMES
-        ? `${OUTCOMES[outcome].label}. ${added} new ${added === 1 ? "event" : "events"} added to the poster queue.`
+        ? `${OUTCOMES[outcome].label}. ${added} new ${added === 1 ? "event" : "events"} added to the review queue.`
         : null;
 
   return (
@@ -98,7 +98,7 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
           description when the site gives none, and each event gets a likely
           type. Anything new goes to the{" "}
           <Link href="/ops/posters" className="text-peacock underline">
-            poster queue
+            review queue
           </Link>
           , for the committee or Toran to check before it&apos;s published. It
           obeys each site&apos;s robots.txt and never reads Facebook or

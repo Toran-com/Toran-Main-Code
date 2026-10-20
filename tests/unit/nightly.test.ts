@@ -136,7 +136,7 @@ describe("nightlyStatus", () => {
     ).toEqual({
       state: "ok",
       ranAt: "2026-10-20T02:15:00Z",
-      text: "checked 12 websites, 1 new event to the poster queue, 3 old records deleted",
+      text: "checked 12 websites, 1 new event to the review queue, 3 old records deleted",
     });
     expect(
       nightlyStatus(
@@ -148,7 +148,7 @@ describe("nightlyStatus", () => {
       ),
     ).toMatchObject({
       state: "late",
-      text: "checked 0 websites, 2 couldn't be saved, 0 new events to the poster queue, the clean-up failed",
+      text: "checked 0 websites, 2 couldn't be saved, 0 new events to the review queue, the clean-up failed",
     });
   });
 });

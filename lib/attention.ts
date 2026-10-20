@@ -170,7 +170,7 @@ export function nightlyStatus(
   const text = [
     `checked ${checked} ${checked === 1 ? "website" : "websites"}`,
     ...(failed ? [`${failed} couldn't be saved`] : []),
-    `${added} new ${added === 1 ? "event" : "events"} to the poster queue`,
+    `${added} new ${added === 1 ? "event" : "events"} to the review queue`,
     s.retention
       ? `${deleted} old ${deleted === 1 ? "record" : "records"} deleted`
       : "the clean-up failed",

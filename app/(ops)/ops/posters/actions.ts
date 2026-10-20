@@ -3,7 +3,7 @@
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
-import { reviewPoster } from "@/lib/poster-review";
+import { correctPoster, reviewPoster } from "@/lib/poster-review";
 import { checkLink, POSTER_SOURCES, type PosterSource } from "@/lib/posters";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -64,17 +64,43 @@ export async function addPoster(formData: FormData) {
 
 export async function reviewPosterAsToran(formData: FormData) {
   const claimId = String(formData.get("poster") ?? "");
-  const decision =
-    formData.get("decision") === "publish" ? "publish" : "discard";
+  const decision = String(formData.get("decision") ?? "");
+  const group = String(formData.get("group") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(
+      `/ops/posters?${group ? `from=${encodeURIComponent(group)}&` : ""}${query}`,
+    );
   const supabase = await createSessionClient();
-  if (!supabase) redirect("/ops/posters?error=failed");
-  const result = await reviewPoster(supabase, claimId, decision, "toran");
-  if (!result.ok) redirect(`/ops/posters?error=${result.error}`);
-  if (decision === "publish") {
+  if (!supabase) back("error=failed");
+
+  // Corrected details, kept for the committee to publish.
+  if (decision === "edit") {
+    const result = await correctPoster(
+      supabase,
+      claimId,
+      eventInputFrom(formData),
+    );
+    if (!result.ok) back(`fix=${claimId}&error=${result.error}`);
+    back("done=corrected");
+  }
+
+  const publish = decision === "publish" || decision === "edit-publish";
+  const result = await reviewPoster(
+    supabase,
+    claimId,
+    publish ? "publish" : "discard",
+    "toran",
+    decision === "edit-publish" ? eventInputFrom(formData) : undefined,
+  );
+  if (!result.ok) {
+    // A correction that didn't pass the checks stays open to fix.
+    back(
+      `${decision === "edit-publish" ? `fix=${claimId}&` : ""}error=${result.error}`,
+    );
+  }
+  if (publish) {
     updateTag(`mandir:${result.slug}`);
     updateTag("events");
   }
-  redirect(
-    `/ops/posters?done=${decision === "publish" ? "published" : "discarded"}`,
-  );
+  back(`done=${publish ? "published" : "discarded"}`);
 }
