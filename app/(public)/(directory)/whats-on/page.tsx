@@ -7,6 +7,7 @@ import { NearMe } from "@/components/near-me";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
 import { EVENT_KINDS, isEventKind, kindLabel } from "@/lib/event-kinds";
+import { regionKey } from "@/lib/i18n/client/mandirs";
 import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
@@ -123,7 +124,9 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             <select name="region" defaultValue={region} className={inputClass}>
               <option value="">{t("whatsOn.anywhere")}</option>
               {REGIONS.map((r) => (
-                <option key={r}>{r}</option>
+                <option key={r} value={r}>
+                  {t(regionKey(r)!)}
+                </option>
               ))}
             </select>
           </label>
@@ -201,7 +204,10 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
                 miles: within,
                 place: near.toUpperCase(),
               })}
-            {region && t("whatsOn.countRegion", { region })}
+            {region &&
+              t("whatsOn.countRegion", {
+                region: regionKey(region) ? t(regionKey(region)!) : region,
+              })}
             {kind && t("whatsOn.countType", { type: EVENT_KINDS[kind] })}
             {position && t("whatsOn.nearestFirst")}
           </p>

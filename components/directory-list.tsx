@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useId, useMemo, useState } from "react";
 import type { MandirSummary } from "@/lib/directory";
 import { useLocale, useT } from "@/components/use-t";
-import { enMandirs } from "@/lib/i18n/client/mandirs";
+import { enMandirs, regionKey } from "@/lib/i18n/client/mandirs";
 import {
   anchorFor,
   groupByRegionAndTown,
@@ -139,6 +139,10 @@ function MandirGroups({
   const t = useT(enMandirs);
   const locale = useLocale();
   const groups = groupByRegionAndTown(mandirs);
+  const regionName = (region: string) => {
+    const key = regionKey(region);
+    return key ? t(key) : region;
+  };
   return (
     <div className="rise-list flex flex-col gap-8">
       {withRegions && (
@@ -150,7 +154,7 @@ function MandirGroups({
                   href={`#${anchorFor(region)}`}
                   className="border-line bg-surface hover:border-marigold/60 hover:text-peacock inline-block rounded-full border px-3 py-1 text-base no-underline shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition duration-200 hover:-translate-y-0.5"
                 >
-                  {region}
+                  {regionName(region)}
                 </a>
               </li>
             ))}
@@ -169,7 +173,7 @@ function MandirGroups({
             id={`${anchorFor(region)}-heading`}
             className="font-display text-3xl font-bold"
           >
-            {region}
+            {regionName(region)}
           </h2>
           {towns.map(({ town, mandirs: list }) => (
             <div key={town} className="flex flex-col gap-2">

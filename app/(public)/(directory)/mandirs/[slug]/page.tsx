@@ -21,6 +21,7 @@ import { describeRule } from "@/lib/recurrence";
 import { eventPath, eventShareText } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData, mandirData } from "@/lib/structured-data";
+import { regionKey } from "@/lib/i18n/client/mandirs";
 import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
 
 // Every mandir page is fully static. A mandir added after the build is
@@ -89,7 +90,7 @@ export default async function MandirPage({
         </h1>
         <Ornament />
         <p className="text-muted text-lg sm:text-xl">
-          {mandir.town}, {mandir.region}
+          {mandir.town}, {regionName(mandir.region)}
         </p>
         {mandir.status === "claimed" && (
           <p>
@@ -399,4 +400,10 @@ function NoEvents({ website }: { website: string | null }) {
       </p>
     </div>
   );
+}
+
+// A region in the page's language, or as stored if it has no translation.
+function regionName(region: string): string {
+  const key = regionKey(region);
+  return key ? pageT()(key) : region;
 }

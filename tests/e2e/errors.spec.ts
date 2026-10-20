@@ -6,9 +6,12 @@ test("unknown pages show the Toran not-found page", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Page not found",
   );
+  // Ways back into the site, not just the home page.
   await expect(
-    page.getByRole("link", { name: "Go to the Toran home page" }),
+    page.getByRole("link", { name: "The Toran home page" }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "Find a mandir" }).click();
+  await expect(page).toHaveURL(/\/mandirs$/);
 });
 
 test("the Sentry test route throws outside the live site", async ({

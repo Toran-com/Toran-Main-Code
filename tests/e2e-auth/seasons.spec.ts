@@ -35,3 +35,15 @@ test("Ram Navami and Hanuman Jayanti together", async ({ page }) => {
     page.getByRole("link", { name: /^Hanuman Jayanti/ }),
   ).toHaveAttribute("href", "/festivals/hanuman-jayanti");
 });
+
+test("the festival dates page leads to every season page", async ({ page }) => {
+  await page.goto("/festivals");
+  const seasons = page.getByRole("region", {
+    name: "Festival seasons at mandirs",
+  });
+  await expect(
+    seasons.getByRole("link", { name: /^Holi at mandirs/ }),
+  ).toHaveAttribute("href", "/holi");
+  await seasons.getByRole("link", { name: /^Ram Navami at mandirs/ }).click();
+  await expect(page).toHaveURL(/\/ram-navami$/);
+});
