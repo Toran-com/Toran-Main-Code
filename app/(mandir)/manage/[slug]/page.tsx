@@ -14,7 +14,10 @@ import {
   pillPrimaryClass,
   quietButtonClass,
 } from "@/components/ui";
+import { CommitteeTodo } from "@/components/committee-todo";
 import { getCurrentUser } from "@/lib/auth";
+import { eventCount, shortSevaShifts } from "@/lib/committee-facts";
+import type { CommitteeFacts } from "@/lib/committee-tasks";
 import { upcomingFilter, withNextStart } from "@/lib/events";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
@@ -188,6 +191,23 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     today,
   );
 
+  const facts: CommitteeFacts = {
+    slug: mandir.slug,
+    today,
+    now: new Date(),
+    events,
+    posters: posters.length,
+    festivals: festivals.map((p) => ({ title: p.title, date: p.date })),
+    shortShifts: await shortSevaShifts(supabase!, events),
+    eventsEver: Math.max(
+      (await eventCount(supabase!, mandir.id)).count ?? 0,
+      events.length,
+    ),
+    members: members?.length ?? 1,
+    invites: invites?.length ?? 0,
+    details: mandir,
+  };
+
   const query = await searchParams;
   // "Duplicate": the add form starts with that event's details.
   const copyId = String(query.copy ?? "");
@@ -254,9 +274,14 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       {error && <Notice tone="error">{error}</Notice>}
       {done && <Notice tone="success">{done}</Notice>}
 
+      <CommitteeTodo facts={facts} />
+
       {posters.length > 0 && (
         <Card>
-          <h2 className="text-xl font-bold sm:text-2xl">
+          <h2
+            id="posters"
+            className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+          >
             Posters waiting for you
           </h2>
           <p className="text-muted">

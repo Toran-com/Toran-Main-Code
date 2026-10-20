@@ -11,6 +11,12 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { getCurrentUser } from "@/lib/auth";
+import { loadCommitteeFacts } from "@/lib/committee-facts";
+import {
+  committeeTasks,
+  committeeTodoCount,
+  setupSteps,
+} from "@/lib/committee-tasks";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { acceptInvite, declineInvite } from "./actions";
@@ -57,7 +63,9 @@ async function Account({ searchParams }: PageProps<"/account">) {
     ? await Promise.all([
         supabase
           .from("mandir_admins")
-          .select("mandir:mandirs (slug, name, town)")
+          .select(
+            "mandir:mandirs (id, slug, name, town, calendar, postcode, website, phone)",
+          )
           .eq("user_id", user.id),
         supabase
           .from("mandir_claims")
@@ -74,6 +82,16 @@ async function Account({ searchParams }: PageProps<"/account">) {
       ])
     : [{ data: null }, { data: null }, { data: null }];
   const mandirs = (runs ?? []).flatMap((r) => (r.mandir ? [r.mandir] : []));
+  // What each needs doing, so the account page says where to start.
+  const todo = await Promise.all(
+    mandirs.map(async (m) => {
+      const facts = await loadCommitteeFacts(supabase!, m);
+      const first =
+        setupSteps(facts).find((step) => !step.done) ??
+        committeeTasks(facts)[0];
+      return { count: committeeTodoCount(facts), first };
+    }),
+  );
 
   return (
     <>
@@ -117,15 +135,44 @@ async function Account({ searchParams }: PageProps<"/account">) {
         {mandirs.length > 0 && (
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-bold">Your mandirs</h2>
-            <ul className="flex flex-col gap-1">
-              {mandirs.map((m) => (
-                <li key={m.slug}>
+            <ul className="flex flex-col gap-3">
+              {mandirs.map((m, i) => (
+                <li
+                  key={m.slug}
+                  className="border-line flex flex-col gap-1 rounded-2xl border p-4"
+                >
                   <Link
                     href={`/manage/${m.slug}`}
-                    className="text-peacock font-semibold underline"
+                    className="text-peacock text-lg font-semibold underline"
                   >
                     {m.name}, {m.town}
                   </Link>
+                  {todo[i].count === 0 ? (
+                    <span className="text-peacock">✓ All up to date</span>
+                  ) : (
+                    <span>
+                      <strong>
+                        {todo[i].count === 1
+                          ? "1 thing to do"
+                          : `${todo[i].count} things to do`}
+                      </strong>
+                      {todo[i].first && (
+                        <>
+                          , starting with:{" "}
+                          <Link
+                            href={
+                              todo[i].first.href.startsWith("#")
+                                ? `/manage/${m.slug}${todo[i].first.href}`
+                                : todo[i].first.href
+                            }
+                            className="text-peacock underline"
+                          >
+                            {todo[i].first.title}
+                          </Link>
+                        </>
+                      )}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

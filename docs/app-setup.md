@@ -399,6 +399,23 @@ with no sign-up and no name (decision 0013). Toran keeps **no volunteer
 names or numbers**, only how many places are taken. Named sign-up waits for
 ICO registration and the DPIA (decision 0006).
 
+### What needs doing (committees)
+
+The top of each mandir's committee page (`/manage/<mandir>`) says what to
+do next, worked out from the page itself (`lib/committee-tasks.ts`):
+
+- posters or messages waiting to be checked;
+- events in the next 30 days nobody has confirmed for 30 days ("Still on");
+- seva shifts in the next fortnight with places still free (not those
+  needing a DBS check);
+- a festival in the next 21 days with nothing added for it;
+- nothing coming up at all.
+
+New committees also see **Getting started**: check the mandir's details,
+add a first event, invite a colleague. Each step ticks itself off. The
+account page shows each mandir with how many things need doing and a link
+to the first.
+
 ### Reading mandirs' websites (`/ops` → Websites)
 
 **Check** reads one mandir's website; **Check the next 5 websites** works
