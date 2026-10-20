@@ -230,7 +230,7 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
           type="button"
           onClick={nearMe}
           disabled={!ready || finding === "finding"}
-          className="border-peacock/30 text-peacock hover:bg-peacock/10 bg-surface inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-base font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-95 disabled:opacity-60"
+          className="border-line-strong bg-surface text-ink hover:border-peacock/60 [&_svg]:text-peacock inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-base font-semibold transition duration-200 active:scale-95 disabled:opacity-60"
         >
           <svg
             aria-hidden="true"

@@ -100,7 +100,7 @@ export default async function SevaPage({
           {formatEventStart(event.next_starts_at, event.all_day)} ·{" "}
           {mandir.name}
         </p>
-        <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+        <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
           {t("seva.help")}
         </h1>
         {open ? (

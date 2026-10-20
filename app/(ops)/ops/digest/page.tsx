@@ -138,7 +138,7 @@ async function DigestPreview({ searchParams }: PageProps<"/ops/digest">) {
 
       <Card>
         <p className="text-muted text-base">Email preview</p>
-        <h2 className="font-display text-3xl font-bold">
+        <h2 className="font-display text-4xl leading-tight">
           What&apos;s on at mandirs
         </h2>
         <p className="text-marigold-ink font-semibold">
