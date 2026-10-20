@@ -64,7 +64,7 @@ function addDays(date: string, days: number): string {
     .slice(0, 10);
 }
 
-function daysBetween(from: string, to: string): number {
+export function daysBetween(from: string, to: string): number {
   return Math.round(
     (new Date(`${to}T00:00:00Z`).getTime() -
       new Date(`${from}T00:00:00Z`).getTime()) /

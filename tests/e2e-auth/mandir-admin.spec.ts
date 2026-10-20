@@ -46,6 +46,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.goto("/account");
   await member.getByRole("link", { name: new RegExp(NAME) }).click();
   await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}$`));
+  // A new committee is shown where to start.
+  await expect(
+    member.getByRole("heading", { name: "Getting started" }),
+  ).toBeVisible();
+  await expect(
+    member.getByRole("link", { name: "Add your first event" }),
+  ).toBeVisible();
   await member.getByLabel("What's happening?").fill("Annakut darshan");
   await member.getByLabel("What kind of event?").selectOption("festival");
   await member.getByLabel("Date").fill(nextWeek());
@@ -57,6 +64,8 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByLabel("Description in Gujarati").fill("સૌનું સ્વાગત છે.");
   await member.getByRole("button", { name: "Add event" }).click();
   await expect(member.getByText("Added.")).toBeVisible();
+  // …and that step is ticked off.
+  await expect(member.getByText("Add your first event (done)")).toBeVisible();
 
   // It's on the public page at once, with the committee badge and the
   // Gujarati under the English.
