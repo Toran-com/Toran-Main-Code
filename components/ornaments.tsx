@@ -66,9 +66,18 @@ export function Logo({ size = "md" }: { size?: "md" | "sm" }) {
 
 // The garland itself, repeated across the width. "night" is the gold and
 // mint one for deep peacock bands; on cream it turns gold in dark mode.
-export function Toran({ night = false }: { night?: boolean }) {
+export function Toran({
+  night = false,
+  className = "",
+}: {
+  night?: boolean;
+  className?: string;
+}) {
   return (
-    <div aria-hidden="true" className={`toran ${night ? "toran-night" : ""}`} />
+    <div
+      aria-hidden="true"
+      className={`toran ${night ? "toran-night" : ""} ${className}`}
+    />
   );
 }
 

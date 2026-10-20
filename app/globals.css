@@ -223,6 +223,12 @@ a:hover {
   }
 }
 
+/* One toran on a screen: a page that hangs its own over its bold moment
+   at the top (.own-toran) doesn't also get the one under the header. */
+body:has(.own-toran) .site-toran {
+  display: none;
+}
+
 /* A large, faint rangoli behind headings and in bold moments. */
 .rangoli-art {
   background: url("/art/rangoli.svg") no-repeat center / contain;

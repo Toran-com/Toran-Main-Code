@@ -8,12 +8,15 @@ import { SiteNav } from "@/components/site-nav";
 import { LOCALES } from "@/lib/i18n";
 import { localePath, pageT } from "@/lib/i18n/page";
 
-// Header, footer and page width for the public directory pages.
+// Header, footer and page width for the public directory pages. Pages
+// are a narrow column for reading, unless the page's content is wrapped in
+// a .page-wide element (mandir and event pages), which takes the full
+// width of the header.
 export function PublicShell({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 pt-4 pb-10 sm:gap-8 sm:px-6 sm:pt-6">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 pt-4 pb-10 has-[>.page-wide]:max-w-6xl sm:gap-8 sm:px-6 sm:pt-6 sm:has-[>.page-wide]:px-8">
         {children}
       </main>
       <SiteFooter />
@@ -61,7 +64,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
           </div>
         </div>
       </header>
-      {toran && <Toran />}
+      {toran && <Toran className="site-toran" />}
     </>
   );
 }
