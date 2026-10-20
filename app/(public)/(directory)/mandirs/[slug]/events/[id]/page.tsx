@@ -456,14 +456,14 @@ function Details({ page }: { page: MandirEventPage }) {
   return (
     <dl className="flex flex-col gap-5">
       {rows.map(({ label, icon, value }) => (
-        <div key={label} className="flex gap-3.5">
-          <span className="text-peacock mt-1 w-6 shrink-0 [&_svg]:size-6">
-            {icon}
-          </span>
-          <div className="flex flex-col">
-            <dt className="text-muted text-base">{label}</dt>
-            <dd>{value}</dd>
-          </div>
+        <div key={label} className="relative pl-[2.375rem]">
+          <dt className="text-muted text-base">
+            <span className="text-peacock absolute top-1 left-0 [&_svg]:size-6">
+              {icon}
+            </span>
+            {label}
+          </dt>
+          <dd>{value}</dd>
         </div>
       ))}
     </dl>
