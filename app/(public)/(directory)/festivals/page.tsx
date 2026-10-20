@@ -7,7 +7,9 @@ import { Loading, Notice } from "@/components/ui";
 import { listFestivalDates, type FestivalDate } from "@/lib/directory";
 import { calendarLabel, formatDateRange, monthOf } from "@/lib/format";
 import { pageMetadata } from "@/lib/site";
-import { festivalText, localePath, pageT } from "@/lib/i18n/page";
+import { seasonDays } from "@/lib/festival-season";
+import { SEASONS } from "@/lib/seasons";
+import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = pageT();
@@ -45,6 +47,16 @@ async function Festivals() {
     return <Notice>{t("festivals.none")}</Notice>;
   }
 
+  // The festival seasons with a page of their own, soonest first. The
+  // dates already start from today (listFestivalDates), so no "today" is
+  // needed and the page stays static.
+  const seasons = SEASONS.flatMap((season) => {
+    const main = seasonDays(result.data, season, "").find(
+      (d) => d.slug === season.main,
+    );
+    return main ? [{ season, main }] : [];
+  }).sort((a, b) => a.main.starts_on.localeCompare(b.main.starts_on));
+
   const months = new Map<string, FestivalDate[]>();
   for (const date of result.data) {
     const month = monthOf(date.starts_on);
@@ -53,6 +65,39 @@ async function Festivals() {
 
   return (
     <div className="flex flex-col gap-8">
+      {seasons.length > 0 && (
+        <section aria-labelledby="seasons" className="flex flex-col gap-3">
+          <h2
+            id="seasons"
+            className="font-display text-2xl font-bold sm:text-3xl"
+          >
+            {t("festivals.seasons")}
+          </h2>
+          <p className="text-muted">{t("festivals.seasonsIntro")}</p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {seasons.map(({ season, main }) => (
+              <li key={season.slug}>
+                <Link
+                  href={localePath(`/${season.slug}`)}
+                  className="border-line bg-surface lift hover:border-marigold/60 flex flex-col rounded-2xl border px-4 py-3 no-underline"
+                >
+                  <span className="text-ink font-bold">
+                    {t("festival.atMandirs", {
+                      name: seasonText(season).name,
+                    })}{" "}
+                    <span aria-hidden="true" className="text-peacock">
+                      →
+                    </span>
+                  </span>
+                  <span className="text-marigold-ink">
+                    {formatDateRange(main.starts_on, main.ends_on)}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {[...months.entries()].map(([month, dates]) => (
         <section key={month} className="flex flex-col gap-3">
           <h2 className="font-display text-2xl font-bold sm:text-3xl">

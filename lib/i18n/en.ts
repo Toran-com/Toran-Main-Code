@@ -159,6 +159,9 @@ export const en = {
     "Dates of Navratri, Diwali, Holi and other Hindu festivals in the UK.",
   "festivals.intro":
     "Dates for the UK. A few festivals fall on different days depending on the calendar a mandir follows, so check with your mandir too.",
+  "festivals.seasons": "Festival seasons at mandirs",
+  "festivals.seasonsIntro":
+    "Every mandir's events for the big festivals, in one place.",
   "festivals.calendarTitle": "Festival dates in your calendar",
   "festivals.calendarBody":
     "Add the festival dates to the calendar on your phone. Dates we check or add later appear there automatically.",

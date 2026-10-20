@@ -13,6 +13,19 @@ export const enMandirs = {
   "mandirs.noMatch":
     "No mandirs match “{query}”. Try a nearby town, or check the spelling.",
   "mandirs.regions": "Regions",
+  // UK regions, as mandirs are grouped (lib/mandir-form.ts REGIONS).
+  "region.East Midlands": "East Midlands",
+  "region.East of England": "East of England",
+  "region.London": "London",
+  "region.North East": "North East",
+  "region.North West": "North West",
+  "region.Northern Ireland": "Northern Ireland",
+  "region.Scotland": "Scotland",
+  "region.South East": "South East",
+  "region.South West": "South West",
+  "region.Wales": "Wales",
+  "region.West Midlands": "West Midlands",
+  "region.Yorkshire": "Yorkshire",
   "map.seeWhatsOn": "See what's on →",
   "map.cluster": "{count} mandirs near here",
   "map.clusterTitle": "{label}: zoom in",
@@ -30,3 +43,10 @@ export const enMandirs = {
   "map.missing.other":
     "{count} mandirs aren't on the map yet (no map position). They're in the list.",
 } as const;
+
+// A region's key, if it has a translation, so a region missing from the
+// list still shows as it's stored.
+export function regionKey(region: string): keyof typeof enMandirs | null {
+  const key = `region.${region}`;
+  return key in enMandirs ? (key as keyof typeof enMandirs) : null;
+}
