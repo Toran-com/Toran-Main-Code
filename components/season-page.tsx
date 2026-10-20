@@ -6,7 +6,9 @@ import { Countdown } from "@/components/countdown";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
 import { NearMe } from "@/components/near-me";
-import { Badge, LoadProblem, PageHeading } from "@/components/public-shell";
+import { DateTile } from "@/components/date-tile";
+import { Toran } from "@/components/ornaments";
+import { LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
 import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
@@ -54,11 +56,92 @@ export function SeasonPage({
           },
         ])}
       />
-      <PageHeading title={text.title} intro={text.intro} />
+      {/* The page's bold moment: the season and its days under a toran. */}
+      <header className="own-toran bg-night text-on-night rise relative overflow-hidden rounded-[2rem]">
+        <Toran night />
+        <div
+          aria-hidden="true"
+          className="rangoli-art rangoli-art-night pointer-events-none absolute -top-10 -right-28 size-[24rem] opacity-10 sm:size-[30rem] sm:opacity-20"
+        />
+        <div className="relative flex flex-col gap-4 px-5 pt-2 pb-8 sm:px-10 sm:pb-10">
+          <h1 className="font-display text-5xl leading-[1.02] tracking-tight sm:text-6xl">
+            {text.title}
+          </h1>
+          <p className="text-night-muted max-w-prose text-lg leading-relaxed">
+            {text.intro}
+          </p>
+          <Suspense fallback={null}>
+            <SeasonDays season={season} />
+          </Suspense>
+        </div>
+      </header>
       <Suspense fallback={<Loading />}>
         <SeasonBody season={season} searchParams={searchParams} />
       </Suspense>
     </>
+  );
+}
+
+// The festival days of the season, inside the heading: each with its date
+// tile and a link to the festival's own page.
+async function SeasonDays({ season }: { season: Season }) {
+  const t = pageT();
+  const text = seasonText(season);
+  const dates = await listFestivalDates();
+  if (dates.state !== "ok") return null;
+  // The dates already start from today (listFestivalDates), so no "today"
+  // is needed and the heading can be saved with the page.
+  const days = seasonDays(dates.data, season, "");
+  if (!seasonWindow(days)) return null;
+  const main = days.find((d) => d.slug === season.main)!;
+  return (
+    <section aria-labelledby="days" className="flex flex-col gap-4 pt-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 id="days" className="text-xl font-semibold sm:text-2xl">
+          {t("season.isOn", {
+            name: text.name,
+            dates: formatDateRange(main.starts_on, main.ends_on),
+          })}
+        </h2>
+        <Countdown date={main.starts_on} night />
+      </div>
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {days.map((d) => (
+          <li
+            key={d.slug}
+            className="has-card-link group bg-on-night/5 hover:bg-on-night/10 flex items-center gap-4 rounded-2xl p-2.5 transition-colors"
+          >
+            <Link
+              href={localePath(`/festivals/${d.slug}`)}
+              className="card-link order-2 flex flex-col leading-snug no-underline"
+            >
+              <span className="text-on-night font-semibold">
+                {festivalText(d.slug, { name: d.name, summary: null }).name}
+              </span>
+              <span className="text-night-muted">
+                {formatEventStart(`${d.starts_on}T12:00:00Z`, true)}
+              </span>
+            </Link>
+            <span className="order-1">
+              <DateTile
+                date={d.starts_on}
+                label={formatDateRange(d.starts_on, d.ends_on)}
+                size="sm"
+                night
+              />
+            </span>
+          </li>
+        ))}
+      </ul>
+      {days.some((d) => !d.verified) && (
+        <p className="text-night-muted text-base">
+          <span className="bg-night-accent/15 text-night-accent rounded-full px-3 py-0.5 font-semibold">
+            {t("festival.dateNotChecked")}
+          </span>{" "}
+          {t("season.otherCalendars")}
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -105,8 +188,6 @@ async function SeasonBody({
       </Notice>
     );
   }
-  const main = days.find((d) => d.slug === season.main)!;
-
   let problem: string | null = null;
   let position = null;
   if (near && origin === "unavailable") {
@@ -123,45 +204,7 @@ async function SeasonBody({
 
   return (
     <>
-      <section
-        aria-labelledby="days"
-        className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="days" className="font-display text-xl font-bold">
-            {t("season.isOn", {
-              name: text.name,
-              dates: formatDateRange(main.starts_on, main.ends_on),
-            })}
-          </h2>
-          <Countdown date={main.starts_on} />
-        </div>
-        <ul className="grid grid-cols-2 gap-1 sm:grid-cols-4">
-          {days.map((d) => (
-            <li key={d.slug}>
-              <Link
-                href={localePath(`/festivals/${d.slug}`)}
-                className="hover:bg-sunk flex flex-col rounded-xl px-2 py-1.5 leading-snug no-underline"
-              >
-                <span className="font-semibold">
-                  {festivalText(d.slug, { name: d.name, summary: null }).name}
-                </span>
-                <span className="text-marigold-ink">
-                  {formatEventStart(`${d.starts_on}T12:00:00Z`, true)}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        {days.some((d) => !d.verified) && (
-          <p className="text-muted text-base">
-            <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge>{" "}
-            {t("season.otherCalendars")}
-          </p>
-        )}
-      </section>
-
-      <form className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5">
+      <form className="border-line bg-surface shadow-card flex flex-col gap-4 rounded-3xl border p-5 sm:p-6">
         <NearMe
           page={localePath(`/${season.slug}`)}
           labels={{
@@ -229,7 +272,7 @@ async function SeasonBody({
           <EventList events={shown} now={new Date()} />
         </section>
       ) : (
-        <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-5">
+        <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
           <p className="font-semibold">
             {t(position ? "season.noneNear" : "season.none", {
               name: text.name,

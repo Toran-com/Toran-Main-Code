@@ -19,12 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function MandirsPage() {
   const t = pageT();
   return (
-    <>
+    <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <PageHeading title={t("shell.mandirs")} intro={t("mandirs.intro")} />
       <Suspense fallback={<Loading />}>
         <Directory />
       </Suspense>
-    </>
+    </div>
   );
 }
 
