@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { sendCount } from "@/components/count-visits";
 import { useOrigin } from "@/components/use-origin";
+import { actionPillClass } from "@/components/ui";
 import { useT } from "@/components/use-t";
 import { enShare } from "@/lib/i18n/client/share";
 import { whatsAppLink } from "@/lib/whatsapp";
@@ -66,17 +67,13 @@ export function ShareButtons({
         target="_blank"
         rel="noopener"
         onClick={() => sendCount("share", path)}
-        className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95"
+        className={actionPillClass}
       >
         <WhatsAppIcon />
         WhatsApp
       </a>
       {copy && (
-        <button
-          type="button"
-          onClick={shareOrCopy}
-          className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95"
-        >
+        <button type="button" onClick={shareOrCopy} className={actionPillClass}>
           {canShare ? t("share.otherApps") : t("share.copyLink")}
         </button>
       )}

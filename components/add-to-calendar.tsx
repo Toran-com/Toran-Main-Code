@@ -1,3 +1,4 @@
+import { actionPillClass } from "@/components/ui";
 import { pageT } from "@/lib/i18n/page";
 
 // "Add to calendar" for one event: Google Calendar, or a calendar file for
@@ -7,25 +8,32 @@ export function AddToCalendar({
   mandirSlug,
   eventId,
   title,
+  primary = false,
 }: {
   mandirSlug: string;
   eventId: string;
   title: string;
+  // The main action on the event's own page: a full-width peacock button.
+  primary?: boolean;
 }) {
   const t = pageT();
   const query = `?event=${encodeURIComponent(eventId)}`;
   const item =
-    "hover:bg-sunk text-peacock rounded-lg px-3 py-2 font-semibold no-underline";
+    "hover:bg-sunk text-peacock rounded-xl px-4 py-2.5 font-semibold no-underline";
   return (
-    <details className="group relative text-base">
+    <details className={`group relative text-base ${primary ? "w-full" : ""}`}>
       <summary
         aria-label={t("calendar.addLabel", { title })}
-        className="border-peacock/30 text-peacock hover:bg-peacock/10 inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border px-3 py-1 font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-95 [&::-webkit-details-marker]:hidden"
+        className={`list-none [&::-webkit-details-marker]:hidden ${
+          primary
+            ? "bg-peacock text-on-peacock hover:bg-peacock-deep flex w-full cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-semibold transition active:scale-[0.98]"
+            : actionPillClass
+        }`}
       >
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
-          className="size-4"
+          className={primary ? "size-5" : "size-4"}
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -36,7 +44,7 @@ export function AddToCalendar({
         </svg>
         {t("calendar.add")}
       </summary>
-      <div className="border-line bg-surface shadow-lift absolute top-full left-0 z-20 mt-2 flex w-max flex-col rounded-xl border p-1">
+      <div className="border-line bg-surface shadow-lift absolute top-full left-0 z-20 mt-2 flex w-max flex-col rounded-2xl border p-1.5">
         <a
           href={`/mandirs/${mandirSlug}/add-to-calendar${query}`}
           target="_blank"

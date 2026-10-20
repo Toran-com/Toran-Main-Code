@@ -71,8 +71,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   };
 
   const form = (
-    <div className="flex flex-col gap-3">
-      <form className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-4 sm:p-5">
+    <div className="flex flex-col gap-4">
+      <form className="border-line bg-surface shadow-card flex flex-col gap-4 rounded-3xl border p-5 sm:p-6">
         <NearMe
           page={localePath("/whats-on")}
           labels={{
@@ -148,10 +148,10 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
                   <Link
                     href={typeHref(value)}
                     aria-current={here ? "page" : undefined}
-                    className={`inline-block rounded-full border px-4 py-1.5 text-base font-semibold whitespace-nowrap no-underline transition-colors ${
+                    className={`inline-block rounded-full border px-4 py-2 text-base whitespace-nowrap no-underline transition-colors ${
                       here
-                        ? "border-peacock bg-peacock text-on-peacock"
-                        : "border-line bg-surface hover:border-peacock/50"
+                        ? "border-ink bg-ink text-bg font-semibold"
+                        : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"
                     }`}
                   >
                     {label}
@@ -214,7 +214,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
           <EventList events={events} now={new Date()} />
         </>
       ) : (
-        <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-5">
+        <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
           <p className="font-semibold">
             {position || region || kind
               ? t("whatsOn.noneThere")

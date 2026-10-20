@@ -10,7 +10,14 @@ const noSubscribe = () => () => {};
 // "In 20 days", "Tomorrow" or "Today" for a date (YYYY-MM-DD), worked out
 // on the visitor's phone so a saved page never shows a stale count. Shows
 // nothing before the page's JavaScript runs, or once the day has passed.
-export function Countdown({ date }: { date: string }) {
+export function Countdown({
+  date,
+  night = false,
+}: {
+  date: string;
+  // On the deep peacock bands.
+  night?: boolean;
+}) {
   const t = useT(enShare);
   const today = useSyncExternalStore(
     noSubscribe,
@@ -31,7 +38,13 @@ export function Countdown({ date }: { date: string }) {
         ? t("day.tomorrow")
         : t("countdown.days", { days });
   return (
-    <span className="bg-marigold/15 text-marigold-ink rounded-full px-3 py-0.5 text-base font-bold">
+    <span
+      className={`rounded-full px-3 py-0.5 text-base font-bold ${
+        night
+          ? "bg-night-accent/15 text-night-accent"
+          : "bg-marigold/15 text-marigold-ink"
+      }`}
+    >
       {text}
     </span>
   );

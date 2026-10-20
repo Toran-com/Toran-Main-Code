@@ -1,16 +1,17 @@
 import Link from "next/link";
+import { DateTile } from "@/components/date-tile";
 import { Badge } from "@/components/public-shell";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
-import { formatMiles, formatTimeOfDay } from "@/lib/format";
+import { formatEventStart, formatMiles, formatTimeOfDay } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";
 import { groupByDay } from "@/lib/whats-on-view";
 import { pageT, localePath } from "@/lib/i18n/page";
 
-// Events across mandirs, grouped by day. Each card opens the event's own
-// page, which has "Add to calendar" and sharing; the list stays easy to
-// scan on a phone.
+// Events across mandirs, grouped by day. Each row opens the event's own
+// page, which has "Add to calendar" and sharing. Rows sit on the page with
+// a fine line between them, so the list stays calm and easy to scan.
 // Pass "now" on pages rendered per visit, so headings can say "Today";
 // leave it out on saved (static) pages.
 export function EventList({
@@ -21,13 +22,13 @@ export function EventList({
   now?: Date | null;
 }) {
   return (
-    <div className="flex flex-col gap-6 sm:gap-8">
+    <div className="flex flex-col gap-8 sm:gap-10">
       {groupByDay(events, now).map(({ heading, events: day }) => (
-        <section key={heading} className="flex flex-col gap-3">
-          <h2 className="font-display text-xl font-bold sm:text-2xl">
+        <section key={heading} className="flex flex-col">
+          <h2 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
             {heading}
           </h2>
-          <ul className="rise-list flex flex-col gap-3">
+          <ul className="divide-line flex flex-col divide-y">
             {day.map((e) => (
               <li key={e.id}>
                 <EventCard event={e} />
@@ -45,14 +46,16 @@ export function EventCard({ event: e }: { event: EventNear }) {
   const cancelled = e.status === "cancelled";
   const rule = e.recurrence && describeRule(e.recurrence);
   const source = sourceLabel(e);
+  const kind = kindLabel(e.kind);
   return (
-    <article className="has-card-link group border-line bg-surface lift shadow-card flex gap-3 rounded-2xl border p-4 sm:gap-5 sm:p-5">
-      <p className="text-marigold-ink w-14 shrink-0 pt-0.5 leading-tight font-bold sm:w-20 sm:text-lg">
-        {formatTimeOfDay(e.next_starts_at, e.all_day)}
-      </p>
+    <article className="has-card-link group flex gap-4 py-5 sm:gap-6 sm:py-6">
+      <DateTile
+        date={e.next_starts_at}
+        label={formatEventStart(e.next_starts_at, true)}
+      />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <h3
-          className={`text-lg leading-snug font-bold sm:text-xl ${cancelled ? "line-through" : ""}`}
+          className={`text-lg leading-snug font-semibold sm:text-xl ${cancelled ? "line-through" : ""}`}
         >
           <Link
             href={localePath(eventPath(e.mandir.slug, e.id))}
@@ -67,25 +70,43 @@ export function EventCard({ event: e }: { event: EventNear }) {
           </p>
         )}
         <p className="text-muted">
-          <span className="text-ink font-semibold">{e.mandir.name}</span>
+          {e.mandir.name}
           {` · ${e.mandir.town}`}
           {e.miles !== null && ` · ${formatMiles(e.miles)}`}
         </p>
-        {e.summary && <p className="text-muted line-clamp-2">{e.summary}</p>}
-        <p className="mt-1 flex flex-wrap items-center gap-2">
-          {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
-          {rule && <Badge tone="marigold">{rule}</Badge>}
-          {kindLabel(e.kind) && <Badge>{kindLabel(e.kind)}</Badge>}
-          {source && (
-            <span
-              className={`text-base ${e.confirmed_at ? "text-peacock font-semibold" : "text-muted"}`}
-            >
-              {e.confirmed_at && <span aria-hidden="true">✓ </span>}
-              {source}
-            </span>
-          )}
+        <p className="text-muted">
+          {formatTimeOfDay(e.next_starts_at, e.all_day)}
+          {rule && ` · ${rule}`}
         </p>
+        {e.summary && <p className="text-muted line-clamp-2">{e.summary}</p>}
+        {(cancelled || kind || source) && (
+          <p className="mt-1.5 flex flex-wrap items-center gap-2">
+            {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
+            {source &&
+              (e.confirmed_at ? (
+                <Badge tone="leaf">
+                  <span aria-hidden="true">✓ </span>
+                  {source}
+                </Badge>
+              ) : (
+                <span className="text-muted text-base">{source}</span>
+              ))}
+            {kind && <Badge>{kind}</Badge>}
+          </p>
+        )}
       </div>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="text-peacock mt-1 hidden size-6 shrink-0 transition-transform group-hover:translate-x-1 sm:block"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
     </article>
   );
 }

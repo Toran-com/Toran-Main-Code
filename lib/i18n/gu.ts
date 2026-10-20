@@ -40,6 +40,18 @@ export const gu: Record<MessageKey, string> = {
   "home.committeesCta": "મંદિર ચલાવો છો? તમારા કાર્યક્રમો Toran પર મૂકો",
   "home.comingSoon": "ટૂંક સમયમાં",
   "home.committeesTitle": "સમિતિઓ માટે તે કેવી રીતે કામ કરે છે",
+  "home.committeesHeading": "તમારા કાર્યક્રમો, જ્યાં પરિવારો પહેલેથી જુએ છે.",
+  "home.mandirCount": "યુકેમાં {count} મંદિરો",
+  "home.mandirsIntro":
+    "તમારું મંદિર શોધો: ત્યાં શું થઈ રહ્યું છે, ત્યાં કેવી રીતે પહોંચવું અને તેના કાર્યક્રમો તમારા કેલેન્ડરમાં કેવી રીતે ઉમેરવા.",
+  "home.regionCount.one": "{count} મંદિર",
+  "home.regionCount.other": "{count} મંદિરો",
+  "home.step1Title": "તમારી પાસે જે છે તે મોકલો",
+  "home.step1": "પોસ્ટર, પત્રિકા કે વોટ્સએપ સંદેશ.",
+  "home.step2Title": "એક મિનિટમાં તપાસો",
+  "home.step2": "તમારી સમિતિ હા પાડે ત્યાં સુધી કંઈ પ્રકાશિત થતું નથી.",
+  "home.step3Title": "પરિવારો તેને શોધે છે",
+  "home.step3": "Toran પર, તેમના કેલેન્ડરમાં અને વોટ્સએપ પર.",
   "home.committeesBody":
     "સમિતિઓ જે પત્રિકા કે પોસ્ટર પહેલેથી શેર કરે છે તે મોકલે છે, અને પ્રકાશિત થાય તે પહેલાં તપાસે છે. મંદિરો માટે તે મફત છે.",
 

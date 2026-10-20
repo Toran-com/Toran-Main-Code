@@ -2,8 +2,11 @@ import { seasonOf } from "@/lib/seasons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DateTile } from "@/components/date-tile";
 import { EventList } from "@/components/event-list";
+import { Toran } from "@/components/ornaments";
 import { Badge, LoadProblem } from "@/components/public-shell";
+import { cardClass } from "@/components/ui";
 import { ShareButtons } from "@/components/share-buttons";
 import { getFestival, listFestivals } from "@/lib/directory";
 import { mentionsFestival } from "@/lib/festival-words";
@@ -76,8 +79,9 @@ export default async function FestivalPage({
         })
       : [];
 
+  const next = festival.dates[0];
   return (
-    <>
+    <div className="page-wide flex flex-col gap-10 sm:gap-14">
       <JsonLd
         data={breadcrumbData([
           { name: "Toran", url: `${siteUrl()}/` },
@@ -85,99 +89,128 @@ export default async function FestivalPage({
           { name: festival.name, url: `${siteUrl()}/festivals/${slug}` },
         ])}
       />
-      <Link
-        href={localePath("/festivals")}
-        className="text-peacock self-start font-semibold hover:underline"
-      >
-        {t("festival.all")}
-      </Link>
-      <div className="rise flex flex-col gap-2 sm:gap-3">
-        <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-          {festival.name}
-        </h1>
-        {festival.summary && (
-          <p className="text-muted max-w-prose text-base sm:text-lg">
-            {festival.summary}
-          </p>
-        )}
-        {festival.dates.length ? (
-          <ul className="flex flex-col gap-1">
-            {festival.dates.map((d) => (
-              <li key={d.id} className="flex flex-wrap items-center gap-2">
-                <span className="text-marigold-ink text-lg font-bold sm:text-xl">
-                  {formatDateRange(d.starts_on, d.ends_on)}
-                </span>
-                {calendarLabel(d.calendar) && (
-                  <span className="text-muted">
-                    · {calendarLabel(d.calendar)}
-                  </span>
-                )}
-                {!d.verified && (
-                  <Badge tone="marigold">{t("festival.dateNotChecked")}</Badge>
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted">{t("festival.noDate")}</p>
-        )}
-        <div className="pt-1">
-          <ShareButtons
-            label={t("festival.share")}
-            text={t("festival.shareText", { name: festival.name })}
-            path={localePath(`/festivals/${festival.slug}`)}
+      <div className="flex flex-col gap-4">
+        <Link
+          href={localePath("/festivals")}
+          className="text-peacock self-start font-semibold hover:underline"
+        >
+          {t("festival.all")}
+        </Link>
+        {/* The page's bold moment: the festival and its next date. */}
+        <header className="own-toran bg-night text-on-night rise relative overflow-hidden rounded-[2rem]">
+          <Toran night />
+          <div
+            aria-hidden="true"
+            className="rangoli-art rangoli-art-night pointer-events-none absolute -top-16 -right-24 size-[22rem] opacity-10 sm:size-[30rem] sm:opacity-20"
           />
-        </div>
+          <div className="relative flex flex-wrap items-end gap-x-8 gap-y-5 px-5 pt-2 pb-8 sm:px-12 sm:pb-12">
+            {next && (
+              <DateTile
+                date={next.starts_on}
+                label={formatDateRange(next.starts_on, next.ends_on)}
+                size="lg"
+                night
+              />
+            )}
+            <div className="flex min-w-0 flex-[1_1_26rem] flex-col gap-3">
+              <h1 className="font-display text-5xl leading-[1.02] tracking-tight sm:text-7xl">
+                {festival.name}
+              </h1>
+              {festival.summary && (
+                <p className="text-night-muted max-w-prose text-lg sm:text-xl">
+                  {festival.summary}
+                </p>
+              )}
+            </div>
+          </div>
+        </header>
       </div>
 
-      {season && (
-        <Link
-          href={localePath(`/${season.slug}`)}
-          className="border-marigold/50 bg-marigold/10 lift text-ink flex items-center justify-between gap-3 rounded-2xl border p-4 font-semibold no-underline"
-        >
-          <span>
-            {t("season.allOf", { period: seasonText(season).period })}
-          </span>
-          <span aria-hidden="true" className="text-peacock">
-            →
-          </span>
-        </Link>
-      )}
-
-      <section aria-labelledby="events" className="flex flex-col gap-4">
-        <h2
-          id="events"
-          className="font-display text-3xl leading-tight sm:text-4xl"
-        >
-          {t("festival.atMandirs", { name: festival.name })}
-        </h2>
-        {during.length ? (
-          <EventList events={nearTo(during, null, 0)} />
-        ) : (
-          <div className="bg-sunk rounded-2xl p-5">
-            <p className="font-semibold">
-              {t("festival.noEvents", { name: festival.name })}
-            </p>
-            <p className="text-muted">
-              {t("festival.appearBefore")}{" "}
-              <Link
-                href={localePath("/whats-on")}
-                className="text-peacock underline"
-              >
-                {t("festival.whatsOnLink")}
-              </Link>{" "}
-              {t("festival.orFind")}{" "}
-              <Link
-                href={localePath("/mandirs")}
-                className="text-peacock underline"
-              >
-                {t("festival.nearestMandir")}
-              </Link>
-              {t("festival.appearAfter")}
-            </p>
+      <div className="flex flex-wrap items-start gap-x-16 gap-y-12">
+        <aside className="flex min-w-0 flex-[1_1_20rem] flex-col gap-6 lg:sticky lg:top-28 lg:order-2">
+          <div className={`${cardClass} flex flex-col gap-5 p-6 sm:p-7`}>
+            {festival.dates.length ? (
+              <ul className="flex flex-col gap-3">
+                {festival.dates.map((d) => (
+                  <li key={d.id} className="flex flex-col items-start gap-1">
+                    <span className="text-lg font-semibold">
+                      {formatDateRange(d.starts_on, d.ends_on)}
+                    </span>
+                    {calendarLabel(d.calendar) && (
+                      <span className="text-muted">
+                        {calendarLabel(d.calendar)}
+                      </span>
+                    )}
+                    {!d.verified && (
+                      <Badge tone="marigold">
+                        {t("festival.dateNotChecked")}
+                      </Badge>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted">{t("festival.noDate")}</p>
+            )}
+            <ShareButtons
+              label={t("festival.share")}
+              text={t("festival.shareText", { name: festival.name })}
+              path={localePath(`/festivals/${festival.slug}`)}
+            />
           </div>
-        )}
-      </section>
-    </>
+          {season && (
+            <Link
+              href={localePath(`/${season.slug}`)}
+              className="bg-sunk text-ink hover:bg-tile flex items-center justify-between gap-3 rounded-3xl px-6 py-5 font-semibold no-underline transition-colors"
+            >
+              <span>
+                {t("season.allOf", { period: seasonText(season).period })}
+              </span>
+              <span aria-hidden="true" className="text-peacock">
+                →
+              </span>
+            </Link>
+          )}
+        </aside>
+
+        <section
+          aria-labelledby="events"
+          className="flex min-w-0 flex-[999_1_34rem] flex-col gap-4"
+        >
+          <h2
+            id="events"
+            className="font-display text-4xl leading-tight sm:text-5xl"
+          >
+            {t("festival.atMandirs", { name: festival.name })}
+          </h2>
+          {during.length ? (
+            <EventList events={nearTo(during, null, 0)} />
+          ) : (
+            <div className="bg-sunk rounded-3xl p-6">
+              <p className="font-semibold">
+                {t("festival.noEvents", { name: festival.name })}
+              </p>
+              <p className="text-muted">
+                {t("festival.appearBefore")}{" "}
+                <Link
+                  href={localePath("/whats-on")}
+                  className="text-peacock underline"
+                >
+                  {t("festival.whatsOnLink")}
+                </Link>{" "}
+                {t("festival.orFind")}{" "}
+                <Link
+                  href={localePath("/mandirs")}
+                  className="text-peacock underline"
+                >
+                  {t("festival.nearestMandir")}
+                </Link>
+                {t("festival.appearAfter")}
+              </p>
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
   );
 }

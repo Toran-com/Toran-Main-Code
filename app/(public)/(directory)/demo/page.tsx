@@ -38,7 +38,7 @@ export default function DemoPage() {
           <p className="text-muted font-semibold">What families see</p>
           <h1
             id="families"
-            className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl"
+            className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl"
           >
             {demoMandir.name}
           </h1>
@@ -50,7 +50,7 @@ export default function DemoPage() {
           </p>
         </div>
 
-        <h2 className="font-display text-3xl font-bold">What&apos;s on</h2>
+        <h2 className="font-display text-4xl leading-tight">What&apos;s on</h2>
         <ul className="rise-list flex flex-col gap-3">
           {demoEvents.map((event) => (
             <li key={event.id}>
@@ -83,7 +83,7 @@ export default function DemoPage() {
       <section aria-labelledby="committee" className="flex flex-col gap-5">
         <div className="flex flex-col gap-3">
           <p className="text-muted font-semibold">What the committee sees</p>
-          <h2 id="committee" className="font-display text-3xl font-bold">
+          <h2 id="committee" className="font-display text-4xl leading-tight">
             Seva rota for {demoRotaEvent}
           </h2>
           <p className="text-muted">
@@ -125,7 +125,7 @@ export default function DemoPage() {
       </section>
 
       <section aria-labelledby="how" className="flex flex-col gap-4">
-        <h2 id="how" className="font-display text-3xl font-bold">
+        <h2 id="how" className="font-display text-4xl leading-tight">
           How it works for your mandir
         </h2>
         <ol className="flex list-decimal flex-col gap-2 pl-6">
