@@ -8,7 +8,7 @@ import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
-import { Card, Ornament, quietButtonClass } from "@/components/ui";
+import { Card, quietButtonClass } from "@/components/ui";
 import {
   getMandir,
   listMandirs,
@@ -88,7 +88,6 @@ export default async function MandirPage({
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           {mandir.name}
         </h1>
-        <Ornament />
         <p className="text-muted text-lg sm:text-xl">
           {mandir.town}, {regionName(mandir.region)}
         </p>
@@ -231,7 +230,7 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
 
   return (
     <section aria-labelledby="about" className="flex flex-col gap-3">
-      <h2 id="about" className="font-display text-2xl font-bold">
+      <h2 id="about" className="font-display text-3xl leading-tight">
         {t("mandir.about")}
       </h2>
       <dl className="border-line bg-surface shadow-card grid gap-x-6 gap-y-3 rounded-2xl border p-5 sm:grid-cols-[auto_1fr]">

@@ -1,7 +1,6 @@
 import { seasonOf } from "@/lib/seasons";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Ornament } from "@/components/ui";
 import { notFound } from "next/navigation";
 import { EventList } from "@/components/event-list";
 import { Badge, LoadProblem } from "@/components/public-shell";
@@ -96,7 +95,6 @@ export default async function FestivalPage({
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           {festival.name}
         </h1>
-        <Ornament />
         {festival.summary && (
           <p className="text-muted max-w-prose text-base sm:text-lg">
             {festival.summary}
@@ -147,7 +145,10 @@ export default async function FestivalPage({
       )}
 
       <section aria-labelledby="events" className="flex flex-col gap-4">
-        <h2 id="events" className="font-display text-2xl font-bold sm:text-3xl">
+        <h2
+          id="events"
+          className="font-display text-3xl leading-tight sm:text-4xl"
+        >
           {t("festival.atMandirs", { name: festival.name })}
         </h2>
         {during.length ? (

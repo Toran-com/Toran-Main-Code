@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" fill="none" stroke="#E9C27A" stroke-width="1.2" stroke-linejoin="round">
+<defs>
+<path id="a" d="M120 120 C106 96 107 62 120 40 C133 62 134 96 120 120 Z"/>
+<path id="b" d="M120 120 C112 104 112 86 120 74 C128 86 128 104 120 120 Z"/>
+<path id="c" d="M120 34 C116 28 116 22 120 16 C124 22 124 28 120 34 Z"/>
+<circle id="d" cx="120" cy="10" r="2.2"/>
+</defs>
+<circle cx="120" cy="120" r="114" stroke-opacity="0.45"/>
+<g>
+<use href="#a"/><use href="#a" transform="rotate(45 120 120)"/><use href="#a" transform="rotate(90 120 120)"/><use href="#a" transform="rotate(135 120 120)"/><use href="#a" transform="rotate(180 120 120)"/><use href="#a" transform="rotate(225 120 120)"/><use href="#a" transform="rotate(270 120 120)"/><use href="#a" transform="rotate(315 120 120)"/>
+</g>
+<g stroke="#7FD6CF">
+<use href="#b" transform="rotate(22.5 120 120)"/><use href="#b" transform="rotate(67.5 120 120)"/><use href="#b" transform="rotate(112.5 120 120)"/><use href="#b" transform="rotate(157.5 120 120)"/><use href="#b" transform="rotate(202.5 120 120)"/><use href="#b" transform="rotate(247.5 120 120)"/><use href="#b" transform="rotate(292.5 120 120)"/><use href="#b" transform="rotate(337.5 120 120)"/>
+</g>
+<g>
+<use href="#c" transform="rotate(22.5 120 120)"/><use href="#c" transform="rotate(67.5 120 120)"/><use href="#c" transform="rotate(112.5 120 120)"/><use href="#c" transform="rotate(157.5 120 120)"/><use href="#c" transform="rotate(202.5 120 120)"/><use href="#c" transform="rotate(247.5 120 120)"/><use href="#c" transform="rotate(292.5 120 120)"/><use href="#c" transform="rotate(337.5 120 120)"/>
+</g>
+<g fill="#E9C27A" stroke="none">
+<use href="#d"/><use href="#d" transform="rotate(45 120 120)"/><use href="#d" transform="rotate(90 120 120)"/><use href="#d" transform="rotate(135 120 120)"/><use href="#d" transform="rotate(180 120 120)"/><use href="#d" transform="rotate(225 120 120)"/><use href="#d" transform="rotate(270 120 120)"/><use href="#d" transform="rotate(315 120 120)"/>
+</g>
+<circle cx="120" cy="120" r="22"/>
+<circle cx="120" cy="120" r="11" fill="#FFB627" stroke="none"/>
+</svg>

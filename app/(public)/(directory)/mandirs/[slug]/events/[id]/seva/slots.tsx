@@ -156,7 +156,7 @@ export function MySlots({ slug, event }: { slug: string; event: string }) {
       aria-labelledby="my-slots"
       className="border-peacock/30 bg-peacock/5 flex flex-col gap-3 rounded-2xl border p-5"
     >
-      <h2 id="my-slots" className="font-display text-2xl font-bold">
+      <h2 id="my-slots" className="font-display text-3xl leading-tight">
         {t("slot.yours")}
       </h2>
       <ul className="flex flex-col gap-4">

@@ -19,11 +19,23 @@
   --leaf: #3f7d3a;
   --peacock-deep: #08504e;
   --card-shadow:
-    0 1px 2px rgba(27, 26, 44, 0.05), 0 10px 28px -16px rgba(27, 26, 44, 0.18);
+    0 1px 2px rgba(27, 26, 44, 0.04), 0 12px 32px -14px rgba(27, 26, 44, 0.14);
   --lift-shadow:
-    0 2px 4px rgba(27, 26, 44, 0.06), 0 22px 44px -18px rgba(27, 26, 44, 0.28);
-  --glow: rgba(240, 160, 10, 0.14);
-  --glow-cool: rgba(11, 107, 104, 0.08);
+    0 2px 4px rgba(27, 26, 44, 0.05), 0 20px 44px -18px rgba(27, 26, 44, 0.24);
+  /* Each page's one bold moment: a deep peacock band with cream text and
+     gold line art (the home page welcome, an event's heading). */
+  --night: #0a3b3a;
+  --on-night: #faf3e6;
+  --night-muted: #cfe3df;
+  --night-accent: #ffc95c;
+  /* Date tiles: a page from a panchang, the month in kumkum. */
+  --tile: #fff6e3;
+  --tile-line: rgba(240, 160, 10, 0.35);
+  --date: #c21e3a;
+  --line-strong: rgba(27, 26, 44, 0.18);
+  /* "Confirmed by the mandir". */
+  --leaf-tint: #eaf3e8;
+  --leaf-ink: #2f6a2b;
 }
 
 @media screen and (prefers-color-scheme: dark) {
@@ -46,8 +58,16 @@
       0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 30px -18px rgba(0, 0, 0, 0.7);
     --lift-shadow:
       0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -18px rgba(0, 0, 0, 0.8);
-    --glow: rgba(255, 182, 39, 0.08);
-    --glow-cool: rgba(60, 198, 191, 0.07);
+    --night: #0b2f31;
+    --on-night: #faf3e6;
+    --night-muted: #c3d9d5;
+    --night-accent: #ffc95c;
+    --tile: rgba(255, 182, 39, 0.12);
+    --tile-line: rgba(255, 182, 39, 0.3);
+    --date: #ff8a9e;
+    --line-strong: rgba(237, 234, 245, 0.22);
+    --leaf-tint: rgba(125, 196, 111, 0.14);
+    --leaf-ink: #9fd892;
   }
 }
 
@@ -65,9 +85,20 @@
   --color-kumkum: var(--kumkum);
   --color-leaf: var(--leaf);
   --color-peacock-deep: var(--peacock-deep);
+  --color-night: var(--night);
+  --color-on-night: var(--on-night);
+  --color-night-muted: var(--night-muted);
+  --color-night-accent: var(--night-accent);
+  --color-tile: var(--tile);
+  --color-tile-line: var(--tile-line);
+  --color-date: var(--date);
+  --color-line-strong: var(--line-strong);
+  --color-leaf-tint: var(--leaf-tint);
+  --color-leaf-ink: var(--leaf-ink);
   --shadow-card: var(--card-shadow);
   --shadow-lift: var(--lift-shadow);
-  --font-display: var(--font-bricolage), "Segoe UI", sans-serif;
+  --font-display:
+    var(--font-instrument), var(--font-gujarati-serif), Georgia, serif;
   --font-sans: var(--font-figtree), "Segoe UI", system-ui, sans-serif;
 }
 
@@ -79,13 +110,14 @@ html {
 }
 
 body {
-  /* A warm glow of marigold and peacock behind the top of every page. */
-  background:
-    radial-gradient(70rem 36rem at 100% -8rem, var(--glow), transparent 70%),
-    radial-gradient(50rem 30rem at -10% 0, var(--glow-cool), transparent 70%),
-    var(--bg);
-  background-repeat: no-repeat;
+  background: var(--bg);
   color: var(--ink);
+}
+
+/* The headline serif has one weight: never let the browser fake a bold
+   one, whatever weight a heading asks for. */
+.font-display {
+  font-synthesis: none;
 }
 
 a {
@@ -190,78 +222,43 @@ a:hover {
   border-radius: inherit;
 }
 
-/* The main menu: a marigold line slides in under the page you're on and
-   the link you point at. */
-.nav-link {
-  position: relative;
-  padding-block: 0.25rem;
-  text-decoration: none;
+/* The toran: mango leaves and marigolds on a string, drawn in fine line
+   (public/art), hung under the header and over each page's bold moment. */
+.toran {
+  height: 48px;
+  background: url("/art/toran.svg") repeat-x 0 0 / 48px 48px;
 }
-.nav-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.1rem;
-  height: 3px;
-  border-radius: 3px;
-  background: var(--marigold);
-  transform: scaleX(0);
-  transition: transform 220ms ease;
+.toran-night {
+  background-image: url("/art/toran-night.svg");
 }
-.nav-link:hover::after,
-.nav-link[aria-current="page"]::after {
-  transform: scaleX(1);
+@media (min-width: 40rem) {
+  .toran {
+    height: 64px;
+    background-size: 64px 64px;
+  }
 }
 
-/* The fringe of marigolds and mango leaves under the header, like a toran
-   over a doorway. */
-.toran-fringe {
-  height: 12px;
-  background:
-    radial-gradient(circle at 8px 4px, var(--marigold) 3.5px, transparent 4px) 0
-      0 / 32px 12px repeat-x,
-    radial-gradient(
-        ellipse 2.5px 5px at 24px 6px,
-        var(--leaf) 90%,
-        transparent 100%
-      )
-      0 0 / 32px 12px repeat-x;
-  opacity: 0.85;
+/* A large, faint rangoli behind headings and in bold moments. */
+.rangoli-art {
+  background: url("/art/rangoli.svg") no-repeat center / contain;
+}
+.rangoli-art-night {
+  background-image: url("/art/rangoli-night.svg");
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  .toran {
+    background-image: url("/art/toran-night.svg");
+  }
+  .rangoli-art {
+    background-image: url("/art/rangoli-night.svg");
+  }
 }
 
 /* Keeps the map's own layers (zoom buttons, popups) inside the map, so
    they slide under the header rather than over it. */
 .leaflet-container {
   isolation: isolate;
-}
-
-/* A small ornament under page headings: two fading lines and a diamond. */
-.ornament {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 7rem;
-}
-.ornament::before,
-.ornament::after {
-  content: "";
-  height: 2px;
-  flex: 1;
-  border-radius: 2px;
-}
-.ornament::before {
-  background: linear-gradient(to right, transparent, var(--marigold));
-}
-.ornament::after {
-  background: linear-gradient(to left, transparent, var(--marigold));
-}
-.ornament > span {
-  width: 0.5rem;
-  height: 0.5rem;
-  transform: rotate(45deg);
-  background: var(--marigold);
-  border-radius: 1px;
 }
 
 /* A faint rangoli pattern for the home page's welcome section. */

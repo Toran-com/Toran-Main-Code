@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ToranGarland } from "@/components/toran-garland";
+import { Logo } from "@/components/ornaments";
 
 // The narrow card layout used by login, account and admin pages.
 export function PageShell({
@@ -17,15 +17,16 @@ export function PageShell({
     <main
       className={`rise mx-auto flex w-full flex-1 flex-col gap-6 px-4 py-8 sm:gap-8 sm:px-6 sm:py-14 ${wide ? "max-w-3xl" : "max-w-lg"}`}
     >
-      <Link href="/" aria-label="Toran home" className="self-start">
-        <ToranGarland className="h-8 w-36" />
+      <Link
+        href="/"
+        aria-label="Toran home"
+        className="text-ink self-start no-underline"
+      >
+        <Logo size="sm" />
       </Link>
-      <div className="flex flex-col gap-2 sm:gap-3">
-        <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-          {title}
-        </h1>
-        <Ornament />
-      </div>
+      <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
+        {title}
+      </h1>
       {children}
       <nav
         aria-label="About Toran"
@@ -45,22 +46,14 @@ export function PageShell({
   );
 }
 
-// Two fading lines and a marigold diamond, under page headings.
-export function Ornament() {
-  return (
-    <span className="ornament" aria-hidden="true">
-      <span />
-    </span>
-  );
-}
-
-// The white (or, in dark mode, deep blue) panel used for cards and forms.
+// The white (or, in dark mode, deep blue) panel for things you tap and
+// for forms. Lists sit on the page with fine lines instead.
 export const cardClass =
-  "border-line bg-surface shadow-card rounded-2xl border";
+  "border-line bg-surface shadow-card rounded-3xl border";
 
 export function Card({ children }: { children: ReactNode }) {
   return (
-    <div className={`${cardClass} flex flex-col gap-4 p-4 sm:gap-5 sm:p-6`}>
+    <div className={`${cardClass} flex flex-col gap-4 p-5 sm:gap-5 sm:p-7`}>
       {children}
     </div>
   );
@@ -74,14 +67,14 @@ export function Notice({
   children: ReactNode;
 }) {
   const colours = {
-    info: "border-line border-l-marigold bg-sunk",
-    error: "border-kumkum text-kumkum bg-surface",
-    success: "border-peacock text-peacock bg-surface",
+    info: "border-transparent bg-sunk",
+    error: "border-kumkum/40 bg-kumkum/5 text-kumkum",
+    success: "border-peacock/30 bg-peacock/5 text-peacock",
   }[tone];
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={`rise rounded-xl border border-l-4 px-4 py-3 ${colours}`}
+      className={`rise rounded-2xl border px-5 py-4 ${colours}`}
     >
       {children}
     </p>
@@ -89,23 +82,26 @@ export function Notice({
 }
 
 export const inputClass =
-  "border-line bg-surface focus:outline-peacock w-full rounded-xl border px-4 py-3 text-lg shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] transition-colors focus:outline-2 hover:border-peacock/40";
+  "border-line-strong bg-surface focus:outline-peacock hover:border-peacock/50 w-full rounded-2xl border px-4 py-3 text-lg transition-colors focus:outline-2";
 
-// Buttons rise a little under the pointer and press in when tapped.
+// Everything you press is a soft pill. Buttons press in a little when
+// tapped.
 const press =
-  "inline-flex items-center justify-center gap-2 text-center transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 text-center no-underline transition duration-200 ease-out active:scale-[0.98] disabled:pointer-events-none";
 
-export const buttonClass = `${press} bg-linear-to-b from-peacock to-peacock-deep w-full rounded-xl px-5 py-3 text-lg font-semibold text-on-peacock shadow-card hover:shadow-lift hover:brightness-110 disabled:opacity-60`;
+// The main action: one per screen.
+export const buttonClass = `${press} bg-peacock text-on-peacock hover:bg-peacock-deep w-full rounded-full px-6 py-3 text-lg font-semibold disabled:opacity-60`;
 
-// Small rounded buttons for actions on an item in a list (Edit, Cancel…),
+// Small pill buttons for actions on an item in a list (Edit, Cancel…),
 // so a row of them fits on a phone.
 export const pillButtonClass =
-  "border-line bg-surface text-ink hover:border-peacock/50 hover:text-peacock inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-base font-semibold no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95";
+  "border-line-strong bg-surface text-ink hover:border-peacock/60 hover:text-peacock inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-1.5 text-base font-semibold no-underline transition duration-200 active:scale-95";
 
 export const pillPrimaryClass =
-  "bg-peacock text-on-peacock hover:brightness-110 inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-base font-semibold no-underline transition duration-200 hover:-translate-y-0.5 active:scale-95";
+  "bg-peacock text-on-peacock hover:bg-peacock-deep inline-flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-1.5 text-base font-semibold no-underline transition duration-200 active:scale-95";
 
-export const quietButtonClass = `${press} border-line bg-surface text-ink hover:border-marigold/60 shadow-card hover:shadow-lift rounded-xl border px-5 py-3 text-lg font-semibold`;
+// Everything else you press: an outlined pill.
+export const quietButtonClass = `${press} border-line-strong bg-surface text-ink hover:border-peacock/60 rounded-full border px-6 py-3 text-lg font-semibold`;
 
 export function Loading() {
   return (

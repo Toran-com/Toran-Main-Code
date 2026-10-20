@@ -193,7 +193,7 @@ async function ComingUp() {
     <section aria-labelledby="coming-up" className="flex flex-col gap-4">
       <h2
         id="coming-up"
-        className="font-display text-2xl font-bold sm:text-3xl"
+        className="font-display text-3xl leading-tight sm:text-4xl"
       >
         {t("home.comingUp")}
       </h2>
@@ -226,7 +226,7 @@ async function FestivalsSoon() {
     <section aria-labelledby="festivals-soon" className="flex flex-col gap-4">
       <h2
         id="festivals-soon"
-        className="font-display text-2xl font-bold sm:text-3xl"
+        className="font-display text-3xl leading-tight sm:text-4xl"
       >
         {t("home.festivalsSoon")}
       </h2>

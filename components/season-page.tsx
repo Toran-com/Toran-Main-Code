@@ -213,7 +213,7 @@ async function SeasonBody({
         <section aria-labelledby="events" className="flex flex-col gap-4">
           <h2
             id="events"
-            className="font-display text-2xl font-bold sm:text-3xl"
+            className="font-display text-3xl leading-tight sm:text-4xl"
           >
             {t("festival.atMandirs", { name: text.name })}
           </h2>

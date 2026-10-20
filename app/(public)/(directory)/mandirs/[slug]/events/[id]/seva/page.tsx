@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
-import { Card, Ornament } from "@/components/ui";
+import { Card } from "@/components/ui";
 import {
   getEventSeva,
   getMandir,
@@ -103,7 +103,6 @@ export default async function SevaPage({
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           {t("seva.help")}
         </h1>
-        <Ornament />
         {open ? (
           <p className="text-xl">
             <strong>{t("seva.takenOf", { taken, needed })}</strong>{" "}

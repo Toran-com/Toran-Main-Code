@@ -41,7 +41,7 @@ export default function AboutPage() {
       />
 
       <section aria-labelledby="why" className="flex flex-col gap-3">
-        <h2 id="why" className="font-display text-2xl font-bold">
+        <h2 id="why" className="font-display text-3xl leading-tight">
           Why Toran
         </h2>
         <p className="max-w-prose">
@@ -55,7 +55,7 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="sources" className="flex flex-col gap-3">
-        <h2 id="sources" className="font-display text-2xl font-bold">
+        <h2 id="sources" className="font-display text-3xl leading-tight">
           Where the listings come from
         </h2>
         <p className="max-w-prose">
@@ -83,7 +83,7 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="free" className="flex flex-col gap-3">
-        <h2 id="free" className="font-display text-2xl font-bold">
+        <h2 id="free" className="font-display text-3xl leading-tight">
           Free, and kept small
         </h2>
         <ul className="flex max-w-prose list-disc flex-col gap-2 pl-6">
@@ -115,7 +115,7 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="who" className="flex flex-col gap-3">
-        <h2 id="who" className="font-display text-2xl font-bold">
+        <h2 id="who" className="font-display text-3xl leading-tight">
           Who runs it
         </h2>
         <p className="max-w-prose">

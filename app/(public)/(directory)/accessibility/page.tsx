@@ -21,7 +21,7 @@ export default function AccessibilityPage() {
       />
 
       <section aria-labelledby="aim" className="flex flex-col gap-3">
-        <h2 id="aim" className="font-display text-2xl font-bold">
+        <h2 id="aim" className="font-display text-3xl leading-tight">
           What we aim for
         </h2>
         <p className="max-w-prose">
@@ -53,7 +53,7 @@ export default function AccessibilityPage() {
       </section>
 
       <section aria-labelledby="known" className="flex flex-col gap-3">
-        <h2 id="known" className="font-display text-2xl font-bold">
+        <h2 id="known" className="font-display text-3xl leading-tight">
           What we know isn&apos;t right yet
         </h2>
         <ul className="flex max-w-prose list-disc flex-col gap-2 pl-6">
@@ -73,7 +73,7 @@ export default function AccessibilityPage() {
       </section>
 
       <section aria-labelledby="tell-us" className="flex flex-col gap-3">
-        <h2 id="tell-us" className="font-display text-2xl font-bold">
+        <h2 id="tell-us" className="font-display text-3xl leading-tight">
           Tell us about a problem
         </h2>
         <p className="max-w-prose">
