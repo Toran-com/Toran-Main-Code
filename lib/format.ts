@@ -39,6 +39,29 @@ function dayLabel(at: Date, timeZone: string, withYear = false): string {
   return withYear ? `${label} ${get("year")}` : label;
 }
 
+// The three lines of a date tile: "NOV", "8" and "Sun" (in Gujarati,
+// "નવે", "8" and "રવિ"). Pass a date-only value (YYYY-MM-DD) for a day, or
+// a moment for the day it falls on in the UK.
+export function dateTileParts(value: string): {
+  month: string;
+  day: string;
+  weekday: string;
+} {
+  const dayOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
+  const parts = new Intl.DateTimeFormat(dateLocale(), {
+    timeZone: dayOnly ? "UTC" : LONDON,
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).formatToParts(dayOnly ? dateOnly(value) : new Date(value));
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return {
+    month: get("month").replace(/\.$/, "").toUpperCase(),
+    day: get("day"),
+    weekday: get("weekday").replace(/\.$/, ""),
+  };
+}
+
 // "Sun 8 Nov 2026", or "Sun 11 Oct – Mon 19 Oct 2026" for a range.
 export function formatDateRange(startsOn: string, endsOn: string): string {
   const start = dateOnly(startsOn);
