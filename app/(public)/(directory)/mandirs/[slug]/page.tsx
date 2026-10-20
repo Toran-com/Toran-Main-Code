@@ -367,8 +367,9 @@ function EventRow({
           </p>
         )}
         <p className="text-muted">
-          {formatTimeOfDay(event.next_starts_at, event.all_day)}
-          {rule && ` · ${rule}`}
+          {event.recurrence
+            ? `${t("event.repeatNext", { rule: rule ?? "" })}${formatEventStart(event.next_starts_at, event.all_day)}`
+            : formatTimeOfDay(event.next_starts_at, event.all_day)}
         </p>
         {event.summary && <p>{event.summary}</p>}
         {event.summary_gu && <p lang="gu">{event.summary_gu}</p>}
