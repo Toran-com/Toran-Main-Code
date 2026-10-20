@@ -82,7 +82,7 @@ export function DirectoryList({ mandirs }: { mandirs: MandirSummary[] }) {
         >
           <span
             aria-hidden="true"
-            className={`from-peacock to-peacock-deep shadow-card absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-linear-to-b transition-transform duration-300 ease-out ${
+            className={`bg-peacock absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full transition-transform duration-300 ease-out ${
               view === "list" ? "translate-x-full" : ""
             }`}
           />
@@ -171,48 +171,50 @@ function MandirGroups({
         >
           <h2
             id={`${anchorFor(region)}-heading`}
-            className="font-display text-3xl font-bold"
+            className="font-display text-4xl leading-tight"
           >
             {regionName(region)}
           </h2>
-          {towns.map(({ town, mandirs: list }) => (
-            <div key={town} className="flex flex-col gap-2">
-              <h3 className="text-muted flex items-center gap-2 text-lg font-semibold">
-                <span
-                  aria-hidden="true"
-                  className="bg-marigold size-2 rotate-45 rounded-[1px]"
-                />
-                {town}
-              </h3>
-              <ul className={`${cardClass} divide-line divide-y`}>
-                {list.map((m) => (
-                  <li key={m.slug}>
-                    <Link
-                      href={withLocale(`/mandirs/${m.slug}`, locale)}
-                      className="group hover:bg-sunk flex items-center gap-3 px-4 py-3 no-underline transition-colors first:rounded-t-2xl last:rounded-b-2xl"
-                    >
-                      <span className="flex flex-1 flex-col">
-                        <span className="text-peacock font-semibold">
-                          {m.name}
-                        </span>
-                        {m.tradition && (
-                          <span className="text-muted text-base">
-                            {m.tradition}
-                          </span>
-                        )}
-                      </span>
-                      <span
-                        aria-hidden="true"
-                        className="text-marigold-ink -translate-x-1 text-xl opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100"
+          <div className="grid items-start gap-x-10 gap-y-6 md:grid-cols-2">
+            {towns.map(({ town, mandirs: list }) => (
+              <div key={town} className="flex flex-col gap-2">
+                <h3 className="text-muted flex items-center gap-2 text-lg font-semibold">
+                  <span
+                    aria-hidden="true"
+                    className="bg-marigold size-2 rotate-45 rounded-[1px]"
+                  />
+                  {town}
+                </h3>
+                <ul className={`${cardClass} divide-line divide-y`}>
+                  {list.map((m) => (
+                    <li key={m.slug}>
+                      <Link
+                        href={withLocale(`/mandirs/${m.slug}`, locale)}
+                        className="group hover:bg-sunk flex items-center gap-3 px-4 py-3 no-underline transition-colors first:rounded-t-2xl last:rounded-b-2xl"
                       >
-                        →
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                        <span className="flex flex-1 flex-col">
+                          <span className="text-peacock font-semibold">
+                            {m.name}
+                          </span>
+                          {m.tradition && (
+                            <span className="text-muted text-base">
+                              {m.tradition}
+                            </span>
+                          )}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className="text-marigold-ink -translate-x-1 text-xl opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100"
+                        >
+                          →
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </section>
       ))}
     </div>
