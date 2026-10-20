@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { EventActions } from "@/components/event-actions";
+import { AddToCalendar } from "@/components/add-to-calendar";
+import { DateTile } from "@/components/date-tile";
+import { CalendarIcon, ClockIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
+import { Toran } from "@/components/ornaments";
 import { Badge, LoadProblem } from "@/components/public-shell";
-import { Card, Notice, quietButtonClass } from "@/components/ui";
+import { ShareButtons } from "@/components/share-buttons";
+import { cardClass, Notice, quietButtonClass } from "@/components/ui";
 import {
   getEventSeva,
   getMandir,
@@ -108,8 +112,19 @@ export default async function EventPage({
       ? others.data.events.filter((e) => e.id !== event.id).slice(0, 3)
       : [];
 
+  const confirmedOn =
+    event.confirmed_at &&
+    t("mandir.confirmedOn", {
+      date: new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
+        timeZone: "Europe/London",
+        day: "numeric",
+        month: "short",
+      }).format(new Date(event.confirmed_at)),
+    });
+  const source = sourceLabel(event);
+
   return (
-    <>
+    <div className="page-wide flex flex-col gap-8 sm:gap-12">
       {upcoming && (
         <JsonLd data={eventData(event, mandir, `${siteUrl()}${path}`)} />
       )}
@@ -121,47 +136,72 @@ export default async function EventPage({
           { name: event.title, url: `${siteUrl()}${path}` },
         ])}
       />
-      <Link
-        href={mandirPath}
-        className="text-peacock self-start font-semibold hover:underline"
-      >
-        ← {mandir.name}
-      </Link>
-
-      <div className="rise flex flex-col gap-2 sm:gap-3">
-        <p className="text-marigold-ink text-lg font-semibold sm:text-xl">
-          {event.recurrence &&
-            t("event.repeatNext", { rule: rule ?? t("event.repeats") })}
-          {formatEventStart(event.next_starts_at, event.all_day)}
-        </p>
-        <h1
-          className={`font-display text-4xl font-extrabold tracking-tight sm:text-5xl ${cancelled ? "line-through" : ""}`}
+      <div className="flex flex-col gap-4">
+        <Link
+          href={mandirPath}
+          className="text-peacock self-start font-semibold hover:underline"
         >
-          {event.title}
-        </h1>
-        {event.title_gu && (
-          <p lang="gu" className="text-xl font-semibold sm:text-2xl">
-            {event.title_gu}
-          </p>
-        )}
-        {(cancelled || !upcoming || kindLabel(event.kind)) && (
-          <p className="flex flex-wrap gap-2">
-            {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
-            {!upcoming && <Badge>{t("event.finished")}</Badge>}
-            {kindLabel(event.kind) && <Badge>{kindLabel(event.kind)}</Badge>}
-          </p>
-        )}
-        {upcoming && !cancelled && (
-          <div className="pt-1">
-            <EventActions
-              mandirSlug={mandir.slug}
-              eventId={event.id}
-              title={event.title}
-              shareText={eventShareText(event, mandir)}
-              path={localePath(path)}
+          ← {mandir.name}
+        </Link>
+
+        {/* The page's bold moment: the date and name under a toran. */}
+        <header className="own-toran bg-night text-on-night rise relative overflow-hidden rounded-[2rem]">
+          <Toran night />
+          <div
+            aria-hidden="true"
+            className="rangoli-art rangoli-art-night pointer-events-none absolute -top-16 -right-24 size-[22rem] opacity-20 sm:-right-16 sm:size-[32rem] sm:opacity-30"
+          />
+          <div className="relative flex flex-wrap items-end gap-x-8 gap-y-5 px-5 pt-2 pb-8 sm:px-12 sm:pt-4 sm:pb-12">
+            <DateTile
+              date={event.next_starts_at}
+              label={formatEventStart(event.next_starts_at, true)}
+              size="lg"
+              night
             />
+            <div className="flex min-w-0 flex-[1_1_26rem] flex-col gap-3">
+              {(cancelled || !upcoming || rule || kindLabel(event.kind)) && (
+                <p className="flex flex-wrap gap-2">
+                  {cancelled && (
+                    <span className="bg-kumkum rounded-full px-3 py-0.5 text-base font-semibold text-white">
+                      {t("event.cancelled")}
+                    </span>
+                  )}
+                  {!upcoming && (
+                    <span className="bg-on-night/15 rounded-full px-3 py-0.5 text-base font-semibold">
+                      {t("event.finished")}
+                    </span>
+                  )}
+                  {rule && (
+                    <span className="bg-night-accent/15 text-night-accent rounded-full px-3 py-0.5 text-base font-semibold">
+                      {rule}
+                    </span>
+                  )}
+                  {kindLabel(event.kind) && (
+                    <span className="bg-on-night/10 rounded-full px-3 py-0.5 text-base font-semibold">
+                      {kindLabel(event.kind)}
+                    </span>
+                  )}
+                </p>
+              )}
+              <h1
+                className={`font-display text-[2.75rem] leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl ${cancelled ? "line-through" : ""}`}
+              >
+                {event.title}
+              </h1>
+              {event.title_gu && (
+                <p lang="gu" className="text-xl font-semibold sm:text-2xl">
+                  {event.title_gu}
+                </p>
+              )}
+              <Link
+                href={mandirPath}
+                className="text-night-muted hover:text-on-night w-fit text-lg underline decoration-1 underline-offset-4 sm:text-xl"
+              >
+                {mandir.name}, {mandir.town}
+              </Link>
+            </div>
           </div>
-        )}
+        </header>
       </div>
 
       {!upcoming && (
@@ -183,102 +223,157 @@ export default async function EventPage({
         </Notice>
       )}
 
-      <Details page={result.data} />
+      <div className="flex flex-wrap items-start gap-x-16 gap-y-12">
+        {/* First on a phone, so the time, place and buttons come straight
+            after the name; beside the details on a wide screen, staying
+            in view while you read. */}
+        <aside className="flex min-w-0 flex-[1_1_20rem] flex-col gap-4 lg:sticky lg:top-28 lg:order-2">
+          <div className={`${cardClass} flex flex-col gap-6 p-6 sm:p-7`}>
+            <Details page={result.data} />
+            {confirmedOn ? (
+              <Badge tone="leaf">
+                <span aria-hidden="true">✓ </span>
+                {confirmedOn}
+              </Badge>
+            ) : (
+              source && <p className="text-muted text-base">{source}</p>
+            )}
+            {upcoming && !cancelled && (
+              <div className="flex flex-col gap-3">
+                <AddToCalendar
+                  mandirSlug={mandir.slug}
+                  eventId={event.id}
+                  title={event.title}
+                  primary
+                />
+                <ShareButtons
+                  text={eventShareText(event, mandir)}
+                  path={localePath(path)}
+                />
+              </div>
+            )}
+          </div>
+          <Link
+            prefetch={false}
+            href={`/corrections?page=${encodeURIComponent(path)}`}
+            className="text-muted self-center text-base"
+          >
+            {t("page.somethingWrong")}
+          </Link>
+        </aside>
 
-      {upcoming && !cancelled && seva.state === "ok" && seva.data?.open && (
-        <SevaCard
-          path={localePath(sevaPath(mandir.slug, event.id))}
-          seva={seva.data}
-        />
-      )}
+        <div className="flex min-w-0 flex-[999_1_34rem] flex-col gap-12 sm:gap-16">
+          {(event.summary || event.summary_gu) && (
+            <section
+              aria-labelledby="about"
+              className="flex max-w-2xl flex-col gap-4"
+            >
+              <h2
+                id="about"
+                className="font-display text-4xl leading-tight sm:text-5xl"
+              >
+                {t("event.about")}
+              </h2>
+              {event.summary && (
+                <p className="text-lg leading-relaxed sm:text-xl">
+                  {event.summary}
+                </p>
+              )}
+              {event.summary_gu && (
+                <p lang="gu" className="text-lg leading-relaxed sm:text-xl">
+                  {event.summary_gu}
+                </p>
+              )}
+            </section>
+          )}
 
-      {(event.summary || event.summary_gu) && (
-        <section aria-labelledby="about" className="flex flex-col gap-2">
-          <h2 id="about" className="font-display text-3xl leading-tight">
-            {t("event.about")}
-          </h2>
-          {event.summary && <p>{event.summary}</p>}
-          {event.summary_gu && <p lang="gu">{event.summary_gu}</p>}
-        </section>
-      )}
+          {upcoming && !cancelled && seva.state === "ok" && seva.data?.open && (
+            <Seva
+              path={localePath(sevaPath(mandir.slug, event.id))}
+              seva={seva.data}
+            />
+          )}
 
-      <p className="text-muted text-base">
-        {event.confirmed_at
-          ? t("mandir.confirmedOn", {
-              date: new Intl.DateTimeFormat(
-                pageLocale() === "gu" ? "gu-IN" : "en-GB",
-                { timeZone: "Europe/London", day: "numeric", month: "short" },
-              ).format(new Date(event.confirmed_at)),
-            })
-          : sourceLabel(event)}
-      </p>
+          {alsoOn.length > 0 && (
+            <section aria-labelledby="also-on" className="flex flex-col">
+              <h2
+                id="also-on"
+                className="font-display mb-2 text-4xl leading-tight sm:text-5xl"
+              >
+                {t("event.alsoAt", { name: mandir.name })}
+              </h2>
+              <ul className="divide-line flex flex-col divide-y">
+                {alsoOn.map((e) => (
+                  <li
+                    key={e.id}
+                    className="has-card-link group flex items-center gap-4 py-4 sm:gap-5"
+                  >
+                    <DateTile
+                      date={e.next_starts_at}
+                      label={formatEventStart(e.next_starts_at, true)}
+                      size="sm"
+                    />
+                    <span className="flex min-w-0 flex-col">
+                      <Link
+                        href={localePath(eventPath(mandir.slug, e.id))}
+                        className="card-link group-hover:text-peacock text-lg leading-snug font-semibold no-underline sm:text-xl"
+                      >
+                        {e.title}
+                      </Link>
+                      <span className="text-muted">
+                        {formatEventStart(e.next_starts_at, e.all_day)}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-      {alsoOn.length > 0 && (
-        <section aria-labelledby="also-on" className="flex flex-col gap-3">
-          <h2 id="also-on" className="font-display text-3xl leading-tight">
-            {t("event.alsoAt", { name: mandir.name })}
-          </h2>
-          <ul className="rise-list flex flex-col gap-3">
-            {alsoOn.map((e) => (
-              <li key={e.id}>
-                <Link
-                  href={localePath(eventPath(mandir.slug, e.id))}
-                  className="border-line bg-surface lift shadow-card flex flex-col rounded-2xl border p-4 no-underline"
-                >
-                  <span className="text-marigold-ink font-semibold">
-                    {formatEventStart(e.next_starts_at, e.all_day)}
-                  </span>
-                  <span className="text-lg font-bold">{e.title}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <div className="flex flex-wrap gap-x-6 gap-y-2">
-        <Link href={mandirPath} className="text-peacock font-semibold">
-          {t("event.everythingAt", { name: mandir.name })}
-        </Link>
-        <Link
-          href={localePath("/whats-on")}
-          className="text-peacock font-semibold"
-        >
-          {t("event.whatsOnNear")}
-        </Link>
-        <Link
-          prefetch={false}
-          href={`/corrections?page=${encodeURIComponent(path)}`}
-          className="text-peacock font-semibold"
-        >
-          {t("page.somethingWrong")}
-        </Link>
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <Link href={mandirPath} className="text-peacock font-semibold">
+              {t("event.everythingAt", { name: mandir.name })}
+            </Link>
+            <Link
+              href={localePath("/whats-on")}
+              className="text-peacock font-semibold"
+            >
+              {t("event.whatsOnNear")}
+            </Link>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
 // "Help with seva" when the committee lets volunteers take slots here.
-function SevaCard({ path, seva }: { path: string; seva: EventSeva }) {
+function Seva({ path, seva }: { path: string; seva: EventSeva }) {
   const shifts = seva.roles.flatMap((r) => (r.needs_dbs ? [] : r.shifts));
   if (!shifts.length) return null;
   const taken = shifts.reduce((n, s) => n + placesTaken(s), 0);
   const needed = shifts.reduce((n, s) => n + s.needed, 0);
   const t = pageT();
   return (
-    <Card>
-      <h2 className="text-2xl font-bold">{t("seva.help")}</h2>
-      <p>
+    <section
+      aria-labelledby="seva"
+      className="bg-sunk flex flex-col gap-4 rounded-3xl p-6 sm:p-8"
+    >
+      <h2 id="seva" className="font-display text-4xl leading-tight">
+        {t("seva.help")}
+      </h2>
+      <p className="text-lg">
         <strong>{t("seva.takenOf", { taken, needed })}</strong>{" "}
         {t("seva.placesTaken")}
       </p>
       <Link href={path} className={`${quietButtonClass} self-start`}>
         {taken < needed ? t("seva.take") : t("seva.seeRota")}
       </Link>
-    </Card>
+    </section>
   );
 }
 
+// When and where, each with its icon, as the top of the side panel.
 function Details({ page }: { page: MandirEventPage }) {
   const { mandir, event } = page;
   const t = pageT();
@@ -288,33 +383,38 @@ function Details({ page }: { page: MandirEventPage }) {
         `${mandir.name} ${mandir.postcode}`,
       )}`
     : null;
-  const rows: { label: string; value: ReactNode }[] = [
+  const rows: { label: string; icon: ReactNode; value: ReactNode }[] = [
     {
       label: t("event.when"),
+      icon: event.recurrence ? <CalendarIcon /> : <ClockIcon />,
       value: event.recurrence ? (
         <>
-          {rule ?? t("event.repeats")}
+          <strong>{rule ?? t("event.repeats")}</strong>
           <br />
           {t("event.next", {
             when: formatEventStart(event.next_starts_at, event.all_day),
           })}
         </>
       ) : (
-        formatEventWhen(event.starts_at, event.ends_at, event.all_day)
+        <strong>
+          {formatEventWhen(event.starts_at, event.ends_at, event.all_day)}
+        </strong>
       ),
     },
     {
       label: t("event.where"),
+      icon: <PinIcon />,
       value: (
         <>
           <Link
             href={localePath(`/mandirs/${mandir.slug}`)}
-            className="text-peacock font-semibold underline"
+            className="text-ink font-semibold no-underline hover:underline"
           >
             {mandir.name}
           </Link>
-          , {mandir.town}
-          {mandir.postcode && `, ${mandir.postcode}`}
+          <br />
+          {mandir.town}
+          {mandir.postcode && ` ${mandir.postcode}`}
           {event.location_note && (
             <>
               <br />
@@ -337,10 +437,11 @@ function Details({ page }: { page: MandirEventPage }) {
     },
   ];
   if (event.cost_note)
-    rows.push({ label: t("event.cost"), value: event.cost_note });
+    rows.push({ label: t("event.cost"), icon: null, value: event.cost_note });
   if (event.link) {
     rows.push({
       label: t("event.moreDetails"),
+      icon: null,
       value: (
         <a
           href={event.link}
@@ -353,11 +454,16 @@ function Details({ page }: { page: MandirEventPage }) {
     });
   }
   return (
-    <dl className="border-line bg-surface shadow-card grid gap-x-6 gap-y-3 rounded-2xl border p-5 sm:grid-cols-[auto_1fr]">
-      {rows.map(({ label, value }) => (
-        <div key={label} className="contents">
-          <dt className="text-muted text-base sm:text-lg">{label}</dt>
-          <dd className="-mt-2 sm:mt-0">{value}</dd>
+    <dl className="flex flex-col gap-5">
+      {rows.map(({ label, icon, value }) => (
+        <div key={label} className="flex gap-3.5">
+          <span className="text-peacock mt-1 w-6 shrink-0 [&_svg]:size-6">
+            {icon}
+          </span>
+          <div className="flex flex-col">
+            <dt className="text-muted text-base">{label}</dt>
+            <dd>{value}</dd>
+          </div>
         </div>
       ))}
     </dl>

@@ -45,3 +45,21 @@ export function SearchIcon() {
     </svg>
   );
 }
+
+export function CalendarIcon() {
+  return (
+    <svg {...props}>
+      <rect x="3.5" y="5" width="17" height="15" rx="3" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" />
+    </svg>
+  );
+}
+
+export function ClockIcon() {
+  return (
+    <svg {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  );
+}
