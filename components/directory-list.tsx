@@ -152,7 +152,7 @@ function MandirGroups({
               <li key={region}>
                 <a
                   href={`#${anchorFor(region)}`}
-                  className="border-line bg-surface hover:border-marigold/60 hover:text-peacock inline-block rounded-full border px-3 py-1 text-base no-underline shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition duration-200 hover:-translate-y-0.5"
+                  className="border-line-strong bg-surface text-ink hover:border-peacock/60 inline-block rounded-full border px-4 py-1.5 text-base no-underline transition-colors"
                 >
                   {regionName(region)}
                 </a>

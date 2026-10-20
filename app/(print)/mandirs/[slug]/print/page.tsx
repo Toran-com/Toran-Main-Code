@@ -74,7 +74,7 @@ export default async function PrintPage({
       <article className="flex flex-col gap-6">
         <header className="border-marigold flex flex-col gap-1 border-b-4 pb-4">
           <p className="text-muted font-semibold">What&apos;s on at</p>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight">
+          <h1 className="font-display text-5xl leading-tight tracking-tight">
             {mandir.name}
           </h1>
           <p className="text-muted text-xl">

@@ -151,7 +151,7 @@ function Tile({ label, value }: { label: string; value: number }) {
   return (
     <div className={`${cardClass} flex flex-col gap-1 p-4`}>
       <dt className="text-muted text-base">{label}</dt>
-      <dd className="font-display text-3xl font-bold tabular-nums">
+      <dd className="font-display text-4xl tabular-nums">
         {value.toLocaleString("en-GB")}
       </dd>
     </div>

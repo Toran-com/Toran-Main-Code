@@ -36,7 +36,7 @@ export default function GuideHandoutPage() {
         <header className="border-marigold flex flex-col gap-4 border-b-4 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
           <div className="flex flex-col gap-1">
             <p className="text-muted font-semibold">For mandir committees</p>
-            <h1 className="font-display text-4xl font-extrabold tracking-tight">
+            <h1 className="font-display text-5xl leading-tight tracking-tight">
               Your mandir&apos;s events on Toran
             </h1>
             <p className="text-muted text-xl">
