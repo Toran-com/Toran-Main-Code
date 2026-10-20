@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { PageHeading } from "@/components/public-shell";
-import { buttonClass, cardClass, quietButtonClass } from "@/components/ui";
+import { buttonClass, quietButtonClass } from "@/components/ui";
 import { GUIDE_PATH } from "@/lib/committee-guide";
 import { pageMetadata } from "@/lib/site";
 
@@ -37,16 +37,13 @@ function Section({ id, children }: { id: SectionId; children: ReactNode }) {
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className={`${cardClass} flex scroll-mt-24 flex-col gap-4 p-5 sm:p-6`}
+      className="border-line flex scroll-mt-28 flex-col gap-4 border-t pt-8"
     >
       <h2
         id={`${id}-title`}
-        className="flex items-center gap-3 text-xl font-bold sm:text-2xl"
+        className="font-display flex items-baseline gap-4 text-4xl leading-tight"
       >
-        <span
-          aria-hidden
-          className="bg-marigold/15 text-marigold-ink grid size-9 shrink-0 place-items-center rounded-full text-lg"
-        >
+        <span aria-hidden className="text-marigold-ink w-8 shrink-0 text-5xl">
           {number}
         </span>
         {title}
@@ -73,8 +70,8 @@ export default function CommitteeGuidePage() {
         intro="How your committee looks after your mandir's page on Toran. Most things take a minute, on a phone."
       />
 
-      <nav aria-label="In this guide" className={`${cardClass} p-5 sm:p-6`}>
-        <h2 className="mb-3 text-lg font-bold">In this guide</h2>
+      <nav aria-label="In this guide" className="bg-sunk rounded-3xl p-6">
+        <h2 className="mb-3 text-xl font-semibold">In this guide</h2>
         <ol className="grid list-decimal gap-x-8 gap-y-2 pl-6 sm:grid-cols-2">
           {SECTIONS.map((s) => (
             <li key={s.id}>
