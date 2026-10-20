@@ -38,6 +38,18 @@ export const en = {
   "home.committeesCta": "Run a mandir? Put your events on Toran",
   "home.comingSoon": "Coming soon",
   "home.committeesTitle": "How it works for committees",
+  "home.committeesHeading": "Your events, where families already look.",
+  "home.mandirCount": "{count} mandirs across the UK",
+  "home.mandirsIntro":
+    "Find yours to see what's on, how to get there and how to get its events in your calendar.",
+  "home.regionCount.one": "{count} mandir",
+  "home.regionCount.other": "{count} mandirs",
+  "home.step1Title": "Send what you already have",
+  "home.step1": "A poster, patrika or WhatsApp message.",
+  "home.step2Title": "Check it in a minute",
+  "home.step2": "Nothing goes live until your committee says so.",
+  "home.step3Title": "Families find it",
+  "home.step3": "On Toran, in their calendar and on WhatsApp.",
   "home.committeesBody":
     "Committees send the patrika or poster they already share, and check it before it goes live. It's free for mandirs.",
 

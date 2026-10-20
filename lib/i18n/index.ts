@@ -30,7 +30,7 @@ export function translator(locale: Locale = DEFAULT_LOCALE) {
     return fill(messages, en, key, values);
   }
   // "1 event", "3 events": English and Gujarati only need one and other.
-  t.count = (key: "whatsOn.count", count: number) =>
+  t.count = (key: "whatsOn.count" | "home.regionCount", count: number) =>
     t(count === 1 ? `${key}.one` : `${key}.other`, { count });
   return t;
 }
