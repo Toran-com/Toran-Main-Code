@@ -29,8 +29,9 @@ import { EventFields } from "@/components/event-fields";
 import { FORM_ERRORS } from "@/lib/mandir-form";
 import { EVENT_ERRORS, eventInputFromEvent } from "@/lib/event-form";
 import { posterFrom } from "@/lib/posters";
-import { PosterDetails } from "@/components/poster-details";
 import { QuickPicks } from "@/components/quick-picks";
+import { ReviewItem } from "@/components/review-item";
+import { eventCandidates, withDuplicates } from "@/lib/review-queue";
 import {
   festivalPicks,
   lastYearPicks,
@@ -191,6 +192,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     today,
   );
 
+  // Posters waiting, each checked against what's already on the page.
+  const posterItems = withDuplicates(
+    posters.map((p) => ({ ...p, mandirId: mandir.id })),
+    await eventCandidates(supabase!, [mandir.id], today),
+  );
+
   const facts: CommitteeFacts = {
     slug: mandir.slug,
     today,
@@ -211,6 +218,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const query = await searchParams;
   // "Duplicate": the add form starts with that event's details.
   const copyId = String(query.copy ?? "");
+  const fixId = String(query.fix ?? "");
   const { data: copy } = UUID.test(copyId)
     ? await supabase!
         .from("events")
@@ -286,40 +294,25 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           </h2>
           <p className="text-muted">
             Someone sent Toran {posters.length === 1 ? "this" : "these"} for
-            your mandir. If the details are right, publish; if not, choose
-            &ldquo;Not right&rdquo; and add the event yourself.
+            your mandir. If the details are right, publish. If something&apos;s
+            wrong, choose &ldquo;Fix something first&rdquo;; if it isn&apos;t
+            happening, discard it.
           </p>
           <ul className="flex flex-col gap-3">
-            {posters.map(({ id, poster }) => (
-              <li
-                key={id}
-                className="border-line flex flex-col gap-3 rounded-2xl border p-4"
-              >
-                <PosterDetails poster={poster} />
-                <form
-                  action={reviewPosterAsCommittee}
-                  className="flex flex-wrap gap-2"
-                >
-                  <input type="hidden" name="slug" value={mandir.slug} />
-                  <input type="hidden" name="poster" value={id} />
-                  <button
-                    type="submit"
-                    name="decision"
-                    value="publish"
-                    className={buttonClass}
-                  >
-                    Publish
-                  </button>
-                  <button
-                    type="submit"
-                    name="decision"
-                    value="discard"
-                    className={quietButtonClass}
-                  >
-                    Not right
-                  </button>
-                </form>
-              </li>
+            {posterItems.map((item) => (
+              <ReviewItem
+                key={item.id}
+                id={item.id}
+                mandirSlug={mandir.slug}
+                poster={item.poster}
+                duplicates={item.duplicates}
+                action={reviewPosterAsCommittee}
+                hidden={{ slug: mandir.slug }}
+                canPublish
+                fixing={fixId === item.id}
+                fixHref={`/manage/${mandir.slug}?fix=${item.id}#item-${item.id}`}
+                cancelHref={`/manage/${mandir.slug}#item-${item.id}`}
+              />
             ))}
           </ul>
         </Card>

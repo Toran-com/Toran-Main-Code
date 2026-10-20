@@ -201,7 +201,7 @@ async function NeedsAttention() {
         list={a.posters}
         intro="Mandirs with posters waiting more than 3 days. Where there's no committee on Toran, Toran checks them."
         empty="No posters have been waiting long."
-        more={{ href: "/ops/posters", label: "Poster queue" }}
+        more={{ href: "/ops/posters", label: "Review queue" }}
         render={(p) => (
           <>
             <Mandir {...p} href={`/ops/mandirs/${p.slug}`} />

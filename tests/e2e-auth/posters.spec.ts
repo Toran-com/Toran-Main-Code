@@ -53,6 +53,57 @@ test("Toran publishes a poster for a mandir with no committee", async ({
   await expect(event).toContainText("From a poster or message");
 });
 
+test("the review queue flags a look-alike, and a poster can be fixed before publishing", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  // Another mandir no other test looks at.
+  const slug = "hindu-cultural-religious-centre-leicester";
+  const title = `Diwali deepotsav ${Date.now()}`;
+  await logInAsAdmin(page, `review-${Date.now()}@example.com`);
+  for (const time of ["18:00", "19:00"]) {
+    await page.goto("/ops/posters");
+    await page.getByRole("combobox", { name: /^Mandir/ }).selectOption(slug);
+    await page.getByLabel("What's happening?").fill(title);
+    await page.getByLabel("Date").fill(nextWeek());
+    await page.getByLabel("Starts").fill(time);
+    await page.getByRole("button", { name: "Add to the queue" }).click();
+    await expect(page.getByText("Added to the queue.")).toBeVisible();
+  }
+
+  // The second looks like the first, so both say so.
+  const items = page
+    .getByRole("listitem")
+    .filter({ has: page.getByText(title, { exact: true }) })
+    .filter({ hasText: "This may already be on Toran" });
+  await expect(items).toHaveCount(2);
+  await expect(items.first()).toContainText("Also waiting:");
+
+  // Fix the first one's time and publish it.
+  await items
+    .first()
+    .getByRole("link", { name: "Fix something first" })
+    .click();
+  await expect(page).toHaveURL(/fix=/);
+  await page.getByLabel("What's happening?").first().fill(`${title} (fixed)`);
+  await page.getByRole("button", { name: "Save and publish" }).click();
+  await expect(page.getByText("Published.")).toBeVisible();
+
+  // The other now looks like the published event: discard it.
+  const other = page
+    .getByRole("listitem")
+    .filter({ has: page.getByText(title, { exact: true }) })
+    .filter({ hasText: "This may already be on Toran" });
+  await expect(other).toContainText("On the page:");
+  await other.getByRole("button", { name: "Discard" }).click();
+  await expect(page.getByText("Discarded.")).toBeVisible();
+
+  await page.goto(`/mandirs/${slug}`);
+  await expect(
+    page.getByRole("article").filter({ hasText: `${title} (fixed)` }),
+  ).toBeVisible();
+});
+
 test("Toran previews the weekly digest", async ({ page }) => {
   test.setTimeout(60_000);
   await logInAsAdmin(page, `digest-${Date.now()}@example.com`);

@@ -1,9 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
-import { checkEvent, type EventError } from "@/lib/event-form";
+import { checkEvent, type EventError, type EventInput } from "@/lib/event-form";
 import { originOfPoster } from "@/lib/event-kinds";
 import { saveEvent } from "@/lib/event-store";
-import { posterFrom } from "@/lib/posters";
+import { type Poster, posterFrom } from "@/lib/posters";
 
 export type ReviewResult =
   | { ok: true; slug: string }
@@ -12,11 +12,14 @@ export type ReviewResult =
 // Publishes a forwarded poster as an event, or discards it. Used by a
 // mandir's committee (which confirms it by publishing) and by Toran for
 // mandirs nobody looks after yet. Row-level security decides who may.
+// `edited` publishes the reviewer's corrected details instead, and keeps
+// them with the poster.
 export async function reviewPoster(
   db: SupabaseClient<Database>,
   claimId: string,
   decision: "publish" | "discard",
   as: "committee" | "toran",
+  edited?: EventInput,
 ): Promise<ReviewResult> {
   const { data: claim } = await db
     .from("event_claims")
@@ -41,8 +44,9 @@ export async function reviewPoster(
   if (as === "toran" && claim.mandir.status === "claimed") {
     return { ok: false, error: "claimed" };
   }
-  const poster = posterFrom(claim.proposed);
-  if (!poster) return { ok: false, error: "failed" };
+  const original = posterFrom(claim.proposed);
+  if (!original) return { ok: false, error: "failed" };
+  const poster: Poster = edited ? { ...original, ...edited } : original;
   const checked = checkEvent(poster);
   if (!checked.ok) return checked;
 
@@ -54,7 +58,11 @@ export async function reviewPoster(
   if (!eventId) return { ok: false, error: "failed" };
   const { data } = await db
     .from("event_claims")
-    .update({ status: "accepted", event_id: eventId })
+    .update({
+      status: "accepted",
+      event_id: eventId,
+      ...(edited && { proposed: poster }),
+    })
     .eq("id", claimId)
     .eq("status", "pending")
     .select("id");
@@ -64,4 +72,33 @@ export async function reviewPoster(
     return { ok: false, error: "done" };
   }
   return { ok: true, slug };
+}
+
+// Corrects a poster's details while it waits, without publishing: Toran
+// fixing a typo for a mandir whose committee publishes its own events.
+export async function correctPoster(
+  db: SupabaseClient<Database>,
+  claimId: string,
+  edited: EventInput,
+): Promise<ReviewResult> {
+  const { data: claim } = await db
+    .from("event_claims")
+    .select("status, proposed, mandir:mandirs (slug)")
+    .eq("id", claimId)
+    .maybeSingle();
+  if (!claim?.mandir) return { ok: false, error: "failed" };
+  if (claim.status !== "pending") return { ok: false, error: "done" };
+  const original = posterFrom(claim.proposed);
+  if (!original) return { ok: false, error: "failed" };
+  const checked = checkEvent(edited);
+  if (!checked.ok) return checked;
+  const { data } = await db
+    .from("event_claims")
+    .update({ proposed: { ...original, ...edited } })
+    .eq("id", claimId)
+    .eq("status", "pending")
+    .select("id");
+  return data?.length
+    ? { ok: true, slug: claim.mandir.slug }
+    : { ok: false, error: "done" };
 }

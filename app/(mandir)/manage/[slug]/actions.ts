@@ -169,17 +169,26 @@ export async function updatePracticalDetails(formData: FormData) {
 export async function reviewPosterAsCommittee(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
   const claimId = String(formData.get("poster") ?? "");
+  const choice = String(formData.get("decision") ?? "");
   const decision =
-    formData.get("decision") === "publish" ? "publish" : "discard";
+    choice === "publish" || choice === "edit-publish" ? "publish" : "discard";
   const back: (query: string) => never = (query) =>
     redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
 
   const supabase = await createSessionClient();
   if (!supabase) back("error=failed");
-  const result = await reviewPoster(supabase, claimId, decision, "committee");
+  // "Fix something first": publish the committee's corrected details.
+  const result = await reviewPoster(
+    supabase,
+    claimId,
+    decision,
+    "committee",
+    choice === "edit-publish" ? eventInputFrom(formData) : undefined,
+  );
   if (!result.ok) {
+    // A correction that didn't pass the checks stays open to fix.
     back(
-      `error=${result.error === "done" || result.error === "failed" ? result.error : "poster"}`,
+      `${choice === "edit-publish" ? `fix=${claimId}&` : ""}error=${result.error === "done" || result.error === "failed" ? result.error : "poster"}`,
     );
   }
   if (decision === "publish") {

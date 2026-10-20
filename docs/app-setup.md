@@ -368,22 +368,38 @@ festival name. To see one before launch, paste a preview link into a
 WhatsApp chat with yourself. WhatsApp keeps a card for a while once it has
 fetched it, so a change may take a day to show on a link already shared.
 
-### Forwarded posters (`/ops` → Posters)
+### Review queue (`/ops` → Review)
+
+Everything waiting before it goes on the site is in one queue, oldest
+first: posters you type up, events visitors send in with "Tell us about an
+event", and events the website checker finds. Filter it by where each came
+from; each says how long it has waited.
 
 When someone forwards a poster or message about a mandir's event (WhatsApp,
 email, a photo of a printed poster):
 
-1. On **Posters**, choose the mandir, copy the event details in and say
-   where it came from. **Only the event**: never the name or phone number of
-   whoever sent it. The poster image itself isn't kept.
+1. On **Review**, choose the mandir under "Type up a poster", copy the event
+   details in and say where it came from. **Only the event**: never the name
+   or phone number of whoever sent it. The poster image itself isn't kept.
 2. **If the mandir has a committee**, it waits on their manage page under
    "Posters waiting for you". Publishing it there marks it "Confirmed by the
-   mandir"; "Not right" discards it.
-3. **If nobody looks after the mandir yet**, you can publish it yourself. It
+   mandir". You can still correct the details for them ("Fix something
+   first" → "Save for the committee"), or discard it.
+3. **If nobody looks after the mandir yet**, you publish it yourself. It
    appears without the "Confirmed by the mandir" label.
 
-The database records who published or discarded each poster and when, and
-a decision can't be changed afterwards.
+**Look-alikes.** When an item looks like an event already on the mandir's
+page, or another item waiting, on the same day (nearly the same name, or
+the same festival however it's spelled), it says "This may already be on
+Toran" and names it. Discard the copy.
+
+**Fixing before publishing.** "Fix something first" opens that item's
+details to correct; "Save and publish" publishes your corrected version
+(committees have the same on their page). What was published is kept with
+the item.
+
+The database records who published or discarded each item and when, and a
+decision can't be changed afterwards.
 
 ### Seva rota (committees)
 

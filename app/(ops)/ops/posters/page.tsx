@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { EventFields } from "@/components/event-fields";
 import { OpsNav } from "@/components/ops-nav";
-import { PosterDetails } from "@/components/poster-details";
 import { Badge } from "@/components/public-shell";
+import { ReviewItem } from "@/components/review-item";
 import {
   buttonClass,
   Card,
@@ -12,17 +12,31 @@ import {
   Loading,
   Notice,
   PageShell,
-  quietButtonClass,
 } from "@/components/ui";
 import { requireToranAdmin } from "@/lib/auth";
+import { londonDate } from "@/lib/london";
+import { daysBetween } from "@/lib/quick-events";
 import { EVENT_ERRORS } from "@/lib/event-form";
 import { pageTitle } from "@/lib/site";
 import { POSTER_SOURCES, posterFrom } from "@/lib/posters";
+import {
+  eventCandidates,
+  SOURCE_GROUPS,
+  type SourceGroup,
+  sourceGroup,
+  withDuplicates,
+} from "@/lib/review-queue";
 import { createSessionClient } from "@/lib/supabase/session";
 import { addPoster, reviewPosterAsToran } from "./actions";
 
+// Toran's review queue: everything waiting before it goes on the site,
+// whichever way it arrived (a poster Toran typed up, a visitor's "Tell us",
+// the website checker), oldest first, with look-alikes flagged. Toran
+// publishes for mandirs with no committee on Toran; for the rest, the
+// committee publishes from its own page.
+
 export const metadata: Metadata = {
-  title: pageTitle("Posters · Admin"),
+  title: pageTitle("Review queue · Admin"),
   robots: { index: false },
 };
 
@@ -33,27 +47,30 @@ const ERRORS: Record<string, string> = {
   link: "Please give a full web address starting https://, or leave it empty.",
   claimed:
     "That mandir has a committee, so they publish it. It's waiting on their page.",
-  done: "Someone has already dealt with that poster.",
+  done: "Someone has already dealt with that one.",
   failed: "Something went wrong. Please try again.",
 };
 
 const DONE: Record<string, string> = {
   published: "Published. It's on the mandir's page now.",
   discarded: "Discarded.",
+  corrected: "Saved. The committee sees your corrected details.",
 };
+
+const GROUPS = Object.keys(SOURCE_GROUPS) as SourceGroup[];
 
 export default function OpsPostersPage(props: PageProps<"/ops/posters">) {
   return (
-    <PageShell title="Forwarded posters" wide>
+    <PageShell title="Review queue" wide>
       <OpsNav current="/ops/posters" />
       <Suspense fallback={<Loading />}>
-        <Posters {...props} />
+        <Queue {...props} />
       </Suspense>
     </PageShell>
   );
 }
 
-async function Posters({ searchParams }: PageProps<"/ops/posters">) {
+async function Queue({ searchParams }: PageProps<"/ops/posters">) {
   await requireToranAdmin("/ops/posters");
   const supabase = await createSessionClient();
   const [{ data: mandirs }, { data: claims }] = supabase
@@ -66,7 +83,7 @@ async function Posters({ searchParams }: PageProps<"/ops/posters">) {
         supabase
           .from("event_claims")
           .select(
-            "id, proposed, created_at, mandir:mandirs (slug, name, town, status)",
+            "id, proposed, created_at, mandir:mandirs (id, slug, name, town, status)",
           )
           .eq("status", "pending")
           .order("created_at"),
@@ -78,16 +95,114 @@ async function Posters({ searchParams }: PageProps<"/ops/posters">) {
     ? "Added to the queue."
     : DONE[String(query.done ?? "")];
   const chosen = String(query.mandir ?? "");
+  const group = GROUPS.find((g) => g === query.from);
+  const fixing = String(query.fix ?? "");
+  const here = group ? `/ops/posters?from=${group}` : "/ops/posters";
 
-  const waiting = (claims ?? []).flatMap((c) => {
+  // Everything waiting, oldest first, with look-alikes flagged.
+  const queue = (claims ?? []).flatMap((c) => {
     const poster = posterFrom(c.proposed);
-    return poster && c.mandir ? [{ ...c, mandir: c.mandir, poster }] : [];
+    return poster && c.mandir
+      ? [{ ...c, mandir: c.mandir, mandirId: c.mandir.id, poster }]
+      : [];
   });
+  const events = supabase
+    ? await eventCandidates(supabase, [
+        ...new Set(queue.map((c) => c.mandirId)),
+      ])
+    : new Map();
+  const all = withDuplicates(queue, events).map((c) => ({
+    ...c,
+    group: sourceGroup(c.poster.from),
+  }));
+  const waiting = group ? all.filter((c) => c.group === group) : all;
+  const today = londonDate();
 
   return (
     <>
+      <p className="text-muted">
+        Everything waiting before it goes on the site: posters you typed up,
+        events visitors sent in, and events the website checker found. Where a
+        mandir has a committee on Toran, the committee publishes; you can still
+        correct the details for them, or discard.
+      </p>
       {error && <Notice tone="error">{error}</Notice>}
       {done && <Notice tone="success">{done}</Notice>}
+
+      <nav aria-label="Where it came from">
+        <ul className="flex flex-wrap gap-2">
+          {[undefined, ...GROUPS].map((g) => {
+            const count = g
+              ? all.filter((c) => c.group === g).length
+              : all.length;
+            const current = g === group;
+            return (
+              <li key={g ?? "all"}>
+                <Link
+                  href={g ? `/ops/posters?from=${g}` : "/ops/posters"}
+                  aria-current={current ? "page" : undefined}
+                  className={`inline-block rounded-full border px-4 py-1.5 text-base font-semibold ${
+                    current
+                      ? "border-peacock bg-peacock text-on-peacock"
+                      : "border-line hover:bg-sunk"
+                  }`}
+                >
+                  {g ? SOURCE_GROUPS[g] : "All"} ({count})
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <section aria-labelledby="waiting" className="flex flex-col gap-3">
+        <h2 id="waiting" className="text-2xl font-bold">
+          Waiting ({waiting.length})
+        </h2>
+        {waiting.length === 0 && <p className="text-muted">Nothing waiting.</p>}
+        <ul className="flex flex-col gap-3">
+          {waiting.map((c) => {
+            const hasCommittee = c.mandir.status === "claimed";
+            // Calendar days in London, so yesterday evening is "1 day".
+            const days = daysBetween(londonDate(new Date(c.created_at)), today);
+            return (
+              <ReviewItem
+                key={c.id}
+                id={c.id}
+                mandirSlug={c.mandir.slug}
+                poster={c.poster}
+                duplicates={c.duplicates}
+                action={reviewPosterAsToran}
+                hidden={group ? { group } : {}}
+                canPublish={!hasCommittee}
+                fixing={fixing === c.id}
+                fixHref={`${here}${group ? "&" : "?"}fix=${c.id}#item-${c.id}`}
+                cancelHref={`${here}#item-${c.id}`}
+                header={
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                      href={`/mandirs/${c.mandir.slug}`}
+                      className="text-peacock font-semibold underline"
+                    >
+                      {c.mandir.name}, {c.mandir.town}
+                    </Link>
+                    {hasCommittee ? (
+                      <Badge tone="peacock">Waiting for the committee</Badge>
+                    ) : (
+                      <Badge tone="marigold">No committee yet</Badge>
+                    )}
+                    <span className="text-muted text-base">
+                      {days === 0
+                        ? "Came in today"
+                        : `Waiting ${days} ${days === 1 ? "day" : "days"}`}
+                    </span>
+                  </div>
+                }
+              />
+            );
+          })}
+        </ul>
+      </section>
 
       <Card>
         <h2 className="text-2xl font-bold">Type up a poster</h2>
@@ -150,63 +265,6 @@ async function Posters({ searchParams }: PageProps<"/ops/posters">) {
           </button>
         </form>
       </Card>
-
-      <section aria-labelledby="waiting" className="flex flex-col gap-3">
-        <h2 id="waiting" className="text-2xl font-bold">
-          Waiting ({waiting.length})
-        </h2>
-        {waiting.length === 0 && <p className="text-muted">Nothing waiting.</p>}
-        <ul className="flex flex-col gap-3">
-          {waiting.map((c) => {
-            const hasCommittee = c.mandir.status === "claimed";
-            return (
-              <li
-                key={c.id}
-                className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-2xl border p-5"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/mandirs/${c.mandir.slug}`}
-                    className="text-peacock font-semibold underline"
-                  >
-                    {c.mandir.name}, {c.mandir.town}
-                  </Link>
-                  {hasCommittee ? (
-                    <Badge tone="peacock">Waiting for the committee</Badge>
-                  ) : (
-                    <Badge tone="marigold">No committee yet</Badge>
-                  )}
-                </div>
-                <PosterDetails poster={c.poster} />
-                <form
-                  action={reviewPosterAsToran}
-                  className="flex flex-wrap gap-2"
-                >
-                  <input type="hidden" name="poster" value={c.id} />
-                  {!hasCommittee && (
-                    <button
-                      type="submit"
-                      name="decision"
-                      value="publish"
-                      className={`${buttonClass} px-4 py-2 text-base`}
-                    >
-                      Publish
-                    </button>
-                  )}
-                  <button
-                    type="submit"
-                    name="decision"
-                    value="discard"
-                    className={`${quietButtonClass} px-4 py-2 text-base`}
-                  >
-                    Discard
-                  </button>
-                </form>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
     </>
   );
 }
