@@ -68,7 +68,7 @@ select is((select array_agg(role_at_mandir order by role_at_mandir) from public.
   'approved requests go after 2 years and turned-down ones after 6 months');
 select is((select count(*)::int from public.mandir_claims where status = 'pending'), 1,
   'requests still waiting stay');
-select is((select array_agg(email order by email) from auth.users where email like 'u%'),
+select is((select array_agg(email::text order by email) from auth.users where email like 'u%'),
   array['unused-admin@example.com', 'unused-new@example.com', 'used@example.com'],
   'logins never used go after 7 days, unless they run a mandir');
 select is((select sum(count)::int from public.daily_counts), 7, 'visit totals go after 3 years');
