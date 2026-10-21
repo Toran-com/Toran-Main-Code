@@ -72,6 +72,11 @@ export const en = {
   "whatsOn.countRegion": " in {region}",
   "whatsOn.countType": " ({type})",
   "whatsOn.nearestFirst": ", nearest first each day",
+  "whatsOn.onDay": " on {day}",
+  "whatsOn.everyDay": "See every day",
+  "whatsOn.moreOnDay": "See all {count} on {day} →",
+  "whatsOn.chooseArea": "Choose your area",
+  "whatsOn.allAreas": "All areas",
   "whatsOn.locationDenied":
     "Your browser didn't share your location. Type your postcode instead.",
   "whatsOn.locationFailed":

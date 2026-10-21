@@ -60,15 +60,63 @@ function longDay(day: string): string {
 export function groupByDay<T extends { next_starts_at: string }>(
   events: readonly T[],
   now: Date | null,
-): { heading: string; events: T[] }[] {
-  const groups: { heading: string; events: T[] }[] = [];
+): { day: string; heading: string; events: T[] }[] {
+  const groups: { day: string; heading: string; events: T[] }[] = [];
   for (const e of events) {
-    const heading = dayHeading(e.next_starts_at, now);
+    const day = londonDate(new Date(e.next_starts_at));
     const last = groups.at(-1);
-    if (last?.heading === heading) last.events.push(e);
-    else groups.push({ heading, events: [e] });
+    if (last?.day === day) last.events.push(e);
+    else
+      groups.push({
+        day,
+        heading: dayHeading(e.next_starts_at, now),
+        events: [e],
+      });
   }
   return groups;
+}
+
+// A long list with nothing chosen to narrow it (no place, area, type or
+// day) shows only the first few events of each day, with a link to the
+// rest of that day, so nobody has to scroll past a whole country's events
+// to find their own. Diwali week could bring 150 or more.
+export const LONG_LIST = 30;
+export const PER_DAY = 8;
+
+// A day chosen in the address (?day=2026-11-08), or "" for none.
+export function dayFrom(value: unknown): string {
+  const day = String(value ?? "");
+  return /^\d{4}-\d{2}-\d{2}$/.test(day) &&
+    !Number.isNaN(Date.parse(`${day}T00:00:00Z`))
+    ? day
+    : "";
+}
+
+export function onDay<T extends { next_starts_at: string }>(
+  events: readonly T[],
+  day: string,
+): T[] {
+  return day
+    ? events.filter((e) => londonDate(new Date(e.next_starts_at)) === day)
+    : [...events];
+}
+
+// How many events each area has, most first: for "Choose your area".
+export function regionCounts(
+  events: readonly { mandir: { region: string } }[],
+): { region: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const e of events) {
+    counts.set(e.mandir.region, (counts.get(e.mandir.region) ?? 0) + 1);
+  }
+  return [...counts]
+    .map(([region, count]) => ({ region, count }))
+    .sort((a, b) => b.count - a.count || a.region.localeCompare(b.region));
+}
+
+// A long day's heading, for "See all 31 on Sunday 8 November".
+export function longDayHeading(day: string): string {
+  return longDay(day);
 }
 
 export const RADII = [5, 15, 30, 60] as const;

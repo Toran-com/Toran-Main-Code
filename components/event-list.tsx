@@ -6,37 +6,57 @@ import { formatEventStart, formatMiles, formatTimeOfDay } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";
-import { groupByDay } from "@/lib/whats-on-view";
+import { groupByDay, longDayHeading } from "@/lib/whats-on-view";
 import { pageT, localePath } from "@/lib/i18n/page";
 
 // Events across mandirs, grouped by day. Each row opens the event's own
 // page, which has "Add to calendar" and sharing. Rows sit on the page with
 // a fine line between them, so the list stays calm and easy to scan.
 // Pass "now" on pages rendered per visit, so headings can say "Today";
-// leave it out on saved (static) pages.
+// leave it out on saved (static) pages. With "more", each day shows at
+// most that many events and links to the rest of the day.
 export function EventList({
   events,
   now = null,
+  more,
 }: {
   events: EventNear[];
   now?: Date | null;
+  more?: { perDay: number; href: (day: string) => string };
 }) {
+  const t = pageT();
   return (
     <div className="flex flex-col gap-8 sm:gap-10">
-      {groupByDay(events, now).map(({ heading, events: day }) => (
-        <section key={heading} className="flex flex-col">
-          <h2 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
-            {heading}
-          </h2>
-          <ul className="divide-line flex flex-col divide-y">
-            {day.map((e) => (
-              <li key={e.id}>
-                <EventCard event={e} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      {groupByDay(events, now).map(({ day, heading, events: all }) => {
+        const shown = more ? all.slice(0, more.perDay) : all;
+        return (
+          <section key={day} className="flex flex-col">
+            <h2 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
+              {heading}
+            </h2>
+            <ul className="divide-line flex flex-col divide-y">
+              {shown.map((e) => (
+                <li key={e.id}>
+                  <EventCard event={e} />
+                </li>
+              ))}
+            </ul>
+            {more && shown.length < all.length && (
+              <p className="border-line border-t pt-4">
+                <Link
+                  href={more.href(day)}
+                  className="text-peacock font-semibold"
+                >
+                  {t("whatsOn.moreOnDay", {
+                    count: all.length,
+                    day: longDayHeading(day),
+                  })}
+                </Link>
+              </p>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
