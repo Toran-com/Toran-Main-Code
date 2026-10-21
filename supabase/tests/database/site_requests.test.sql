@@ -3,7 +3,7 @@
 -- days after it was dealt with.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(13);
+select plan(15);
 
 insert into auth.users (id, email) values
   ('cccccccc-0000-0000-0000-000000000003', 'c@example.com'),
@@ -26,6 +26,12 @@ select throws_ok(
 select throws_ok(
   $$select public.request_correction('wrong', 'https://example.org', 'Wrong')$$,
   '22023', null, 'not a page outside the site');
+select throws_ok(
+  $$select public.request_correction('wrong', '//example.org/page', 'Wrong')$$,
+  '22023', null, 'nor a link to another site written as //');
+select throws_ok(
+  $$select public.request_correction('wrong', '/\example.org/page', 'Wrong')$$,
+  '22023', null, 'or as /\');
 select throws_ok(
   $$select public.request_correction('wrong', '/', ' ')$$,
   '22023', null, 'not without saying what''s wrong');

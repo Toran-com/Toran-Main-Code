@@ -135,6 +135,11 @@ describe("checkWebsite", () => {
       "http://localhost:3000/",
       "http://127.0.0.1/",
       "http://169.254.169.254/latest/meta-data/",
+      // The same addresses written as IPv6, or as numbers.
+      "http://[::ffff:127.0.0.1]/",
+      "http://[::ffff:a9fe:a9fe]/latest/meta-data/",
+      "http://2130706433/",
+      "http://0x7f.1/",
       "http://private.example.org/",
       "ftp://mandir.example.org/",
       "not a web address",
@@ -158,6 +163,17 @@ describe("isPrivateAddress", () => {
       "fd00::1",
       "fe80::1",
       "::ffff:10.0.0.1",
+      // How a URL writes [::ffff:127.0.0.1] once parsed.
+      "::ffff:7f00:1",
+      "::ffff:a9fe:a9fe",
+      "::",
+      "::127.0.0.1",
+      "64:ff9b::7f00:1",
+      "2002:7f00:1::1",
+      "fe80::1%eth0",
+      "0.0.0.0",
+      "224.0.0.1",
+      "not an address",
     ]) {
       expect(isPrivateAddress(a)).toBe(true);
     }
@@ -166,6 +182,7 @@ describe("isPrivateAddress", () => {
       "8.8.8.8",
       "172.32.0.1",
       "2a00:1450::1",
+      "::ffff:8.8.8.8",
     ]) {
       expect(isPrivateAddress(a)).toBe(false);
     }

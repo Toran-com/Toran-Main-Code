@@ -134,7 +134,8 @@ it.
 
 In short:
 logins until you ask us to delete them, or 24 months after your last login
-(we email first); decided page requests for 2 years; error reports for
+(we email first); an address typed on the login page whose link is never
+opened, 7 days; decided page requests for 2 years; error reports for
 about 30 days.
 
 ## Your rights

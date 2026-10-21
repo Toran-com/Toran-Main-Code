@@ -184,6 +184,10 @@ the mandirs table in pull request 6.
    - Redirect URLs, add three: `https://toran-main-code.vercel.app/**`,
      `https://*-toran4.vercel.app/**` (preview links) and
      `http://localhost:3000/**`
+   - On the live project (`toran-prod`), add only the live address. The
+     preview pattern matches any Vercel address ending in `-toran4`, and
+     anyone can make one of those, so a login link could be sent to their
+     site (docs/security-review.md, finding 2).
 2. **Authentication → Multi-Factor** (or Sign In / Providers → MFA): make
    sure **TOTP (authenticator app)** is enabled.
 3. Log in once at `/login` with your email, then make yourself an admin in
@@ -199,6 +203,16 @@ the mandirs table in pull request 6.
 4. Before the pilot: **Authentication → Emails → SMTP Settings**, connect a
    proper email sender (Resend or Postmark). The built-in sender only sends
    a few emails an hour and isn't meant for real use.
+5. **Authentication → Sign In / Providers → Email**: make sure **Confirm
+   email** is on (it is unless someone turned it off). With it off, anyone
+   can make an account for someone else's address (docs/security-review.md,
+   finding 1).
+6. Before the pilot: **Authentication → Rate Limits**, once the email sender
+   is connected, raise emails sent per hour to about 30. The limit is for
+   the whole site, so at a few an hour anyone could use it up and stop
+   committee members logging in. Also consider **Attack Protection →
+   CAPTCHA** (Cloudflare Turnstile, free) on the login page, which needs a
+   small change to the page itself.
 
 ### Pull request 5 — error alerts and uptime
 

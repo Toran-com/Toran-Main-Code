@@ -2,12 +2,16 @@
 -- only the person invited can accept, and who may take people off.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(26);
 
-insert into auth.users (id, email) values
-  ('aaaaaaaa-0000-0000-0000-000000000001', 'a@example.com'),
-  ('bbbbbbbb-0000-0000-0000-000000000002', 'b@example.com'),
-  ('cccccccc-0000-0000-0000-000000000003', 'c@example.com');
+insert into auth.users (id, email, email_confirmed_at) values
+  ('aaaaaaaa-0000-0000-0000-000000000001', 'a@example.com', now()),
+  ('bbbbbbbb-0000-0000-0000-000000000002', 'b@example.com', now()),
+  ('cccccccc-0000-0000-0000-000000000003', 'c@example.com', now()),
+  -- Signed up but never opened their link, and signed up with a password
+  -- (Toran never uses passwords).
+  ('eeeeeeee-0000-0000-0000-000000000005', 'u@example.com', null),
+  ('ffffffff-0000-0000-0000-000000000006', 'p@example.com', now());
 insert into public.mandirs (id, slug, name, town, region, status) values
   ('10000000-0000-0000-0000-000000000001', 'mandir-one', 'Mandir One', 'Harrow', 'London', 'claimed');
 insert into public.mandir_admins (mandir_id, user_id) values
@@ -15,6 +19,8 @@ insert into public.mandir_admins (mandir_id, user_id) values
 
 create temporary table invites (id uuid);
 grant select, insert on invites to authenticated;
+create temporary table unproved (id uuid);
+grant select, insert on unproved to authenticated;
 
 set local role authenticated;
 
@@ -70,6 +76,25 @@ select results_eq($$select email, added_by_me from public.committee_members('100
   'the committee sees who is on it and whom they added');
 select ok(public.remove_committee_member('10000000-0000-0000-0000-000000000001',
     'bbbbbbbb-0000-0000-0000-000000000002'), 'they can take off someone they added');
+
+-- An address counts only once it's proved ----------------------------------------------
+insert into unproved
+  select public.invite_committee_member('10000000-0000-0000-0000-000000000001', e)
+  from unnest(array['u@example.com', 'p@example.com']) e;
+select set_config('request.jwt.claims',
+  '{"sub":"eeeeeeee-0000-0000-0000-000000000005","role":"authenticated","email":"u@example.com"}', true);
+select is((select count(*)::int from public.mandir_invites), 0,
+  'someone who never opened their login link doesn''t see an invite to that address');
+select throws_ok($$select public.accept_committee_invite(i.id) from unproved i$$,
+  'P0002', 'not_found', 'nor can they accept it');
+select set_config('request.jwt.claims',
+  '{"sub":"ffffffff-0000-0000-0000-000000000006","role":"authenticated","email":"p@example.com","amr":[{"method":"password","timestamp":1}]}', true);
+select throws_ok($$select public.accept_committee_invite(i.id) from unproved i$$,
+  'P0002', 'not_found', 'nor can someone who logged in with a password');
+select set_config('request.jwt.claims',
+  '{"sub":"aaaaaaaa-0000-0000-0000-000000000001","role":"authenticated","email":"a@example.com"}', true);
+select is((select count(*)::int from unproved i where public.drop_committee_invite(i.id)), 2,
+  'the committee cancels those invites');
 
 -- At most five open invites.
 select lives_ok($$select public.invite_committee_member('10000000-0000-0000-0000-000000000001', e)

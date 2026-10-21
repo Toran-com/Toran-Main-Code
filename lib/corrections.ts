@@ -20,10 +20,15 @@ export type CorrectionKind = (typeof CORRECTION_KINDS)[number]["value"];
 export const DETAILS_MAX = 1000;
 
 // The page a request is about, as a path on this site. Anything else
-// (another site, nonsense) becomes the home page.
+// (another site, nonsense) becomes the home page. Browsers read "//x" and
+// "/\x" as another site, so neither is a path here.
 export function correctionPage(value: unknown): string {
   const page = String(value ?? "").trim();
-  return /^\/\S{0,199}$/.test(page) && !page.startsWith("//") ? page : "/";
+  return /^\/\S{0,199}$/.test(page) &&
+    !page.startsWith("//") &&
+    !page.includes("\\")
+    ? page
+    : "/";
 }
 
 export type CorrectionCheck =

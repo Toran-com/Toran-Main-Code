@@ -1,5 +1,5 @@
 import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
+import { BlockList, isIP } from "node:net";
 import { londonDate } from "@/lib/format";
 import {
   candidateLinks,
@@ -42,33 +42,52 @@ const MAX_BYTES = 2_000_000;
 const MAX_REDIRECTS = 3;
 const SITE_BUDGET_MS = 25_000;
 
-// Private, loopback and link-local addresses, IPv4 and IPv6.
+// Addresses that aren't on the public internet: private networks,
+// loopback, link-local (including cloud metadata at 169.254.169.254),
+// shared, benchmarking, multicast and reserved, plus the IPv6 forms that
+// carry an IPv4 address inside them (NAT64, 6to4, Teredo). Node checks
+// IPv4-mapped IPv6 addresses (::ffff:7f00:1 is 127.0.0.1) against the
+// IPv4 rules.
+const NOT_PUBLIC = new BlockList();
+for (const [network, prefix] of [
+  ["0.0.0.0", 8],
+  ["10.0.0.0", 8],
+  ["100.64.0.0", 10],
+  ["127.0.0.0", 8],
+  ["169.254.0.0", 16],
+  ["172.16.0.0", 12],
+  ["192.0.0.0", 24],
+  ["192.0.2.0", 24],
+  ["192.168.0.0", 16],
+  ["198.18.0.0", 15],
+  ["198.51.100.0", 24],
+  ["203.0.113.0", 24],
+  ["224.0.0.0", 3],
+] as const) {
+  NOT_PUBLIC.addSubnet(network, prefix, "ipv4");
+}
+for (const [network, prefix] of [
+  ["::", 96],
+  ["64:ff9b::", 96],
+  ["100::", 64],
+  ["2001::", 32],
+  ["2001:db8::", 32],
+  ["2002::", 16],
+  ["fc00::", 7],
+  ["fe80::", 10],
+  ["ff00::", 8],
+] as const) {
+  NOT_PUBLIC.addSubnet(network, prefix, "ipv6");
+}
+
+// True for an address Toran must never fetch from, and for anything that
+// isn't an address at all.
 export function isPrivateAddress(address: string): boolean {
-  const v4 = /^(?:::ffff:)?(\d+)\.(\d+)\.(\d+)\.(\d+)$/i.exec(address);
-  if (v4) {
-    const [a, b] = [Number(v4[1]), Number(v4[2])];
-    return (
-      a === 0 ||
-      a === 10 ||
-      a === 127 ||
-      (a === 100 && b >= 64 && b <= 127) ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) ||
-      a >= 224
-    );
-  }
-  const v6 = address.toLowerCase();
-  return (
-    v6 === "::" ||
-    v6 === "::1" ||
-    v6.startsWith("fc") ||
-    v6.startsWith("fd") ||
-    v6.startsWith("fe8") ||
-    v6.startsWith("fe9") ||
-    v6.startsWith("fea") ||
-    v6.startsWith("feb")
-  );
+  const plain = address.replace(/%.*$/, "");
+  const kind = isIP(plain);
+  if (kind === 4) return NOT_PUBLIC.check(plain, "ipv4");
+  if (kind === 6) return NOT_PUBLIC.check(plain, "ipv6");
+  return true;
 }
 
 async function isPublicHost(hostname: string): Promise<boolean> {

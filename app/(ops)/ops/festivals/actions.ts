@@ -2,11 +2,13 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireToranAdmin } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/session";
 
 // Marks a festival date as checked (or not) against a published panchang,
 // recording where it was checked.
 export async function setFestivalDateChecked(formData: FormData) {
+  await requireToranAdmin("/ops/festivals");
   const id = String(formData.get("id") ?? "");
   const verified = formData.get("verified") === "yes";
   const source = String(formData.get("source") ?? "").trim();
