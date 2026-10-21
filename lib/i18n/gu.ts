@@ -74,6 +74,11 @@ export const gu: Record<MessageKey, string> = {
   "whatsOn.countRegion": ", {region}માં",
   "whatsOn.countType": " ({type})",
   "whatsOn.nearestFirst": ", દરરોજ સૌથી નજીકના પહેલા",
+  "whatsOn.onDay": ", {day}ના રોજ",
+  "whatsOn.everyDay": "બધા દિવસો જુઓ",
+  "whatsOn.moreOnDay": "{day}ના બધા {count} કાર્યક્રમો જુઓ →",
+  "whatsOn.chooseArea": "તમારો વિસ્તાર પસંદ કરો",
+  "whatsOn.allAreas": "બધા વિસ્તારો",
   "whatsOn.locationDenied":
     "તમારા બ્રાઉઝરે તમારું સ્થાન શેર કર્યું નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
   "whatsOn.locationFailed":

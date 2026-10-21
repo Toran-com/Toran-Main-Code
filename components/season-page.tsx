@@ -20,11 +20,18 @@ import type { Season } from "@/lib/seasons";
 import { pageMetadata, siteUrl } from "@/lib/site";
 import { breadcrumbData } from "@/lib/structured-data";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
+import { regionKey } from "@/lib/i18n/client/mandirs";
 import {
+  dayFrom,
+  LONG_LIST,
+  longDayHeading,
   nearestFirstEachDay,
   nearTo,
+  onDay,
+  PER_DAY,
   RADII,
   radiusFrom,
+  regionCounts,
 } from "@/lib/whats-on-view";
 
 // A festival season's page (/diwali, /holi and so on): the festival days,
@@ -111,8 +118,11 @@ async function SeasonDays({ season }: { season: Season }) {
             key={d.slug}
             className="has-card-link group bg-on-night/5 hover:bg-on-night/10 flex items-center gap-4 rounded-2xl p-2.5 transition-colors"
           >
+            {/* Not fetched ahead: four festival pages would cost visitors
+                on mobile data more than the wait saves. */}
             <Link
               href={localePath(`/festivals/${d.slug}`)}
+              prefetch={false}
               className="card-link order-2 flex flex-col leading-snug no-underline"
             >
               <span className="text-on-night font-semibold">
@@ -161,6 +171,21 @@ async function SeasonBody({
     .trim()
     .slice(0, 10);
   const within = radiusFrom(query.within);
+  const region = String(query.region ?? "").slice(0, 80);
+  const day = dayFrom(query.day);
+  // Links that change one choice and keep the others.
+  const here = (change: { region?: string; day?: string }) => {
+    const params = new URLSearchParams();
+    if (near) params.set("near", near);
+    if (within !== 15) params.set("within", String(within));
+    const r = change.region ?? region;
+    const d = change.day ?? day;
+    if (r) params.set("region", r);
+    if (d) params.set("day", d);
+    const q = params.toString();
+    return `${localePath(`/${season.slug}`)}${q ? `?${q}` : ""}#events`;
+  };
+  const regionName = (r: string) => (regionKey(r) ? t(regionKey(r)!) : r);
 
   const [dates, events, origin] = await Promise.all([
     listFestivalDates(),
@@ -199,8 +224,14 @@ async function SeasonBody({
   }
   const during =
     events.state === "ok" ? seasonEvents(events.data, season, window) : [];
-  const nearby = nearTo(during, position, within);
+  const inRegion = region
+    ? during.filter((e) => e.mandir.region === region)
+    : during;
+  const nearby = nearTo(onDay(inRegion, day), position, within);
   const shown = position ? nearestFirstEachDay(nearby) : nearby;
+  // Choosing an area helps most when nothing narrows the list yet.
+  const areas = position ? [] : regionCounts(onDay(during, day));
+  const long = !position && !region && !day && shown.length > LONG_LIST;
 
   return (
     <>
@@ -247,6 +278,8 @@ async function SeasonBody({
             {t("whatsOn.show")}
           </button>
         </div>
+        {region && <input type="hidden" name="region" value={region} />}
+        {day && <input type="hidden" name="day" value={day} />}
       </form>
 
       {problem && <Notice tone="error">{problem}</Notice>}
@@ -267,9 +300,66 @@ async function SeasonBody({
                 miles: within,
                 place: near.toUpperCase(),
               })}
+            {region && t("whatsOn.countRegion", { region: regionName(region) })}
+            {day && t("whatsOn.onDay", { day: longDayHeading(day) })}
             {position && t("whatsOn.nearestFirst")}
+            {day && (
+              <>
+                {" · "}
+                <Link
+                  href={here({ day: "" })}
+                  className="text-peacock underline"
+                >
+                  {t("whatsOn.everyDay")}
+                </Link>
+              </>
+            )}
           </p>
-          <EventList events={shown} now={new Date()} />
+          {areas.length > 1 && (
+            <nav
+              aria-label={t("whatsOn.chooseArea")}
+              className="-mx-4 flex flex-col gap-2 px-4 sm:mx-0 sm:px-0"
+            >
+              <p className="font-semibold">{t("whatsOn.chooseArea")}</p>
+              <ul className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+                {[
+                  { region: "", count: onDay(during, day).length },
+                  ...areas,
+                ].map((a) => {
+                  const chosen = a.region === region;
+                  return (
+                    <li key={a.region || "all"} className="shrink-0">
+                      <Link
+                        href={here({ region: a.region })}
+                        aria-current={chosen ? "page" : undefined}
+                        className={`inline-block rounded-full border px-4 py-2 text-base whitespace-nowrap no-underline transition-colors ${
+                          chosen
+                            ? "border-ink bg-ink text-bg font-semibold"
+                            : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"
+                        }`}
+                      >
+                        {a.region
+                          ? regionName(a.region)
+                          : t("whatsOn.allAreas")}{" "}
+                        <span className={chosen ? "" : "text-muted"}>
+                          {a.count}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          )}
+          <EventList
+            events={shown}
+            now={new Date()}
+            more={
+              long
+                ? { perDay: PER_DAY, href: (d) => here({ day: d }) }
+                : undefined
+            }
+          />
         </section>
       ) : (
         <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">

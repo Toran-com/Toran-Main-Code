@@ -12,8 +12,13 @@ import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
 import {
+  dayFrom,
+  LONG_LIST,
+  longDayHeading,
   nearestFirstEachDay,
   nearTo,
+  onDay,
+  PER_DAY,
   RADII,
   radiusFrom,
 } from "@/lib/whats-on-view";
@@ -53,22 +58,27 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const region = String(query.region ?? "");
   const type = String(query.type ?? "");
   const kind = isEventKind(type) ? type : "";
+  const day = dayFrom(query.day);
 
   const [result, origin] = await Promise.all([
     listUpcomingEvents(),
     near ? positionForSearch(near) : Promise.resolve(null),
   ]);
 
-  // Links for the type-of-event chips keep the other choices.
-  const typeHref = (value: string) => {
+  // Links that change one choice and keep the others.
+  const here = (change: { type?: string; day?: string }) => {
     const params = new URLSearchParams();
     if (near) params.set("near", near);
     if (within !== 15) params.set("within", String(within));
     if (region) params.set("region", region);
-    if (value) params.set("type", value);
+    const k = change.type ?? kind;
+    const d = change.day ?? day;
+    if (k) params.set("type", k);
+    if (d) params.set("day", d);
     const q = params.toString();
     return q ? `${localePath("/whats-on")}?${q}` : localePath("/whats-on");
   };
+  const typeHref = (value: string) => here({ type: value });
 
   const form = (
     <div className="flex flex-col gap-4">
@@ -132,6 +142,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
           </label>
         </details>
         {kind && <input type="hidden" name="type" value={kind} />}
+        {day && <input type="hidden" name="day" value={day} />}
       </form>
       <nav
         aria-label={t("whatsOn.type")}
@@ -183,13 +194,18 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     position = origin;
   }
 
-  const chosen = result.data.filter(
-    (e) =>
-      (!region || e.mandir.region === region) && (!kind || e.kind === kind),
+  const chosen = onDay(
+    result.data.filter(
+      (e) =>
+        (!region || e.mandir.region === region) && (!kind || e.kind === kind),
+    ),
+    day,
   );
   // Near a place: each day's events nearest first.
   const nearby = nearTo(chosen, position, within);
   const events = position ? nearestFirstEachDay(nearby) : nearby;
+  const long =
+    !position && !region && !kind && !day && events.length > LONG_LIST;
 
   return (
     <>
@@ -208,15 +224,38 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
               t("whatsOn.countRegion", {
                 region: regionKey(region) ? t(regionKey(region)!) : region,
               })}
-            {kind && t("whatsOn.countType", { type: EVENT_KINDS[kind] })}
+            {kind &&
+              t("whatsOn.countType", {
+                type: kindLabel(kind) ?? EVENT_KINDS[kind],
+              })}
+            {day && t("whatsOn.onDay", { day: longDayHeading(day) })}
             {position && t("whatsOn.nearestFirst")}
+            {day && (
+              <>
+                {" · "}
+                <Link
+                  href={here({ day: "" })}
+                  className="text-peacock underline"
+                >
+                  {t("whatsOn.everyDay")}
+                </Link>
+              </>
+            )}
           </p>
-          <EventList events={events} now={new Date()} />
+          <EventList
+            events={events}
+            now={new Date()}
+            more={
+              long
+                ? { perDay: PER_DAY, href: (d) => here({ day: d }) }
+                : undefined
+            }
+          />
         </>
       ) : (
         <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
           <p className="font-semibold">
-            {position || region || kind
+            {position || region || kind || day
               ? t("whatsOn.noneThere")
               : t("whatsOn.noneYet")}
           </p>
