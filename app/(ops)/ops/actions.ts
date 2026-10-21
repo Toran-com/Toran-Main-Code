@@ -2,6 +2,7 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireToranAdmin } from "@/lib/auth";
 import { lookupPostcodes, normalisePostcode } from "@/lib/geo";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -87,6 +88,7 @@ export async function verifySecondFactor(
 // Approve or reject a mandir claim. The database only lets a Toran admin
 // with the second factor do this; approving makes them a mandir admin.
 export async function decideClaim(formData: FormData) {
+  await requireToranAdmin("/ops");
   const claim = String(formData.get("claim") ?? "");
   const approve = formData.get("decision") === "approve";
   const supabase = await createSessionClient();
@@ -113,6 +115,7 @@ export async function decideClaim(formData: FormData) {
 // Looks up map positions for every mandir that has a postcode but no
 // position yet, so "near you" and distances work. Safe to run again.
 export async function fillMapPositions() {
+  await requireToranAdmin("/ops");
   const supabase = await createSessionClient();
   if (!supabase) redirect("/ops?error=positions");
 

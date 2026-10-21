@@ -2,6 +2,7 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireToranAdmin } from "@/lib/auth";
 import { lookupPostcode, type Position } from "@/lib/geo";
 import { parseMandirDetails, slugFor } from "@/lib/mandir-form";
 import { createSessionClient } from "@/lib/supabase/session";
@@ -22,6 +23,7 @@ async function positionFor(postcode: string | null) {
 }
 
 export async function createMandir(formData: FormData) {
+  await requireToranAdmin("/ops/mandirs/new");
   const parsed = parseMandirDetails(formData);
   if (!parsed.ok) redirect(`/ops/mandirs/new?error=${parsed.error}`);
   const values = parsed.values;
@@ -49,6 +51,7 @@ export async function createMandir(formData: FormData) {
 }
 
 export async function updateMandir(formData: FormData) {
+  await requireToranAdmin("/ops/mandirs");
   const slug = String(formData.get("slug") ?? "");
   const back: (query: string) => never = (query) =>
     redirect(`/ops/mandirs/${encodeURIComponent(slug)}?${query}`);
@@ -84,6 +87,7 @@ export async function updateMandir(formData: FormData) {
 }
 
 export async function removeMandirAdmin(formData: FormData) {
+  await requireToranAdmin("/ops/mandirs");
   const slug = String(formData.get("slug") ?? "");
   const mandirId = String(formData.get("mandir") ?? "");
   const member = String(formData.get("member") ?? "");

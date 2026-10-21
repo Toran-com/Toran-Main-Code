@@ -8,6 +8,9 @@ describe("correctionPage", () => {
     );
     expect(correctionPage("https://example.org")).toBe("/");
     expect(correctionPage("//example.org")).toBe("/");
+    // Browsers read a backslash as a slash: this is another site too.
+    expect(correctionPage("/\\example.org")).toBe("/");
+    expect(correctionPage("/mandirs\\x")).toBe("/");
     expect(correctionPage("/has a space")).toBe("/");
     expect(correctionPage(null)).toBe("/");
   });

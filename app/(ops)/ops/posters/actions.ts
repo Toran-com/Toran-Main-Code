@@ -2,6 +2,7 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireToranAdmin } from "@/lib/auth";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { correctPoster, reviewPoster } from "@/lib/poster-review";
 import { checkLink, POSTER_SOURCES, type PosterSource } from "@/lib/posters";
@@ -11,6 +12,7 @@ import { createSessionClient } from "@/lib/supabase/session";
 // waits in the queue for the mandir's committee to publish, or for Toran
 // to publish if nobody looks after the mandir yet.
 export async function addPoster(formData: FormData) {
+  await requireToranAdmin("/ops/posters");
   const slug = String(formData.get("mandir") ?? "");
   const from = String(formData.get("from") ?? "");
   const link = String(formData.get("link") ?? "").trim();
@@ -63,6 +65,7 @@ export async function addPoster(formData: FormData) {
 }
 
 export async function reviewPosterAsToran(formData: FormData) {
+  await requireToranAdmin("/ops/posters");
   const claimId = String(formData.get("poster") ?? "");
   const decision = String(formData.get("decision") ?? "");
   const group = String(formData.get("group") ?? "");

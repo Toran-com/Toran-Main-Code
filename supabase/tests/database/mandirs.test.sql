@@ -1,15 +1,16 @@
 -- Who can see and change mandirs, their private contacts, and claims.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(25);
 
 -- People: A runs mandir 1, B runs mandir 2, C is a member with no role,
 -- T is a Toran admin.
-insert into auth.users (id, email) values
-  ('aaaaaaaa-0000-0000-0000-000000000001', 'a@example.com'),
-  ('bbbbbbbb-0000-0000-0000-000000000002', 'b@example.com'),
-  ('cccccccc-0000-0000-0000-000000000003', 'c@example.com'),
-  ('dddddddd-0000-0000-0000-000000000004', 't@example.com');
+insert into auth.users (id, email, email_confirmed_at) values
+  ('aaaaaaaa-0000-0000-0000-000000000001', 'a@example.com', now()),
+  ('bbbbbbbb-0000-0000-0000-000000000002', 'b@example.com', now()),
+  ('cccccccc-0000-0000-0000-000000000003', 'c@example.com', now()),
+  ('dddddddd-0000-0000-0000-000000000004', 't@example.com', now()),
+  ('eeeeeeee-0000-0000-0000-000000000005', 'u@example.com', null);
 insert into public.toran_admins (user_id) values ('dddddddd-0000-0000-0000-000000000004');
 
 insert into public.mandirs (id, slug, name, town, region, status) values
@@ -71,6 +72,17 @@ select throws_ok(
       (select id from public.mandir_claims limit 1), true)$$,
   '42501', null, 'a member cannot approve their own claim');
 select is((select count(*)::int from public.mandir_claims), 1, 'a member sees their own claim');
+
+-- Someone who never opened their login link can't ask yet: Toran's admins
+-- would see an address nobody has proved.
+select set_config('request.jwt.claims',
+  '{"sub":"eeeeeeee-0000-0000-0000-000000000005","role":"authenticated","aal":"aal1"}', true);
+select throws_ok(
+  $$insert into public.mandir_claims (mandir_id, role_at_mandir)
+    values ('20000000-0000-0000-0000-000000000002', 'Trustee')$$,
+  '42501', null, 'an unproved address cannot claim a mandir');
+select set_config('request.jwt.claims',
+  '{"sub":"cccccccc-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', true);
 
 -- Mandir 1's admin ------------------------------------------------------------
 select set_config('request.jwt.claims',
