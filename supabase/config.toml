@@ -249,6 +249,17 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
+# Toran's login email, for logging in and for joining (see the template).
+# The live project's templates are set in the Supabase dashboard; see
+# supabase/README.md.
+[auth.email.template.magic_link]
+subject = "Your Toran login link"
+content_path = "./supabase/templates/login.html"
+
+[auth.email.template.confirmation]
+subject = "Your Toran login link"
+content_path = "./supabase/templates/login.html"
+
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Toran } from "@/components/ornaments";
 import { PrintButton } from "@/components/print-button";
 import { GUIDE_PATH, HANDOUT_STEPS } from "@/lib/committee-guide";
 import { qrPath } from "@/lib/qr";
@@ -32,11 +33,14 @@ export default function GuideHandoutPage() {
         <PrintButton label="Print this page" />
       </div>
 
-      <article className="flex flex-col gap-5">
-        <header className="border-marigold flex flex-col gap-4 border-b-4 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+      <article className="flex flex-col gap-5 [print-color-adjust:exact]">
+        <Toran />
+        <header className="border-line flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
           <div className="flex flex-col gap-1">
-            <p className="text-muted font-semibold">For mandir committees</p>
-            <h1 className="font-display text-5xl leading-tight tracking-tight">
+            <p className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
+              For mandir committees
+            </p>
+            <h1 className="font-display text-5xl leading-[1.05] tracking-tight">
               Your mandir&apos;s events on Toran
             </h1>
             <p className="text-muted text-xl">
@@ -64,16 +68,16 @@ export default function GuideHandoutPage() {
           {HANDOUT_STEPS.map((step, i) => (
             <li
               key={step.title}
-              className="border-line flex break-inside-avoid gap-4 border-b pb-2"
+              className="border-line flex break-inside-avoid gap-4 border-b pb-3"
             >
               <span
                 aria-hidden
-                className="border-marigold text-marigold-ink grid size-10 shrink-0 place-items-center rounded-full border-2 text-xl font-bold"
+                className="font-display text-marigold-ink w-8 shrink-0 text-5xl leading-none"
               >
                 {i + 1}
               </span>
               <div className="flex flex-col gap-1">
-                <h2 className="text-xl font-bold">{step.title}</h2>
+                <h2 className="text-xl font-semibold">{step.title}</h2>
                 <p>{step.body}</p>
               </div>
             </li>

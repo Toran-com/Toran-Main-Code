@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DateTile } from "@/components/date-tile";
+import { Logo, Toran } from "@/components/ornaments";
 import { LoadProblem } from "@/components/public-shell";
 import { PrintButton } from "@/components/print-button";
 import { getMandir, listMandirs } from "@/lib/directory";
@@ -71,10 +73,13 @@ export default async function PrintPage({
         <PrintButton label="Print this page" />
       </div>
 
-      <article className="flex flex-col gap-6">
-        <header className="border-marigold flex flex-col gap-1 border-b-4 pb-4">
-          <p className="text-muted font-semibold">What&apos;s on at</p>
-          <h1 className="font-display text-5xl leading-tight tracking-tight">
+      <article className="flex flex-col gap-6 [print-color-adjust:exact]">
+        <header className="flex flex-col gap-1">
+          <Toran />
+          <p className="text-marigold-ink pt-4 text-base font-semibold tracking-[0.12em] uppercase">
+            What&apos;s on at
+          </p>
+          <h1 className="font-display text-5xl leading-[1.05] tracking-tight">
             {mandir.name}
           </h1>
           <p className="text-muted text-xl">
@@ -84,26 +89,32 @@ export default async function PrintPage({
         </header>
 
         {events.length ? (
-          <ul className="flex flex-col gap-4">
+          <ul className="divide-line border-line flex flex-col divide-y border-y">
             {events.map((event) => (
-              <li
-                key={event.id}
-                className="border-line flex break-inside-avoid flex-col gap-1 border-b pb-3"
-              >
-                <p className="text-marigold-ink font-semibold">
-                  {event.recurrence &&
-                    `${describeRule(event.recurrence)} · next `}
-                  {formatEventStart(event.next_starts_at, event.all_day)}
-                </p>
-                <h2 className="text-xl font-bold">{event.title}</h2>
-                {event.summary && <p>{event.summary}</p>}
-                {(event.location_note || event.cost_note) && (
+              <li key={event.id} className="flex break-inside-avoid gap-4 py-3">
+                <DateTile
+                  date={event.next_starts_at}
+                  label={formatEventStart(event.next_starts_at, true)}
+                  size="sm"
+                />
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <h2 className="text-xl leading-snug font-semibold">
+                    {event.title}
+                  </h2>
                   <p className="text-muted">
-                    {[event.location_note, event.cost_note]
-                      .filter(Boolean)
-                      .join(" · ")}
+                    {event.recurrence &&
+                      `${describeRule(event.recurrence)} · next `}
+                    {formatEventStart(event.next_starts_at, event.all_day)}
                   </p>
-                )}
+                  {event.summary && <p>{event.summary}</p>}
+                  {(event.location_note || event.cost_note) && (
+                    <p className="text-muted">
+                      {[event.location_note, event.cost_note]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
@@ -123,12 +134,15 @@ export default async function PrintPage({
           >
             <path d={qr.d} fill="#000" />
           </svg>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-1 flex-col gap-1">
             <p className="text-lg font-semibold">
               Scan for the latest events and to share them on WhatsApp.
             </p>
             <p className="text-muted break-all">{url}</p>
           </div>
+          <span className="text-ink hidden shrink-0 sm:block print:block">
+            <Logo size="sm" />
+          </span>
         </footer>
       </article>
     </>
