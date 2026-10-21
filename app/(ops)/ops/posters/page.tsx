@@ -27,7 +27,12 @@ import {
   withDuplicates,
 } from "@/lib/review-queue";
 import { createSessionClient } from "@/lib/supabase/session";
-import { addPoster, reviewPosterAsToran } from "./actions";
+import {
+  IMPORT_COLUMNS,
+  IMPORT_PROBLEMS,
+  type ImportProblem,
+} from "@/lib/website-import";
+import { addPoster, importWebsiteEvents, reviewPosterAsToran } from "./actions";
 
 // Toran's review queue: everything waiting before it goes on the site,
 // whichever way it arrived (a poster Toran typed up, a visitor's "Tell us",
@@ -98,6 +103,23 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
   const group = GROUPS.find((g) => g === query.from);
   const fixing = String(query.fix ?? "");
   const here = group ? `/ops/posters?from=${group}` : "/ops/posters";
+  const imported =
+    query.imported === undefined
+      ? null
+      : {
+          added: Number(query.imported) || 0,
+          skipped: Number(query.skipped) || 0,
+          problems: String(query.problems ?? "")
+            .split(",")
+            .flatMap((p) => {
+              const [line, problem] = p.split(":");
+              return problem && problem in IMPORT_PROBLEMS
+                ? [
+                    `Line ${line}: ${IMPORT_PROBLEMS[problem as ImportProblem["problem"]]}.`,
+                  ]
+                : [];
+            }),
+        };
 
   // Everything waiting, oldest first, with look-alikes flagged.
   const queue = (claims ?? []).flatMap((c) => {
@@ -262,6 +284,60 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
           </label>
           <button type="submit" className={buttonClass}>
             Add to the queue
+          </button>
+        </form>
+      </Card>
+
+      <Card>
+        <h2 id="import" className="text-2xl font-bold">
+          Add several from mandirs&apos; websites
+        </h2>
+        <p className="text-muted">
+          For events read from a mandir&apos;s own website, such as its Diwali
+          programme page. Copy rows from a spreadsheet with these columns, in
+          this order (a header row is fine):{" "}
+          <code>{IMPORT_COLUMNS.join(", ")}</code>. The mandir is its page
+          address on Toran, the date is YYYY-MM-DD, the time is HH:MM or empty
+          for all day, and the link is the page it was read from. Kind,
+          description and Gujarati name are optional. Each joins the queue as
+          &ldquo;From the mandir&apos;s website&rdquo;. Anything already there
+          is skipped, so the same rows can be sent again.
+        </p>
+        {imported && (
+          <Notice tone="success">
+            Added {imported.added} to the queue
+            {imported.skipped
+              ? `; ${imported.skipped} ${imported.skipped === 1 ? "was" : "were"} already there`
+              : ""}
+            .
+          </Notice>
+        )}
+        {imported && imported.problems.length > 0 && (
+          <Notice tone="error">
+            These rows weren&apos;t added:
+            <ul className="mt-2 list-disc pl-6">
+              {imported.problems.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </Notice>
+        )}
+        <form action={importWebsiteEvents} className="flex flex-col gap-5">
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Rows</span>
+            <textarea
+              name="rows"
+              required
+              rows={8}
+              spellCheck={false}
+              placeholder={
+                "shree-ram-mandir-leicester\t2026-11-08\t18:30\tDiwali Lakshmi puja\thttps://example.org/diwali"
+              }
+              className={`${inputClass} font-mono`}
+            />
+          </label>
+          <button type="submit" className={buttonClass}>
+            Add them to the queue
           </button>
         </form>
       </Card>
