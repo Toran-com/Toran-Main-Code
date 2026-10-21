@@ -23,7 +23,8 @@ import { eventPath, eventShareText } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData, mandirData } from "@/lib/structured-data";
 import { regionKey } from "@/lib/i18n/client/mandirs";
-import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
+import { localePath, pageLocale, pageT, seasonText } from "@/lib/i18n/page";
+import { mandirKit } from "@/lib/season-kit";
 
 // Every mandir page is fully static. A mandir added after the build is
 // rendered on its first visit (which waits for it), so an unknown address
@@ -59,7 +60,7 @@ export default async function MandirPage({
 }: PageProps<"/mandirs/[slug]">) {
   const { slug } = await params;
   const t = pageT();
-  const result = await getMandir(slug);
+  const [result, kit] = await Promise.all([getMandir(slug), mandirKit(slug)]);
   if (result.state === "not connected") notFound();
   if (result.state === "unavailable") {
     return <LoadProblem state="unavailable" what={t("load.mandirPage")} />;
@@ -151,6 +152,14 @@ export default async function MandirPage({
                 className="text-peacock font-semibold"
               >
                 {t("mandir.print")}
+              </Link>
+            )}
+            {kit && (
+              <Link
+                href={`/mandirs/${mandir.slug}/kit/${kit.season.slug}`}
+                className="text-peacock font-semibold"
+              >
+                {t("mandir.kit", { period: seasonText(kit.season).period })}
               </Link>
             )}
           </div>

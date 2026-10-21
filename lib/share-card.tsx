@@ -202,3 +202,192 @@ export async function shareCard({
     { ...cardSize, fonts },
   );
 }
+
+// A mandir's festival programme as a portrait picture to send on WhatsApp
+// (lib/season-kit.ts): the season and mandir under the toran, then each
+// event with its date tile, then where to find the details.
+export const posterSize = { width: 1080, height: 1350 };
+
+export async function seasonPoster({
+  kicker,
+  title,
+  detail,
+  events,
+  more,
+  address,
+}: {
+  kicker: string;
+  title: string;
+  detail: string;
+  events: { date: string; time: string; title: string }[];
+  // How many more events there are than fit.
+  more: number;
+  address: string;
+}): Promise<ImageResponse> {
+  const { fonts, toran, rangoli } = await loadAssets();
+  const titleSize = title.length > 40 ? 64 : title.length > 26 ? 76 : 92;
+  return new ImageResponse(
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        background: colour.night,
+        color: colour.cream,
+        fontFamily: "Figtree",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- drawn into a picture, not a page */}
+      <img
+        src={rangoli}
+        width={620}
+        height={620}
+        alt=""
+        style={{ position: "absolute", right: -200, top: 40, opacity: 0.22 }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element -- as above */}
+      <img
+        src={toran}
+        width={1080}
+        height={72}
+        alt=""
+        style={{ marginTop: 6 }}
+      />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          padding: "48px 72px 0",
+        }}
+      >
+        <div style={{ fontSize: 38, fontWeight: 600, color: colour.accent }}>
+          {kicker}
+        </div>
+        <div
+          style={{
+            fontFamily: "Instrument Serif",
+            fontSize: titleSize,
+            lineHeight: 1.02,
+          }}
+        >
+          {title}
+        </div>
+        <div style={{ fontSize: 36, fontWeight: 600, color: colour.mist }}>
+          {detail}
+        </div>
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: 22,
+          padding: "32px 72px",
+        }}
+      >
+        {events.map((e, i) => {
+          const tile = dateTileParts(e.date);
+          return (
+            <div
+              key={i}
+              style={{ display: "flex", alignItems: "center", gap: 28 }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  width: 112,
+                  padding: "8px 0 8px",
+                  borderRadius: 24,
+                  background: colour.cream,
+                  color: colour.ink,
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 700,
+                    letterSpacing: 2,
+                    color: colour.kumkum,
+                  }}
+                >
+                  {tile.month}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "Instrument Serif",
+                    fontSize: 60,
+                    lineHeight: 1,
+                  }}
+                >
+                  {tile.day}
+                </span>
+                <span style={{ fontSize: 22, color: colour.muted }}>
+                  {tile.weekday}
+                </span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div
+                  style={{
+                    fontSize: e.title.length > 44 ? 32 : 38,
+                    fontWeight: 700,
+                    lineHeight: 1.15,
+                    maxWidth: 800,
+                  }}
+                >
+                  {e.title.length > 80 ? `${e.title.slice(0, 78)}…` : e.title}
+                </div>
+                <div
+                  style={{ fontSize: 30, fontWeight: 600, color: colour.mist }}
+                >
+                  {e.time}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {more > 0 && (
+          <div style={{ fontSize: 32, fontWeight: 600, color: colour.accent }}>
+            {`+ ${more} more on Toran`}
+          </div>
+        )}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 20,
+          padding: "0 72px 56px",
+        }}
+      >
+        <div style={{ fontSize: 30, fontWeight: 600, color: colour.mist }}>
+          {address}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- as above */}
+          <img src={rangoli} width={48} height={48} alt="" />
+          <span style={{ fontFamily: "Instrument Serif", fontSize: 48 }}>
+            {site.name}
+          </span>
+          <span
+            style={{
+              fontSize: 28,
+              fontWeight: 600,
+              color: colour.mist,
+              marginLeft: 12,
+            }}
+          >
+            {site.tagline}
+          </span>
+        </div>
+      </div>
+    </div>,
+    { ...posterSize, fonts },
+  );
+}

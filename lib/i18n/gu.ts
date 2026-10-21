@@ -121,6 +121,7 @@ export const gu: Record<MessageKey, string> = {
   "mandir.tellUs": "અહીંના કોઈ કાર્યક્રમ વિશે જાણો છો? અમને જણાવો →",
   "mandir.festivalDates": "યુકે માટે તહેવારોની તારીખો →",
   "mandir.print": "નોટિસ બોર્ડ માટે છાપો →",
+  "mandir.kit": "{period} શેર કરો: ચિત્ર અને નોટિસ બોર્ડ માટે શીટ →",
   "mandir.calendarTitle": "આ કાર્યક્રમો તમારા કેલેન્ડરમાં મેળવો",
   "mandir.calendarBody":
     "{name}ના કાર્યક્રમો તમારા ફોનના કેલેન્ડરમાં ઉમેરો. નવા કાર્યક્રમો અને ફેરફારો આપમેળે દેખાશે.",

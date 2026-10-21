@@ -14,6 +14,7 @@ import {
   pillPrimaryClass,
   quietButtonClass,
 } from "@/components/ui";
+import { mandirKit } from "@/lib/season-kit";
 import { CommitteeTodo } from "@/components/committee-todo";
 import { getCurrentUser } from "@/lib/auth";
 import { eventCount, shortSevaShifts } from "@/lib/committee-facts";
@@ -198,6 +199,8 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     await eventCandidates(supabase!, [mandir.id], today),
   );
 
+  // The festival coming up, if the mandir has events for it.
+  const kit = await mandirKit(mandir.slug);
   const facts: CommitteeFacts = {
     slug: mandir.slug,
     today,
@@ -283,6 +286,26 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       {done && <Notice tone="success">{done}</Notice>}
 
       <CommitteeTodo facts={facts} />
+
+      {kit && (
+        <Card>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            Share your {kit.season.period} programme
+          </h2>
+          <p className="text-muted">
+            A picture and a message for your WhatsApp groups, and a sheet for
+            the noticeboard, made from the {kit.events.length}{" "}
+            {kit.events.length === 1 ? "event" : "events"} you have on Toran for{" "}
+            {kit.season.period}. They change when your events do.
+          </p>
+          <Link
+            href={`/mandirs/${mandir.slug}/kit/${kit.season.slug}`}
+            className={`${buttonClass} self-start`}
+          >
+            Get the picture and sheet
+          </Link>
+        </Card>
+      )}
 
       {posters.length > 0 && (
         <Card>

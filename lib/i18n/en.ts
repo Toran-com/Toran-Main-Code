@@ -118,6 +118,7 @@ export const en = {
   "mandir.tellUs": "Know about an event here? Tell us →",
   "mandir.festivalDates": "Festival dates for the UK →",
   "mandir.print": "Print for a noticeboard →",
+  "mandir.kit": "Share {period}: a picture and a noticeboard sheet →",
   "mandir.calendarTitle": "Get these events in your calendar",
   "mandir.calendarBody":
     "Add {name}'s events to the calendar on your phone. New events and changes appear there automatically.",
