@@ -102,11 +102,9 @@ export function seasonWindow(
 
 // Events on the season's days that are part of it: named after one of its
 // festivals, or marked as a festival by the mandir.
-export function seasonEvents<T extends ListedEvent>(
-  events: T[],
-  season: Season,
-  window: { from: string; to: string },
-): T[] {
+export function seasonEvents<
+  T extends Pick<ListedEvent, "next_starts_at" | "title" | "summary" | "kind">,
+>(events: T[], season: Season, window: { from: string; to: string }): T[] {
   return events.filter((e) => {
     const day = londonDate(new Date(e.next_starts_at));
     if (day < window.from || day > window.to) return false;
