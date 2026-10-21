@@ -25,6 +25,16 @@ pnpm dlx supabase stop
 `supabase start` prints a local API URL and publishable (anon) key; put
 them in `.env.local` to point the app at the local database.
 
+## Login emails
+
+`templates/login.html` is the email with the login link, in Toran's look.
+`config.toml` uses it for the local stack. The hosted projects keep their
+email templates in the Supabase dashboard, so after changing it, paste it in
+by hand for each project: **Authentication → Email Templates**, for both
+**Magic link** and **Confirm signup**, with the subject "Your Toran login
+link". Keep the button the first link in the email: the end-to-end tests
+follow the first link.
+
 ## How changes reach the real database
 
 1. A pull request adds a migration. The **Database** check starts a fresh

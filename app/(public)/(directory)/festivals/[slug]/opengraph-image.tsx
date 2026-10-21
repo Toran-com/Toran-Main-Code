@@ -26,5 +26,6 @@ export default async function Image({
     kicker: "Festival dates in the UK",
     title: festival.name,
     detail: next ? formatDateRange(next.starts_on, next.ends_on) : undefined,
+    date: next?.starts_on,
   });
 }

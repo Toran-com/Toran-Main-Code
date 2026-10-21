@@ -32,5 +32,6 @@ export default async function Image({
           : when,
     title: event.title,
     detail: `${mandir.name}, ${mandir.town}`,
+    date: event.next_starts_at,
   });
 }
