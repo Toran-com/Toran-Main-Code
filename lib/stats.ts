@@ -22,6 +22,7 @@ const ID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 const PAGES: [RegExp, string][] = [
   [/^\/$/, "Home"],
   [/^\/whats-on$/, "What's on"],
+  [/^\/seva$/, "Seva"],
   [/^\/mandirs$/, "Mandir list and map"],
   [new RegExp(`^/mandirs/${SLUG}$`), "Mandir pages"],
   [new RegExp(`^/mandirs/${SLUG}/events/${ID}$`), "Event pages"],

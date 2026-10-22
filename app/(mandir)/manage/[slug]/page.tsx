@@ -269,6 +269,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               ["#upcoming", `Coming up (${events.length})`],
               ...(festivals.length ? [["#festivals", "Festivals"]] : []),
               ["#add-event", "Add an event"],
+              [`/manage/${mandir.slug}/seva`, "Seva"],
               ["#committee", "Committee"],
               ["#details", "Details"],
             ].map(([href, label]) => (

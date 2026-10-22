@@ -20,6 +20,7 @@ import { siteUrl } from "@/lib/site";
 import { siteData } from "@/lib/structured-data";
 import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
 import { seasonBySlug } from "@/lib/seasons";
+import { sevaSummary } from "@/lib/seva-needs";
 
 // Only the address: the title, description and link preview picture come
 // from the root layout.
@@ -137,6 +138,10 @@ export default function Home() {
               <Mandirs />
             </Suspense>
           </div>
+
+          <Suspense fallback={null}>
+            <SevaSoon />
+          </Suspense>
 
           <section
             aria-labelledby="committees"
@@ -260,6 +265,39 @@ async function FestivalsSoon() {
       >
         {t("home.allFestivals")} →
       </Link>
+    </section>
+  );
+}
+
+// Seva being asked for, with the way to the Seva page. Nothing when no
+// mandir is asking.
+async function SevaSoon() {
+  const t = pageT();
+  const seva = await sevaSummary();
+  if (!seva?.events) return null;
+  return (
+    <section
+      aria-labelledby="seva-soon"
+      className="border-line bg-surface shadow-card flex flex-wrap items-center gap-x-10 gap-y-5 rounded-[2rem] border p-6 sm:p-10"
+    >
+      <div className="flex min-w-0 flex-[1_1_24rem] flex-col gap-3">
+        <h2
+          id="seva-soon"
+          className="font-display text-4xl leading-tight tracking-tight sm:text-5xl"
+        >
+          {t("home.sevaTitle")}
+        </h2>
+        <p className="text-muted text-lg">{t("sevaList.intro")}</p>
+      </div>
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-leaf-ink text-xl font-semibold">
+          {t.count("sevaList.count", seva.events)} ·{" "}
+          {t.count("sevaList.free", seva.places)}
+        </p>
+        <Link href={localePath("/seva")} className={buttonClass}>
+          {t("home.sevaLink")}
+        </Link>
+      </div>
     </section>
   );
 }

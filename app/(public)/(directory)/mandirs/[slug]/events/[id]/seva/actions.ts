@@ -16,6 +16,8 @@ const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 function refresh(slug: string) {
   if (SLUG.test(slug)) updateTag(`mandir:${slug}`);
+  // The Seva page's counts across mandirs (lib/seva-needs.ts).
+  updateTag("seva");
 }
 
 export async function takeSlot(

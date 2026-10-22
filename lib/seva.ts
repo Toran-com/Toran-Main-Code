@@ -127,3 +127,70 @@ export function rotaMessage(
       : "Reply here if you can help. 🙏",
   ].join("\n\n");
 }
+
+// The shifts in a rota that haven't ended and still need people, soonest
+// first, for the committee's seva overview.
+export function stillShort(
+  rota: Rota,
+  now: Date,
+): {
+  role: string;
+  needsDbs: boolean;
+  startsAt: string;
+  endsAt: string;
+  needed: number;
+  short: number;
+}[] {
+  const at = now.toISOString();
+  return rota
+    .flatMap((r) =>
+      r.shifts.map((s) => ({
+        role: r.name,
+        needsDbs: r.needs_dbs,
+        startsAt: s.starts_at,
+        endsAt: s.ends_at,
+        needed: s.needed,
+        short: s.needed - placesTaken(s),
+      })),
+    )
+    .filter((s) => s.endsAt > at && s.short > 0)
+    .sort(
+      (a, b) =>
+        a.startsAt.localeCompare(b.startsAt) || a.role.localeCompare(b.role),
+    );
+}
+
+// Every event's seva still needed, as one message for the volunteers'
+// WhatsApp group: each event with its short shifts, and where to take a
+// slot when online sign-up is on.
+export function sevaRoundup(
+  mandirName: string,
+  events: {
+    title: string;
+    when: string;
+    // The event's seva page, when volunteers can take slots on Toran.
+    link: string | null;
+    short: ReturnType<typeof stillShort>;
+  }[],
+): string {
+  const parts = events
+    .filter((e) => e.short.length)
+    .map((e) =>
+      [
+        `*${e.title}* (${e.when})`,
+        ...e.short.map(
+          (s) =>
+            `• ${s.role}${s.needsDbs ? " (DBS check needed)" : ""}, ${shiftLabel(s.startsAt, s.endsAt)}: ${s.short} still needed`,
+        ),
+        e.link ? `Take a slot, no sign-up needed: ${e.link}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    );
+  const anyClosed = events.some((e) => e.short.length && !e.link);
+  return [
+    `Seva still needed at ${mandirName} 🙏`,
+    ...parts,
+    ...(anyClosed ? ["Reply here if you can help."] : []),
+  ].join("\n\n");
+}

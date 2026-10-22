@@ -49,6 +49,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
           <SiteNav
             links={[
               { href: localePath("/whats-on"), label: t("shell.whatsOn") },
+              { href: localePath("/seva"), label: t("shell.seva") },
               { href: localePath("/mandirs"), label: t("shell.mandirs") },
               { href: localePath("/festivals"), label: t("shell.festivals") },
             ]}
@@ -90,6 +91,7 @@ export function SiteFooter() {
       heading: t("shell.find"),
       links: [
         { href: localePath("/whats-on"), label: t("shell.whatsOn") },
+        { href: localePath("/seva"), label: t("shell.seva") },
         { href: localePath("/mandirs"), label: t("shell.mandirs") },
         { href: localePath("/festivals"), label: t("shell.festivals") },
         { href: "/for-mandirs", label: t("shell.forMandirs") },
