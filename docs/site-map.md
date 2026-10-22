@@ -12,6 +12,7 @@ English and Gujarati, and by following every link from the home page.
 | ---------------------- | ------------------------------------ | ------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | Home                   | `/`                                  | What's on near you, the next festival season, coming up | What's on, a season page, festival dates, mandirs, each event                     |
 | What's on              | `/whats-on`                          | Every event, by date; near a postcode; by kind, region  | Each event, each mandir                                                           |
+| Seva                   | `/seva`                              | Seva mandirs are asking for, near you; by area          | Each event's seva rota                                                            |
 | Mandirs                | `/mandirs`                           | Every mandir, on a map or as a list by region and town  | Each mandir; What's on near one                                                   |
 | A mandir               | `/mandirs/<mandir>`                  | Its events, address, website, calendar feed, print      | Each event, "Tell us about an event", look after this page, festival dates, print |
 | An event               | `/mandirs/<mandir>/events/<id>`      | One event to share: when, where, calendar, WhatsApp     | Its seva rota, the mandir, What's on                                              |
@@ -35,6 +36,7 @@ English and Gujarati, and by following every link from the home page.
 | Your account          | `/account`                          | Your mandirs, invites to accept, requests being checked        | Each mandir's committee page                       |
 | Committee page        | `/manage/<mandir>`                  | Posters to check, events, festivals to add, committee, details | Edit an event, a seva rota, the public page, print |
 | Edit an event         | `/manage/<mandir>/events/<id>`      | Change an event                                                | The committee page                                 |
+| Seva                  | `/manage/<mandir>/seva`             | Every rota, what's still short, one message for the group      | Each seva rota, the Seva page                      |
 | Seva rota             | `/manage/<mandir>/seva/<id>`        | Roles and shifts; the message for the volunteers' group        | The public seva page                               |
 | Print a notice        | `/mandirs/<mandir>/print`           | One page of what's on, with a QR code                          | —                                                  |
 

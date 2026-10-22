@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { AreaChips, regionName } from "@/components/area-chips";
 import { Countdown } from "@/components/countdown";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
@@ -20,7 +21,6 @@ import type { Season } from "@/lib/seasons";
 import { pageMetadata, siteUrl } from "@/lib/site";
 import { breadcrumbData } from "@/lib/structured-data";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
-import { regionKey } from "@/lib/i18n/client/mandirs";
 import {
   dayFrom,
   LONG_LIST,
@@ -185,7 +185,6 @@ async function SeasonBody({
     const q = params.toString();
     return `${localePath(`/${season.slug}`)}${q ? `?${q}` : ""}#events`;
   };
-  const regionName = (r: string) => (regionKey(r) ? t(regionKey(r)!) : r);
 
   const [dates, events, origin] = await Promise.all([
     listFestivalDates(),
@@ -315,42 +314,12 @@ async function SeasonBody({
               </>
             )}
           </p>
-          {areas.length > 1 && (
-            <nav
-              aria-label={t("whatsOn.chooseArea")}
-              className="-mx-4 flex flex-col gap-2 px-4 sm:mx-0 sm:px-0"
-            >
-              <p className="font-semibold">{t("whatsOn.chooseArea")}</p>
-              <ul className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
-                {[
-                  { region: "", count: onDay(during, day).length },
-                  ...areas,
-                ].map((a) => {
-                  const chosen = a.region === region;
-                  return (
-                    <li key={a.region || "all"} className="shrink-0">
-                      <Link
-                        href={here({ region: a.region })}
-                        aria-current={chosen ? "page" : undefined}
-                        className={`inline-block rounded-full border px-4 py-2 text-base whitespace-nowrap no-underline transition-colors ${
-                          chosen
-                            ? "border-ink bg-ink text-bg font-semibold"
-                            : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"
-                        }`}
-                      >
-                        {a.region
-                          ? regionName(a.region)
-                          : t("whatsOn.allAreas")}{" "}
-                        <span className={chosen ? "" : "text-muted"}>
-                          {a.count}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
-          )}
+          <AreaChips
+            areas={areas}
+            total={onDay(during, day).length}
+            chosen={region}
+            href={(r) => here({ region: r })}
+          />
           <EventList
             events={shown}
             now={new Date()}

@@ -169,6 +169,30 @@ export const en = {
   "event.where": "Where",
   "event.cost": "Cost",
   "event.fromMandir": "From the mandir",
+  "shell.seva": "Seva",
+  "sevaList.title": "Seva",
+  "sevaList.intro":
+    "Help at a mandir near you: in the kitchen, with parking, shoes or decorations. Take a slot in a tap: no sign-up, and no name needed.",
+  "sevaList.description":
+    "Mandirs across the UK that need volunteers. Take a seva slot in a tap, no sign-up needed.",
+  "sevaList.count.one": "{count} event needs help",
+  "sevaList.count.other": "{count} events need help",
+  "sevaList.free.one": "{count} place free",
+  "sevaList.free.other": "{count} places free",
+  "sevaList.none":
+    "No mandir is asking for seva on Toran just now. Committees add their rotas as festivals come up, so look again soon.",
+  "sevaList.noneNear": "No seva is being asked for near there yet.",
+  "sevaList.howTitle": "How it works",
+  "sevaList.how1": "Choose a shift that suits you and press “Take this slot”.",
+  "sevaList.how2":
+    "Toran doesn't ask your name. Your phone remembers your slots, so you can add them to your calendar or give one back.",
+  "sevaList.how3":
+    "Some roles need a DBS check. For those, ask the mandir's committee.",
+  "sevaList.committee":
+    "On a mandir committee? Plan your rota on Toran and see at a glance which shifts are still short.",
+  "sevaList.committeeLink": "How it works for committees →",
+  "home.sevaTitle": "Seva near you",
+  "home.sevaLink": "See where help is needed →",
   "seva.help": "Help with seva",
   "seva.takenOf": "{taken} of {needed}",
   "seva.placesTaken":

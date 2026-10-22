@@ -9,6 +9,7 @@ import type { Locale } from "@/lib/i18n";
 const GUJARATI_PATHS = [
   /^\/$/,
   /^\/whats-on$/,
+  /^\/seva$/,
   /^\/mandirs(\/[^/]+(\/events\/[^/]+(\/seva)?)?(\/tell-us)?)?$/,
   /^\/festivals(\/[^/]+)?$/,
   // The festival season pages (lib/seasons.ts; a test checks they match).

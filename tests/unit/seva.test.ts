@@ -4,6 +4,8 @@ import {
   checkShift,
   placesTaken,
   rotaMessage,
+  sevaRoundup,
+  stillShort,
   shiftLabel,
 } from "@/lib/seva";
 
@@ -180,5 +182,90 @@ describe("rotaMessage when volunteers can take slots on Toran", () => {
   it("points to the link instead of asking for replies", () => {
     expect(message).toMatch(/Take a slot at the link below/);
     expect(message).not.toMatch(/Reply here/);
+  });
+});
+
+describe("the committee's seva overview", () => {
+  const now = new Date("2026-11-07T12:00:00Z");
+  const rota = [
+    {
+      name: "Kitchen",
+      description: null,
+      needs_dbs: false,
+      shifts: [
+        // Ended, full, and short.
+        {
+          starts_at: "2026-11-06T15:00:00Z",
+          ends_at: "2026-11-06T18:00:00Z",
+          needed: 3,
+        },
+        {
+          starts_at: "2026-11-08T15:00:00Z",
+          ends_at: "2026-11-08T18:00:00Z",
+          needed: 3,
+          filled_offline: 3,
+        },
+        {
+          starts_at: "2026-11-08T18:30:00Z",
+          ends_at: "2026-11-08T21:00:00Z",
+          needed: 4,
+          filled_offline: 1,
+          taken_online: 1,
+        },
+      ],
+    },
+    {
+      name: "Children's corner",
+      description: null,
+      needs_dbs: true,
+      shifts: [
+        {
+          starts_at: "2026-11-08T17:00:00Z",
+          ends_at: "2026-11-08T20:00:00Z",
+          needed: 1,
+        },
+      ],
+    },
+  ];
+
+  it("lists the shifts still short, soonest first", () => {
+    expect(
+      stillShort(rota, now).map((s) => [s.role, s.startsAt, s.short]),
+    ).toEqual([
+      ["Children's corner", "2026-11-08T17:00:00Z", 1],
+      ["Kitchen", "2026-11-08T18:30:00Z", 2],
+    ]);
+  });
+
+  it("puts every event's short shifts in one message", () => {
+    const short = stillShort(rota, now);
+    expect(
+      sevaRoundup("Shree Ram Mandir", [
+        {
+          title: "Diwali",
+          when: "Sun 8 Nov, 6:30pm",
+          link: "https://toran.example/seva-link",
+          short,
+        },
+        { title: "Annakut", when: "Tue 10 Nov", link: null, short },
+        { title: "Full up", when: "Wed 11 Nov", link: null, short: [] },
+      ]),
+    ).toBe(
+      [
+        "Seva still needed at Shree Ram Mandir 🙏",
+        [
+          "*Diwali* (Sun 8 Nov, 6:30pm)",
+          "• Children's corner (DBS check needed), Sun 8 Nov, 5pm–8pm: 1 still needed",
+          "• Kitchen, Sun 8 Nov, 6:30pm–9pm: 2 still needed",
+          "Take a slot, no sign-up needed: https://toran.example/seva-link",
+        ].join("\n"),
+        [
+          "*Annakut* (Tue 10 Nov)",
+          "• Children's corner (DBS check needed), Sun 8 Nov, 5pm–8pm: 1 still needed",
+          "• Kitchen, Sun 8 Nov, 6:30pm–9pm: 2 still needed",
+        ].join("\n"),
+        "Reply here if you can help.",
+      ].join("\n\n"),
+    );
   });
 });

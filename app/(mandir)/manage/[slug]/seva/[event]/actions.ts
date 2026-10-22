@@ -14,7 +14,10 @@ function backTo(formData: FormData): (query: string) => never {
   const slug = encodeURIComponent(rawSlug);
   const event = encodeURIComponent(String(formData.get("event") ?? ""));
   return (query) => {
-    if (!query.startsWith("error=")) updateTag(`mandir:${rawSlug}`);
+    if (!query.startsWith("error=")) {
+      updateTag(`mandir:${rawSlug}`);
+      updateTag("seva");
+    }
     redirect(`/manage/${slug}/seva/${event}?${query}`);
   };
 }
