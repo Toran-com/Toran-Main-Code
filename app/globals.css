@@ -180,6 +180,87 @@ a:hover {
   animation-delay: 300ms;
 }
 
+/* Numbers that count up as the page opens (the Seva page's totals): the
+   number is the element's --to; browsers that can't animate it just show
+   it. Screen readers get the number from text beside it. */
+@property --count {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+@keyframes count-up {
+  from {
+    --count: 0;
+  }
+  to {
+    --count: var(--to);
+  }
+}
+.count-up {
+  animation: count-up 1200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  counter-reset: count var(--count);
+}
+.count-up::after {
+  content: counter(count);
+}
+
+/* A progress bar fills from the left as it appears. */
+@keyframes fill-bar {
+  from {
+    transform: scaleX(0);
+  }
+}
+.fill-bar {
+  transform-origin: left;
+  animation: fill-bar 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Taking a seva slot: marigold petals fall and the diya glows. */
+.petals {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.petals span {
+  position: absolute;
+  top: -1rem;
+  width: 0.875rem;
+  height: 0.625rem;
+  border-radius: 60% 0;
+  opacity: 0;
+  animation: petal-fall var(--d) ease-in var(--delay) both;
+}
+@keyframes petal-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(32rem) rotate(var(--r));
+  }
+}
+@keyframes diya-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0.25rem var(--marigold));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 1.25rem var(--marigold));
+    transform: scale(1.08);
+  }
+}
+.diya {
+  animation:
+    rise 450ms cubic-bezier(0.2, 0.7, 0.2, 1) both,
+    diya-glow 1800ms ease-in-out 450ms 3;
+}
+
 .lift {
   transition:
     transform 200ms ease,
@@ -316,8 +397,22 @@ body:has(.own-toran) .site-toran {
   font-weight: 700;
 }
 
+/* The Seva map (components/seva-map.tsx): bigger where more help is
+   needed, with the number of places inside. */
+.toran-map .toran-need {
+  display: grid;
+  place-items: center;
+  background: var(--marigold);
+  color: #1b1a2c;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+}
+
 .toran-map .toran-dot:focus-visible,
-.toran-map .toran-cluster:focus-visible {
+.toran-map .toran-cluster:focus-visible,
+.toran-map .toran-need:focus-visible {
   outline: 3px solid black;
   outline-offset: 2px;
 }

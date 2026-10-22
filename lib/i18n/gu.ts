@@ -185,7 +185,13 @@ export const gu: Record<MessageKey, string> = {
   "sevaList.free.other": "{count} જગ્યા ખાલી",
   "sevaList.none":
     "અત્યારે કોઈ મંદિર Toran પર સેવા માટે પૂછી રહ્યું નથી. તહેવારો નજીક આવતાં સમિતિઓ તેમનું સમયપત્રક ઉમેરે છે, તેથી થોડા સમયમાં ફરી જુઓ.",
-  "sevaList.noneNear": "ત્યાં નજીક હજી કોઈ સેવા માટે પૂછાયું નથી.",
+  "sevaList.places.one": "જગ્યા માટે હજી સ્વયંસેવક જોઈએ છે",
+  "sevaList.places.other": "જગ્યાઓ માટે હજી સ્વયંસેવકો જોઈએ છે",
+  "sevaList.atMandirs.one": "{count} મંદિરમાં",
+  "sevaList.atMandirs.other": "{count} મંદિરોમાં",
+  "sevaList.taken.one": "અત્યાર સુધી Toran પર {count} જગ્યા લેવાઈ",
+  "sevaList.taken.other": "અત્યાર સુધી Toran પર {count} જગ્યાઓ લેવાઈ",
+  "sevaList.postcode": "અથવા પોસ્ટકોડ લખો",
   "sevaList.howTitle": "કેવી રીતે કામ કરે છે",
   "sevaList.how1": "તમને અનુકૂળ સમય પસંદ કરો અને “આ જગ્યા લો” દબાવો.",
   "sevaList.how2":

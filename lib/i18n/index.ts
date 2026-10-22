@@ -32,7 +32,13 @@ export function translator(locale: Locale = DEFAULT_LOCALE) {
   // "1 event", "3 events": English and Gujarati only need one and other.
   t.count = (
     key:
-      "whatsOn.count" | "home.regionCount" | "sevaList.count" | "sevaList.free",
+      | "whatsOn.count"
+      | "home.regionCount"
+      | "sevaList.count"
+      | "sevaList.free"
+      | "sevaList.places"
+      | "sevaList.atMandirs"
+      | "sevaList.taken",
     count: number,
   ) => t(count === 1 ? `${key}.one` : `${key}.other`, { count });
   return t;

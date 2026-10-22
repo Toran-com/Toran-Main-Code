@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/cache", () => ({ cacheLife: () => {}, cacheTag: () => {} }));
 
-import { rolesSummary, type SevaRow, sevaNeeds } from "@/lib/seva-needs";
+import { type SevaRow, sevaNeeds, sevaTotals } from "@/lib/seva-needs";
 
 const mandir = {
   slug: "m",
@@ -125,33 +125,58 @@ describe("sevaNeeds", () => {
   });
 });
 
-describe("rolesSummary", () => {
-  it("adds up places free per role, in the order roles first come up", () => {
-    const [need] = sevaNeeds(
+describe("sevaTotals", () => {
+  it("counts places still needed, mandirs asking, and slots taken on Toran", () => {
+    const other = { ...mandir, slug: "n" };
+    const totals = sevaTotals(
       [
-        row("e", [
-          {
-            name: "Parking",
-            needs_dbs: false,
-            seva_shifts: [
-              shift("p", "2026-11-08T18:00:00Z", "2026-11-08T21:00:00Z", 2),
-            ],
-          },
+        row("a", [
           {
             name: "Kitchen",
             needs_dbs: false,
             seva_shifts: [
-              shift("k1", "2026-11-08T15:00:00Z", "2026-11-08T18:00:00Z", 3),
-              shift("k2", "2026-11-08T19:00:00Z", "2026-11-08T22:00:00Z", 4, 1),
+              shift(
+                "k1",
+                "2026-11-08T15:00:00Z",
+                "2026-11-08T18:00:00Z",
+                4,
+                1,
+                1,
+              ),
+              // Full: no places, but its slot taken on Toran counts.
+              shift(
+                "k2",
+                "2026-11-08T18:00:00Z",
+                "2026-11-08T21:00:00Z",
+                2,
+                1,
+                1,
+              ),
+              // Over: nothing counts.
+              shift(
+                "k0",
+                "2026-11-06T15:00:00Z",
+                "2026-11-06T18:00:00Z",
+                4,
+                0,
+                3,
+              ),
             ],
           },
         ]),
+        row("b", [
+          {
+            name: "Parking",
+            needs_dbs: false,
+            seva_shifts: [
+              shift("p1", "2026-11-09T09:00:00Z", "2026-11-09T13:00:00Z", 3),
+            ],
+          },
+        ]),
+        { ...row("c", []), mandir: other },
       ],
       now,
     );
-    expect(rolesSummary(need.shifts)).toEqual([
-      { role: "Kitchen", free: 6, needsDbs: false },
-      { role: "Parking", free: 2, needsDbs: false },
-    ]);
+    expect(totals).toEqual({ places: 5, mandirs: 1, taken: 2 });
   });
 });

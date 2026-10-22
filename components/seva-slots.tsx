@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type ReactNode,
   useActionState,
   useEffect,
   useRef,
@@ -10,7 +11,7 @@ import {
 import { useOrigin } from "@/components/use-origin";
 import { buttonClass } from "@/components/ui";
 import { calendarFile, googleCalendarLink } from "@/lib/ical";
-import { giveBackSlot, takeSlot } from "./actions";
+import { giveBackSlot, takeSlot, type TakeResult } from "@/lib/seva-actions";
 import { useT } from "@/components/use-t";
 import { enSlots } from "@/lib/i18n/client/slots";
 
@@ -78,8 +79,58 @@ function subscribe(onChange: () => void) {
   };
 }
 
-function useMySlots(): MySlot[] {
+export function useMySlots(): MySlot[] {
   return useSyncExternalStore(subscribe, read, () => NONE);
+}
+
+// The mandir a slot is at, from its page's address
+// (/mandirs/<slug>/events/<id>/seva, or the same under /gu).
+export function slotMandir(slot: MySlot): string {
+  return /\/mandirs\/([^/]+)\//.exec(slot.path)?.[1] ?? "";
+}
+
+// Takes a slot and keeps it on this phone, for buttons outside a form
+// (the Seva page). Saved here, not in the button, so it's kept even if the
+// shift fills and its button goes when the page refreshes.
+export async function takeAndKeep(
+  slug: string,
+  details: Omit<MySlot, "slot">,
+): Promise<TakeResult> {
+  const form = new FormData();
+  form.set("shift", details.shift);
+  form.set("slug", slug);
+  let result: TakeResult;
+  try {
+    result = await takeSlot(null, form);
+  } catch {
+    result = { ok: false, shift: details.shift, error: "failed" };
+  }
+  if (result?.ok) write([...read(), { ...details, slot: result.slot }]);
+  return result;
+}
+
+// A slot as a calendar entry, and as a file for Apple or Outlook.
+export function calendarEntry(slot: MySlot, origin: string) {
+  return {
+    uid: `seva-${slot.slot}@toran`,
+    title: `Seva: ${slot.role} (${slot.title})`,
+    location: slot.place,
+    url: `${origin}${slot.path}`,
+    start: slot.starts_at,
+    end: slot.ends_at,
+    allDay: false,
+  };
+}
+
+export function downloadCalendar(entry: ReturnType<typeof calendarEntry>) {
+  const blob = new Blob([calendarFile("Seva", [entry])], {
+    type: "text/calendar",
+  });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "seva.ics";
+  link.click();
+  URL.revokeObjectURL(link.href);
 }
 
 const MESSAGES = {
@@ -169,30 +220,21 @@ export function MySlots({ slug, event }: { slug: string; event: string }) {
   );
 }
 
-function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
+export function MySlotItem({
+  slug,
+  slot,
+  children,
+}: {
+  slug: string;
+  slot: MySlot;
+  // More about the slot, between "You're on" and the links (the Seva page
+  // shows where and how soon).
+  children?: ReactNode;
+}) {
   const t = useT(enSlots);
   const origin = useOrigin();
   const [busy, setBusy] = useState(false);
-  const entry = {
-    uid: `seva-${slot.slot}@toran`,
-    title: `Seva: ${slot.role} (${slot.title})`,
-    location: slot.place,
-    url: `${origin}${slot.path}`,
-    start: slot.starts_at,
-    end: slot.ends_at,
-    allDay: false,
-  };
-
-  function downloadFile() {
-    const blob = new Blob([calendarFile("Seva", [entry])], {
-      type: "text/calendar",
-    });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "seva.ics";
-    link.click();
-    URL.revokeObjectURL(link.href);
-  }
+  const entry = calendarEntry(slot, origin);
 
   // Give it back first, then forget it on this phone, so the rota already
   // shows the freed place when "You're on" disappears.
@@ -212,6 +254,7 @@ function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
       <p className="text-lg font-bold">
         {t("slot.youreOnRole", { role: slot.role, label: slot.label })}
       </p>
+      {children}
       <p className="flex flex-wrap gap-x-4 gap-y-1 text-base">
         <a
           href={googleCalendarLink(entry)}
@@ -221,7 +264,11 @@ function MySlotItem({ slug, slot }: { slug: string; slot: MySlot }) {
         >
           {t("slot.google")}
         </a>
-        <button type="button" onClick={downloadFile} className={link}>
+        <button
+          type="button"
+          onClick={() => downloadCalendar(entry)}
+          className={link}
+        >
           {t("slot.apple")}
         </button>
         <button

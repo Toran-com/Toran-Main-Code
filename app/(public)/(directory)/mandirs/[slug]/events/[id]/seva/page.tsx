@@ -14,7 +14,7 @@ import { formatEventStart } from "@/lib/format";
 import { placesTaken, shiftLabel } from "@/lib/seva";
 import { eventPath, sevaPath } from "@/lib/share";
 import { pageMetadata, pageTitle } from "@/lib/site";
-import { MySlots, TakeSlot } from "./slots";
+import { MySlots, TakeSlot } from "@/components/seva-slots";
 import { localePath, pageT } from "@/lib/i18n/page";
 
 // An event's seva rota for volunteers: what's needed, how many places are
