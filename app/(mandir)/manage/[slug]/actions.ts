@@ -2,11 +2,19 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import {
+  comparableEvent,
+  draftParam,
+  keepApart,
+  listedEvents,
+  matchesFor,
+} from "@/lib/duplicate-check";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
+import { londonDate } from "@/lib/london";
 import { parsePracticalDetails } from "@/lib/mandir-form";
-import { reviewPoster } from "@/lib/poster-review";
+import { likenessFrom, reviewPoster } from "@/lib/poster-review";
 import { picksFromForm } from "@/lib/quick-events";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -19,7 +27,8 @@ export async function addEvent(formData: FormData) {
   const back: (query: string) => never = (query) =>
     redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
 
-  const checked = checkEvent(eventInputFrom(formData));
+  const input = eventInputFrom(formData);
+  const checked = checkEvent(input);
   if (!checked.ok) back(`error=${checked.error}`);
 
   const supabase = await createSessionClient();
@@ -31,12 +40,43 @@ export async function addEvent(formData: FormData) {
     .maybeSingle();
   if (!mandir) back("error=failed");
 
+  // Never listed twice. Already on the page: change that one instead. Maybe
+  // on the page: the form comes back, as typed, to ask.
+  const draft = `draft=${draftParam(input)}#add-event`;
+  const listed =
+    (
+      await listedEvents(
+        supabase,
+        [mandir.id],
+        londonDate(checked.event.startsAt),
+      )
+    ).get(mandir.id) ?? [];
+  const matches = matchesFor(comparableEvent(checked.event), listed);
+  const sure = matches.find((m) => m.verdict === "same");
+  if (sure) back(`error=duplicate&dup=${sure.id}&${draft}`);
+  const different = String(formData.get("different") ?? "").split(",");
+  if (matches.some((m) => !different.includes(m.id))) {
+    back(`maybe=${matches.map((m) => m.id).join(",")}&${draft}`);
+  }
+
   // Adding it is confirming it.
-  const id = await saveEvent(supabase, mandir.id, checked.event, {
+  const saved = await saveEvent(supabase, mandir.id, checked.event, {
     confirmed: true,
     origin: "mandir",
   });
-  if (!id) back("error=failed");
+  if (!saved.ok) {
+    back(
+      saved.duplicate
+        ? `error=duplicate&dup=${saved.duplicate}&${draft}`
+        : "error=failed",
+    );
+  }
+  // They said it's different from these: don't ask again.
+  await keepApart(
+    supabase,
+    saved.id,
+    matches.map((m) => m.id),
+  );
   updateTag(`mandir:${mandir.slug}`);
   updateTag("events");
   back("added=1");
@@ -69,22 +109,48 @@ export async function addPickedEvents(formData: FormData) {
     .maybeSingle();
   if (!mandir) back("error=failed");
 
+  // Anything that is, or may be, on the page already is left out (and
+  // said so); it can be added on its own if it's different.
+  const listed =
+    (await listedEvents(supabase, [mandir.id])).get(mandir.id) ?? [];
   let added = 0;
+  let skipped = 0;
+  let failed = 0;
   for (const { result, festivalDateId } of checked) {
     if (!result.ok) continue;
-    const id = await saveEvent(supabase, mandir.id, result.event, {
+    const item = comparableEvent(result.event);
+    if (matchesFor(item, listed).length) {
+      skipped += 1;
+      continue;
+    }
+    const saved = await saveEvent(supabase, mandir.id, result.event, {
       confirmed: true,
       origin: "mandir",
       festivalDateId,
     });
-    if (id) added += 1;
+    if (saved.ok) {
+      added += 1;
+      // Two picks for the same event count once.
+      listed.push({
+        kind: "event",
+        id: saved.id,
+        ...item,
+        time: item.time ?? "",
+        cancelled: false,
+      });
+    } else if (saved.duplicate) {
+      skipped += 1;
+    } else {
+      failed += 1;
+    }
   }
   if (added) {
     updateTag(`mandir:${mandir.slug}`);
     updateTag("events");
   }
-  if (added < checked.length) back(`added=${added}&error=failed`);
-  back(`added=${added}`);
+  const counts = `added=${added}${skipped ? `&skipped=${skipped}` : ""}`;
+  if (failed) back(`${counts}&error=failed`);
+  back(counts);
 }
 
 const CHANGES = {
@@ -170,8 +236,7 @@ export async function reviewPosterAsCommittee(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
   const claimId = String(formData.get("poster") ?? "");
   const choice = String(formData.get("decision") ?? "");
-  const decision =
-    choice === "publish" || choice === "edit-publish" ? "publish" : "discard";
+  const decision = choice === "discard" ? "discard" : "publish";
   const back: (query: string) => never = (query) =>
     redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
 
@@ -184,18 +249,22 @@ export async function reviewPosterAsCommittee(formData: FormData) {
     decision,
     "committee",
     choice === "edit-publish" ? eventInputFrom(formData) : undefined,
+    likenessFrom(formData),
   );
   if (!result.ok) {
     // A correction that didn't pass the checks stays open to fix.
-    back(
-      `${choice === "edit-publish" ? `fix=${claimId}&` : ""}error=${result.error === "done" || result.error === "failed" ? result.error : "poster"}`,
-    );
+    const said = ["done", "failed", "maybe", "cancelled"].includes(result.error)
+      ? result.error
+      : "poster";
+    back(`${choice === "edit-publish" ? `fix=${claimId}&` : ""}error=${said}`);
   }
   if (decision === "publish") {
     updateTag(`mandir:${result.slug}`);
     updateTag("events");
   }
-  back(`done=${decision === "publish" ? "published" : "discarded"}`);
+  back(
+    `done=${decision === "discard" ? "discarded" : result.merged ? "merged" : "published"}`,
+  );
 }
 
 // The committee on Toran: invite a colleague by email, cancel an invite,

@@ -6,7 +6,7 @@
 
 import { checkEvent, type EventError, type EventInput } from "@/lib/event-form";
 import { checkLink } from "@/lib/posters";
-import { eventKey } from "@/lib/website-claims";
+import { compareEvents } from "@/lib/duplicates";
 
 // Columns, in order. Copy them from the research sheet's header.
 export const IMPORT_COLUMNS = [
@@ -62,7 +62,7 @@ export function parseWebsiteEvents(
 ): { rows: ImportRow[]; problems: ImportProblem[] } {
   const rows: ImportRow[] = [];
   const problems: ImportProblem[] = [];
-  const seen = new Set<string>();
+
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
 
   lines.forEach((raw, index) => {
@@ -107,12 +107,15 @@ export function parseWebsiteEvents(
       problems.push({ line, problem: checked.error });
       return;
     }
-    const key = `${slug}|${eventKey(title, date)}`;
-    if (seen.has(key)) {
+    // The same event twice in one paste, however it's spelled.
+    if (
+      rows.some(
+        (r) => r.slug === slug && compareEvents(r.input, input) === "same",
+      )
+    ) {
       problems.push({ line, problem: "repeated" });
       return;
     }
-    seen.add(key);
     rows.push({ line, slug, input, link });
   });
 

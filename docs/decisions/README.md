@@ -13,21 +13,22 @@ that replaces it and mark the old one Superseded.
 
 ## Decisions
 
-| No.  | Decision                                                                                            | Status   |
-| ---- | --------------------------------------------------------------------------------------------------- | -------- |
-| 0001 | [Record decisions in this folder](0001-record-decisions.md)                                         | Accepted |
-| 0002 | [One web app, no native apps for v1](0002-one-web-app.md)                                           | Proposed |
-| 0003 | [TypeScript, Next.js, Supabase and Vercel](0003-tech-stack.md)                                      | Proposed |
-| 0004 | [Events are sourced claims, not plain facts](0004-events-as-claims.md)                              | Proposed |
-| 0005 | [Mandirs send us events; no social media scraping](0005-no-social-scraping.md)                      | Proposed |
-| 0006 | [Collect the least personal data possible](0006-data-minimisation.md)                               | Proposed |
-| 0007 | [Set up as a limited company](0007-limited-company.md)                                              | Accepted |
-| 0008 | [Personal WhatsApp number for the pilot, company number before automating](0008-whatsapp-number.md) | Accepted |
-| 0009 | [Database changes only through migrations; one project until launch](0009-database-changes.md)      | Proposed |
-| 0010 | [Login by emailed link; admins need an authenticator app](0010-login.md)                            | Proposed |
-| 0011 | [A map of mandirs with Leaflet and OpenStreetMap](0011-mandir-map.md)                               | Proposed |
-| 0012 | [Every event has its own page and address](0012-event-pages.md)                                     | Proposed |
-| 0013 | [Volunteers take seva slots without giving a name](0013-seva-slots-without-names.md)                | Proposed |
-| 0014 | [Committees invite colleagues themselves, by email address](0014-committee-invites.md)              | Proposed |
-| 0015 | [Count visits with Toran's own counter, not an analytics service](0015-own-visit-counter.md)        | Proposed |
-| 0016 | [A nightly job, run by Vercel Cron with the database's secret key](0016-nightly-job.md)             | Proposed |
+| No.  | Decision                                                                                                       | Status   |
+| ---- | -------------------------------------------------------------------------------------------------------------- | -------- |
+| 0001 | [Record decisions in this folder](0001-record-decisions.md)                                                    | Accepted |
+| 0002 | [One web app, no native apps for v1](0002-one-web-app.md)                                                      | Proposed |
+| 0003 | [TypeScript, Next.js, Supabase and Vercel](0003-tech-stack.md)                                                 | Proposed |
+| 0004 | [Events are sourced claims, not plain facts](0004-events-as-claims.md)                                         | Proposed |
+| 0005 | [Mandirs send us events; no social media scraping](0005-no-social-scraping.md)                                 | Proposed |
+| 0006 | [Collect the least personal data possible](0006-data-minimisation.md)                                          | Proposed |
+| 0007 | [Set up as a limited company](0007-limited-company.md)                                                         | Accepted |
+| 0008 | [Personal WhatsApp number for the pilot, company number before automating](0008-whatsapp-number.md)            | Accepted |
+| 0009 | [Database changes only through migrations; one project until launch](0009-database-changes.md)                 | Proposed |
+| 0010 | [Login by emailed link; admins need an authenticator app](0010-login.md)                                       | Proposed |
+| 0011 | [A map of mandirs with Leaflet and OpenStreetMap](0011-mandir-map.md)                                          | Proposed |
+| 0012 | [Every event has its own page and address](0012-event-pages.md)                                                | Proposed |
+| 0013 | [Volunteers take seva slots without giving a name](0013-seva-slots-without-names.md)                           | Proposed |
+| 0014 | [Committees invite colleagues themselves, by email address](0014-committee-invites.md)                         | Proposed |
+| 0015 | [Count visits with Toran's own counter, not an analytics service](0015-own-visit-counter.md)                   | Proposed |
+| 0016 | [A nightly job, run by Vercel Cron with the database's secret key](0016-nightly-job.md)                        | Proposed |
+| 0017 | [One copy of each event: same, maybe or different, with a database safety net](0017-one-copy-of-each-event.md) | Proposed |

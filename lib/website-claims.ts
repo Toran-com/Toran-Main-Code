@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
-import { londonDate } from "@/lib/format";
+import {
+  alreadyKnown,
+  knownFor,
+  type Listed,
+  type Waiting,
+} from "@/lib/duplicate-check";
+import { compareEvents } from "@/lib/duplicates";
 import type { CheckResult } from "@/lib/website-check";
 import type { FoundEvent } from "@/lib/website-events";
 
@@ -15,47 +21,20 @@ const SOURCE = { kind: "crawler", label: "Website check" } as const;
 // can't flood the queue.
 const MAX_NEW = 20;
 
-// The same event: the same name (ignoring case) on the same day.
-export const eventKey = (title: string, date: string) =>
-  `${title.trim().toLowerCase()}|${date}`;
-
-// What a mandir already has, to skip: every claim about it, waiting or
-// decided, and its events from today on.
-export async function knownEvents(
-  db: SupabaseClient<Database>,
-  mandirId: string,
-): Promise<{ title: string; date: string }[]> {
-  const today = `${londonDate()}T00:00:00Z`;
-  const [{ data: claims }, { data: events }] = await Promise.all([
-    db.from("event_claims").select("proposed").eq("mandir_id", mandirId),
-    db
-      .from("events")
-      .select("title, starts_at")
-      .eq("mandir_id", mandirId)
-      .gte("starts_at", today),
-  ]);
-  return [
-    ...(claims ?? []).flatMap(({ proposed }) => {
-      const p = proposed as { title?: unknown; date?: unknown };
-      return typeof p.title === "string" && typeof p.date === "string"
-        ? [{ title: p.title, date: p.date }]
-        : [];
-    }),
-    ...(events ?? []).map((e) => ({
-      title: e.title,
-      date: londonDate(new Date(e.starts_at)),
-    })),
-  ];
-}
-
-// The found events not already an event or a claim for this mandir.
+// The found events not already known for this mandir (lib/duplicate-check.ts).
 export function newEvents(
   found: FoundEvent[],
-  known: { title: string; date: string }[],
+  known: readonly (Listed | Waiting)[],
 ): FoundEvent[] {
-  const seen = new Set(known.map((k) => eventKey(k.title, k.date)));
+  const kept: FoundEvent[] = [];
   return found
-    .filter((e) => !seen.has(eventKey(e.title, e.date)))
+    .filter((e) => {
+      if (alreadyKnown(e, known)) return false;
+      // A site listing the same event twice.
+      if (kept.some((k) => compareEvents(k, e) === "same")) return false;
+      kept.push(e);
+      return true;
+    })
     .slice(0, MAX_NEW);
 }
 
@@ -84,7 +63,7 @@ export async function recordWebsiteCheck(
 
   let added = 0;
   if (result.events.length) {
-    const known = await knownEvents(db, mandir.id);
+    const known = (await knownFor(db, [mandir.id])).get(mandir.id) ?? [];
     const fresh = newEvents(result.events, known);
     if (fresh.length) {
       const { error } = await db.from("event_claims").insert(

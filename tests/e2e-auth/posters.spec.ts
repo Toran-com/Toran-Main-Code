@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { logInAsAdmin } from "./helpers";
+import { logInAsAdmin, sql } from "./helpers";
 
 // Toran types up a forwarded poster for a mandir nobody looks after yet,
 // and publishes it. (A committee publishing its own is in
@@ -53,33 +53,35 @@ test("Toran publishes a poster for a mandir with no committee", async ({
   await expect(event).toContainText("From a poster or message");
 });
 
-test("the review queue flags a look-alike, and a poster can be fixed before publishing", async ({
+test("the review queue keeps one copy of each event, and a poster can be fixed first", async ({
   page,
 }) => {
   test.setTimeout(120_000);
   // Another mandir no other test looks at.
   const slug = "hindu-cultural-religious-centre-leicester";
   const title = `Diwali deepotsav ${Date.now()}`;
-  await logInAsAdmin(page, `review-${Date.now()}@example.com`);
-  for (const time of ["18:00", "19:00"]) {
+  const addPoster = async (name: string, time: string) => {
     await page.goto("/ops/posters");
     await page.getByRole("combobox", { name: /^Mandir/ }).selectOption(slug);
-    await page.getByLabel("What's happening?").fill(title);
+    await page.getByLabel("What's happening?").fill(name);
     await page.getByLabel("Date").fill(nextWeek());
     await page.getByLabel("Starts").fill(time);
     await page.getByRole("button", { name: "Add to the queue" }).click();
+  };
+  await logInAsAdmin(page, `review-${Date.now()}@example.com`);
+  for (const time of ["18:00", "19:00"]) {
+    await addPoster(title, time);
     await expect(page.getByText("Added to the queue.")).toBeVisible();
   }
 
-  // The second looks like the first, so both say so.
+  // The same name an hour apart: each says the other is waiting.
   const items = page
     .getByRole("listitem")
     .filter({ has: page.getByText(title, { exact: true }) })
-    .filter({ hasText: "This may already be on Toran" });
+    .filter({ hasText: "Also waiting:" });
   await expect(items).toHaveCount(2);
-  await expect(items.first()).toContainText("Also waiting:");
 
-  // Fix the first one's time and publish it.
+  // Fix the first one's name and publish it.
   await items
     .first()
     .getByRole("link", { name: "Fix something first" })
@@ -89,19 +91,39 @@ test("the review queue flags a look-alike, and a poster can be fixed before publ
   await page.getByRole("button", { name: "Save and publish" }).click();
   await expect(page.getByText("Published.")).toBeVisible();
 
-  // The other now looks like the published event: discard it.
+  // The other may be the published event: Toran says it's the same, and
+  // nothing is listed twice.
   const other = page
     .getByRole("listitem")
-    .filter({ has: page.getByText(title, { exact: true }) })
-    .filter({ hasText: "This may already be on Toran" });
-  await expect(other).toContainText("On the page:");
-  await other.getByRole("button", { name: "Discard" }).click();
-  await expect(page.getByText("Discarded.")).toBeVisible();
+    .filter({ has: page.getByText(title, { exact: true }) });
+  await expect(other).toContainText("This may already be on the page");
+  await expect(
+    other.getByRole("button", { name: "Publish", exact: true }),
+  ).toHaveCount(0);
+  await other
+    .getByRole("button", { name: "Same event: add what's new to it" })
+    .click();
+  await expect(page.getByText("It was already on the page")).toBeVisible();
+
+  // Typing it up again is refused outright.
+  await addPoster(`${title} (fixed)`, "18:00");
+  await expect(
+    page.getByText("That event is already on Toran, or already waiting"),
+  ).toBeVisible();
 
   await page.goto(`/mandirs/${slug}`);
   await expect(
-    page.getByRole("article").filter({ hasText: `${title} (fixed)` }),
-  ).toBeVisible();
+    page.getByRole("article").filter({ hasText: title }),
+  ).toHaveCount(1);
+
+  // The database refuses an exact copy, however it's added.
+  expect(() =>
+    sql(
+      `insert into public.events (mandir_id, title, starts_at, status)
+         select mandir_id, title, starts_at, 'published' from public.events
+         where title = '${title} (fixed)'`,
+    ),
+  ).toThrow();
 });
 
 test("Toran previews the weekly digest", async ({ page }) => {

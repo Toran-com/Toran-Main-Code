@@ -198,13 +198,58 @@ describe("newEvents", () => {
     link: "",
     kind: "other" as const,
   });
-  it("skips events already listed or queued, ignoring case", () => {
+  it("skips events already listed or queued, however they're spelled", () => {
     expect(
       newEvents(
-        [e("Diwali", "2026-11-08"), e("Garba", "2026-10-17")],
-        [{ title: "diwali ", date: "2026-11-08" }],
+        [
+          e("Deepavali", "2026-11-08"),
+          e("Garba", "2026-10-17"),
+          e("Annakoot Darshan", "2026-11-09"),
+        ],
+        [
+          {
+            kind: "event",
+            id: "e1",
+            title: "diwali ",
+            date: "2026-11-08",
+            time: "",
+            cancelled: false,
+          },
+          {
+            kind: "queue",
+            id: "c1",
+            title: "Annakut",
+            date: "2026-11-09",
+            time: "",
+            discarded: true,
+          },
+        ],
       ).map((x) => x.title),
     ).toEqual(["Garba"]);
+  });
+
+  it("keeps an event that only may be the same, for a person to decide", () => {
+    expect(
+      newEvents(
+        [e("Diwali fireworks", "2026-11-08")],
+        [
+          {
+            kind: "event",
+            id: "e1",
+            title: "Diwali",
+            date: "2026-11-08",
+            time: "",
+            cancelled: false,
+          },
+        ],
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("finds each event once, however often a site lists it", () => {
+    expect(
+      newEvents([e("Diwali", "2026-11-08"), e("Deepavali", "2026-11-08")], []),
+    ).toHaveLength(1);
   });
   it("adds at most 20 at once", () => {
     const many = Array.from({ length: 30 }, (_, i) =>
