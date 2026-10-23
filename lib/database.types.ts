@@ -19,6 +19,32 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"distinct_events": {
+                  Row: {
+                    "decided_at": string,"decided_by": string | null,"first_id": string,"second_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "decided_at"?: string,"decided_by"?: string | null,"first_id": string,"second_id": string
+                  }
+                  Update: {
+                    "decided_at"?: string,"decided_by"?: string | null,"first_id"?: string,"second_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "distinct_events_first_id_fkey"
+      columns: ["first_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "distinct_events_second_id_fkey"
+      columns: ["second_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"event_claims": {
                   Row: {
                     "confidence": number,"created_at": string,"event_id": string | null,"id": string,"mandir_id": string,"note": string | null,"proposed": NonNullable<Json>,"reviewed_at": string | null,"reviewed_by": string | null,"source_id": string | null,"status": string
@@ -376,6 +402,12 @@ isOneToOne: false
 "edit_event":
 { Args: { "dates": (string)[],"details": Json,"target": string,"today": string }; Returns: undefined
                            },
+"event_title_key":
+{ Args: { "title": string }; Returns: string
+                           },
+"fill_event_gaps":
+{ Args: { "details": Json,"target": string }; Returns: undefined
+                           },
 "give_back_seva_slot":
 { Args: { "slot": string }; Returns: boolean
                            },
@@ -391,10 +423,19 @@ isOneToOne: false
 "is_toran_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"london_day":
+{ Args: { "at": string }; Returns: string
+                           },
 "mandir_admin_list":
 { Args: { "target": string }; Returns: {
               "added_at": string,"email": string,"user_id": string
             }[]
+                           },
+"may_decide_events":
+{ Args: { "a": string,"b": string }; Returns: boolean
+                           },
+"merge_events":
+{ Args: { "keep": string,"other": string }; Returns: undefined
                            },
 "my_email":
 { Args: Record<PropertyKey, never>; Returns: string

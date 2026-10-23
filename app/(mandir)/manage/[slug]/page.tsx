@@ -28,6 +28,8 @@ import { createSessionClient } from "@/lib/supabase/session";
 import { ConfirmButton } from "@/components/confirm-button";
 import { EventFields } from "@/components/event-fields";
 import { FORM_ERRORS } from "@/lib/mandir-form";
+import { DUPLICATE_ERRORS, MERGED } from "@/lib/duplicates";
+import { draftFrom } from "@/lib/duplicate-check";
 import { EVENT_ERRORS, eventInputFromEvent } from "@/lib/event-form";
 import { posterFrom } from "@/lib/posters";
 import { QuickPicks } from "@/components/quick-picks";
@@ -65,12 +67,14 @@ const ERRORS: Record<string, string> = {
   "invite-member": "They're already on your committee.",
   "invite-too-many":
     "You have five invites waiting. Cancel one, or wait for them to be accepted.",
+  ...DUPLICATE_ERRORS,
   failed: "Something went wrong. Please try again.",
 };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const DONE: Record<string, string> = {
+  merged: MERGED,
   added: "Added. It's on your public page now.",
   edited: "Saved. Your public page shows the changes.",
   confirm: "Thanks, marked as confirmed today.",
@@ -240,14 +244,37 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       }
     : undefined;
 
+  // The add form sent back to ask about events already on the page
+  // ("dup": surely the same; "maybe": the committee says).
+  const draft = draftFrom(query.draft);
+  const askIds = String(query.maybe ?? query.dup ?? "")
+    .split(",")
+    .filter((id) => UUID.test(id))
+    .slice(0, 5);
+  const { data: lookalikes } = askIds.length
+    ? await supabase!
+        .from("events")
+        .select("id, title, starts_at, all_day")
+        .in("id", askIds)
+        .eq("mandir_id", mandir.id)
+    : { data: [] };
+  const asking = query.maybe ? (lookalikes ?? []) : [];
+  const formValues = copyValues ?? draft ?? undefined;
+
   const error = ERRORS[String(query.error ?? "")];
   const added = Number(query.added ?? 0);
+  const skipped = Number(query.skipped ?? 0);
+  const leftOut = skipped
+    ? ` ${skipped === 1 ? "One was" : `${skipped} were`} already on your page, so ${skipped === 1 ? "it wasn't" : "they weren't"} added again.`
+    : "";
   const done =
     added > 1
-      ? `Added ${added} events. They're on your public page now.`
+      ? `Added ${added} events. They're on your public page now.${leftOut}`
       : added === 1
-        ? DONE.added
-        : DONE[String(query.done ?? "")];
+        ? `${DONE.added}${leftOut}`
+        : skipped
+          ? leftOut.trim()
+          : DONE[String(query.done ?? "")];
 
   return (
     <>
@@ -483,13 +510,61 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             </Link>
           </p>
         )}
+        {query.dup && lookalikes?.[0] && (
+          <p className="bg-sunk rounded-2xl p-4">
+            Already on your page:{" "}
+            <Link
+              href={`/manage/${mandir.slug}/events/${lookalikes[0].id}`}
+              className="text-peacock font-semibold underline"
+            >
+              {lookalikes[0].title},{" "}
+              {formatEventStart(lookalikes[0].starts_at, lookalikes[0].all_day)}
+            </Link>
+            . Change that one instead.
+          </p>
+        )}
         <form
-          key={copy ? copyId : "blank"}
+          key={copy ? copyId : draft ? String(query.draft) : "blank"}
           action={addEvent}
           className="flex flex-col gap-5"
         >
           <input type="hidden" name="slug" value={mandir.slug} />
-          <EventFields gujarati kinds values={copyValues} />
+          {asking.length > 0 && (
+            <div
+              role="note"
+              className="border-marigold bg-marigold/10 flex flex-col gap-2 rounded-xl border-l-4 px-4 py-3"
+            >
+              <p className="font-semibold">Is this already on your page?</p>
+              <ul className="flex flex-col gap-1">
+                {asking.map((e) => (
+                  <li key={e.id}>
+                    <Link
+                      href={`/manage/${mandir.slug}/events/${e.id}`}
+                      className="text-peacock font-semibold underline"
+                    >
+                      {e.title}
+                    </Link>
+                    , {formatEventStart(e.starts_at, e.all_day)}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-muted text-base">
+                If it&apos;s the same event, change that one instead, so
+                it&apos;s only listed once.
+              </p>
+              <label className="flex items-start gap-3 font-semibold">
+                <input
+                  type="checkbox"
+                  name="different"
+                  value={asking.map((e) => e.id).join(",")}
+                  required
+                  className="mt-1 size-5"
+                />
+                It&apos;s a different event: add it as well
+              </label>
+            </div>
+          )}
+          <EventFields gujarati kinds values={formValues} />
           <button type="submit" className={buttonClass}>
             Add event
           </button>

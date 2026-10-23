@@ -48,6 +48,7 @@ English and Gujarati, and by following every link from the home page.
 | Needs attention  | `/ops/attention`    | Everything to follow up, and whether the nightly job ran                             |
 | Mandirs          | `/ops/mandirs`      | Add, correct or hide a mandir                                                        |
 | Posters / Review | `/ops/posters`      | What's waiting before it goes on the site; type up a poster                          |
+| Duplicates       | `/ops/duplicates`   | Copies of events already on Toran to merge, and mandirs that may be listed twice     |
 | Websites         | `/ops/websites`     | The website checker                                                                  |
 | Festival dates   | `/ops/festivals`    | Check dates against a second calendar                                                |
 | Stats            | `/ops/stats`        | Visits, calendar adds and shares, with no personal data                              |

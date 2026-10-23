@@ -97,6 +97,32 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await expect(page.getByText("Added.")).toBeVisible();
   await expect(bhajans).toHaveCount(2);
 
+  // Adding the same event again is refused, and the form keeps what was
+  // typed. Something that may be the same asks first.
+  const addAgain = async (title: string, time: string) => {
+    await page.goto(`/manage/${SLUG}#add-event`);
+    await page.getByLabel("What's happening?").fill(title);
+    await page.getByLabel("Date").fill(inDays(20));
+    await page.getByLabel("Starts").fill(time);
+    await page.getByRole("button", { name: "Add event" }).click();
+  };
+  await addAgain("Utsav Eve Bhajans", "19:00");
+  await expect(
+    page.getByText("That event is already on the page, so it wasn't added"),
+  ).toBeVisible();
+  await expect(page.getByText(/^Already on your page:/)).toBeVisible();
+  await expect(page.getByLabel("What's happening?")).toHaveValue(
+    "Utsav Eve Bhajans",
+  );
+  await addAgain("Utsav eve bhajans and aarti", "19:30");
+  await expect(page.getByText("Is this already on your page?")).toBeVisible();
+  await expect(page.getByLabel("Starts")).toHaveValue("19:30");
+  await page
+    .getByRole("checkbox", { name: "It's a different event: add it as well" })
+    .check();
+  await page.getByRole("button", { name: "Add event" }).click();
+  await expect(page.getByText("Added.")).toBeVisible();
+
   // On the public page too.
   await page.goto(`/mandirs/${SLUG}`);
   await expect(page.getByText("Test Utsav").first()).toBeVisible();

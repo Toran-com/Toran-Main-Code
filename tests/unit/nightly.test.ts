@@ -19,7 +19,17 @@ function fakeDb(mandirs: { id: string; website: string }[]) {
   const from = (table: string) => {
     let op = "select";
     const builder: Record<string, unknown> = {};
-    for (const name of ["select", "not", "neq", "eq", "gte", "limit", "order"])
+    for (const name of [
+      "select",
+      "not",
+      "neq",
+      "eq",
+      "gte",
+      "in",
+      "or",
+      "limit",
+      "order",
+    ])
       builder[name] = () => builder;
     builder.insert = (value: unknown) => {
       op = "insert";

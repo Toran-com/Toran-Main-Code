@@ -2,12 +2,20 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import type { EventOrigin } from "@/lib/event-kinds";
 import type { CheckedEvent } from "@/lib/event-form";
+import { duplicateFrom } from "@/lib/duplicate-check";
 import { londonDate } from "@/lib/format";
+
+export type SaveResult =
+  | { ok: true; id: string }
+  // The database refused a copy of an event already listed (the id).
+  | { ok: false; duplicate: string | null };
 
 // Saves a checked event and, if it repeats, each of its dates. Row-level
 // security decides whether the signed-in person may add it.
 // "confirmed" means a mandir admin is adding or approving it themselves;
-// the database records who.
+// the database records who. A copy of an event already listed is refused
+// by the database; callers check for look-alikes first
+// (lib/duplicate-check.ts).
 export async function saveEvent(
   db: SupabaseClient<Database>,
   mandirId: string,
@@ -24,7 +32,7 @@ export async function saveEvent(
     // The festival date it belongs to, when added from a festival.
     festivalDateId?: string | null;
   },
-): Promise<string | null> {
+): Promise<SaveResult> {
   const { data, error } = await db
     .from("events")
     .insert({
@@ -45,7 +53,7 @@ export async function saveEvent(
     })
     .select("id")
     .single();
-  if (error || !data) return null;
+  if (error || !data) return { ok: false, duplicate: duplicateFrom(error) };
 
   if (event.occurrences.length) {
     const { error: datesError } = await db.from("event_occurrences").insert(
@@ -57,10 +65,10 @@ export async function saveEvent(
     if (datesError) {
       // Don't leave a repeating event without its dates.
       await db.from("events").update({ status: "removed" }).eq("id", data.id);
-      return null;
+      return { ok: false, duplicate: null };
     }
   }
-  return data.id;
+  return { ok: true, id: data.id };
 }
 
 // Changes an event's details and, for a repeating event, its future dates,
@@ -71,7 +79,7 @@ export async function updateEvent(
   db: SupabaseClient<Database>,
   eventId: string,
   event: CheckedEvent,
-): Promise<boolean> {
+): Promise<{ ok: true } | { ok: false; duplicate: string | null }> {
   const { error } = await db.rpc("edit_event", {
     target: eventId,
     details: {
@@ -87,5 +95,5 @@ export async function updateEvent(
     dates: event.occurrences.map((at) => at.toISOString()),
     today: `${londonDate()}T00:00:00Z`,
   });
-  return !error;
+  return error ? { ok: false, duplicate: duplicateFrom(error) } : { ok: true };
 }
