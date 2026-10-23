@@ -97,7 +97,9 @@ test("the review queue keeps one copy of each event, and a poster can be fixed f
     .getByRole("listitem")
     .filter({ has: page.getByText(title, { exact: true }) });
   await expect(other).toContainText("This may already be on the page");
-  await expect(other.getByRole("button", { name: "Publish" })).toHaveCount(0);
+  await expect(
+    other.getByRole("button", { name: "Publish", exact: true }),
+  ).toHaveCount(0);
   await other
     .getByRole("button", { name: "Same event: add what's new to it" })
     .click();
