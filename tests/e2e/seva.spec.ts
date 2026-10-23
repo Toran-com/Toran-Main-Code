@@ -10,7 +10,6 @@ test("the Seva page is in the main menu", async ({ page }) => {
     .click();
   await expect(page).toHaveURL(/\/seva$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Seva");
-  await expect(page.getByRole("button", { name: "Show" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "How it works" }),
   ).toBeVisible();

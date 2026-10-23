@@ -12,6 +12,7 @@ for (const path of [
   "/mandirs/geeta-bhavan-leicester",
   "/festivals",
   "/whats-on",
+  "/seva",
 ]) {
   test(`${path} with data stays within the speed budget`, async ({ page }) => {
     await stubMapTiles(page);

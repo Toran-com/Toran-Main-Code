@@ -181,7 +181,13 @@ export const en = {
   "sevaList.free.other": "{count} places free",
   "sevaList.none":
     "No mandir is asking for seva on Toran just now. Committees add their rotas as festivals come up, so look again soon.",
-  "sevaList.noneNear": "No seva is being asked for near there yet.",
+  "sevaList.places.one": "place still needed",
+  "sevaList.places.other": "places still needed",
+  "sevaList.atMandirs.one": "at {count} mandir",
+  "sevaList.atMandirs.other": "at {count} mandirs",
+  "sevaList.taken.one": "{count} slot taken on Toran so far",
+  "sevaList.taken.other": "{count} slots taken on Toran so far",
+  "sevaList.postcode": "Or type a postcode",
   "sevaList.howTitle": "How it works",
   "sevaList.how1": "Choose a shift that suits you and press “Take this slot”.",
   "sevaList.how2":

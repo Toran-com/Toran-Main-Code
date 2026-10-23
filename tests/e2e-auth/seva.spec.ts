@@ -116,11 +116,38 @@ test("a committee plans a seva rota and volunteers take slots", async ({
   await visitor.reload();
   await expect(visitor.getByText("1 of 4 taken")).toBeVisible();
 
+  // The Seva page finds it too: choose Kitchen, open the event's shifts and
+  // take one there, to a thank-you.
+  await visitor.goto("/seva");
+  await visitor.getByRole("button", { name: /^Kitchen/ }).click();
+  await expect(
+    visitor.getByRole("button", { name: /^Kitchen/ }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(visitor).toHaveURL(/kind=kitchen/);
+  const card = visitor.getByRole("article").filter({
+    has: visitor.getByRole("link", { name: "Diwali celebrations" }),
+  });
+  await expect(card.getByText("3 still needed")).toBeVisible();
+  await card.getByRole("button", { name: /Choose/ }).click();
+  await card.getByRole("button", { name: /Take this slot: Kitchen/ }).click();
+  const thanks = visitor.getByRole("dialog");
+  await expect(
+    thanks.getByRole("heading", { name: "Thank you!" }),
+  ).toBeVisible();
+  await expect(thanks.getByText("You're on Kitchen")).toBeVisible();
+  await expect(
+    thanks.getByRole("link", { name: "Ask friends on WhatsApp" }),
+  ).toHaveAttribute("href", /wa\.me.*Diwali%20celebrations/);
+  await thanks.getByRole("button", { name: "Back to seva" }).click();
+  await expect(thanks).toBeHidden();
+  // "Your seva" at the top keeps it, for this phone only.
+  await expect(
+    visitor
+      .getByRole("region", { name: "Your seva" })
+      .getByText(/You're on Kitchen/),
+  ).toBeVisible();
+
   // If slots look wrong (say, a joke), the committee can clear them.
-  await visitor
-    .getByRole("button", { name: /Take this slot: Kitchen/ })
-    .click();
-  await expect(visitor.getByText(/You're on Kitchen/)).toBeVisible();
   await page.reload();
   page.once("dialog", (dialog) => void dialog.accept());
   await page.getByRole("button", { name: "Clear Toran slots" }).click();

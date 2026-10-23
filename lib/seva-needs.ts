@@ -102,18 +102,23 @@ export function sevaNeeds(rows: readonly SevaRow[], now: Date): SevaNeed[] {
     .sort((a, b) => a.next_starts_at.localeCompare(b.next_starts_at));
 }
 
-// "Kitchen 2 · Parking 3 · Children's corner 1": places free in each role,
-// in the order the roles first come up.
-export function rolesSummary(
-  shifts: readonly SevaShiftNeed[],
-): { role: string; free: number; needsDbs: boolean }[] {
-  const roles = new Map<string, { free: number; needsDbs: boolean }>();
-  for (const s of shifts) {
-    const r = roles.get(s.role) ?? { free: 0, needsDbs: s.needsDbs };
-    r.free += s.free;
-    roles.set(s.role, r);
-  }
-  return [...roles].map(([role, r]) => ({ role, ...r }));
+// The numbers at the top of the Seva page: places still needed, at how
+// many mandirs, and slots taken on Toran for shifts still to come.
+// Totals only; nothing about who.
+export function sevaTotals(
+  rows: readonly SevaRow[],
+  now: Date,
+): { places: number; mandirs: number; taken: number } {
+  const needs = sevaNeeds(rows, now);
+  const at = now.toISOString();
+  return {
+    places: needs.reduce((sum, n) => sum + n.free, 0),
+    mandirs: new Set(needs.map((n) => n.mandir.slug)).size,
+    taken: rows
+      .flatMap((r) => r.seva_roles.flatMap((role) => role.seva_shifts))
+      .filter((s) => s.ends_at > at)
+      .reduce((sum, s) => sum + s.taken_online, 0),
+  };
 }
 
 // Seva is asked for up to this far ahead.

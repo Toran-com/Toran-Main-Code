@@ -1,5 +1,6 @@
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { enReport } from "@/lib/i18n/client/report";
+import { enSeva } from "@/lib/i18n/client/seva";
 import { enShare } from "@/lib/i18n/client/share";
 import { enSlots } from "@/lib/i18n/client/slots";
 
@@ -12,6 +13,7 @@ export const enClient = {
   ...enShare,
   ...enMandirs,
   ...enSlots,
+  ...enSeva,
   ...enReport,
 } as const;
 
