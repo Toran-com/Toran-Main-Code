@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { BUDGET, MAP_JS, pageWeight } from "../speed";
+import { BUDGET, MAP_JS, ownDownloadsOnly, pageWeight } from "../speed";
 import { stubMapTiles } from "./helpers";
 
 // With real data the longest pages (every mandir, eight weeks of events)
@@ -17,6 +17,7 @@ for (const path of [
 ]) {
   test(`${path} with data stays within the speed budget`, async ({ page }) => {
     await stubMapTiles(page);
+    await ownDownloadsOnly(page);
     await page.goto(path);
     const weight = await pageWeight(page);
     const map = path === "/mandirs" || path.endsWith("view=map") ? MAP_JS : 0;
