@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { type CSSProperties, Suspense } from "react";
 import { POSTCODE_CREDIT } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
+import { RememberPlace } from "@/components/remember-place";
 import { SevaExplorer } from "@/components/seva-explorer";
 import {
   buttonClass,
@@ -115,8 +116,34 @@ async function SevaNeeds({ searchParams }: PageProps<"/seva">) {
   const part = String(query.time ?? "");
   const day = dayFrom(query.day);
 
+  // The visitor's other choices, kept when going to their saved place.
+  const keep = new URLSearchParams();
+  for (const [name, value] of Object.entries(query)) {
+    if (
+      !["near", "within", "remember"].includes(name) &&
+      typeof value === "string"
+    )
+      keep.set(name, value);
+  }
+
   return (
     <>
+      <RememberPlace
+        page={localePath("/seva")}
+        near={near}
+        within={within}
+        status={
+          !near
+            ? "none"
+            : origin === "unavailable"
+              ? "unavailable"
+              : origin
+                ? "found"
+                : "unknown"
+        }
+        keep={keep.toString()}
+        remember={query.remember === "1"}
+      />
       {totals.places > 0 && <NeedBand totals={totals} />}
       {problem && <Notice tone="error">{problem}</Notice>}
       {rotas.state !== "ok" ? (
@@ -230,6 +257,8 @@ function PostcodeForm({ near, within }: { near: string; within: number }) {
           className={`${inputClass} min-w-0 flex-[2]`}
         />
         {within !== 15 && <input type="hidden" name="within" value={within} />}
+        {/* So the page remembers it for next time. */}
+        <input type="hidden" name="remember" value="1" />
         <button
           type="submit"
           className={`${buttonClass} flex-1 basis-24 sm:max-w-40`}

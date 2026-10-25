@@ -3,9 +3,10 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Countdown } from "@/components/countdown";
 import { DateTile } from "@/components/date-tile";
-import { EventList } from "@/components/event-list";
+import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
 import { Toran } from "@/components/ornaments";
+import { RememberPlace } from "@/components/remember-place";
 import { SiteFooter, SiteHeader, wideClass } from "@/components/public-shell";
 import { buttonClass } from "@/components/ui";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
@@ -13,8 +14,8 @@ import { EVENT_KINDS, kindLabel } from "@/lib/event-kinds";
 import { formatDateRange } from "@/lib/format";
 import { regionKey } from "@/lib/i18n/client/mandirs";
 import { getSeasonBanner } from "@/lib/season-banner";
-import { listUpcomingEvents } from "@/lib/whats-on";
-import { nearTo } from "@/lib/whats-on-view";
+import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
+import { nearestFirstEachDay, nearTo, radiusFrom } from "@/lib/whats-on-view";
 import { siteUrl } from "@/lib/site";
 import { siteData } from "@/lib/structured-data";
 import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
@@ -32,7 +33,7 @@ const QUICK_KINDS = ["festival", "aarti", "bhajan", "class"] as const;
 // peacock band under a toran, with the search and the festivals coming
 // up. Then the next few events, the mandirs by region, and a word for
 // committees.
-export default function Home() {
+export default function Home({ searchParams }: PageProps<"/">) {
   const t = pageT();
   return (
     <>
@@ -105,7 +106,7 @@ export default function Home() {
         >
           <div className="flex flex-wrap gap-x-16 gap-y-16">
             <Suspense fallback={null}>
-              <ComingUp />
+              <ComingUp searchParams={searchParams} />
             </Suspense>
             <Suspense fallback={null}>
               <Mandirs />
@@ -275,32 +276,74 @@ async function SevaSoon() {
   );
 }
 
-// The next few events anywhere, straight from What's on.
-async function ComingUp() {
+// The next few events, straight from What's on: near the place this
+// phone chose before (RememberPlace brings it here as ?near=), or
+// anywhere.
+async function ComingUp({
+  searchParams,
+}: {
+  searchParams: PageProps<"/">["searchParams"];
+}) {
   const t = pageT();
-  const result = await listUpcomingEvents();
+  const query = await searchParams;
+  const near = String(query.near ?? "")
+    .trim()
+    .slice(0, 10);
+  const within = radiusFrom(query.within);
+  const [result, origin] = await Promise.all([
+    listUpcomingEvents(),
+    near ? positionForSearch(near) : Promise.resolve(null),
+  ]);
   if (result.state !== "ok" || result.data.length === 0) return null;
-  const next = result.data.filter((e) => e.status === "published").slice(0, 5);
+  const published = result.data.filter((e) => e.status === "published");
+  const position = origin && origin !== "unavailable" ? origin : null;
+  const nearby = position
+    ? nearestFirstEachDay(nearTo(published, position, within)).slice(0, 5)
+    : [];
+  const place = near.toUpperCase();
+  const params = new URLSearchParams({ near });
+  if (within !== 15) params.set("within", String(within));
   return (
     <section
       aria-labelledby="coming-up"
       className="flex min-w-0 flex-[999_1_34rem] flex-col gap-4"
     >
+      <RememberPlace
+        page={localePath("/")}
+        near={near}
+        within={within}
+        status={
+          !near
+            ? "none"
+            : origin === "unavailable"
+              ? "unavailable"
+              : origin
+                ? "found"
+                : "unknown"
+        }
+      />
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <h2
           id="coming-up"
           className="font-display text-5xl leading-tight tracking-tight sm:text-6xl"
         >
-          {t("home.comingUp")}
+          {nearby.length
+            ? t("home.comingUpNear", { place })
+            : t("home.comingUp")}
         </h2>
         <Link
-          href={localePath("/whats-on")}
+          href={localePath(nearby.length ? `/whats-on?${params}` : "/whats-on")}
           className="text-peacock text-lg font-semibold"
         >
           {t("home.seeAll")} →
         </Link>
       </div>
-      <EventList events={nearTo(next, null, 0)} />
+      <EventList
+        events={nearby.length ? nearby : nearTo(published.slice(0, 5), null, 0)}
+      />
+      {nearby.length > 0 && (
+        <p className="text-muted text-base">{POSTCODE_CREDIT}</p>
+      )}
     </section>
   );
 }

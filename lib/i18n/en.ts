@@ -32,6 +32,7 @@ export const en = {
     "Events from mandirs across the UK in one place, and a simple way for committees to organise seva. We are talking to mandir committees now and will open in 2027.",
   "home.mandirs": "Browse mandirs",
   "home.comingUp": "Coming up",
+  "home.comingUpNear": "Coming up near {place}",
   "home.seeAll": "See everything that's on",
   "home.festivalsSoon": "Festivals coming up",
   "home.allFestivals": "All festival dates",

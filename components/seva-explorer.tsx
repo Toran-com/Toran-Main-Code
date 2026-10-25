@@ -28,6 +28,7 @@ import type { Position } from "@/lib/geo";
 import { googleCalendarLink } from "@/lib/ical";
 import { enSeva } from "@/lib/i18n/client/seva";
 import { enSlots } from "@/lib/i18n/client/slots";
+import { savePlace } from "@/lib/place-memory";
 import { londonDate } from "@/lib/london";
 import {
   type Choice,
@@ -184,7 +185,11 @@ export function SevaExplorer({
           within={within}
           onFound={setOrigin}
           onWithin={setWithin}
-          onClear={() => setOrigin(null)}
+          onClear={() => {
+            setOrigin(null);
+            // "Anywhere": next time too.
+            savePlace({ skip: true });
+          }}
         />
         {postcode}
       </section>

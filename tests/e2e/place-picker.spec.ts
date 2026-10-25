@@ -118,3 +118,30 @@ test("says so when the browser won't share a location", async ({ page }) => {
     page.getByText("Your browser didn't share your location."),
   ).toBeVisible();
 });
+
+test.describe("with a place saved", () => {
+  test.use({
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: "http://localhost:3100",
+          localStorage: [
+            { name: "toran:place", value: '{"near":"LE4","within":30}' },
+          ],
+        },
+      ],
+    },
+  });
+
+  test("Seva starts there too, keeping other choices", async ({ page }) => {
+    await page.goto("/seva?kind=kitchen");
+    await expect(page).toHaveURL(/\/seva\?kind=kitchen&near=LE4&within=30$/);
+  });
+});
+
+test("a postcode typed on Seva is remembered", async ({ page }) => {
+  await page.goto("/seva?near=LE4&remember=1");
+  // The address loses "remember", whether or not the postcode was found.
+  await expect(page).toHaveURL(/\/seva\?near=LE4$/);
+});
