@@ -436,6 +436,14 @@ function Details({ page }: { page: MandirEventPage }) {
       ),
     },
   ];
+  if (mandir.getting_there)
+    rows.push({
+      label: t("mandir.gettingThere"),
+      icon: null,
+      value: (
+        <span className="whitespace-pre-line">{mandir.getting_there}</span>
+      ),
+    });
   if (event.cost_note)
     rows.push({ label: t("event.cost"), icon: null, value: event.cost_note });
   if (event.link) {

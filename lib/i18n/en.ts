@@ -129,6 +129,7 @@ export const en = {
   "mandir.tradition": "Tradition",
   "mandir.postcode": "Postcode",
   "mandir.directions": "Directions",
+  "mandir.gettingThere": "Getting there",
   "mandir.website": "Website",
   "mandir.phone": "Phone",
   "mandir.call": "Call",
