@@ -497,6 +497,10 @@ function NearMeButton({
 const pressedRing =
   "aria-pressed:border-peacock aria-pressed:bg-peacock/10 aria-pressed:ring-peacock aria-pressed:ring-2";
 
+// An option with nothing in it just now: still there to press, but plainer.
+// (Fading it with opacity would make its words too faint to read.)
+const QUIET = "bg-sunk border-dashed";
+
 function Tile({
   pressed,
   onClick,
@@ -517,7 +521,7 @@ function Tile({
       type="button"
       aria-pressed={pressed}
       onClick={onClick}
-      className={`border-line bg-surface hover:border-peacock/60 flex cursor-pointer items-center gap-3 rounded-2xl border p-3 text-left transition active:scale-[0.97] sm:p-4 ${pressedRing} ${quiet && !pressed ? "opacity-60" : ""}`}
+      className={`border-line hover:border-peacock/60 flex cursor-pointer items-center gap-3 rounded-2xl border p-3 text-left transition active:scale-[0.97] sm:p-4 ${pressedRing} ${quiet && !pressed ? QUIET : "bg-surface"}`}
     >
       <span aria-hidden="true" className="text-3xl leading-none sm:text-4xl">
         {icon}
@@ -548,7 +552,7 @@ function DayChip({
       type="button"
       aria-pressed={pressed}
       onClick={onClick}
-      className={`border-line bg-surface hover:border-peacock/60 flex shrink-0 cursor-pointer snap-start flex-col items-start rounded-2xl border px-4 py-2 text-left transition active:scale-[0.97] ${pressedRing} ${quiet && !pressed ? "opacity-60" : ""}`}
+      className={`border-line hover:border-peacock/60 flex shrink-0 cursor-pointer snap-start flex-col items-start rounded-2xl border px-4 py-2 text-left transition active:scale-[0.97] ${pressedRing} ${quiet && !pressed ? QUIET : "bg-surface"}`}
     >
       <span className="font-bold whitespace-nowrap">{label}</span>
       <span className="text-muted text-base whitespace-nowrap">{count}</span>
@@ -572,7 +576,7 @@ function Chip({
       type="button"
       aria-pressed={pressed}
       onClick={onClick}
-      className={`border-line bg-surface hover:border-peacock/60 cursor-pointer rounded-full border px-4 py-1.5 text-base font-semibold transition active:scale-95 ${pressedRing} ${quiet && !pressed ? "opacity-60" : ""}`}
+      className={`border-line hover:border-peacock/60 cursor-pointer rounded-full border px-4 py-1.5 text-base font-semibold transition active:scale-95 ${pressedRing} ${quiet && !pressed ? QUIET : "bg-surface"}`}
     >
       {children}
     </button>
