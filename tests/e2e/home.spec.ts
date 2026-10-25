@@ -18,7 +18,7 @@ test("home page shows the coming soon message", async ({ page }) => {
 test("text is at least 18px", async ({ page }) => {
   await page.goto("/");
   const size = await page
-    .getByText("Events from mandirs")
+    .getByText("Events and seva at UK mandirs")
     .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
   expect(size).toBeGreaterThanOrEqual(18);
 });

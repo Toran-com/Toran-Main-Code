@@ -168,22 +168,22 @@ export default function Home() {
             <ol className="divide-line flex min-w-0 flex-[1_1_24rem] flex-col divide-y">
               {(
                 [
-                  ["home.step1Title", "home.step1"],
-                  ["home.step2Title", "home.step2"],
-                  ["home.step3Title", "home.step3"],
+                  "home.step1Title",
+                  "home.step2Title",
+                  "home.step3Title",
                 ] as const
-              ).map(([title, body], i) => (
-                <li key={title} className="flex gap-6 py-5 first:pt-0">
+              ).map((title, i) => (
+                <li
+                  key={title}
+                  className="flex items-center gap-6 py-5 first:pt-0"
+                >
                   <span
                     aria-hidden="true"
                     className="font-display text-marigold-ink w-8 shrink-0 text-5xl leading-none"
                   >
                     {i + 1}
                   </span>
-                  <span className="flex flex-col gap-1">
-                    <span className="text-xl font-semibold">{t(title)}</span>
-                    <span className="text-muted">{t(body)}</span>
-                  </span>
+                  <span className="text-xl font-semibold">{t(title)}</span>
                 </li>
               ))}
             </ol>
