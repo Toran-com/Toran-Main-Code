@@ -11,7 +11,7 @@ English and Gujarati, and by following every link from the home page.
 | Page                   | Address                              | For                                                                     | Leads to                                                                          |
 | ---------------------- | ------------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | Home                   | `/`                                  | What's on near you, the next festival season, coming up                 | What's on, a season page, festival dates, mandirs, each event                     |
-| What's on              | `/whats-on`                          | Every event, by date; near a postcode; by kind, region                  | Each event, each mandir                                                           |
+| What's on              | `/whats-on`                          | Every event, by date; asks where you are first; by kind, region         | Each event, each mandir                                                           |
 | Seva                   | `/seva`                              | Seva mandirs are asking for: near me, kind, day, map; take a slot there | Each event's seva rota                                                            |
 | Mandirs                | `/mandirs`                           | Every mandir, on a map or as a list by region and town                  | Each mandir; What's on near one                                                   |
 | A mandir               | `/mandirs/<mandir>`                  | Its events, address, website, calendar feed, print                      | Each event, "Tell us about an event", look after this page, festival dates, print |
@@ -48,6 +48,7 @@ English and Gujarati, and by following every link from the home page.
 | Needs attention  | `/ops/attention`    | Everything to follow up, and whether the nightly job ran                             |
 | Mandirs          | `/ops/mandirs`      | Add, correct or hide a mandir                                                        |
 | Posters / Review | `/ops/posters`      | What's waiting before it goes on the site; type up a poster                          |
+| Duplicates       | `/ops/duplicates`   | Copies of events already on Toran to merge, and mandirs that may be listed twice     |
 | Websites         | `/ops/websites`     | The website checker                                                                  |
 | Festival dates   | `/ops/festivals`    | Check dates against a second calendar                                                |
 | Stats            | `/ops/stats`        | Visits, calendar adds and shares, with no personal data                              |

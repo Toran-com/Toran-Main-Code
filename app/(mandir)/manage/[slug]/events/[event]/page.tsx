@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 
 const ERRORS: Record<string, string> = {
   ...EVENT_ERRORS,
+  duplicate:
+    "Another event on your page has that name at that time, so it wasn't changed. If they're the same event, remove one of them.",
   failed: "Something went wrong. Please try again.",
 };
 

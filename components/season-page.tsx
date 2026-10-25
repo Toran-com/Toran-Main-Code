@@ -6,13 +6,13 @@ import { AreaChips, regionName } from "@/components/area-chips";
 import { Countdown } from "@/components/countdown";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
-import { NearMe } from "@/components/near-me";
 import { DateTile } from "@/components/date-tile";
 import { Toran } from "@/components/ornaments";
+import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
-import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
+import { Loading, Notice } from "@/components/ui";
 import { listFestivalDates } from "@/lib/directory";
 import { seasonDays, seasonEvents, seasonWindow } from "@/lib/festival-season";
 import { formatDateRange, formatEventStart } from "@/lib/format";
@@ -234,52 +234,24 @@ async function SeasonBody({
 
   return (
     <>
-      <form className="border-line bg-surface shadow-card flex flex-col gap-4 rounded-3xl border p-5 sm:p-6">
-        <NearMe
-          page={localePath(`/${season.slug}`)}
-          labels={{
-            field: t("whatsOn.near"),
-            button: t("whatsOn.nearMe"),
-            finding: t("whatsOn.finding"),
-            denied: t("whatsOn.locationDenied"),
-            failed: t("whatsOn.locationFailed"),
-          }}
-          input={
-            <input
-              id="near"
-              name="near"
-              defaultValue={near}
-              placeholder={t("whatsOn.nearExample")}
-              autoComplete="postal-code"
-              className={inputClass}
-            />
-          }
-        />
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2">
-            <span className="font-semibold">{t("whatsOn.within")}</span>
-            <select
-              name="within"
-              defaultValue={String(within)}
-              className={`${inputClass} w-auto py-2`}
-            >
-              {RADII.map((r) => (
-                <option key={r} value={r}>
-                  {t("whatsOn.miles", { miles: r })}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="submit"
-            className={`${buttonClass} flex-1 basis-32 py-2 sm:max-w-48`}
-          >
-            {t("whatsOn.show")}
-          </button>
-        </div>
-        {region && <input type="hidden" name="region" value={region} />}
-        {day && <input type="hidden" name="day" value={day} />}
-      </form>
+      <PlacePicker
+        page={localePath(`/${season.slug}`)}
+        near={near}
+        within={within}
+        radii={RADII}
+        status={
+          !near
+            ? "none"
+            : origin === "unavailable"
+              ? "unavailable"
+              : origin
+                ? "found"
+                : "unknown"
+        }
+        region={region}
+        keep={day ? `day=${day}` : ""}
+        pick={query.pick === "1"}
+      />
 
       {problem && <Notice tone="error">{problem}</Notice>}
       {events.state !== "ok" ? (
@@ -294,11 +266,6 @@ async function SeasonBody({
           </h2>
           <p className="text-muted" aria-live="polite">
             {t.count("whatsOn.count", shown.length)}
-            {position &&
-              t("whatsOn.countNear", {
-                miles: within,
-                place: near.toUpperCase(),
-              })}
             {region && t("whatsOn.countRegion", { region: regionName(region) })}
             {day && t("whatsOn.onDay", { day: longDayHeading(day) })}
             {position && t("whatsOn.nearestFirst")}

@@ -23,6 +23,8 @@ test("public pages are accessible", async ({ page }) => {
     "/festivals",
     "/whats-on",
     "/whats-on?near=ZZ99&within=15",
+    "/whats-on?type=festival&region=London",
+    "/whats-on?pick=1",
     "/diwali",
     "/login",
   ]) {
@@ -33,6 +35,10 @@ test("public pages are accessible", async ({ page }) => {
   // The mandirs as a list as well as on the map.
   await page.goto("/mandirs");
   await showMandirList(page);
+  await expectAccessible(page);
+  // What's on's filters, open.
+  await page.goto("/whats-on");
+  await page.locator("summary", { hasText: "Filter" }).click();
   await expectAccessible(page);
   // A festival's own page.
   await page.goto("/festivals");
@@ -99,6 +105,7 @@ test("the admin area is accessible", async ({ page }) => {
     "/ops/mandirs/new",
     "/ops/mandirs/geeta-bhavan-leicester",
     "/ops/posters",
+    "/ops/duplicates",
     "/ops/websites",
     "/ops/festivals",
     "/ops/digest",
