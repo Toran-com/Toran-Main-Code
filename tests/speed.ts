@@ -1,5 +1,18 @@
 import type { Page } from "@playwright/test";
 
+// Counts only what the page itself downloads. Next.js fetches the pages
+// that visible links lead to ahead of time (their data and code), so they
+// open at once; whether that has finished when the page is weighed
+// depends on timing, and it's those pages' cost, not this one's. Call
+// before going to the page.
+export async function ownDownloadsOnly(page: Page) {
+  await page.route("**/*", (route) =>
+    route.request().headers()["next-router-prefetch"]
+      ? route.abort()
+      : route.fallback(),
+  );
+}
+
 // What a page cost to download, in kilobytes as sent over the network
 // (compressed), once it has finished loading.
 export async function pageWeight(page: Page) {
