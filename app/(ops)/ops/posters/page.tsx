@@ -16,6 +16,7 @@ import {
 import { requireToranAdmin } from "@/lib/auth";
 import { londonDate } from "@/lib/london";
 import { daysBetween } from "@/lib/quick-events";
+import { DUPLICATE_ERRORS, MERGED } from "@/lib/duplicates";
 import { EVENT_ERRORS } from "@/lib/event-form";
 import { pageTitle } from "@/lib/site";
 import { POSTER_SOURCES, posterFrom } from "@/lib/posters";
@@ -53,10 +54,12 @@ const ERRORS: Record<string, string> = {
   claimed:
     "That mandir has a committee, so they publish it. It's waiting on their page.",
   done: "Someone has already dealt with that one.",
+  ...DUPLICATE_ERRORS,
   failed: "Something went wrong. Please try again.",
 };
 
 const DONE: Record<string, string> = {
+  merged: MERGED,
   published: "Published. It's on the mandir's page now.",
   discarded: "Discarded.",
   corrected: "Saved. The committee sees your corrected details.",

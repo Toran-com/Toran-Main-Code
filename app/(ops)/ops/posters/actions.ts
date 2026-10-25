@@ -4,10 +4,10 @@ import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireToranAdmin } from "@/lib/auth";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
-import { correctPoster, reviewPoster } from "@/lib/poster-review";
+import { correctPoster, likenessFrom, reviewPoster } from "@/lib/poster-review";
 import { checkLink, POSTER_SOURCES, type PosterSource } from "@/lib/posters";
 import { createSessionClient } from "@/lib/supabase/session";
-import { eventKey, knownEvents } from "@/lib/website-claims";
+import { alreadyKnown, comparableInput, knownFor } from "@/lib/duplicate-check";
 import { parseWebsiteEvents } from "@/lib/website-import";
 
 // One source per mandir and kind of message, reused.
@@ -59,6 +59,11 @@ export async function addPoster(formData: FormData) {
     .eq("slug", slug)
     .maybeSingle();
   if (!mandir) back("error=mandir");
+  // Already listed, waiting or discarded: not queued twice.
+  const known = await knownFor(supabase, [mandir.id]);
+  if (alreadyKnown(comparableInput(input), known.get(mandir.id))) {
+    back("error=already");
+  }
 
   const sourceId = await posterSource(
     supabase,
@@ -98,13 +103,14 @@ export async function reviewPosterAsToran(formData: FormData) {
     back("done=corrected");
   }
 
-  const publish = decision === "publish" || decision === "edit-publish";
+  const publish = decision !== "discard";
   const result = await reviewPoster(
     supabase,
     claimId,
     publish ? "publish" : "discard",
     "toran",
     decision === "edit-publish" ? eventInputFrom(formData) : undefined,
+    likenessFrom(formData),
   );
   if (!result.ok) {
     // A correction that didn't pass the checks stays open to fix.
@@ -116,7 +122,9 @@ export async function reviewPosterAsToran(formData: FormData) {
     updateTag(`mandir:${result.slug}`);
     updateTag("events");
   }
-  back(`done=${publish ? "published" : "discarded"}`);
+  back(
+    `done=${!publish ? "discarded" : result.merged ? "merged" : "published"}`,
+  );
 }
 
 // Several events read from mandirs' own websites, pasted as spreadsheet
@@ -137,6 +145,7 @@ export async function importWebsiteEvents(formData: FormData) {
     : { data: [] };
   const ids = new Map((mandirs ?? []).map((m) => [m.slug, m.id]));
 
+  const known = await knownFor(supabase, [...ids.values()]);
   let added = 0;
   let skipped = 0;
   for (const slug of slugs) {
@@ -148,13 +157,10 @@ export async function importWebsiteEvents(formData: FormData) {
       );
       continue;
     }
-    const known = new Set(
-      (await knownEvents(supabase, mandirId)).map((k) =>
-        eventKey(k.title, k.date),
-      ),
-    );
+    // Anything already listed, waiting or discarded is left out; a
+    // possible copy joins the queue, flagged for the reviewer.
     const fresh = mine.filter(
-      (r) => !known.has(eventKey(r.input.title, r.input.date)),
+      (r) => !alreadyKnown(comparableInput(r.input), known.get(mandirId)),
     );
     skipped += mine.length - fresh.length;
     if (!fresh.length) continue;

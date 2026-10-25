@@ -5,6 +5,7 @@ const LINKS = [
   { href: "/ops/attention", label: "Needs attention" },
   { href: "/ops/mandirs", label: "Mandirs" },
   { href: "/ops/posters", label: "Review" },
+  { href: "/ops/duplicates", label: "Duplicates" },
   { href: "/ops/websites", label: "Websites" },
   { href: "/ops/festivals", label: "Festival dates" },
   { href: "/ops/stats", label: "Stats" },
