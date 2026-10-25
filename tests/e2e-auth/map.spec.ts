@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { expectAccessible } from "../a11y";
-import { BUDGET, MAP_JS, pageWeight } from "../speed";
+import { BUDGET, MAP_JS, ownDownloadsOnly, pageWeight } from "../speed";
 import { showMandirList, stubMapTiles } from "./helpers";
 
 // The map view of the mandir list. Which mandirs have map positions
@@ -48,6 +48,7 @@ test("the map view is accessible", async ({ page }) => {
 });
 
 test("the map view stays within the speed budget", async ({ page }) => {
+  await ownDownloadsOnly(page);
   await openMap(page);
   const weight = await pageWeight(page);
   expect(
