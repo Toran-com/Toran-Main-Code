@@ -26,6 +26,7 @@ test("public pages are accessible", async ({ page }) => {
     "/whats-on?type=festival&region=London",
     "/whats-on?pick=1",
     "/diwali",
+    "/search?q=diwali",
     "/login",
   ]) {
     await page.goto(path);

@@ -10,6 +10,7 @@ export const en = {
   "shell.whatsOn": "What's on",
   "shell.mandirs": "Mandirs",
   "shell.festivals": "Festivals",
+  "shell.search": "Search",
   "shell.forMandirs": "For mandir committees",
   "shell.find": "Find",
   "shell.toran": "Toran",
@@ -53,6 +54,19 @@ export const en = {
   "home.committeesBody":
     "Committees send the patrika or poster they already share, and check it before it goes live. It's free for mandirs.",
 
+  "search.title": "Search",
+  "search.description":
+    "Search events, mandirs, towns and festivals across the UK.",
+  "search.label": "Events, mandirs, towns or festivals",
+  "search.example": "e.g. Diwali Leicester, Garba, BAPS",
+  "search.button": "Search",
+  "search.count.one": "{count} result",
+  "search.count.other": "{count} results",
+  "search.none":
+    "Nothing found for “{q}”. Try a town, a mandir's name or a festival.",
+  "search.events": "Events",
+  "search.allMandirs": "See every mandir",
+  "search.allEvents": "See everything that's on",
   "whatsOn.title": "What's on",
   "whatsOn.intro": "Events at UK mandirs in the next eight weeks.",
   "whatsOn.filter": "Filter",

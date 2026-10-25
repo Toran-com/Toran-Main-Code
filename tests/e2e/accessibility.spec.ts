@@ -10,6 +10,7 @@ for (const path of [
   "/whats-on",
   "/whats-on?pick=1",
   "/seva",
+  "/search?q=diwali",
   "/diwali",
   "/holi",
   "/demo",

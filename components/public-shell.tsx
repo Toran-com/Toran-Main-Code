@@ -55,6 +55,25 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
             ]}
           />
           <div className="flex items-center gap-2">
+            <Link
+              href={localePath("/search")}
+              aria-label={t("shell.search")}
+              title={t("shell.search")}
+              className="text-ink hover:bg-sunk inline-flex size-11 items-center justify-center rounded-full no-underline transition-colors"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="size-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="M16 16l4.5 4.5" />
+              </svg>
+            </Link>
             {LOCALES.gu.ready && <LanguageSwitch />}
             <Link
               href="/for-mandirs"
