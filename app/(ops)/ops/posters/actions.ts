@@ -8,6 +8,13 @@ import { correctPoster, likenessFrom, reviewPoster } from "@/lib/poster-review";
 import { checkLink, POSTER_SOURCES, type PosterSource } from "@/lib/posters";
 import { createSessionClient } from "@/lib/supabase/session";
 import { alreadyKnown, comparableInput, knownFor } from "@/lib/duplicate-check";
+import { londonDate } from "@/lib/london";
+import {
+  isPosterType,
+  MAX_POSTER_BYTES,
+  posterReadingOn,
+  readPoster,
+} from "@/lib/poster-reader";
 import { parseWebsiteEvents } from "@/lib/website-import";
 
 // One source per mandir and kind of message, reused.
@@ -192,4 +199,80 @@ export async function importWebsiteEvents(formData: FormData) {
   redirect(
     `/ops/posters?imported=${added}&skipped=${skipped}${report ? `&problems=${encodeURIComponent(report)}` : ""}#import`,
   );
+}
+
+// Toran sends a photo or PDF of a poster; Claude reads the events off it
+// (lib/poster-reader.ts) and each one joins the queue to be checked, like
+// one typed up by hand. Events already listed or waiting are left out.
+export async function readPosterPicture(formData: FormData) {
+  await requireToranAdmin("/ops/posters");
+  const slug = String(formData.get("mandir") ?? "");
+  const from = String(formData.get("from") ?? "");
+  const file = formData.get("poster");
+  const back: (query: string) => never = (query) =>
+    redirect(`/ops/posters?mandir=${encodeURIComponent(slug)}&${query}#read`);
+
+  if (!posterReadingOn()) back("error=readingOff");
+  if (!(from in POSTER_SOURCES) || from === "visitor") back("error=from");
+  if (!(file instanceof File) || file.size === 0) back("error=picture");
+  if (!isPosterType(file.type)) back("error=pictureType");
+  if (file.size > MAX_POSTER_BYTES) back("error=pictureSize");
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, name, town")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=mandir");
+
+  const read = await readPoster(
+    { data: Buffer.from(await file.arrayBuffer()), type: file.type },
+    {
+      mandir: `${mandir.name}, ${mandir.town}`,
+      today: londonDate(new Date()),
+    },
+  );
+  if (!read.ok)
+    back(
+      `error=${read.error === "refused" ? "pictureRefused" : "pictureFailed"}`,
+    );
+
+  const known = (await knownFor(supabase, [mandir.id])).get(mandir.id) ?? [];
+  const sourceId = await posterSource(
+    supabase,
+    mandir.id,
+    from as PosterSource,
+  );
+  let added = 0;
+  let skipped = 0;
+  for (const input of read.events) {
+    const item = comparableInput(input);
+    if (!checkEvent(input).ok || alreadyKnown(item, known)) {
+      skipped += 1;
+      continue;
+    }
+    const { error } = await supabase.from("event_claims").insert({
+      mandir_id: mandir.id,
+      source_id: sourceId,
+      proposed: { ...input, from, link: "", read: "machine" },
+      // Lower than a typed-up poster: nobody has looked at it yet.
+      confidence: 0.4,
+    });
+    if (error) {
+      skipped += 1;
+      continue;
+    }
+    added += 1;
+    // The same event twice on one poster is queued once.
+    known.push({
+      ...item,
+      time: input.time,
+      kind: "queue",
+      id: "",
+      discarded: false,
+    });
+  }
+  redirect(`/ops/posters?read=${added}&skipped=${skipped}`);
 }

@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  experimental: {
+    // Room for a poster photo or PDF sent to be read (lib/poster-reader.ts,
+    // at most 4 MB); forms are otherwise far smaller.
+    serverActions: { bodySizeLimit: "5mb" },
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
