@@ -101,6 +101,7 @@ test("the admin area is accessible", async ({ page }) => {
   await logInAsAdmin(page, `a11y-admin-${Date.now()}@example.com`);
   for (const path of [
     "/ops",
+    "/ops/today",
     "/ops/mandirs",
     "/ops/mandirs/new",
     "/ops/mandirs/geeta-bhavan-leicester",
