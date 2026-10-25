@@ -54,7 +54,9 @@ test("a link can open it (?pick=1)", async ({ page }) => {
   const ask = page.getByRole("dialog", { name: "Where are you?" });
   await ask.getByRole("link", { name: "Show all of the UK" }).click();
   await page.goto("/whats-on?type=festival&pick=1");
-  await expect(ask).toBeVisible();
+  // It's in the page from the start, and becomes a pop-up (which Escape
+  // closes) once the page has loaded.
+  await expect(page.locator("dialog:modal")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(ask).toBeHidden();
   await expect(page).toHaveURL(/\/whats-on\?type=festival$/);
