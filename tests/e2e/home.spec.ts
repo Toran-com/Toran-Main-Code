@@ -15,6 +15,12 @@ test("home page shows the coming soon message", async ({ page }) => {
   await expect(page).toHaveURL(/\/whats-on\?type=festival$/);
 });
 
+test("the main button goes to What's on", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Find events near me" }).click();
+  await expect(page).toHaveURL(/\/whats-on$/);
+});
+
 test("text is at least 18px", async ({ page }) => {
   await page.goto("/");
   const size = await page

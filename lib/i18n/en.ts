@@ -27,10 +27,10 @@ export const en = {
     "Toran is being tested with mandir committees and opens in 2027. Details come from mandirs' own websites and our research; if something is wrong, the mandir's committee can correct it.",
 
   "home.tagline": "What's on at mandirs near you",
+  "home.findNear": "Find events near me",
   "home.intro":
     "Events from mandirs across the UK in one place, and a simple way for committees to organise seva. We are talking to mandir committees now and will open in 2027.",
   "home.mandirs": "Browse mandirs",
-  "home.searchTitle": "Find what's on near you",
   "home.comingUp": "Coming up",
   "home.seeAll": "See everything that's on",
   "home.festivalsSoon": "Festivals coming up",
@@ -54,33 +54,25 @@ export const en = {
     "Committees send the patrika or poster they already share, and check it before it goes live. It's free for mandirs.",
 
   "whatsOn.title": "What's on",
-  "whatsOn.intro":
-    "Events at mandirs across the UK in the next eight weeks. Type your postcode, or press \u201cNear me\u201d, to see what's near you.",
-  "whatsOn.near": "Your postcode or area",
+  "whatsOn.intro": "Events at UK mandirs in the next eight weeks.",
+  "whatsOn.filter": "Filter",
+  "whatsOn.chosen": "Chosen filters",
+  "whatsOn.removeFilter": "Remove {filter}",
   "whatsOn.nearExample": "e.g. HA9 or LE4 6AR",
-  "whatsOn.within": "Within",
-  "whatsOn.miles": "{miles} miles",
   "whatsOn.region": "Region",
   "whatsOn.anywhere": "Anywhere",
   "whatsOn.type": "Type of event",
   "whatsOn.anyType": "Everything",
-  "whatsOn.moreOptions": "Choose a region",
   "whatsOn.show": "Show",
   "whatsOn.count.one": "{count} event",
   "whatsOn.count.other": "{count} events",
-  "whatsOn.countNear": " within {miles} miles of {place}",
   "whatsOn.countRegion": " in {region}",
-  "whatsOn.countType": " ({type})",
-  "whatsOn.nearestFirst": ", nearest first each day",
+  "whatsOn.nearestFirst": " · nearest first",
   "whatsOn.onDay": " on {day}",
   "whatsOn.everyDay": "See every day",
   "whatsOn.moreOnDay": "See all {count} on {day} →",
   "whatsOn.chooseArea": "Choose your area",
   "whatsOn.allAreas": "All areas",
-  "whatsOn.locationDenied":
-    "Your browser didn't share your location. Type your postcode instead.",
-  "whatsOn.locationFailed":
-    "We couldn't find your area just now. Type your postcode instead.",
   "whatsOn.lookupFailed":
     "We couldn't look up that postcode just now, so all events are shown.",
   "whatsOn.notFound":

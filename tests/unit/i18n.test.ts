@@ -6,7 +6,9 @@ import { LOCALES, placeholders, translator } from "@/lib/i18n";
 describe("translator", () => {
   it("fills in values", () => {
     const t = translator("en");
-    expect(t("whatsOn.miles", { miles: 15 })).toBe("15 miles");
+    expect(t("whatsOn.moreOnDay", { count: 3, day: "Saturday" })).toBe(
+      "See all 3 on Saturday →",
+    );
     expect(t("festival.atMandirs", { name: "Diwali" })).toBe(
       "Diwali at mandirs",
     );
