@@ -40,6 +40,9 @@ within one month.
   to find your postcode district, such as "RG1". Only the district reaches
   Toran, just as if you'd typed it; your position isn't sent to us or
   kept. postcodes.io is a free public service run by Ideal Postcodes.
+  Your phone remembers the postcode or district you chose (or that you
+  chose all of the UK), so What's on starts there next time. It stays on
+  your phone; clearing the site's data in your browser forgets it.
 - **Calendars.** If you add a mandir's events or the festival dates to
   your calendar, your calendar app checks Toran for changes every few
   hours. Like any visit, that shows up briefly in the server logs; we

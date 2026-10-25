@@ -29,10 +29,10 @@ export const gu: Record<MessageKey, string> = {
     "Toranનું મંદિર સમિતિઓ સાથે પરીક્ષણ ચાલી રહ્યું છે અને તે 2027માં શરૂ થશે. વિગતો મંદિરોની પોતાની વેબસાઇટ્સ અને અમારા સંશોધનમાંથી આવે છે; જો કંઈ ખોટું હોય, તો મંદિરની સમિતિ તેને સુધારી શકે છે.",
 
   "home.tagline": "તમારી નજીકના મંદિરોમાં શું થઈ રહ્યું છે",
+  "home.findNear": "મારી નજીકના કાર્યક્રમો શોધો",
   "home.intro":
     "યુકેભરના મંદિરોના કાર્યક્રમો એક જ જગ્યાએ, અને સમિતિઓ માટે સેવાનું આયોજન કરવાની સરળ રીત. અમે હાલમાં મંદિર સમિતિઓ સાથે વાત કરી રહ્યા છીએ અને 2027માં શરૂ કરીશું.",
   "home.mandirs": "મંદિરો જુઓ",
-  "home.searchTitle": "તમારી નજીક શું છે તે શોધો",
   "home.comingUp": "આવનારા કાર્યક્રમો",
   "home.seeAll": "બધા કાર્યક્રમો જુઓ",
   "home.festivalsSoon": "આવનારા તહેવારો",
@@ -56,33 +56,25 @@ export const gu: Record<MessageKey, string> = {
     "સમિતિઓ જે પત્રિકા કે પોસ્ટર પહેલેથી શેર કરે છે તે મોકલે છે, અને પ્રકાશિત થાય તે પહેલાં તપાસે છે. મંદિરો માટે તે મફત છે.",
 
   "whatsOn.title": "કાર્યક્રમો",
-  "whatsOn.intro":
-    "આગામી આઠ અઠવાડિયામાં યુકેભરના મંદિરોના કાર્યક્રમો. તમારી નજીક શું છે તે જોવા તમારો પોસ્ટકોડ લખો, અથવા \u201cમારી નજીક\u201d દબાવો.",
-  "whatsOn.near": "તમારો પોસ્ટકોડ અથવા વિસ્તાર",
+  "whatsOn.intro": "આગામી આઠ અઠવાડિયામાં યુકેનાં મંદિરોના કાર્યક્રમો.",
+  "whatsOn.filter": "ફિલ્ટર",
+  "whatsOn.chosen": "પસંદ કરેલા ફિલ્ટર",
+  "whatsOn.removeFilter": "{filter} કાઢી નાખો",
   "whatsOn.nearExample": "દા.ત. HA9 અથવા LE4 6AR",
-  "whatsOn.within": "કેટલા અંતરમાં",
-  "whatsOn.miles": "{miles} માઇલ",
   "whatsOn.region": "પ્રદેશ",
   "whatsOn.anywhere": "ગમે ત્યાં",
   "whatsOn.type": "કાર્યક્રમનો પ્રકાર",
   "whatsOn.anyType": "બધું",
-  "whatsOn.moreOptions": "પ્રદેશ પસંદ કરો",
   "whatsOn.show": "બતાવો",
   "whatsOn.count.one": "{count} કાર્યક્રમ",
   "whatsOn.count.other": "{count} કાર્યક્રમો",
-  "whatsOn.countNear": ", {place} થી {miles} માઇલની અંદર",
   "whatsOn.countRegion": ", {region}માં",
-  "whatsOn.countType": " ({type})",
-  "whatsOn.nearestFirst": ", દરરોજ સૌથી નજીકના પહેલા",
+  "whatsOn.nearestFirst": " · સૌથી નજીકના પહેલા",
   "whatsOn.onDay": ", {day}ના રોજ",
   "whatsOn.everyDay": "બધા દિવસો જુઓ",
   "whatsOn.moreOnDay": "{day}ના બધા {count} કાર્યક્રમો જુઓ →",
   "whatsOn.chooseArea": "તમારો વિસ્તાર પસંદ કરો",
   "whatsOn.allAreas": "બધા વિસ્તારો",
-  "whatsOn.locationDenied":
-    "તમારા બ્રાઉઝરે તમારું સ્થાન શેર કર્યું નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
-  "whatsOn.locationFailed":
-    "અમે અત્યારે તમારો વિસ્તાર શોધી શક્યા નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
   "whatsOn.lookupFailed":
     "અમે અત્યારે એ પોસ્ટકોડ શોધી શક્યા નથી, તેથી બધા કાર્યક્રમો બતાવ્યા છે.",
   "whatsOn.notFound":

@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 // The Diwali page gathers Diwali week: the festival days from the
-// festival calendar, a search near you, and a calendar to subscribe to.
+// festival calendar, a way to see events near you, and a calendar to
+// subscribe to.
 // Which year's dates show depends on today, so check the shape.
 
 test("Diwali week in one place", async ({ page, request }) => {
@@ -17,7 +18,10 @@ test("Diwali week in one place", async ({ page, request }) => {
     await expect(
       page.getByRole("link", { name: /^Dhanteras/ }),
     ).toHaveAttribute("href", "/festivals/dhanteras");
-    await expect(page.getByLabel("Your postcode or area")).toBeVisible();
+    // And a way to see events near you.
+    await expect(
+      page.getByRole("link", { name: "Find near me" }),
+    ).toBeVisible();
   }
 
   const feed = await request.get("/diwali/calendar.ics");

@@ -5,10 +5,9 @@ import { Countdown } from "@/components/countdown";
 import { DateTile } from "@/components/date-tile";
 import { EventList } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
-import { NearMe } from "@/components/near-me";
 import { Toran } from "@/components/ornaments";
 import { SiteFooter, SiteHeader, wideClass } from "@/components/public-shell";
-import { buttonClass, inputClass } from "@/components/ui";
+import { buttonClass } from "@/components/ui";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
 import { EVENT_KINDS, kindLabel } from "@/lib/event-kinds";
 import { formatDateRange } from "@/lib/format";
@@ -69,39 +68,13 @@ export default function Home() {
                 {t("home.intro")}
               </p>
 
-              <form
-                action={localePath("/whats-on")}
-                aria-label={t("home.searchTitle")}
-                className="bg-surface text-ink flex max-w-2xl flex-col gap-3 rounded-3xl p-4 shadow-[0_20px_48px_rgba(0,0,0,0.28)] sm:p-5"
+              <Link
+                href={localePath("/whats-on")}
+                className="bg-marigold inline-flex w-fit items-center justify-center gap-2 rounded-full px-8 py-4 text-xl font-bold text-[#1b1a2c] no-underline shadow-[0_20px_48px_rgba(0,0,0,0.28)] transition hover:brightness-105 active:scale-[0.98]"
               >
-                <NearMe
-                  page={localePath("/whats-on")}
-                  labels={{
-                    field: t("whatsOn.near"),
-                    button: t("whatsOn.nearMe"),
-                    finding: t("whatsOn.finding"),
-                    denied: t("whatsOn.locationDenied"),
-                    failed: t("whatsOn.locationFailed"),
-                  }}
-                  input={
-                    <div className="flex flex-wrap gap-2">
-                      <input
-                        id="near"
-                        name="near"
-                        placeholder={t("whatsOn.nearExample")}
-                        autoComplete="postal-code"
-                        className={`${inputClass} min-w-0 flex-[1_1_12rem]`}
-                      />
-                      <button
-                        type="submit"
-                        className="bg-marigold inline-flex flex-[1_1_8rem] items-center justify-center rounded-full px-7 py-3 text-lg font-bold text-[#1b1a2c] transition hover:brightness-105 active:scale-[0.98]"
-                      >
-                        {t("whatsOn.show")}
-                      </button>
-                    </div>
-                  }
-                />
-              </form>
+                <span aria-hidden="true">📍</span>
+                {t("home.findNear")}
+              </Link>
 
               <nav aria-label={t("whatsOn.type")}>
                 <ul className="flex flex-wrap gap-2">

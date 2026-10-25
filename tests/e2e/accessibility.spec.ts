@@ -8,6 +8,7 @@ for (const path of [
   "/mandirs",
   "/festivals",
   "/whats-on",
+  "/whats-on?pick=1",
   "/seva",
   "/diwali",
   "/holi",

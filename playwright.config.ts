@@ -11,7 +11,21 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
-  use: { baseURL: `http://localhost:${port}` },
+  use: {
+    baseURL: `http://localhost:${port}`,
+    // As if "Where are you?" had been answered "all of the UK", so it
+    // doesn't open over other tests. tests/e2e/place-picker.spec.ts
+    // starts without it.
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: `http://localhost:${port}`,
+          localStorage: [{ name: "toran:place", value: '{"skip":true}' }],
+        },
+      ],
+    },
+  },
   projects: [
     {
       name: "mobile",
