@@ -26,6 +26,7 @@ test("public pages are accessible", async ({ page }) => {
     "/whats-on?type=festival&region=London",
     "/whats-on?pick=1",
     "/whats-on?view=map",
+    "/whats-on?when=weekend",
     "/whats-on?mandirs=geeta-bhavan-leicester",
     "/diwali",
     "/search?q=diwali",
