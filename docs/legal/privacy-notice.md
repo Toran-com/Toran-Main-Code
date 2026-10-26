@@ -62,7 +62,11 @@ within one month.
   account. When you choose "Only mandirs I follow" on What's on, the
   mandirs' web addresses go in the page's address so Toran can show their
   events, like any other choice on that page; we don't keep them.
-  Clearing the site's data in your browser forgets who you follow.
+  The home page shows their next events: it comes with every mandir's
+  next event and your phone shows the ones you follow, so who you follow
+  stays on your phone. Your phone also keeps their pages, so they open
+  without signal. Clearing the site's data in your browser forgets who
+  you follow, and those pages.
 - **Telling us about an event, or asking for a correction.** We keep only
   what you type into the form: the event's details, or what's wrong and on
   which page. We don't ask who you are or record your IP address, so please

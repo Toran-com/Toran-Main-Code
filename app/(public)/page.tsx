@@ -7,18 +7,30 @@ import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
 import { Toran } from "@/components/ornaments";
 import { RememberPlace } from "@/components/remember-place";
+import { YourMandirs, type MandirBrief } from "@/components/your-mandirs";
 import { SiteFooter, SiteHeader, wideClass } from "@/components/public-shell";
 import { buttonClass } from "@/components/ui";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
 import { EVENT_KINDS, kindLabel } from "@/lib/event-kinds";
-import { formatDateRange } from "@/lib/format";
+import { formatDateRange, formatEventStart } from "@/lib/format";
 import { regionKey } from "@/lib/i18n/client/mandirs";
 import { getSeasonBanner } from "@/lib/season-banner";
-import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
+import {
+  listUpcomingEvents,
+  positionForSearch,
+  type ListedEvent,
+} from "@/lib/whats-on";
+import { eventPath } from "@/lib/share";
 import { nearestFirstEachDay, nearTo, radiusFrom } from "@/lib/whats-on-view";
 import { siteUrl } from "@/lib/site";
 import { siteData } from "@/lib/structured-data";
-import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
+import {
+  festivalText,
+  localePath,
+  pageLocale,
+  pageT,
+  seasonText,
+} from "@/lib/i18n/page";
 import { seasonBySlug } from "@/lib/seasons";
 import { sevaSummary } from "@/lib/seva-needs";
 
@@ -104,6 +116,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
         <div
           className={`${wideClass} flex flex-col gap-20 pt-16 sm:gap-28 sm:pt-24`}
         >
+          <Suspense fallback={null}>
+            <Followed />
+          </Suspense>
+
           <div className="flex flex-wrap gap-x-16 gap-y-16">
             <Suspense fallback={null}>
               <ComingUp searchParams={searchParams} />
@@ -346,6 +362,41 @@ async function ComingUp({
       )}
     </section>
   );
+}
+
+// "Your mandirs": every mandir's name and next event, for the browser to
+// show the ones this phone follows (components/your-mandirs.tsx).
+async function Followed() {
+  const [mandirs, events] = await Promise.all([
+    listMandirs(),
+    listUpcomingEvents(),
+  ]);
+  if (mandirs.state !== "ok") return null;
+  const gujarati = pageLocale() === "gu";
+  const next = new Map<string, ListedEvent>();
+  for (const e of events.state === "ok" ? events.data : []) {
+    if (e.status !== "published") continue;
+    const soonest = next.get(e.mandir.slug);
+    if (!soonest || e.next_starts_at < soonest.next_starts_at) {
+      next.set(e.mandir.slug, e);
+    }
+  }
+  const brief: Record<string, MandirBrief> = {};
+  for (const m of mandirs.data) {
+    const e = next.get(m.slug);
+    brief[m.slug] = {
+      name: m.name,
+      path: localePath(`/mandirs/${m.slug}`),
+      next: e
+        ? {
+            title: (gujarati && e.title_gu) || e.title,
+            when: formatEventStart(e.next_starts_at, e.all_day),
+            path: localePath(eventPath(m.slug, e.id)),
+          }
+        : null,
+    };
+  }
+  return <YourMandirs mandirs={brief} />;
 }
 
 // How many mandirs are listed, region by region. The way to the mandir
