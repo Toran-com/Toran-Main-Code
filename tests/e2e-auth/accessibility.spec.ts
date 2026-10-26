@@ -115,6 +115,7 @@ test("the admin area is accessible", async ({ page }) => {
     "/ops/posters",
     "/ops/duplicates",
     "/ops/websites",
+    "/ops/mandirs/import",
     "/ops/festivals",
     "/ops/digest",
     "/ops/translations",
