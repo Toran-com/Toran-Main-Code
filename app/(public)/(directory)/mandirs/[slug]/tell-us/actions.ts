@@ -1,8 +1,10 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { checkLink } from "@/lib/posters";
+import { senderAddress, sendLimiter, spamCheck } from "@/lib/spam";
 import { createPublicServerClient } from "@/lib/supabase/server";
 
 // A visitor sends in an event they know about. It waits in the review
@@ -16,12 +18,17 @@ export async function reportEvent(formData: FormData) {
 
   // A hidden field only automated spam fills in: pretend it worked.
   if (String(formData.get("company") ?? "") !== "") back("sent=1");
+  if (!sendLimiter.allow("report", senderAddress(await headers())))
+    back("error=slow");
 
   const link = String(formData.get("link") ?? "").trim();
   if (!checkLink(link)) back("error=link");
   const input = eventInputFrom(formData);
   const checked = checkEvent(input);
   if (!checked.ok) back(`error=${checked.error}`);
+  const spam = spamCheck([input.title, input.summary]);
+  if (spam === "junk") back("sent=1");
+  if (spam === "links") back("error=links");
 
   const db = createPublicServerClient();
   if (!db) back("error=failed");

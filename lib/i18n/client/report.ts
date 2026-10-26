@@ -20,6 +20,9 @@ export const enReport = {
     "Please choose an end date after the first date, and within a year of it.",
   "report.error.link":
     "Please give a web address starting with http:// or https://, or leave it empty.",
+  "report.error.links": "Please include no more than two web addresses.",
+  "report.error.slow":
+    "You've sent a few already. Please wait a few minutes before sending another.",
   "report.error.busy":
     "Thank you, but there are a lot of events waiting to be checked just now. Please try again in a few days.",
   "report.error.failed": "Something went wrong. Please try again.",

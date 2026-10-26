@@ -597,6 +597,25 @@ committee and admin pages link to Privacy, Terms and Contact.
   Requests appear under **Corrections and removals** on `/ops/attention`;
   press **Done** once each is dealt with. The terms promise mandirs that
   ask to be hidden it happens the same day.
+- **Spam on the public forms** ("Tell us about an event" and
+  `/corrections`) is held back without keeping anything about senders
+  (`lib/spam.ts`):
+  - a hidden field only robots fill in: they're thanked and nothing is
+    saved;
+  - link markup (`<a href`, `[url=`) and plain spam words are dropped the
+    same way; more than two web addresses asks the person to remove some;
+  - five sends of a form in ten minutes from one internet address, then a
+    short wait. This is counted in the server's memory only, under a
+    scrambled code, and never saved; with several servers running it is a
+    speed bump rather than a wall;
+  - in the database: at most 30 sends an hour of each form across the
+    whole site, at most 10 reports waiting per mandir, 300 reports and 200
+    corrections waiting in all, and the same event or correction twice is
+    kept once.
+
+  If robots still get through, add a rate-limit rule in Vercel's
+  Firewall for POST requests to `/corrections` and `/mandirs/*/tell-us`.
+
 - `/contact` points people to the right form. Once Toran has its own email
   address, put it in `CONTACT_EMAIL` in `lib/site.ts` and the page shows
   it for privacy requests.

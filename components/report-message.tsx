@@ -10,6 +10,8 @@ import { EVENT_ERRORS } from "@/lib/event-form";
 const ERRORS = [
   ...Object.keys(EVENT_ERRORS),
   "link",
+  "links",
+  "slow",
   "busy",
   "failed",
 ] as const;
