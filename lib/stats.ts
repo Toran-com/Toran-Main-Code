@@ -32,6 +32,10 @@ const PAGES: [RegExp, string][] = [
     new RegExp(`^/${s.slug}$`),
     `${s.name} page`,
   ]),
+  ...SEASONS.map((s): [RegExp, string] => [
+    new RegExp(`^/${s.slug}/${SLUG}$`),
+    `${s.name} town pages`,
+  ]),
   [new RegExp(`^/festivals/${SLUG}$`), "Festival pages"],
   [/^\/for-mandirs$/, "For mandirs"],
   [/^\/for-mandirs\/guide$/, "Committee guide"],

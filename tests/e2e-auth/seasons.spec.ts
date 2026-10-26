@@ -47,3 +47,28 @@ test("the festival dates page leads to every season page", async ({ page }) => {
   await seasons.getByRole("link", { name: /^Ram Navami at mandirs/ }).click();
   await expect(page).toHaveURL(/\/ram-navami$/);
 });
+
+test("each season has a page for each town with a mandir", async ({ page }) => {
+  // Geeta Bhavan Leicester is in the directory, so Leicester has one,
+  // whether or not anything is listed there yet.
+  const response = await page.goto("/holi/leicester");
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Holi in Leicester",
+  );
+  await expect(
+    page.getByRole("heading", { name: /^Holi is on .*22 Mar/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Geeta Bhavan Leicester" }),
+  ).toHaveAttribute("href", "/mandirs/geeta-bhavan-leicester");
+  await page
+    .getByRole("link", { name: /Holi across the UK/ })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/holi$/);
+
+  // In Gujarati too; and a town without a mandir isn't a page.
+  expect((await page.goto("/gu/holi/leicester"))?.status()).toBe(200);
+  expect((await page.goto("/holi/no-mandirs-here"))?.status()).toBe(404);
+});

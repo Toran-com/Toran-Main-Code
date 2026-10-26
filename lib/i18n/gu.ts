@@ -304,6 +304,15 @@ export const gu: Record<MessageKey, string> = {
   "season.tellFamily": "કુટુંબ અને મિત્રોને જણાવો",
   "season.share": "{name}નું પાનું શેર કરો",
   "season.allOf": "મંદિરોમાં {period}ના બધા કાર્યક્રમો, એક જ જગ્યાએ",
+  "season.inTown": "{town}માં {name}",
+  "season.townDescription":
+    "{town}નાં મંદિરોમાં {name}ના કાર્યક્રમો: શું, ક્યારે અને ક્યાં, મંદિરો પાસેથી જ.",
+  "season.acrossUk": "આખા યુકેમાં {name}",
+  "season.townEvents": "{town}માં {name}ના કાર્યક્રમો",
+  "season.noneInTown": "{town}માં હજી {name}ના કોઈ કાર્યક્રમ નથી.",
+  "season.townMandirs": "{town}નાં મંદિરો",
+  "season.townShareText": "{town}નાં મંદિરોમાં {name}ના કાર્યક્રમો:",
+  "season.byTown": "શહેર પ્રમાણે {name}",
   "season.diwali.period": "દિવાળી સપ્તાહ",
   "season.diwali.title": "યુકેનાં મંદિરોમાં દિવાળી",
   "season.diwali.description":

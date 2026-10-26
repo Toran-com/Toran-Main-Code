@@ -20,6 +20,7 @@ import { festivalText, localePath, pageT, seasonText } from "@/lib/i18n/page";
 import type { Season } from "@/lib/seasons";
 import { pageMetadata, siteUrl } from "@/lib/site";
 import { breadcrumbData } from "@/lib/structured-data";
+import { townCounts } from "@/lib/towns";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
 import {
   dayFrom,
@@ -91,7 +92,7 @@ export function SeasonPage({
 
 // The festival days of the season, inside the heading: each with its date
 // tile and a link to the festival's own page.
-async function SeasonDays({ season }: { season: Season }) {
+export async function SeasonDays({ season }: { season: Season }) {
   const t = pageT();
   const text = seasonText(season);
   const dates = await listFestivalDates();
@@ -231,6 +232,8 @@ async function SeasonBody({
   // Choosing an area helps most when nothing narrows the list yet.
   const areas = position ? [] : regionCounts(onDay(during, day));
   const long = !position && !region && !day && shown.length > LONG_LIST;
+  // Each town's own page for the season (/diwali/leicester).
+  const towns = townCounts(during);
 
   return (
     <>
@@ -321,6 +324,28 @@ async function SeasonBody({
         </div>
       )}
       {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
+
+      {towns.length > 0 && (
+        <nav aria-labelledby="by-town" className="flex flex-col gap-3">
+          <h2 id="by-town" className="text-xl font-semibold sm:text-2xl">
+            {t("season.byTown", { name: text.name })}
+          </h2>
+          <ul className="flex flex-wrap gap-2">
+            {towns.map((town) => (
+              <li key={town.slug}>
+                <Link
+                  href={localePath(`/${season.slug}/${town.slug}`)}
+                  prefetch={false}
+                  className="border-line-strong bg-surface text-ink hover:border-peacock/60 inline-flex items-baseline gap-2 rounded-full border px-4 py-1.5 text-base font-medium no-underline"
+                >
+                  {town.town}
+                  <span className="text-muted tabular-nums">{town.count}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
 
       <SubscribeCalendar
         path={`/${season.slug}/calendar.ics`}
