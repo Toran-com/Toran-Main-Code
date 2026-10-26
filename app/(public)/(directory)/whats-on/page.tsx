@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { EventsMapView } from "@/components/events-map-view";
 import { FollowedOnly } from "@/components/follow";
+import { PlanLink } from "@/components/plan";
 import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading, Notice, pillButtonClass } from "@/components/ui";
@@ -238,7 +239,10 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
               </Link>
             ))}
           </nav>
-          {!mandirs.length && <FollowedOnly href={here({})} />}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {!mandirs.length && <FollowedOnly href={here({})} />}
+            <PlanLink />
+          </div>
         </div>
         {active.length > 0 && (
           <ul aria-label={t("whatsOn.chosen")} className="flex flex-wrap gap-2">

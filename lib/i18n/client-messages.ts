@@ -4,6 +4,7 @@ import { enFollow } from "@/lib/i18n/client/follow";
 import { enHours } from "@/lib/i18n/client/hours";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { enPlace } from "@/lib/i18n/client/place";
+import { enPlan } from "@/lib/i18n/client/plan";
 import { enReport } from "@/lib/i18n/client/report";
 import { enSeva } from "@/lib/i18n/client/seva";
 import { enShare } from "@/lib/i18n/client/share";
@@ -23,6 +24,7 @@ export const enClient = {
   ...enPlace,
   ...enEventsMap,
   ...enFollow,
+  ...enPlan,
   ...enDisplay,
   ...enHours,
 } as const;

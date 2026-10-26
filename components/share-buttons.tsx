@@ -2,6 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { sendCount } from "@/components/count-visits";
+import { WhatsAppIcon } from "@/components/icons";
 import { useOrigin } from "@/components/use-origin";
 import { actionPillClass } from "@/components/ui";
 import { useT } from "@/components/use-t";
@@ -81,23 +82,5 @@ export function ShareButtons({
         {copied ? t("share.copied") : ""}
       </span>
     </div>
-  );
-}
-
-function WhatsAppIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.7z" />
-      <path d="M9.5 9.5c.3 1.8 1.7 3.4 3.6 4.3l1.2-1.1 1.7.8c-.2 1-1 1.6-2 1.6-3 0-5.8-2.7-5.8-5.8 0-1 .6-1.8 1.6-2l.8 1.7z" />
-    </svg>
   );
 }

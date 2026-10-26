@@ -9,6 +9,7 @@ import { CalendarIcon, ClockIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Toran } from "@/components/ornaments";
 import { Badge, LoadProblem } from "@/components/public-shell";
+import { PlanButton } from "@/components/plan";
 import { ShareButtons } from "@/components/share-buttons";
 import { cardClass, Notice, quietButtonClass } from "@/components/ui";
 import { visitingSummary } from "@/components/visiting-info";
@@ -253,6 +254,7 @@ export default async function EventPage({
                   text={eventShareText(event, mandir)}
                   path={localePath(path)}
                 />
+                <PlanButton id={event.id} at={event.next_starts_at} />
               </div>
             )}
           </div>

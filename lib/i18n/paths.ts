@@ -10,6 +10,7 @@ const GUJARATI_PATHS = [
   /^\/$/,
   /^\/whats-on$/,
   /^\/seva$/,
+  /^\/plan$/,
   /^\/mandirs(\/[^/]+(\/events\/[^/]+(\/seva)?)?(\/tell-us)?)?$/,
   /^\/festivals(\/[^/]+)?$/,
   // The festival season pages (lib/seasons.ts; a test checks they match).

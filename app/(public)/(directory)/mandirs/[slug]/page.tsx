@@ -424,6 +424,7 @@ function EventRow({
               shareText={eventShareText(event, mandir)}
               path={localePath(eventPath(mandir.slug, event.id))}
               copy={false}
+              nextStartsAt={event.next_starts_at}
             />
           </div>
         )}

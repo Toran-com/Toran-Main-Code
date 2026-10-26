@@ -22,6 +22,7 @@ English and Gujarati, and by following every link from the home page.
 | A festival             | `/festivals/<festival>`              | Its dates and which mandirs are marking it                              | Its season page, each event                                                       |
 | Festival seasons       | `/diwali`, `/navratri`, `/holi`, …   | Every mandir's events for one season, near you                          | Each festival day, each event, calendar feed, each town's page                    |
 | A season in a town     | `/diwali/<town>`, …                  | The season's events at one town's mandirs, and those mandirs            | The season page, each festival day, each event, each mandir                       |
+| Our plan               | `/plan`                              | Events picked on this phone, sent to the family in one message          | Each event, What's on                                                             |
 | Calendar feeds         | `…/calendar.ics`                     | Subscribe in a phone's calendar                                         | —                                                                                 |
 | Offline                | `/offline`                           | Shown by the installed app with no signal                               | Pages already opened                                                              |
 
