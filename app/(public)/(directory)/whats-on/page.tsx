@@ -4,10 +4,12 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { EventsMapView } from "@/components/events-map-view";
+import { FollowedOnly } from "@/components/follow";
 import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading, Notice, pillButtonClass } from "@/components/ui";
 import { EVENT_KINDS, isEventKind, kindLabel } from "@/lib/event-kinds";
+import { cleanSlugs } from "@/lib/follow";
 import { regionKey } from "@/lib/i18n/client/mandirs";
 import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
@@ -62,6 +64,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const kind = isEventKind(type) ? type : "";
   const day = dayFrom(query.day);
   const view = query.view === "map" ? "map" : "list";
+  // The mandirs followed on the visitor's phone, when they ask for those.
+  const mandirs = cleanSlugs(query.mandirs);
 
   const [result, origin] = await Promise.all([
     listUpcomingEvents(),
@@ -74,6 +78,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     region?: string;
     day?: string;
     view?: string;
+    mandirs?: string;
   }) => {
     const params = new URLSearchParams();
     if (near) params.set("near", near);
@@ -85,7 +90,9 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     if (k) params.set("type", k);
     if (d) params.set("day", d);
     if ((change.view ?? view) === "map") params.set("view", "map");
-    const q = params.toString();
+    const m = change.mandirs ?? mandirs.join(",");
+    if (m) params.set("mandirs", m);
+    const q = params.toString().replace(/%2C/g, ",");
     return q ? `${localePath("/whats-on")}?${q}` : localePath("/whats-on");
   };
 
@@ -93,6 +100,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   if (kind) keep.set("type", kind);
   if (day) keep.set("day", day);
   if (view === "map") keep.set("view", "map");
+  if (mandirs.length) keep.set("mandirs", mandirs.join(","));
   const place = (
     <PlacePicker
       page={localePath("/whats-on")}
@@ -137,7 +145,9 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const chosen = onDay(
     result.data.filter(
       (e) =>
-        (!region || e.mandir.region === region) && (!kind || e.kind === kind),
+        (!region || e.mandir.region === region) &&
+        (!kind || e.kind === kind) &&
+        (!mandirs.length || mandirs.includes(e.mandir.slug)),
     ),
     day,
   );
@@ -145,7 +155,12 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const nearby = nearTo(chosen, position, within);
   const events = position ? nearestFirstEachDay(nearby) : nearby;
   const long =
-    !position && !region && !kind && !day && events.length > LONG_LIST;
+    !position &&
+    !region &&
+    !kind &&
+    !day &&
+    !mandirs.length &&
+    events.length > LONG_LIST;
 
   // What narrows the list, each with a way to take it off.
   const active = [
@@ -158,6 +173,10 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       href: here({ region: "" }),
     },
     day && { label: longDayHeading(day), href: here({ day: "" }) },
+    mandirs.length > 0 && {
+      label: t("whatsOn.followed"),
+      href: here({ mandirs: "" }),
+    },
   ].filter((f): f is { label: string; href: string } => !!f);
 
   return (
@@ -190,6 +209,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             here={here}
           />
         </div>
+        {!mandirs.length && <FollowedOnly href={here({})} />}
         {active.length > 0 && (
           <ul aria-label={t("whatsOn.chosen")} className="flex flex-wrap gap-2">
             {active.map((f) => (
@@ -230,7 +250,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       ) : (
         <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
           <p className="font-semibold">
-            {position || region || kind || day
+            {position || region || kind || day || mandirs.length
               ? t("whatsOn.noneThere")
               : t("whatsOn.noneYet")}
           </p>

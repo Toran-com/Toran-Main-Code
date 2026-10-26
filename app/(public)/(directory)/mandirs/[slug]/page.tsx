@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
 import { EventActions } from "@/components/event-actions";
+import { FollowButton } from "@/components/follow";
 import { GlobeIcon, PhoneIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
@@ -108,6 +109,7 @@ export default async function MandirPage({
             )}
           </p>
           <QuickLinks mandir={mandir} />
+          <FollowButton slug={mandir.slug} />
         </div>
       </header>
 

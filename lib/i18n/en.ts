@@ -69,6 +69,7 @@ export const en = {
   "whatsOn.showAs": "Show as",
   "whatsOn.list": "List",
   "whatsOn.map": "Map",
+  "whatsOn.followed": "Mandirs you follow",
   "whatsOn.chosen": "Chosen filters",
   "whatsOn.removeFilter": "Remove {filter}",
   "whatsOn.nearExample": "e.g. HA9 or LE4 6AR",

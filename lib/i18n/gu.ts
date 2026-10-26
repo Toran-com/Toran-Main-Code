@@ -70,6 +70,7 @@ export const gu: Record<MessageKey, string> = {
   "whatsOn.showAs": "આ રીતે બતાવો",
   "whatsOn.list": "યાદી",
   "whatsOn.map": "નકશો",
+  "whatsOn.followed": "તમે ફોલો કરો છો તે મંદિરો",
   "whatsOn.chosen": "પસંદ કરેલા ફિલ્ટર",
   "whatsOn.removeFilter": "{filter} કાઢી નાખો",
   "whatsOn.nearExample": "દા.ત. HA9 અથવા LE4 6AR",
