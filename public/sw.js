@@ -6,6 +6,11 @@
 const VERSION = "v1";
 const PAGES = `toran-pages-${VERSION}`;
 const ASSETS = `toran-assets-${VERSION}`;
+// The pages of the mandirs a visitor follows (components/follow.tsx), kept
+// apart so they're never pushed out by other pages.
+const FOLLOWED = `toran-followed-${VERSION}`;
+const FOLLOWED_PAGE = /^(\/gu)?\/mandirs\/[a-z0-9-]+$/;
+const REFRESH_MS = 12 * 60 * 60 * 1000;
 const OFFLINE = "/offline";
 const MAX_PAGES = 40;
 
@@ -38,7 +43,8 @@ self.addEventListener("activate", (event) => {
           keys
             .filter(
               (key) =>
-                key.startsWith("toran-") && ![PAGES, ASSETS].includes(key),
+                key.startsWith("toran-") &&
+                ![PAGES, ASSETS, FOLLOWED].includes(key),
             )
             .map((key) => caches.delete(key)),
         ),
@@ -58,6 +64,39 @@ async function keepPage(request, response) {
   }
 }
 
+// Keeps the followed mandirs' pages (fetched again when over 12 hours
+// old), and lets go of ones no longer followed.
+async function keepFollowed(paths) {
+  const wanted = new Set(
+    (Array.isArray(paths) ? paths : [])
+      .filter((p) => typeof p === "string" && FOLLOWED_PAGE.test(p))
+      .slice(0, 30),
+  );
+  const cache = await caches.open(FOLLOWED);
+  for (const kept of await cache.keys()) {
+    if (!wanted.has(new URL(kept.url).pathname)) await cache.delete(kept);
+  }
+  for (const path of wanted) {
+    const kept = await cache.match(path);
+    const age = kept
+      ? Date.now() - Date.parse(kept.headers.get("date") ?? "")
+      : Infinity;
+    if (age < REFRESH_MS) continue;
+    try {
+      const response = await fetch(path, { cache: "no-cache" });
+      if (response.ok && !response.redirected) await cache.put(path, response);
+    } catch {
+      // Offline now: the copy already kept (if any) stays.
+    }
+  }
+}
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "followed") {
+    event.waitUntil(keepFollowed(event.data.paths));
+  }
+});
+
 // Pages: always try the network first, so visitors see the latest; fall
 // back to the kept copy, then to the offline page. "no-cache" makes the
 // browser check with the server: pages say a cache may serve an old copy
@@ -76,8 +115,10 @@ async function page(request, url) {
     return response;
   } catch {
     const cache = await caches.open(PAGES);
+    const followed = await caches.open(FOLLOWED);
     return (
       (await cache.match(request, { ignoreSearch: false })) ??
+      (await followed.match(request)) ??
       (await cache.match(OFFLINE)) ??
       Response.error()
     );

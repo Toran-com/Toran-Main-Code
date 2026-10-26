@@ -15,7 +15,7 @@ import { enFollow } from "@/lib/i18n/client/follow";
 // Following mandirs on this phone (lib/follow.ts): a button on a mandir's
 // page, and on What's on a way to show only the mandirs followed.
 
-function useFollowing(): string[] {
+export function useFollowing(): string[] {
   const snapshot = useSyncExternalStore(
     onFollowingChange,
     followingSnapshot,
@@ -25,7 +25,11 @@ function useFollowing(): string[] {
   return useMemo(() => parseFollowing(snapshot), [snapshot]);
 }
 
-function whatsOnHref(locale: string, base: string, slugs: string[]): string {
+export function whatsOnHref(
+  locale: string,
+  base: string,
+  slugs: string[],
+): string {
   const page = base || (locale === "gu" ? "/gu/whats-on" : "/whats-on");
   const [path, query = ""] = page.split("?");
   const params = new URLSearchParams(query);
@@ -33,7 +37,7 @@ function whatsOnHref(locale: string, base: string, slugs: string[]): string {
   return `${path}?${params.toString().replace(/%2C/g, ",")}`;
 }
 
-function Star({ filled }: { filled: boolean }) {
+export function Star({ filled }: { filled: boolean }) {
   return (
     <svg
       aria-hidden="true"
@@ -49,6 +53,21 @@ function Star({ filled }: { filled: boolean }) {
   );
 }
 
+// Asks the service worker (public/sw.js) to keep the followed mandirs'
+// pages for offline use, and to forget ones no longer followed. Just the
+// addresses go to the phone's own service worker; nothing reaches Toran.
+export function keepOffline(locale: string) {
+  const worker =
+    typeof navigator === "undefined"
+      ? null
+      : navigator.serviceWorker?.controller;
+  if (!worker) return;
+  const paths = parseFollowing(followingSnapshot()).map(
+    (slug) => `${locale === "gu" ? "/gu" : ""}/mandirs/${slug}`,
+  );
+  worker.postMessage({ type: "followed", paths });
+}
+
 // "Follow" on a mandir's page; once followed, where to see its events.
 export function FollowButton({ slug }: { slug: string }) {
   const t = useT(enFollow);
@@ -60,7 +79,10 @@ export function FollowButton({ slug }: { slug: string }) {
       <button
         type="button"
         aria-pressed={on}
-        onClick={() => setFollowing(slug, !on)}
+        onClick={() => {
+          setFollowing(slug, !on);
+          keepOffline(locale);
+        }}
         className={`${actionPillClass} self-start ${on ? "border-peacock" : ""}`}
       >
         <Star filled={on} />
