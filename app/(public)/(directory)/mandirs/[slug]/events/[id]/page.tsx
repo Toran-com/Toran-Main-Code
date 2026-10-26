@@ -8,6 +8,7 @@ import { CalendarIcon, ClockIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Toran } from "@/components/ornaments";
 import { Badge, LoadProblem } from "@/components/public-shell";
+import { ReadAloud } from "@/components/read-aloud";
 import { ShareButtons } from "@/components/share-buttons";
 import { cardClass, Notice, quietButtonClass } from "@/components/ui";
 import {
@@ -19,7 +20,12 @@ import {
   type MandirEventPage,
 } from "@/lib/directory";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
-import { formatEventStart, formatEventWhen } from "@/lib/format";
+import {
+  formatEventStart,
+  formatEventWhen,
+  formatSpokenStart,
+} from "@/lib/format";
+import { readingText } from "@/lib/read-aloud";
 import { describeRule } from "@/lib/recurrence";
 import { placesTaken } from "@/lib/seva";
 import { eventPath, eventShareText, sevaPath } from "@/lib/share";
@@ -229,6 +235,7 @@ export default async function EventPage({
             in view while you read. */}
         <aside className="flex min-w-0 flex-[1_1_20rem] flex-col gap-4 lg:sticky lg:top-28 lg:order-2">
           <div className={`${cardClass} flex flex-col gap-6 p-6 sm:p-7`}>
+            <ReadAloud text={spokenEvent(result.data)} />
             <Details page={result.data} />
             {confirmedOn ? (
               <Badge tone="leaf">
@@ -374,6 +381,25 @@ function Seva({ path, seva }: { path: string; seva: EventSeva }) {
 }
 
 // When and where, each with its icon, as the top of the side panel.
+// The event in a few sentences, for "Read aloud": in Gujarati where the
+// mandir gave its name and description in Gujarati.
+function spokenEvent({ mandir, event }: MandirEventPage): string {
+  const t = pageT();
+  const gu = pageLocale() === "gu";
+  const rule = event.recurrence && describeRule(event.recurrence);
+  return readingText([
+    gu && event.title_gu ? event.title_gu : event.title,
+    event.status === "cancelled" && t("event.cancelled"),
+    rule,
+    formatSpokenStart(event.next_starts_at, event.all_day),
+    `${mandir.name}, ${mandir.town}`,
+    event.location_note,
+    gu && event.summary_gu ? event.summary_gu : event.summary,
+    event.cost_note,
+    mandir.getting_there,
+  ]);
+}
+
 function Details({ page }: { page: MandirEventPage }) {
   const { mandir, event } = page;
   const t = pageT();
