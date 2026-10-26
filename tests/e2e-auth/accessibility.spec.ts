@@ -25,8 +25,11 @@ test("public pages are accessible", async ({ page }) => {
     "/whats-on?near=ZZ99&within=15",
     "/whats-on?type=festival&region=London",
     "/whats-on?pick=1",
+    "/whats-on?view=map",
     "/diwali",
     "/search?q=diwali",
+    "/seva?near=LE4&within=60",
+    "/?near=LE4&within=60",
     "/login",
   ]) {
     await page.goto(path);
@@ -74,6 +77,8 @@ test("a committee's pages are accessible", async ({ page }) => {
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/events/${event}`);
   await expectAccessible(page);
+  await page.goto(`/manage/${slug}/numbers`);
+  await expectAccessible(page);
   // Give it a seva rota open for volunteers (before its pages are first
   // seen, as they are saved).
   sql(
@@ -102,6 +107,7 @@ test("the admin area is accessible", async ({ page }) => {
   await logInAsAdmin(page, `a11y-admin-${Date.now()}@example.com`);
   for (const path of [
     "/ops",
+    "/ops/today",
     "/ops/mandirs",
     "/ops/mandirs/new",
     "/ops/mandirs/geeta-bhavan-leicester",

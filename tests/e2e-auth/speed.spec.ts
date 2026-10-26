@@ -4,14 +4,15 @@ import { stubMapTiles } from "./helpers";
 
 // With real data the longest pages (every mandir, eight weeks of events)
 // must stay light too. The HTML itself may grow with the list, so these
-// allow 100 KB more than the empty pages. /mandirs opens on the map, which
-// has its own JavaScript allowance (tests/speed.ts); its pictures are
-// stubbed.
+// allow 100 KB more than the empty pages. /mandirs opens on the map, and
+// What's on can be shown as one; the map has its own JavaScript allowance
+// (tests/speed.ts) and its pictures are stubbed.
 for (const path of [
   "/mandirs",
   "/mandirs/geeta-bhavan-leicester",
   "/festivals",
   "/whats-on",
+  "/whats-on?view=map",
   "/seva",
 ]) {
   test(`${path} with data stays within the speed budget`, async ({ page }) => {
@@ -19,7 +20,7 @@ for (const path of [
     await ownDownloadsOnly(page);
     await page.goto(path);
     const weight = await pageWeight(page);
-    const map = path === "/mandirs" ? MAP_JS : 0;
+    const map = path === "/mandirs" || path.endsWith("view=map") ? MAP_JS : 0;
     expect(weight.js, `JavaScript on ${path} (KB)`).toBeLessThanOrEqual(
       BUDGET.js + map,
     );

@@ -18,6 +18,7 @@ import {
 import { useT } from "@/components/use-t";
 import { outcodeNear } from "@/lib/geo";
 import { enPlace } from "@/lib/i18n/client/place";
+import { placeHref, readSaved, savePlace as save } from "@/lib/place-memory";
 
 // "Where are you?": the place What's on and the festival season pages show
 // events near. A line saying where ("Near HA9 · 15 miles") with "Change",
@@ -28,40 +29,7 @@ import { enPlace } from "@/lib/i18n/client/place";
 // on, the pop-up opens by itself the first time; a link can open it
 // with ?pick=1.
 
-const KEY = "toran:place";
-const DEFAULT_MILES = 15;
 const noSubscribe = () => () => {};
-
-type Saved = { near: string; within: number } | { skip: true };
-
-function readSaved(): Saved | null {
-  try {
-    const raw: unknown = JSON.parse(localStorage.getItem(KEY) ?? "null");
-    if (!raw || typeof raw !== "object") return null;
-    if ("skip" in raw && raw.skip === true) return { skip: true };
-    if (
-      "near" in raw &&
-      typeof raw.near === "string" &&
-      raw.near &&
-      "within" in raw &&
-      typeof raw.within === "number"
-    ) {
-      return { near: raw.near.slice(0, 10), within: raw.within };
-    }
-  } catch {
-    // Storage blocked or spoiled: as if nothing was saved.
-  }
-  return null;
-}
-
-function save(value: Saved | null) {
-  try {
-    if (value) localStorage.setItem(KEY, JSON.stringify(value));
-    else localStorage.removeItem(KEY);
-  } catch {
-    // Not saved; the page still works.
-  }
-}
 
 // Opens the pop-up (shown in the page first when the address asks, ?pick=1).
 function popUp(dialog: HTMLDialogElement | null) {
@@ -70,27 +38,6 @@ function popUp(dialog: HTMLDialogElement | null) {
   dialog.showModal();
   // Start on the main choice rather than ✕.
   dialog.querySelector<HTMLElement>("[data-first]")?.focus();
-}
-
-// The page's address with a place (or none), keeping the visitor's other
-// choices ("keep"). A region only stays when no place is chosen.
-function placeHref(
-  page: string,
-  keep: string,
-  place: { near?: string; within?: number; region?: string; pick?: boolean },
-): string {
-  const query = new URLSearchParams(keep);
-  if (place.near) {
-    query.set("near", place.near);
-    if (place.within && place.within !== DEFAULT_MILES) {
-      query.set("within", String(place.within));
-    }
-  } else if (place.region) {
-    query.set("region", place.region);
-  }
-  if (place.pick) query.set("pick", "1");
-  const q = query.toString();
-  return q ? `${page}?${q}` : page;
 }
 
 export function PlacePicker({

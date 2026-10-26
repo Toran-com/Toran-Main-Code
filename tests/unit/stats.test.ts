@@ -5,6 +5,7 @@ import {
   countablePath,
   isBot,
   isMetric,
+  mandirNumbers,
   mandirSlugOf,
   pageKind,
   periodDays,
@@ -162,5 +163,50 @@ describe("festival season pages", () => {
     const sql = readFileSync(`${dir}/${latest}`, "utf8");
     const listed = /'\^\/\(([a-z|-]+)\)\$'/.exec(sql)?.[1].split("|");
     expect(listed?.sort()).toEqual(SEASONS.map((s) => s.slug).sort());
+  });
+});
+
+describe("mandirNumbers", () => {
+  const A = "11111111-1111-1111-1111-111111111111";
+  const B = "22222222-2222-2222-2222-222222222222";
+  const row = (path: string, metric: string, count: number) => ({
+    path,
+    metric,
+    count,
+  });
+  const numbers = mandirNumbers(
+    {
+      days: [],
+      paths: [
+        row("/mandirs/one", "view", 10),
+        row("/mandirs/one", "subscribe", 2),
+        row(`/mandirs/one/events/${A}`, "view", 4),
+        row(`/mandirs/one/events/${A}/seva`, "view", 3),
+        row(`/mandirs/one/events/${A}`, "calendar", 2),
+        row(`/mandirs/one/events/${B}`, "view", 9),
+        row(`/mandirs/one/events/${B}`, "share", 1),
+        // Another mandir, and something not counted.
+        row("/mandirs/one-two", "view", 50),
+        row("/mandirs/one", "click", 5),
+      ],
+    },
+    "one",
+  );
+
+  it("adds up the mandir's own pages only", () => {
+    expect(numbers.totals).toEqual({
+      view: 26,
+      calendar: 2,
+      subscribe: 2,
+      share: 1,
+    });
+    expect(numbers.pageViews).toBe(10);
+  });
+
+  it("counts each event's page and seva sign-up page together, most viewed first", () => {
+    expect(numbers.events).toEqual([
+      { id: B, views: 9, calendar: 0, share: 1 },
+      { id: A, views: 7, calendar: 2, share: 0 },
+    ]);
   });
 });

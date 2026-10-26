@@ -17,7 +17,7 @@ export function generateMetadata(): Metadata {
 }
 
 // The home page in Gujarati.
-export default function GujaratiHome() {
+export default function GujaratiHome(props: PageProps<"/gu">) {
   setPageLocale("gu");
-  return <Home />;
+  return <Home {...props} />;
 }

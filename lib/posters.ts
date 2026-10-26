@@ -17,7 +17,12 @@ export const POSTER_SOURCES = {
 
 export type PosterSource = keyof typeof POSTER_SOURCES;
 
-export type Poster = EventInput & { from: PosterSource; link: string };
+export type Poster = EventInput & {
+  from: PosterSource;
+  link: string;
+  // Read off a picture by machine (lib/poster-reader.ts), not typed up.
+  read?: "machine";
+};
 
 // Reads a stored poster back, or null if it isn't one.
 export function posterFrom(proposed: unknown): Poster | null {
@@ -36,6 +41,7 @@ export function posterFrom(proposed: unknown): Poster | null {
   for (const f of ["title_gu", "summary_gu", "kind"] as const) {
     if (typeof p[f] === "string" && p[f]) poster[f] = p[f];
   }
+  if (p.read === "machine") poster.read = "machine";
   return poster;
 }
 

@@ -54,7 +54,7 @@ async function EditMandir({
     ? await supabase
         .from("mandirs")
         .select(
-          "id, slug, name, town, region, postcode, website, phone, tradition, calendar, charity_number, status, latitude",
+          "id, slug, name, town, region, postcode, website, phone, tradition, calendar, charity_number, status, latitude, getting_there",
         )
         .eq("slug", slug)
         .maybeSingle()

@@ -4,14 +4,9 @@ import { connection } from "next/server";
 import { type CSSProperties, Suspense } from "react";
 import { POSTCODE_CREDIT } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
+import { RememberPlace } from "@/components/remember-place";
 import { SevaExplorer } from "@/components/seva-explorer";
-import {
-  buttonClass,
-  Card,
-  inputClass,
-  Loading,
-  Notice,
-} from "@/components/ui";
+import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
 import { dateTileParts, formatEventStart } from "@/lib/format";
 import { localePath, pageT } from "@/lib/i18n/page";
 import { londonDate } from "@/lib/london";
@@ -115,8 +110,34 @@ async function SevaNeeds({ searchParams }: PageProps<"/seva">) {
   const part = String(query.time ?? "");
   const day = dayFrom(query.day);
 
+  // The visitor's other choices, kept when going to their saved place.
+  const keep = new URLSearchParams();
+  for (const [name, value] of Object.entries(query)) {
+    if (
+      !["near", "within", "remember"].includes(name) &&
+      typeof value === "string"
+    )
+      keep.set(name, value);
+  }
+
   return (
     <>
+      <RememberPlace
+        page={localePath("/seva")}
+        near={near}
+        within={within}
+        status={
+          !near
+            ? "none"
+            : origin === "unavailable"
+              ? "unavailable"
+              : origin
+                ? "found"
+                : "unknown"
+        }
+        keep={keep.toString()}
+        remember={query.remember === "1"}
+      />
       {totals.places > 0 && <NeedBand totals={totals} />}
       {problem && <Notice tone="error">{problem}</Notice>}
       {rotas.state !== "ok" ? (
@@ -150,16 +171,16 @@ async function SevaNeeds({ searchParams }: PageProps<"/seva">) {
       )}
       {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
 
-      <Card>
-        <h2 className="text-xl font-bold sm:text-2xl">
+      <details className="group border-line border-t pt-4">
+        <summary className="text-peacock w-fit cursor-pointer text-lg font-semibold">
           {t("sevaList.howTitle")}
-        </h2>
-        <ol className="flex list-decimal flex-col gap-2 pl-6">
+        </summary>
+        <ol className="mt-3 flex list-decimal flex-col gap-2 pl-6">
           <li>{t("sevaList.how1")}</li>
           <li>{t("sevaList.how2")}</li>
           <li>{t("sevaList.how3")}</li>
         </ol>
-      </Card>
+      </details>
       <p className="text-muted">
         {t("sevaList.committee")}{" "}
         <Link href="/for-mandirs" className="text-peacock font-semibold">
@@ -230,6 +251,8 @@ function PostcodeForm({ near, within }: { near: string; within: number }) {
           className={`${inputClass} min-w-0 flex-[2]`}
         />
         {within !== 15 && <input type="hidden" name="within" value={within} />}
+        {/* So the page remembers it for next time. */}
+        <input type="hidden" name="remember" value="1" />
         <button
           type="submit"
           className={`${buttonClass} flex-1 basis-24 sm:max-w-40`}
