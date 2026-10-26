@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
 import { EventActions } from "@/components/event-actions";
 import { FollowButton } from "@/components/follow";
-import { GlobeIcon, PhoneIcon, PinIcon } from "@/components/icons";
+import { CallAndDirections, directionsTo } from "@/components/call-directions";
+import { GlobeIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ReadAloud } from "@/components/read-aloud";
@@ -331,51 +332,26 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
   );
 }
 
-function directionsTo(mandir: MandirDetails): string | null {
-  return mandir.postcode
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        `${mandir.name} ${mandir.postcode}`,
-      )}`
-    : null;
-}
-
-// The things people most often want, in one tap: directions, the
-// mandir's own website, a call, or sharing the page.
+// The things people most often want, in one tap: directions and a call
+// as big buttons, then the mandir's own website or sharing the page.
 function QuickLinks({ mandir }: { mandir: MandirDetails }) {
   const t = pageT();
-  const directions = directionsTo(mandir);
   return (
-    <div className="flex flex-wrap items-center gap-2 pt-1">
-      {directions && (
-        <a
-          href={directions}
-          rel="noopener"
-          className="bg-peacock text-on-peacock hover:bg-peacock-deep inline-flex items-center gap-2 rounded-full px-5 py-2 text-base font-semibold no-underline transition active:scale-95"
-        >
-          <PinIcon />
-          {t("mandir.directions")}
-        </a>
-      )}
-      {mandir.website && (
-        <a href={mandir.website} rel="noopener" className={actionPillClass}>
-          <GlobeIcon />
-          {t("mandir.website")}
-        </a>
-      )}
-      {mandir.phone && (
-        <a
-          href={`tel:${mandir.phone.replace(/\s/g, "")}`}
-          className={actionPillClass}
-        >
-          <PhoneIcon />
-          {t("mandir.call")}
-        </a>
-      )}
-      <ShareButtons
-        label={t("mandir.share")}
-        text={t("mandir.shareText", { name: mandir.name, town: mandir.town })}
-        path={localePath(`/mandirs/${mandir.slug}`)}
-      />
+    <div className="flex flex-col gap-3 pt-1">
+      <CallAndDirections mandir={mandir} />
+      <div className="flex flex-wrap items-center gap-2">
+        {mandir.website && (
+          <a href={mandir.website} rel="noopener" className={actionPillClass}>
+            <GlobeIcon />
+            {t("mandir.website")}
+          </a>
+        )}
+        <ShareButtons
+          label={t("mandir.share")}
+          text={t("mandir.shareText", { name: mandir.name, town: mandir.town })}
+          path={localePath(`/mandirs/${mandir.slug}`)}
+        />
+      </div>
     </div>
   );
 }
@@ -477,6 +453,7 @@ function EventRow({
               shareText={eventShareText(event, mandir)}
               path={localePath(eventPath(mandir.slug, event.id))}
               copy={false}
+              nextStartsAt={event.next_starts_at}
             />
           </div>
         )}

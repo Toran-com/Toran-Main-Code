@@ -75,6 +75,49 @@ export async function listUpcomingEvents(): Promise<Loaded<ListedEvent[]>> {
   return { state: "ok", data: events };
 }
 
+// Particular events, still to come, however far ahead: a family's plan
+// (lib/plan.ts). Cached for these ids; any change to an event or mandir
+// refreshes it.
+export async function listEventsById(
+  ids: string[],
+): Promise<Loaded<ListedEvent[]>> {
+  "use cache";
+  cacheTag("events", "mandirs");
+  let db;
+  try {
+    db = createPublicServerClient();
+  } catch {
+    cacheLife("minutes");
+    return { state: "unavailable" };
+  }
+  if (!db) {
+    cacheLife("hours");
+    return { state: "not connected" };
+  }
+  if (!ids.length) return { state: "ok", data: [] };
+  const from = `${londonDate()}T00:00:00Z`;
+  const { data, error } = await db
+    .from("events")
+    .select(
+      "id, title, title_gu, summary, kind, confirmed_at, origin, starts_at, all_day, status, recurrence, link, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), event_occurrences (starts_at, cancelled)",
+    )
+    .in("id", ids)
+    .in("status", ["published", "cancelled"])
+    .or(upcomingFilter(from))
+    .gte("event_occurrences.starts_at", from);
+  if (error) {
+    cacheLife("minutes");
+    return { state: "unavailable" };
+  }
+  cacheLife("hours");
+  return {
+    state: "ok",
+    data: withNextStart(data, from).map(
+      ({ event_occurrences, starts_at, ...e }) => e,
+    ),
+  };
+}
+
 // A visitor's typed postcode or district, as a map position. Cached by
 // postcode only (never linked to a person) so repeat searches are quick.
 export async function positionForSearch(

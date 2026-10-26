@@ -154,6 +154,7 @@ export const gu: Record<MessageKey, string> = {
   "mandir.website": "વેબસાઇટ",
   "mandir.phone": "ફોન",
   "mandir.call": "ફોન કરો",
+  "mandir.callNumber": "{name}ને {phone} પર ફોન કરો",
   "mandir.charity": "નોંધાયેલ ચેરિટી",
   "mandir.about": "મંદિર વિશે",
   "mandir.share": "આ મંદિર શેર કરો",
@@ -165,6 +166,16 @@ export const gu: Record<MessageKey, string> = {
   "mandir.untilThenCheck": "ત્યાં સુધી,",
   "mandir.orNoticeboard": "અથવા મંદિરનું નોટિસ બોર્ડ જુઓ.",
   "mandir.untilThenNoticeboard": "ત્યાં સુધી, મંદિરનું નોટિસ બોર્ડ જુઓ.",
+  "plan.title": "અમારો પ્લાન",
+  "plan.description":
+    "તમે પસંદ કરેલા કાર્યક્રમો, પરિવારને એક WhatsApp સંદેશમાં મોકલવા માટે.",
+  "plan.intro":
+    "આ ફોન પર પસંદ કરેલા કાર્યક્રમો. એક WhatsApp સંદેશમાં પરિવારને મોકલો; લિંક ધરાવનાર દરેકને આ જ પ્લાન દેખાશે.",
+  "plan.send": "પરિવારને WhatsApp પર મોકલો",
+  "plan.messageTitle": "અમારો પ્લાન:",
+  "plan.messageLink": "Toran પર બધું:",
+  "plan.notShown":
+    "દેખાતા નથી: {count} વધુ, જે પૂરા થઈ ગયા છે કે હવે Toran પર નથી.",
   "visit.title": "મુલાકાત",
   "visit.access": "પ્રવેશ અને અંદર ફરવું",
   "visit.food": "ભોજન",

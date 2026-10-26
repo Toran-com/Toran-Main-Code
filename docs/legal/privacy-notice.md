@@ -67,6 +67,11 @@ within one month.
   stays on your phone. Your phone also keeps their pages, so they open
   without signal. Clearing the site's data in your browser forgets who
   you follow, and those pages.
+- **Making a plan.** If you press "Add to our plan" on an event, your phone
+  remembers it; nothing is sent to us. When you open the plan, or send it
+  to someone on WhatsApp, the events' codes go in the page's address so
+  Toran can show them, like any other link; we don't keep them. Clearing
+  the plan, or the site's data in your browser, forgets it.
 - **Telling us about an event, or asking for a correction.** We keep only
   what you type into the form: the event's details, or what's wrong and on
   which page. We don't ask who you are or record your IP address, so please

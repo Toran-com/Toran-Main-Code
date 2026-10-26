@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { AddToCalendar } from "@/components/add-to-calendar";
+import { CallAndDirections } from "@/components/call-directions";
 import { DateTile } from "@/components/date-tile";
 import { CalendarIcon, ClockIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Toran } from "@/components/ornaments";
 import { Badge, LoadProblem } from "@/components/public-shell";
+import { PlanButton } from "@/components/plan";
 import { ReadAloud } from "@/components/read-aloud";
 import { ShareButtons } from "@/components/share-buttons";
 import { cardClass, Notice, quietButtonClass } from "@/components/ui";
@@ -238,6 +240,7 @@ export default async function EventPage({
           <div className={`${cardClass} flex flex-col gap-6 p-6 sm:p-7`}>
             <ReadAloud text={spokenEvent(result.data)} />
             <Details page={result.data} />
+            <CallAndDirections mandir={mandir} />
             {confirmedOn ? (
               <Badge tone="leaf">
                 <span aria-hidden="true">✓ </span>
@@ -258,6 +261,7 @@ export default async function EventPage({
                   text={eventShareText(event, mandir)}
                   path={localePath(path)}
                 />
+                <PlanButton id={event.id} at={event.next_starts_at} />
               </div>
             )}
           </div>
@@ -405,11 +409,6 @@ function Details({ page }: { page: MandirEventPage }) {
   const { mandir, event } = page;
   const t = pageT();
   const rule = event.recurrence && describeRule(event.recurrence);
-  const directions = mandir.postcode
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        `${mandir.name} ${mandir.postcode}`,
-      )}`
-    : null;
   const rows: { label: string; icon: ReactNode; value: ReactNode }[] = [
     {
       label: t("event.when"),
@@ -446,17 +445,6 @@ function Details({ page }: { page: MandirEventPage }) {
             <>
               <br />
               {event.location_note}
-            </>
-          )}
-          {directions && (
-            <>
-              <br />
-              <a
-                href={directions}
-                className="text-peacock font-semibold underline"
-              >
-                {t("mandir.directions")}
-              </a>
             </>
           )}
         </>
