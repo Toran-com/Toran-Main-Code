@@ -45,6 +45,12 @@ test("Toran sends a reviewer only what's new in the Gujarati", async ({
   await expect(
     page.getByText(/^All \d+ lines have been checked/),
   ).toBeVisible();
-  await expect(page.getByText("New", { exact: true })).toHaveCount(0);
-  await expect(page.getByText("Changed", { exact: true })).toHaveCount(0);
+  // Visible ones only: the page as it was before stays in the document,
+  // hidden, for going back.
+  await expect(
+    page.getByText("New", { exact: true }).filter({ visible: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("Changed", { exact: true }).filter({ visible: true }),
+  ).toHaveCount(0);
 });
