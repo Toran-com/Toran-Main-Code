@@ -341,14 +341,14 @@ isOneToOne: false
                   ]
                 },"sources": {
                   Row: {
-                    "created_at": string,"id": string,"kind": string,"label": string | null,"last_checked_at": string | null,"last_found": number | null,"last_notes": string | null,"last_outcome": string | null,"mandir_id": string,"url": string | null
+                    "created_at": string,"id": string,"kind": string,"label": string | null,"last_checked_at": string | null,"last_documents": Json | null,"last_found": number | null,"last_notes": string | null,"last_outcome": string | null,"mandir_id": string,"url": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"id"?: string,"kind": string,"label"?: string | null,"last_checked_at"?: string | null,"last_found"?: number | null,"last_notes"?: string | null,"last_outcome"?: string | null,"mandir_id": string,"url"?: string | null
+                    "created_at"?: string,"id"?: string,"kind": string,"label"?: string | null,"last_checked_at"?: string | null,"last_documents"?: Json | null,"last_found"?: number | null,"last_notes"?: string | null,"last_outcome"?: string | null,"mandir_id": string,"url"?: string | null
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"kind"?: string,"label"?: string | null,"last_checked_at"?: string | null,"last_found"?: number | null,"last_notes"?: string | null,"last_outcome"?: string | null,"mandir_id"?: string,"url"?: string | null
+                    "created_at"?: string,"id"?: string,"kind"?: string,"label"?: string | null,"last_checked_at"?: string | null,"last_documents"?: Json | null,"last_found"?: number | null,"last_notes"?: string | null,"last_outcome"?: string | null,"mandir_id"?: string,"url"?: string | null
                   }
                   Relationships: [
                     {

@@ -452,8 +452,9 @@ to the first.
 through them, oldest check first. Each check reads the home page, up to
 five pages that look like an events list, and the event data they lead to:
 
-- event data in the pages (schema.org JSON-LD or microdata), including on
-  single event pages when the list itself has none;
+- event data in the pages (schema.org JSON-LD or microdata, or the older
+  hCalendar and h-event markup), including on single event pages when the
+  list itself has none;
 - calendar feeds (`.ics`, "Export events", `webcal:` links);
 - Google Calendars shown on the site (their public feed);
 - WordPress sites with The Events Calendar (its list of events).
@@ -470,6 +471,13 @@ for example a Wix site (events load in the browser) or a site that only
 writes dates out in text or poster pictures. For those, ask the committee
 to add events themselves or forward their posters. It obeys robots.txt and
 never reads Facebook or Instagram (decision 0005).
+
+It also lists up to five patrikas and posters each site links to or shows:
+PDFs and pictures whose words or file names look like a programme, poster
+or festival (not logos or small pictures). Toran doesn't download or read
+them; each has **Type it up**, which opens the poster form on
+`/ops/posters` with the mandir, the patrika's address and "Mandir's
+website" already filled in.
 
 ### Nightly job (decision 0016)
 

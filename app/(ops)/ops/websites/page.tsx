@@ -59,7 +59,7 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
         supabase
           .from("sources")
           .select(
-            "mandir_id, last_checked_at, last_outcome, last_found, last_notes",
+            "mandir_id, last_checked_at, last_outcome, last_found, last_notes, last_documents",
           )
           .eq("kind", "crawler"),
       ])
@@ -93,8 +93,10 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
         <p>
           Reads each mandir&apos;s own website for events it publishes in a form
           Toran can read: event data in its pages, calendar feeds, Google
-          Calendars shown on the site, and WordPress&apos;s The Events Calendar.
-          Names and descriptions are cleaned into plain text, times found in the
+          Calendars shown on the site, WordPress&apos;s The Events Calendar, and
+          the older hCalendar markup. It also lists the patrikas and posters
+          (PDFs and pictures) a site links to, to type up by hand. Names and
+          descriptions are cleaned into plain text, times found in the
           description when the site gives none, and each event gets a likely
           type. Anything new goes to the{" "}
           <Link href="/ops/posters" className="text-peacock underline">
@@ -146,6 +148,35 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
                     {r.check.last_notes.split("\n").join(" ")}
                   </span>
                 )}
+                {documentsOf(r.check?.last_documents).length > 0 && (
+                  <ul
+                    aria-label={`Patrikas and posters on ${r.name}'s website`}
+                    className="flex flex-col gap-1 pt-1"
+                  >
+                    {documentsOf(r.check?.last_documents).map((d) => (
+                      <li
+                        key={d.url}
+                        className="flex flex-wrap items-baseline gap-x-3"
+                      >
+                        <a
+                          href={d.url}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          className="text-peacock font-semibold underline"
+                        >
+                          {d.kind === "pdf" ? "PDF" : "Picture"}: {d.label}
+                        </a>
+                        <Link
+                          href={`/ops/posters?mandir=${encodeURIComponent(r.slug)}&source=website&link=${encodeURIComponent(d.url)}#type-up`}
+                          className="text-peacock text-base underline"
+                        >
+                          Type it up
+                          <span className="sr-only">: {d.label}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               {last && last in OUTCOMES && (
                 <Badge tone={OUTCOMES[last].tone}>
@@ -168,6 +199,27 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
         })}
       </ul>
     </>
+  );
+}
+
+// The patrikas and posters saved with a check, ignoring anything malformed.
+function documentsOf(
+  value: unknown,
+): { url: string; kind: string; label: string }[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((d) =>
+    d &&
+    typeof d === "object" &&
+    typeof d.url === "string" &&
+    /^https?:\/\//.test(d.url)
+      ? [
+          {
+            url: d.url,
+            kind: d.kind === "pdf" ? "pdf" : "picture",
+            label: typeof d.label === "string" && d.label ? d.label : d.url,
+          },
+        ]
+      : [],
   );
 }
 

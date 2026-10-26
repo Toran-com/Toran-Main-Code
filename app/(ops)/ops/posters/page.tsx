@@ -21,7 +21,7 @@ import { DUPLICATE_ERRORS, MERGED } from "@/lib/duplicates";
 import { EVENT_ERRORS } from "@/lib/event-form";
 import { pageTitle } from "@/lib/site";
 import { posterReadingOn } from "@/lib/poster-reader";
-import { POSTER_SOURCES, posterFrom } from "@/lib/posters";
+import { checkLink, POSTER_SOURCES, posterFrom } from "@/lib/posters";
 import {
   eventCandidates,
   SOURCE_GROUPS,
@@ -125,6 +125,13 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       ? readMessage(read)
       : DONE[String(query.done ?? "")];
   const chosen = String(query.mandir ?? "");
+  // Coming from a patrika found on a mandir's website (/ops/websites).
+  const startLink = String(query.link ?? "");
+  const prefill = {
+    link: startLink && checkLink(startLink) ? startLink : "",
+    from:
+      query.source === "website" ? ("website" as const) : ("whatsapp" as const),
+  };
   const group = GROUPS.find((g) => g === query.from);
   const fixing = String(query.fix ?? "");
   const here = group ? `/ops/posters?from=${group}` : "/ops/posters";
@@ -281,7 +288,9 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       </Card>
 
       <Card>
-        <h2 className="text-2xl font-bold">Type up a poster</h2>
+        <h2 id="type-up" className="text-2xl font-bold">
+          Type up a poster
+        </h2>
         <p className="text-muted">
           Copy the event details from a poster or message someone forwarded.
           Only the event: never the name or number of whoever sent it. The
@@ -316,6 +325,7 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
               type="url"
               maxLength={300}
               placeholder="https://"
+              defaultValue={prefill.link}
               className={inputClass}
             />
           </label>
@@ -324,7 +334,7 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
             <select
               name="from"
               required
-              defaultValue="whatsapp"
+              defaultValue={prefill.from}
               className={inputClass}
             >
               {Object.entries(POSTER_SOURCES)
