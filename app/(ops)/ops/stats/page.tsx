@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
+import {
+  FigureTable as Table,
+  FigureTile as Tile,
+} from "@/components/ops-figures";
 import { OpsNav } from "@/components/ops-nav";
-import { cardClass, Loading, Notice, PageShell } from "@/components/ui";
+import { Loading, Notice, PageShell } from "@/components/ui";
 import { requireToranAdmin } from "@/lib/auth";
 import { londonDate } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
@@ -144,72 +148,6 @@ async function Stats({ searchParams }: PageProps<"/ops/stats">) {
         empty="No event pages counted yet."
       />
     </>
-  );
-}
-
-function Tile({ label, value }: { label: string; value: number }) {
-  return (
-    <div className={`${cardClass} flex flex-col gap-1 p-4`}>
-      <dt className="text-muted text-base">{label}</dt>
-      <dd className="font-display text-4xl tabular-nums">
-        {value.toLocaleString("en-GB")}
-      </dd>
-    </div>
-  );
-}
-
-function Table({
-  title,
-  head,
-  rows,
-  empty,
-}: {
-  title: string;
-  head: string[];
-  rows: ReactNode[][];
-  empty: string;
-}) {
-  return (
-    <section className={`${cardClass} flex flex-col gap-3 p-5`}>
-      <h2 className="text-xl font-bold">{title}</h2>
-      {rows.length ? (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-base">
-            <thead>
-              <tr className="border-line text-muted border-b">
-                {head.map((h, i) => (
-                  <th
-                    key={h}
-                    scope="col"
-                    className={`py-2 pr-3 font-semibold ${i ? "text-right" : ""}`}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, r) => (
-                <tr key={r} className="border-line border-b last:border-0">
-                  {row.map((cell, i) => (
-                    <td
-                      key={i}
-                      className={`py-2 pr-3 ${i ? "text-right tabular-nums" : ""}`}
-                    >
-                      {typeof cell === "number"
-                        ? cell.toLocaleString("en-GB")
-                        : cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p className="text-muted">{empty}</p>
-      )}
-    </section>
   );
 }
 
