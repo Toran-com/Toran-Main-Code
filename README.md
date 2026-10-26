@@ -58,7 +58,8 @@ heading that fails stops the merge. `tests/a11y.ts` has the check.
 
 They also keep to a **speed budget** (`tests/speed.ts`): at most 250 KB of
 JavaScript and 350 KB in all per page, as sent over the network, because
-many visitors are on older phones and mobile data.
+many visitors are on older phones and mobile data. It counts what each page
+downloads for itself, not the pages its links fetch ahead of time.
 
 Backups, and the restore drill to practise every three months, are in
 `docs/backup-and-restore.md`.
