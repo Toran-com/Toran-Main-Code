@@ -6,13 +6,7 @@ import { POSTCODE_CREDIT } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { RememberPlace } from "@/components/remember-place";
 import { SevaExplorer } from "@/components/seva-explorer";
-import {
-  buttonClass,
-  Card,
-  inputClass,
-  Loading,
-  Notice,
-} from "@/components/ui";
+import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
 import { dateTileParts, formatEventStart } from "@/lib/format";
 import { localePath, pageT } from "@/lib/i18n/page";
 import { londonDate } from "@/lib/london";
@@ -177,16 +171,16 @@ async function SevaNeeds({ searchParams }: PageProps<"/seva">) {
       )}
       {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
 
-      <Card>
-        <h2 className="text-xl font-bold sm:text-2xl">
+      <details className="group border-line border-t pt-4">
+        <summary className="text-peacock w-fit cursor-pointer text-lg font-semibold">
           {t("sevaList.howTitle")}
-        </h2>
-        <ol className="flex list-decimal flex-col gap-2 pl-6">
+        </summary>
+        <ol className="mt-3 flex list-decimal flex-col gap-2 pl-6">
           <li>{t("sevaList.how1")}</li>
           <li>{t("sevaList.how2")}</li>
           <li>{t("sevaList.how3")}</li>
         </ol>
-      </Card>
+      </details>
       <p className="text-muted">
         {t("sevaList.committee")}{" "}
         <Link href="/for-mandirs" className="text-peacock font-semibold">

@@ -97,21 +97,21 @@ export function EventCard({ event: e }: { event: EventNear }) {
         <p className="text-muted">
           {formatTimeOfDay(e.next_starts_at, e.all_day)}
           {rule && ` · ${rule}`}
+          {kind && ` · ${kind}`}
         </p>
         {e.summary && <p className="text-muted line-clamp-2">{e.summary}</p>}
-        {(cancelled || kind || source) && (
-          <p className="mt-1.5 flex flex-wrap items-center gap-2">
+        {(cancelled || source) && (
+          <p className="text-muted mt-1 flex flex-wrap items-center gap-x-2 text-base">
             {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
             {source &&
               (e.confirmed_at ? (
-                <Badge tone="leaf">
+                <span className="text-leaf-ink font-semibold">
                   <span aria-hidden="true">✓ </span>
                   {source}
-                </Badge>
+                </span>
               ) : (
-                <span className="text-muted text-base">{source}</span>
+                <span>{source}</span>
               ))}
-            {kind && <Badge>{kind}</Badge>}
           </p>
         )}
       </div>

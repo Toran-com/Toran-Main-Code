@@ -14,8 +14,7 @@ export const guClient: Record<ClientKey, string> = {
   "share.copyPrompt": "આ લિંક કૉપિ કરો:",
   "subscribe.apple": "Apple કે Outlook કેલેન્ડર",
   "subscribe.google": "Google કેલેન્ડર",
-  "subscribe.note":
-    "કોઈ એકાઉન્ટની જરૂર નથી. તમે ગમે ત્યારે તેને તમારા કેલેન્ડરમાંથી કાઢી શકો છો.",
+  "subscribe.note": "કોઈ ખાતાની જરૂર નથી.",
   "countdown.days": "{days} દિવસ બાકી",
   "mandirs.find": "મંદિર કે શહેર શોધો",
   "mandirs.findExample": "દા.ત. Leicester, BAPS, Harrow",
