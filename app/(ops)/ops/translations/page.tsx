@@ -1,41 +1,51 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { CopyText } from "@/components/copy-text";
 import { OpsNav } from "@/components/ops-nav";
-import { Card, Loading, Notice, PageShell } from "@/components/ui";
+import { TranslationLine } from "@/components/translation-line";
+import {
+  Card,
+  Loading,
+  Notice,
+  PageShell,
+  pillButtonClass,
+  pillPrimaryClass,
+} from "@/components/ui";
 import { requireToranAdmin } from "@/lib/auth";
-import { LOCALES, MESSAGES, type MessageKey } from "@/lib/i18n";
-import { en } from "@/lib/i18n/en";
+import { LOCALES } from "@/lib/i18n";
 import { pageTitle } from "@/lib/site";
+import { loadReviewLines } from "@/lib/translation-pack";
+import { reviewerText, stampsFor, toReview } from "@/lib/translation-review";
+import { markChecked } from "./actions";
 
 export const metadata: Metadata = {
   title: pageTitle("Translations · Admin"),
   robots: { index: false },
 };
 
-export default function OpsTranslationsPage() {
+export default function OpsTranslationsPage(
+  props: PageProps<"/ops/translations">,
+) {
   return (
     <PageShell title="Translations" wide>
       <OpsNav current="/ops/translations" />
       <Suspense fallback={<Loading />}>
-        <Translations />
+        <Translations {...props} />
       </Suspense>
     </PageShell>
   );
 }
 
-async function Translations() {
+async function Translations({ searchParams }: PageProps<"/ops/translations">) {
   await requireToranAdmin("/ops/translations");
-  const keys = Object.keys(en) as MessageKey[];
-  const gu = MESSAGES.gu;
-  // Numbered so a reviewer can reply "7: better as …".
-  const forReviewer = [
-    "Toran: Gujarati wording to check. For each line, is the Gujarati right, natural and polite? Reply with the number and a better version.",
-    ...keys.map(
-      (key, i) =>
-        `${i + 1}. English: ${en[key]}\n    ગુજરાતી: ${gu[key] ?? ""}`,
-    ),
-  ].join("\n\n");
+  const query = await searchParams;
+  const { lines, saved } = await loadReviewLines();
+  const fresh = toReview(lines);
+  // What's new, unless everything has been checked or all was asked for.
+  const all = query.show === "all" || !fresh.length;
+  const shown = all ? lines : fresh;
+  const checked = Number(query.checked) || 0;
 
   return (
     <>
@@ -43,28 +53,107 @@ async function Translations() {
         <Notice>
           The Gujarati is a <strong>draft</strong> and isn&apos;t shown on the
           site. Before it is, a native Gujarati speaker (ideally someone from a
-          mandir committee) should check every line. Copy the list below and
-          send it to them; then the corrections go into{" "}
-          <code>lib/i18n/gu.ts</code> and <code>ready</code> is switched on in{" "}
-          <code>lib/i18n/index.ts</code>.
+          mandir committee) should check every line. Send them the pack below;
+          then the corrections go into <code>lib/i18n/gu.ts</code> and{" "}
+          <code>ready</code> is switched on in <code>lib/i18n/index.ts</code>.
         </Notice>
       )}
+      {checked > 0 && (
+        <Notice tone="success">
+          {checked === 1 ? "1 line" : `${checked} lines`} marked as checked.
+          They&apos;ll come back only if their wording changes.
+        </Notice>
+      )}
+      {query.error === "nothing" && (
+        <Notice tone="error">
+          Nothing was marked: the wording changed since the page was opened.
+          Have a look at the list again.
+        </Notice>
+      )}
+      {query.error === "failed" && (
+        <Notice tone="error">
+          That didn&apos;t save. Try again in a minute.
+        </Notice>
+      )}
+      {!saved && (
+        <Notice tone="error">
+          Couldn&apos;t read which lines have been checked, so every line is
+          shown as new.
+        </Notice>
+      )}
+
       <Card>
-        <h2 className="text-xl font-bold">Send to a reviewer</h2>
+        <h2 className="text-xl font-bold">The review pack</h2>
         <p className="text-muted">
-          {keys.length} lines, numbered, English then Gujarati.
+          {fresh.length
+            ? `${fresh.length} of ${lines.length} lines are new or have changed since a reviewer last checked them.`
+            : `All ${lines.length} lines have been checked. New or changed wording shows up here.`}
         </p>
-        <CopyText text={forReviewer} label="Copy the list" />
-      </Card>
-      <ol className="flex flex-col gap-3">
-        {keys.map((key, i) => (
-          <li
-            key={key}
-            className="border-line bg-surface shadow-card grid gap-2 rounded-2xl border p-4 sm:grid-cols-[3rem_1fr_1fr]"
+        {fresh.length > 0 && (
+          <nav aria-label="Lines to show" className="flex flex-wrap gap-2">
+            {(
+              [
+                ["", `What's new (${fresh.length})`, !all],
+                ["all", `Every line (${lines.length})`, all],
+              ] as const
+            ).map(([show, label, current]) => (
+              <Link
+                key={show}
+                href={
+                  show ? `/ops/translations?show=${show}` : "/ops/translations"
+                }
+                aria-current={current ? "page" : undefined}
+                className={`rounded-full border px-4 py-1.5 text-base font-semibold no-underline ${
+                  current
+                    ? "border-peacock bg-peacock text-on-peacock"
+                    : "border-line text-ink hover:bg-sunk"
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+        )}
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            href={`/ops/translations/print${all && fresh.length ? "?show=all" : ""}`}
+            className={pillButtonClass}
           >
-            <span className="text-muted font-semibold">{i + 1}</span>
-            <p>{en[key]}</p>
-            <p lang={LOCALES.gu.lang}>{gu[key]}</p>
+            Print these {shown.length} lines
+          </Link>
+          <CopyText text={reviewerText(shown)} label="Copy the list" />
+        </div>
+        <p className="text-muted text-base">
+          The printout puts English and Gujarati side by side with room to write
+          a better version. The numbers stay the same in every pack, so a reply
+          like &ldquo;312: better as …&rdquo; always means the same line.
+        </p>
+      </Card>
+
+      {saved && fresh.length > 0 && (
+        <Card>
+          <h2 className="text-xl font-bold">When the reviewer has replied</h2>
+          <p className="text-muted">
+            Once their corrections are on the site, mark what&apos;s new as
+            checked. The next pack then only has lines added or changed after
+            today.
+          </p>
+          <form action={markChecked}>
+            <input type="hidden" name="lines" value={stampsFor(fresh)} />
+            <button type="submit" className={pillPrimaryClass}>
+              Mark the {fresh.length} new lines as checked
+            </button>
+          </form>
+        </Card>
+      )}
+
+      <ol className="flex flex-col gap-3">
+        {shown.map((line) => (
+          <li
+            key={line.key}
+            className="border-line bg-surface shadow-card grid gap-2 rounded-2xl border p-4 sm:grid-cols-[6rem_1fr_1fr]"
+          >
+            <TranslationLine line={line} />
           </li>
         ))}
       </ol>

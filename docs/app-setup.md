@@ -564,10 +564,17 @@ page, for example `/gu/mandirs/<a mandir>`, to read it in place.
 
 **To switch Gujarati on:**
 
-1. A native Gujarati speaker checks every line. On Translations, **Copy the
-   list** gives numbered English and Gujarati pairs to send them; they reply
+1. A native Gujarati speaker checks every line. Translations is the
+   review pack: **Copy the list** gives numbered English and Gujarati pairs
+   to paste into an email or WhatsApp, and **Print** gives the same side by
+   side on A4 with room to write a better version. The reviewer replies
    with numbers and corrections, which go into `lib/i18n/gu.ts` (and
-   `lib/i18n/client-messages.ts` for the lines the browser shows).
+   `lib/i18n/client-messages-gu.ts` for the lines the browser shows).
+   Once the corrections are on the site, **Mark the new lines as checked**.
+   From then on the pack has only what's new: lines added since, and lines
+   whose English or Gujarati has changed (shown with what they said before).
+   The numbers never change, so "312" means the same line in every pack.
+   What was checked is kept in the `translation_checks` table.
 2. Set `ready: true` for `gu` in `lib/i18n/index.ts`. The draft notice goes,
    a "ગુજરાતી" / "English" switch appears in the header, and the Gujarati
    pages join the sitemap.

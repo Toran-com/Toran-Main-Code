@@ -121,6 +121,7 @@ test("the admin area is accessible", async ({ page }) => {
     "/ops/festivals",
     "/ops/digest",
     "/ops/translations",
+    "/ops/translations/print",
   ]) {
     await page.goto(path);
     await page.waitForLoadState("networkidle");
