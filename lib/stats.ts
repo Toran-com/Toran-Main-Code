@@ -185,3 +185,49 @@ export function summarise(input: CountSummary, days: string[]): StatsSummary {
     byEvent: [...events].map(([path, views]) => ({ path, views })).sort(most),
   };
 }
+
+// One mandir's numbers for its committee (mandir_count_summary): the
+// totals, its own page's views, and each event's (its page and its seva
+// sign-up page together), most viewed first.
+export type MandirNumbers = {
+  totals: Record<Metric, number>;
+  pageViews: number;
+  events: { id: string; views: number; calendar: number; share: number }[];
+};
+
+export function mandirNumbers(
+  input: CountSummary,
+  slug: string,
+): MandirNumbers {
+  const totals: Record<Metric, number> = {
+    view: 0,
+    calendar: 0,
+    subscribe: 0,
+    share: 0,
+  };
+  let pageViews = 0;
+  const events = new Map<string, MandirNumbers["events"][number]>();
+  const eventPage = new RegExp(`^/mandirs/${slug}/events/(${ID})(?:/seva)?$`);
+  for (const row of input.paths) {
+    if (!isMetric(row.metric) || mandirSlugOf(row.path) !== slug) continue;
+    totals[row.metric] += row.count;
+    if (row.path === `/mandirs/${slug}` && row.metric === "view") {
+      pageViews += row.count;
+    }
+    const id = eventPage.exec(row.path)?.[1];
+    if (!id || row.metric === "subscribe") continue;
+    const e = events.get(id) ?? { id, views: 0, calendar: 0, share: 0 };
+    e[row.metric === "view" ? "views" : row.metric] += row.count;
+    events.set(id, e);
+  }
+  return {
+    totals,
+    pageViews,
+    events: [...events.values()].sort(
+      (a, b) =>
+        b.views - a.views ||
+        b.calendar + b.share - (a.calendar + a.share) ||
+        a.id.localeCompare(b.id),
+    ),
+  };
+}

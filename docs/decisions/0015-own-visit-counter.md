@@ -29,3 +29,7 @@ Track or Global Privacy Control, and known bots, aren't counted.
   guide, not an audit. The database only counts real public pages (the
   mandir, event or festival must exist), so junk can't pile up.
 - Numbers are a little lower than the truth (privacy settings, bots).
+- Each committee sees its own mandir's totals on `/manage/[slug]/numbers`
+  (its page and its events' pages), through `mandir_count_summary`, which
+  only that mandir's committee and Toran admins can call. The same totals,
+  nothing more: still nothing about who visited.

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { EventFields } from "@/components/event-fields";
 import { OpsNav } from "@/components/ops-nav";
+import { PosterPicture } from "@/components/poster-picture";
 import { Badge } from "@/components/public-shell";
 import { ReviewItem } from "@/components/review-item";
 import {
@@ -19,6 +20,7 @@ import { daysBetween } from "@/lib/quick-events";
 import { DUPLICATE_ERRORS, MERGED } from "@/lib/duplicates";
 import { EVENT_ERRORS } from "@/lib/event-form";
 import { pageTitle } from "@/lib/site";
+import { posterReadingOn } from "@/lib/poster-reader";
 import { checkLink, POSTER_SOURCES, posterFrom } from "@/lib/posters";
 import {
   eventCandidates,
@@ -33,7 +35,12 @@ import {
   IMPORT_PROBLEMS,
   type ImportProblem,
 } from "@/lib/website-import";
-import { addPoster, importWebsiteEvents, reviewPosterAsToran } from "./actions";
+import {
+  addPoster,
+  importWebsiteEvents,
+  readPosterPicture,
+  reviewPosterAsToran,
+} from "./actions";
 
 // Toran's review queue: everything waiting before it goes on the site,
 // whichever way it arrived (a poster Toran typed up, a visitor's "Tell us",
@@ -55,6 +62,15 @@ const ERRORS: Record<string, string> = {
     "That mandir has a committee, so they publish it. It's waiting on their page.",
   done: "Someone has already dealt with that one.",
   ...DUPLICATE_ERRORS,
+  readingOff: "Reading pictures isn't switched on yet.",
+  picture: "Please choose a photo or PDF of the poster.",
+  pictureType: "Please send a JPEG, PNG, WebP or GIF photo, or a PDF.",
+  pictureSize:
+    "That file is over 4 MB. Try a smaller photo, or one page of the PDF.",
+  pictureRefused:
+    "Claude declined to read that picture. Please type it up instead.",
+  pictureFailed:
+    "The poster couldn't be read just now. Please try again, or type it up.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -99,9 +115,15 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
     : [{ data: [] }, { data: [] }];
   const query = await searchParams;
   const error = ERRORS[String(query.error ?? "")];
+  const read =
+    query.read === undefined
+      ? null
+      : { added: Number(query.read) || 0, skipped: Number(query.skipped) || 0 };
   const done = query.added
     ? "Added to the queue."
-    : DONE[String(query.done ?? "")];
+    : read
+      ? readMessage(read)
+      : DONE[String(query.done ?? "")];
   const chosen = String(query.mandir ?? "");
   // Coming from a patrika found on a mandir's website (/ops/websites).
   const startLink = String(query.link ?? "");
@@ -237,6 +259,35 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       </section>
 
       <Card>
+        <h2 id="read" className="text-2xl font-bold">
+          Read a poster
+        </h2>
+        {posterReadingOn() ? (
+          <>
+            <p className="text-muted">
+              Send a photo or PDF of a poster or patrika. Claude reads the
+              events off it and each one waits here to be checked, marked
+              &ldquo;read by machine&rdquo;. The picture isn&apos;t kept.
+            </p>
+            <PosterPicture
+              action={readPosterPicture}
+              mandirs={mandirs ?? []}
+              chosen={chosen}
+              sources={Object.entries(POSTER_SOURCES)
+                .filter(([key]) => key !== "visitor")
+                .map(([value, { label }]) => ({ value, label }))}
+            />
+          </>
+        ) : (
+          <p className="text-muted">
+            Not switched on yet: it needs an Anthropic API key
+            (ANTHROPIC_API_KEY) in Vercel&apos;s settings. Until then, type
+            posters up below.
+          </p>
+        )}
+      </Card>
+
+      <Card>
         <h2 id="type-up" className="text-2xl font-bold">
           Type up a poster
         </h2>
@@ -356,4 +407,14 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       </Card>
     </>
   );
+}
+
+function readMessage({ added, skipped }: { added: number; skipped: number }) {
+  const events = (n: number) => `${n} ${n === 1 ? "event" : "events"}`;
+  const left = skipped
+    ? ` ${events(skipped)} left out: already listed or waiting, or not readable.`
+    : "";
+  return added
+    ? `Read ${events(added)} off the poster. They're waiting below, marked "read by machine": check each one.${left}`
+    : `No new events found on that poster.${left}`;
 }

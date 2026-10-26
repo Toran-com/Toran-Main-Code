@@ -38,6 +38,7 @@ describe("parseMandirDetails", () => {
         tradition: null,
         calendar: "north_indian",
         charity_number: "262605",
+        getting_there: null,
       },
     });
   });
@@ -61,7 +62,12 @@ describe("parsePracticalDetails", () => {
   it("allows everything to be left empty", () => {
     expect(parsePracticalDetails(form({}))).toEqual({
       ok: true,
-      values: { postcode: null, website: null, phone: null },
+      values: {
+        postcode: null,
+        website: null,
+        phone: null,
+        getting_there: null,
+      },
     });
   });
   it("rejects odd websites and phone numbers", () => {
@@ -73,6 +79,33 @@ describe("parsePracticalDetails", () => {
       ok: false,
       error: "phone",
     });
+  });
+  it("keeps a getting-there note, trimmed", () => {
+    const parsed = parsePracticalDetails(
+      form({
+        getting_there:
+          "  Free parking behind the hall.\nBus 18 stops outside. ",
+      }),
+    );
+    expect(parsed.ok && parsed.values.getting_there).toBe(
+      "Free parking behind the hall.\nBus 18 stops outside.",
+    );
+  });
+  it("keeps personal contact details out of the note", () => {
+    for (const note of [
+      "Call Ramesh on 07700 900123 for parking",
+      "Email parking@example.com first",
+    ]) {
+      expect(parsePracticalDetails(form({ getting_there: note }))).toEqual({
+        ok: false,
+        error: "getting_there_contact",
+      });
+    }
+  });
+  it("keeps the note short", () => {
+    expect(
+      parsePracticalDetails(form({ getting_there: "x".repeat(401) })),
+    ).toEqual({ ok: false, error: "getting_there" });
   });
 });
 

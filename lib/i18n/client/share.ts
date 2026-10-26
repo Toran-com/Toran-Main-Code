@@ -10,7 +10,6 @@ export const enShare = {
   "share.copyPrompt": "Copy this link:",
   "subscribe.apple": "Apple or Outlook calendar",
   "subscribe.google": "Google Calendar",
-  "subscribe.note":
-    "No account needed. You can remove it from your calendar at any time.",
+  "subscribe.note": "No account needed.",
   "countdown.days": "In {days} days",
 } as const;

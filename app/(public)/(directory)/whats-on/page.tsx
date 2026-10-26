@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
+import { EventsMapView } from "@/components/events-map-view";
 import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading, Notice, pillButtonClass } from "@/components/ui";
@@ -19,6 +20,7 @@ import {
   nearTo,
   onDay,
   PER_DAY,
+  pinsFor,
   RADII,
   radiusFrom,
 } from "@/lib/whats-on-view";
@@ -59,6 +61,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const type = String(query.type ?? "");
   const kind = isEventKind(type) ? type : "";
   const day = dayFrom(query.day);
+  const view = query.view === "map" ? "map" : "list";
 
   const [result, origin] = await Promise.all([
     listUpcomingEvents(),
@@ -66,7 +69,12 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   ]);
 
   // Links that change one choice and keep the others.
-  const here = (change: { type?: string; region?: string; day?: string }) => {
+  const here = (change: {
+    type?: string;
+    region?: string;
+    day?: string;
+    view?: string;
+  }) => {
     const params = new URLSearchParams();
     if (near) params.set("near", near);
     if (within !== 15) params.set("within", String(within));
@@ -76,6 +84,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     if (r) params.set("region", r);
     if (k) params.set("type", k);
     if (d) params.set("day", d);
+    if ((change.view ?? view) === "map") params.set("view", "map");
     const q = params.toString();
     return q ? `${localePath("/whats-on")}?${q}` : localePath("/whats-on");
   };
@@ -83,6 +92,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const keep = new URLSearchParams();
   if (kind) keep.set("type", kind);
   if (day) keep.set("day", day);
+  if (view === "map") keep.set("view", "map");
   const place = (
     <PlacePicker
       page={localePath("/whats-on")}
@@ -155,10 +165,23 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       <div className="flex flex-col gap-3">
         {place}
         <div className="flex items-center justify-between gap-3">
-          <p className="text-muted" aria-live="polite">
-            {t.count("whatsOn.count", events.length)}
-            {position && events.length > 1 && t("whatsOn.nearestFirst")}
-          </p>
+          <nav
+            aria-label={t("whatsOn.showAs")}
+            className="border-line-strong bg-surface flex rounded-full border p-1"
+          >
+            {(["list", "map"] as const).map((v) => (
+              <Link
+                key={v}
+                href={here({ view: v })}
+                aria-current={view === v ? "page" : undefined}
+                className={`rounded-full px-4 py-1 text-base font-semibold no-underline ${
+                  view === v ? "bg-ink text-bg" : "text-ink hover:bg-sunk"
+                }`}
+              >
+                {v === "list" ? t("whatsOn.list") : t("whatsOn.map")}
+              </Link>
+            ))}
+          </nav>
           <Filters
             key={`${kind}|${region}`}
             kind={kind}
@@ -183,9 +206,18 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             ))}
           </ul>
         )}
+        <p className="text-muted" aria-live="polite">
+          {t.count("whatsOn.count", events.length)}
+          {position &&
+            events.length > 1 &&
+            view === "list" &&
+            t("whatsOn.nearestFirst")}
+        </p>
       </div>
       {problem && <Notice tone="error">{problem}</Notice>}
-      {events.length ? (
+      {events.length && view === "map" ? (
+        <EventsMapView pins={pinsFor(events)} origin={position} />
+      ) : events.length ? (
         <EventList
           events={events}
           now={new Date()}

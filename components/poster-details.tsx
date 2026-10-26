@@ -46,6 +46,13 @@ export function PosterDetails({ poster }: { poster: Poster }) {
           kindLabel(poster.kind) &&
           ` · ${kindLabel(poster.kind)}`}
       </p>
+      {poster.read === "machine" && (
+        <p>
+          <Badge tone="marigold">
+            Read from a picture by machine: check every detail
+          </Badge>
+        </p>
+      )}
       {!checked.ok && (
         <p>
           <Badge tone="kumkum">

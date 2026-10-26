@@ -10,8 +10,10 @@ test("the Seva page is in the main menu", async ({ page }) => {
     .click();
   await expect(page).toHaveURL(/\/seva$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Seva");
+  // How it works, folded away until wanted.
+  await page.getByText("How it works", { exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "How it works" }),
+    page.getByText("No name needed. Your phone remembers your slots."),
   ).toBeVisible();
 });
 

@@ -446,6 +446,11 @@ body:has(.own-toran) .site-toran {
   margin: 0;
 }
 
+.toran-map .toran-popup-when {
+  display: block;
+  color: var(--muted);
+}
+
 .toran-map .toran-popup-name {
   font-weight: 700;
 }
