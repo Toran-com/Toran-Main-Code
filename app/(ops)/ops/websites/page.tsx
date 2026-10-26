@@ -15,6 +15,8 @@ import { requireToranAdmin } from "@/lib/auth";
 import { formatEventStart, websiteLabel } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
+import { posterReadingOn } from "@/lib/poster-reader";
+import { readFoundPatrika } from "../posters/actions";
 import { checkNext, checkOne } from "./actions";
 
 export const metadata: Metadata = {
@@ -68,6 +70,8 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
   const rows = (mandirs ?? []).map((m) => ({ ...m, check: checks.get(m.id) }));
 
   const checked = rows.filter((r) => r.check?.last_checked_at);
+  // Reading found patrikas needs the Anthropic key (docs/decisions/0018).
+  const reading = posterReadingOn();
   const count = (outcome: Outcome) =>
     checked.filter((r) => r.check?.last_outcome === outcome).length;
 
@@ -85,7 +89,10 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
   return (
     <>
       {query.error && (
-        <Notice tone="error">Something went wrong. Please try again.</Notice>
+        <Notice tone="error">
+          {ERRORS[String(query.error)] ??
+            "Something went wrong. Please try again."}
+        </Notice>
       )}
       {notice && <Notice tone="success">{notice}</Notice>}
 
@@ -95,10 +102,11 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
           Toran can read: event data in its pages, calendar feeds, Google
           Calendars shown on the site, WordPress&apos;s The Events Calendar, and
           the older hCalendar markup. It also lists the patrikas and posters
-          (PDFs and pictures) a site links to, to type up by hand. Names and
-          descriptions are cleaned into plain text, times found in the
-          description when the site gives none, and each event gets a likely
-          type. Anything new goes to the{" "}
+          (PDFs and pictures) a site links to, to type up, or to read with
+          Claude when that&apos;s switched on. Names and descriptions are
+          cleaned into plain text, times found in the description when the site
+          gives none, and each event gets a likely type. Anything new goes to
+          the{" "}
           <Link href="/ops/posters" className="text-peacock underline">
             review queue
           </Link>
@@ -173,6 +181,19 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
                           Type it up
                           <span className="sr-only">: {d.label}</span>
                         </Link>
+                        {reading && (
+                          <form action={readFoundPatrika}>
+                            <input type="hidden" name="mandir" value={r.slug} />
+                            <input type="hidden" name="url" value={d.url} />
+                            <button
+                              type="submit"
+                              className="text-peacock cursor-pointer text-base font-semibold underline"
+                            >
+                              Read it with Claude
+                              <span className="sr-only">: {d.label}</span>
+                            </button>
+                          </form>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -201,6 +222,21 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
     </>
   );
 }
+
+// What went wrong reading a found patrika (readFoundPatrika).
+const ERRORS: Record<string, string> = {
+  readingOff:
+    "Reading posters isn't switched on: it needs ANTHROPIC_API_KEY in Vercel's settings.",
+  notFound:
+    "That patrika isn't among the ones the last check found. Check the website again.",
+  blocked: "The site's robots.txt asks robots not to read that file.",
+  unreachable:
+    "Couldn't fetch it: the site didn't answer, or the file is over 4 MB. Open it and send a smaller copy from the review queue.",
+  documentType:
+    "That file isn't a PDF or a picture Claude can read. Open it and type it up instead.",
+  refused: "Claude wouldn't read that one. Please type it up instead.",
+  readFailed: "Couldn't read it just now. Please try again in a minute.",
+};
 
 // The patrikas and posters saved with a check, ignoring anything malformed.
 function documentsOf(

@@ -113,8 +113,11 @@ async function isPublicHost(hostname: string): Promise<boolean> {
   }
 }
 
-async function readLimited(response: Response): Promise<string | null> {
-  if (!response.body) return "";
+async function readLimited(
+  response: Response,
+  maxBytes: number,
+): Promise<Buffer | null> {
+  if (!response.body) return Buffer.alloc(0);
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let size = 0;
@@ -122,20 +125,36 @@ async function readLimited(response: Response): Promise<string | null> {
     const { done, value } = await reader.read();
     if (done) break;
     size += value.byteLength;
-    if (size > MAX_BYTES) {
+    if (size > maxBytes) {
       await reader.cancel();
       return null;
     }
     chunks.push(value);
   }
-  return new TextDecoder().decode(Buffer.concat(chunks));
+  return Buffer.concat(chunks);
 }
+
+const PAGE_TYPES =
+  "text/html,text/calendar,application/json;q=0.9,application/xhtml+xml;q=0.9,*/*;q=0.5";
 
 // Fetches a public web page or feed as text, following a few redirects
 // (each checked again). Null if it can't, or shouldn't.
 async function fetchText(
   url: string,
 ): Promise<{ url: string; text: string } | null> {
+  const result = await fetchPublic(url, PAGE_TYPES, MAX_BYTES);
+  return (
+    result && { url: result.url, text: new TextDecoder().decode(result.body) }
+  );
+}
+
+// The same for any file (a PDF or a picture), with its type as the site
+// gave it.
+async function fetchPublic(
+  url: string,
+  accept: string,
+  maxBytes: number,
+): Promise<{ url: string; body: Buffer; type: string } | null> {
   let current = url;
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
     let target: URL;
@@ -155,8 +174,7 @@ async function fetchText(
         signal: AbortSignal.timeout(TIMEOUT_MS),
         headers: {
           "user-agent": `${AGENT}/0.1 (+${siteUrl()}/demo)`,
-          accept:
-            "text/html,text/calendar,application/json;q=0.9,application/xhtml+xml;q=0.9,*/*;q=0.5",
+          accept,
         },
       });
     } catch {
@@ -169,8 +187,17 @@ async function fetchText(
       continue;
     }
     if (!response.ok) return null;
-    const text = await readLimited(response).catch(() => null);
-    return text === null ? null : { url: target.toString(), text };
+    const body = await readLimited(response, maxBytes).catch(() => null);
+    return body === null
+      ? null
+      : {
+          url: target.toString(),
+          body,
+          type: (response.headers.get("content-type") ?? "")
+            .split(";")[0]
+            .trim()
+            .toLowerCase(),
+        };
   }
   return null;
 }
@@ -344,4 +371,48 @@ function unreachable(): CheckResult {
     pagesRead: 0,
     notes: ["The site didn't answer, or answered with an error."],
   };
+}
+
+// A patrika or poster a check found (lib/website-events.ts patrikaLinks),
+// fetched to be read: as politely and carefully as the pages (robots.txt,
+// public addresses only, a few seconds), and no bigger than "maxBytes".
+// Its type from the site, or from the file's name when the site's isn't a
+// PDF or picture type.
+export async function fetchDocument(
+  url: string,
+  maxBytes: number,
+): Promise<
+  | { ok: true; data: Buffer; type: string }
+  | { ok: false; error: "blocked" | "unreachable" }
+> {
+  let address: URL;
+  try {
+    address = new URL(url);
+  } catch {
+    return { ok: false, error: "unreachable" };
+  }
+  const robots = await fetchText(`${address.origin}/robots.txt`);
+  if (robots && !robotsAllows(robots.text, address.pathname, AGENT)) {
+    return { ok: false, error: "blocked" };
+  }
+  const file = await fetchPublic(
+    url,
+    "application/pdf,image/*;q=0.9,*/*;q=0.5",
+    maxBytes,
+  );
+  if (!file) return { ok: false, error: "unreachable" };
+  const byName: Record<string, string> = {
+    pdf: "application/pdf",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+  };
+  const extension = /\.([a-z]+)$/i.exec(address.pathname)?.[1].toLowerCase();
+  // Some sites send PDFs as "application/octet-stream" or plain text.
+  const type = Object.values(byName).includes(file.type)
+    ? file.type
+    : (byName[extension ?? ""] ?? file.type);
+  return { ok: true, data: file.body, type };
 }

@@ -474,10 +474,14 @@ never reads Facebook or Instagram (decision 0005).
 
 It also lists up to five patrikas and posters each site links to or shows:
 PDFs and pictures whose words or file names look like a programme, poster
-or festival (not logos or small pictures). Toran doesn't download or read
-them; each has **Type it up**, which opens the poster form on
-`/ops/posters` with the mandir, the patrika's address and "Mandir's
-website" already filled in.
+or festival (not logos or small pictures). Each has **Type it up**, which
+opens the poster form on `/ops/posters` with the mandir, the patrika's
+address and "Mandir's website" already filled in. Once poster reading is
+switched on (ANTHROPIC_API_KEY, decision 0018), each also has **Read it
+with Claude**: Toran fetches the file as carefully as the site's pages
+(robots.txt, public addresses only, up to 4 MB) and reads it like a
+poster sent in, so its events wait in the review queue marked "read by
+machine". Only files a check found for that mandir can be read.
 
 ### Nightly job (decision 0016)
 

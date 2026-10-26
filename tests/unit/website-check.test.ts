@@ -11,12 +11,19 @@ vi.mock("node:dns/promises", () => ({
   ],
 }));
 
-import { checkWebsite, isPrivateAddress } from "@/lib/website-check";
+import {
+  checkWebsite,
+  fetchDocument,
+  isPrivateAddress,
+} from "@/lib/website-check";
 import { newEvents } from "@/lib/website-claims";
 
 const now = new Date("2026-10-14T09:00:00Z");
 
-let site: Record<string, { status?: number; body?: string; location?: string }>;
+let site: Record<
+  string,
+  { status?: number; body?: string; location?: string; type?: string }
+>;
 const fetched: string[] = [];
 
 beforeEach(() => {
@@ -28,7 +35,10 @@ beforeEach(() => {
     if (!page) return new Response("Not found", { status: 404 });
     return new Response(page.body ?? "", {
       status: page.status ?? 200,
-      headers: page.location ? { location: page.location } : {},
+      headers: {
+        ...(page.location && { location: page.location }),
+        ...(page.type && { "content-type": page.type }),
+      },
     });
   });
 });
@@ -175,6 +185,54 @@ describe("checkWebsite", () => {
       expect((await checkWebsite(address, now)).outcome).toBe("unreachable");
     }
     expect(fetched).toEqual([]);
+  });
+});
+
+describe("fetchDocument", () => {
+  it("fetches a patrika, with its type from the site or its name", async () => {
+    site = {
+      "https://docs.example.org/patrika.pdf": { body: "%PDF-1.7" },
+      "https://docs.example.org/poster": {
+        body: "jpeg",
+        type: "image/jpeg; charset=binary",
+      },
+    };
+    const pdf = await fetchDocument(
+      "https://docs.example.org/patrika.pdf",
+      100,
+    );
+    expect(pdf).toEqual({
+      ok: true,
+      data: Buffer.from("%PDF-1.7"),
+      type: "application/pdf",
+    });
+    expect(
+      await fetchDocument("https://docs.example.org/poster", 100),
+    ).toMatchObject({ ok: true, type: "image/jpeg" });
+  });
+
+  it("obeys robots.txt, size and private addresses", async () => {
+    site = {
+      "https://shy.example.org/robots.txt": {
+        body: "User-agent: *\nDisallow: /files/",
+      },
+      "https://shy.example.org/files/patrika.pdf": { body: "%PDF" },
+      "https://big.example.org/patrika.pdf": { body: "x".repeat(200) },
+    };
+    expect(
+      await fetchDocument("https://shy.example.org/files/patrika.pdf", 100),
+    ).toEqual({ ok: false, error: "blocked" });
+    expect(fetched).not.toContain("https://shy.example.org/files/patrika.pdf");
+    expect(
+      await fetchDocument("https://big.example.org/patrika.pdf", 100),
+    ).toEqual({ ok: false, error: "unreachable" });
+    expect(
+      await fetchDocument("https://private.example.org/patrika.pdf", 100),
+    ).toEqual({ ok: false, error: "unreachable" });
+    expect(await fetchDocument("not a url", 100)).toEqual({
+      ok: false,
+      error: "unreachable",
+    });
   });
 });
 

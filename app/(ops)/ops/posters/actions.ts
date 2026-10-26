@@ -3,7 +3,7 @@
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireToranAdmin } from "@/lib/auth";
-import { checkEvent, eventInputFrom } from "@/lib/event-form";
+import { checkEvent, eventInputFrom, type EventInput } from "@/lib/event-form";
 import { correctPoster, likenessFrom, reviewPoster } from "@/lib/poster-review";
 import { checkLink, POSTER_SOURCES, type PosterSource } from "@/lib/posters";
 import { createSessionClient } from "@/lib/supabase/session";
@@ -15,6 +15,7 @@ import {
   posterReadingOn,
   readPoster,
 } from "@/lib/poster-reader";
+import { fetchDocument } from "@/lib/website-check";
 import { parseWebsiteEvents } from "@/lib/website-import";
 
 // One source per mandir and kind of message, reused.
@@ -239,24 +240,40 @@ export async function readPosterPicture(formData: FormData) {
       `error=${read.error === "refused" ? "pictureRefused" : "pictureFailed"}`,
     );
 
-  const known = (await knownFor(supabase, [mandir.id])).get(mandir.id) ?? [];
-  const sourceId = await posterSource(
+  const { added, skipped } = await queueRead(
     supabase,
     mandir.id,
     from as PosterSource,
+    read.events,
+    "",
   );
+  redirect(`/ops/posters?read=${added}&skipped=${skipped}`);
+}
+
+// Events read off a poster go to the review queue, marked as read by
+// machine, apart from ones already listed, waiting or discarded (and the
+// same event twice on one poster).
+async function queueRead(
+  supabase: NonNullable<Awaited<ReturnType<typeof createSessionClient>>>,
+  mandirId: string,
+  from: PosterSource,
+  events: EventInput[],
+  link: string,
+): Promise<{ added: number; skipped: number }> {
+  const known = (await knownFor(supabase, [mandirId])).get(mandirId) ?? [];
+  const sourceId = await posterSource(supabase, mandirId, from);
   let added = 0;
   let skipped = 0;
-  for (const input of read.events) {
+  for (const input of events) {
     const item = comparableInput(input);
     if (!checkEvent(input).ok || alreadyKnown(item, known)) {
       skipped += 1;
       continue;
     }
     const { error } = await supabase.from("event_claims").insert({
-      mandir_id: mandir.id,
+      mandir_id: mandirId,
       source_id: sourceId,
-      proposed: { ...input, from, link: "", read: "machine" },
+      proposed: { ...input, from, link, read: "machine" },
       // Lower than a typed-up poster: nobody has looked at it yet.
       confidence: 0.4,
     });
@@ -274,5 +291,58 @@ export async function readPosterPicture(formData: FormData) {
       discarded: false,
     });
   }
+  return { added, skipped };
+}
+
+// A patrika or poster the website check found on a mandir's site
+// (/ops/websites): fetched as carefully as the site's pages, and read
+// like one sent in. Only what a check found for that mandir can be read,
+// so this can't be used to fetch anything else.
+export async function readFoundPatrika(formData: FormData) {
+  await requireToranAdmin("/ops/websites");
+  const slug = String(formData.get("mandir") ?? "");
+  const url = String(formData.get("url") ?? "");
+  const back: (error: string) => never = (error) =>
+    redirect(`/ops/websites?error=${error}`);
+
+  if (!posterReadingOn()) back("readingOff");
+  const supabase = await createSessionClient();
+  if (!supabase) back("failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, name, town")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("failed");
+  const { data: checks } = await supabase
+    .from("sources")
+    .select("last_documents")
+    .eq("mandir_id", mandir.id)
+    .eq("kind", "crawler");
+  const found = (checks ?? [])
+    .flatMap((c) => (Array.isArray(c.last_documents) ? c.last_documents : []))
+    .some((d) => !!d && typeof d === "object" && "url" in d && d.url === url);
+  if (!found) back("notFound");
+
+  const file = await fetchDocument(url, MAX_POSTER_BYTES);
+  if (!file.ok) back(file.error);
+  if (!isPosterType(file.type)) back("documentType");
+
+  const read = await readPoster(
+    { data: file.data, type: file.type },
+    {
+      mandir: `${mandir.name}, ${mandir.town}`,
+      today: londonDate(new Date()),
+    },
+  );
+  if (!read.ok) back(read.error === "refused" ? "refused" : "readFailed");
+
+  const { added, skipped } = await queueRead(
+    supabase,
+    mandir.id,
+    "website",
+    read.events,
+    url.length <= 300 ? url : "",
+  );
   redirect(`/ops/posters?read=${added}&skipped=${skipped}`);
 }
