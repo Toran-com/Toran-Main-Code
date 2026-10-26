@@ -431,6 +431,9 @@ isOneToOne: false
               "added_at": string,"email": string,"user_id": string
             }[]
                            },
+"mandir_count_summary":
+{ Args: { "since": string,"target": string }; Returns: Json
+                           },
 "may_decide_events":
 { Args: { "a": string,"b": string }; Returns: boolean
                            },
