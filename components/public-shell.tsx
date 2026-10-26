@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Notice } from "@/components/ui";
 import { InstallApp } from "@/components/install-app";
+import { DisplaySettings } from "@/components/display-settings";
 import { LanguageSwitch } from "@/components/language-switch";
 import { Logo, Toran } from "@/components/ornaments";
 import { SiteNav } from "@/components/site-nav";
@@ -74,6 +75,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
                 <path d="M16 16l4.5 4.5" />
               </svg>
             </Link>
+            <DisplaySettings />
             {LOCALES.gu.ready && <LanguageSwitch />}
             <Link
               href="/for-mandirs"

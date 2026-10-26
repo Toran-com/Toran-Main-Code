@@ -71,6 +71,37 @@
   }
 }
 
+/* Higher contrast, chosen with "Aa": darker grey text and lines on a
+   white page, or brighter ones on black in dark mode. */
+html[data-contrast="high"] {
+  --bg: #ffffff;
+  --sunk: #f2f0eb;
+  --ink: #0b0a14;
+  --muted: #2f2d3d;
+  --line: rgba(11, 10, 20, 0.35);
+  --line-strong: rgba(11, 10, 20, 0.6);
+  --peacock: #054846;
+  --peacock-deep: #033331;
+  --marigold-ink: #5a3b00;
+  --leaf-ink: #1d4a1a;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  html[data-contrast="high"] {
+    --bg: #000000;
+    --surface: #0a0c16;
+    --sunk: #06080f;
+    --ink: #ffffff;
+    --muted: #dedcea;
+    --line: rgba(255, 255, 255, 0.4);
+    --line-strong: rgba(255, 255, 255, 0.65);
+    --peacock: #6ee6df;
+    --peacock-deep: #4fd3cb;
+    --marigold-ink: #ffd27a;
+    --leaf-ink: #b6eaa9;
+  }
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -107,6 +138,15 @@ html {
   font-size: 112.5%;
   /* Room for the header, which stays at the top, when jumping to a section. */
   scroll-padding-top: 6rem;
+}
+
+/* Bigger text, chosen with "Aa" in the header (lib/display.ts): 20px and
+   22.5px instead of 18px. Everything is sized in rem, so it all grows. */
+html[data-text="lg"] {
+  font-size: 125%;
+}
+html[data-text="xl"] {
+  font-size: 140.625%;
 }
 
 body {
