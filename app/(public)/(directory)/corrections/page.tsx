@@ -15,6 +15,7 @@ import {
   DETAILS_MAX,
 } from "@/lib/corrections";
 import { pageMetadata } from "@/lib/site";
+import { MAX_LINKS } from "@/lib/spam";
 import { requestCorrection } from "./actions";
 
 // Ask for something to be corrected or removed: a wrong listing, a mandir
@@ -33,6 +34,8 @@ export const metadata: Metadata = {
 const ERRORS: Record<string, string> = {
   kind: "Choose what kind of change you'd like.",
   details: `Say what should change, in up to ${DETAILS_MAX} characters.`,
+  links: `Please include no more than ${MAX_LINKS} web addresses.`,
+  slow: "You've sent a few already. Please wait a few minutes before sending another.",
   busy: "We have a lot of requests waiting just now. Please try again tomorrow.",
   failed: "That didn't send. Please try again in a few minutes.",
 };

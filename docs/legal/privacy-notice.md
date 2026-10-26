@@ -66,8 +66,11 @@ within one month.
 - **Telling us about an event, or asking for a correction.** We keep only
   what you type into the form: the event's details, or what's wrong and on
   which page. We don't ask who you are or record your IP address, so please
-  don't type anyone's name or contact details. Correction and removal
-  requests are deleted 90 days after we've dealt with them.
+  don't type anyone's name or contact details. To stop automated spam, the
+  site counts how often a form is sent from the same internet address for
+  ten minutes, in a scrambled form and in its working memory only; it is
+  never saved. Correction and removal requests are deleted 90 days after
+  we've dealt with them.
 - **Visitor numbers.** Toran counts how many times each public page is
   seen each day, and how often events are added to calendars or shared,
   with its own simple counter. It uses no cookies and keeps nothing about

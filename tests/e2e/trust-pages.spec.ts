@@ -87,3 +87,32 @@ test("a link to another site can't be slipped into the form", async ({
   await page.goto("/corrections?page=https%3A%2F%2Fexample.org");
   await expect(page.getByText("About this page:")).toHaveCount(0);
 });
+
+test("the correction form holds back spam", async ({ page }, info) => {
+  // Its own address (and a new one on a retry), so the limit doesn't
+  // touch other tests.
+  await page.setExtraHTTPHeaders({
+    "x-forwarded-for": `203.0.113.${77 + info.retry}`,
+  });
+  const send = async (details: string) => {
+    await page.goto("/corrections?page=%2F");
+    await page
+      .getByRole("textbox", { name: /What should change/ })
+      .fill(details);
+    await page.getByRole("button", { name: "Send" }).click();
+    await expect(page).toHaveURL(/(error|sent)=/);
+  };
+
+  await send("See https://a.example, http://b.example and www.c.example");
+  await expect(
+    page.getByText("Please include no more than 2 web addresses."),
+  ).toBeVisible();
+  // Link markup only robots write: thanked, and dropped.
+  await send("[url=https://cheap.example]cheap[/url]");
+  await expect(page).toHaveURL(/sent=1/);
+  // Five tries in ten minutes, then a pause.
+  for (let i = 0; i < 3; i++) await send(`The phone number is wrong (${i})`);
+  await expect(page.getByText("That didn't send.")).toBeVisible();
+  await send("The phone number is wrong (again)");
+  await expect(page.getByText("You've sent a few already.")).toBeVisible();
+});
