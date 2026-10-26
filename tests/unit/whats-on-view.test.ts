@@ -7,6 +7,7 @@ import {
   nearestFirstEachDay,
   nearTo,
   onDay,
+  pinsFor,
   radiusFrom,
   regionCounts,
 } from "@/lib/whats-on-view";
@@ -153,5 +154,43 @@ describe("nearestFirstEachDay", () => {
       "leicester-sun",
       "london-sun",
     ]);
+  });
+});
+
+describe("pinsFor", () => {
+  const at = (id: string, mandir: string, status = "published") => ({
+    ...event(id, "2026-11-14T18:00:00Z", leicester),
+    status,
+    mandir: { ...event(id, "", leicester).mandir, slug: mandir, name: mandir },
+  });
+
+  it("puts each mandir's events on one pin, its first three listed", () => {
+    const pins = pinsFor([
+      at("a", "one"),
+      at("b", "two"),
+      at("c", "one"),
+      at("d", "one"),
+      at("e", "one"),
+    ]);
+    expect(pins.map((p) => [p.slug, p.count, p.events.length])).toEqual([
+      ["one", 4, 3],
+      ["two", 1, 1],
+    ]);
+    expect(pins[0].events[0]).toEqual({
+      when: "Sat 14 Nov, 6pm",
+      title: "a",
+      path: "/mandirs/one/events/a",
+    });
+    expect(pins[0].more).toBe("/mandirs/one");
+  });
+
+  it("leaves out cancelled events and mandirs not on the map", () => {
+    const nowhere = {
+      ...event("x", "2026-11-14T18:00:00Z", {
+        latitude: null,
+        longitude: null,
+      }),
+    };
+    expect(pinsFor([at("a", "one", "cancelled"), nowhere])).toEqual([]);
   });
 });
