@@ -11,6 +11,7 @@ import { Toran } from "@/components/ornaments";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import { cardClass, Notice, quietButtonClass } from "@/components/ui";
+import { visitingSummary } from "@/components/visiting-info";
 import {
   getEventSeva,
   getMandir,
@@ -428,6 +429,20 @@ function Details({ page }: { page: MandirEventPage }) {
       icon: null,
       value: (
         <span className="whitespace-pre-line">{mandir.getting_there}</span>
+      ),
+    });
+  const visiting = visitingSummary(mandir.facilities);
+  if (visiting || mandir.visiting_note)
+    rows.push({
+      label: t("visit.title"),
+      icon: null,
+      value: (
+        <Link
+          href={`${localePath(`/mandirs/${mandir.slug}`)}#visiting`}
+          className="text-peacock underline"
+        >
+          {visiting || mandir.visiting_note}
+        </Link>
       ),
     });
   if (event.cost_note)

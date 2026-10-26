@@ -331,7 +331,16 @@ After your authenticator code, `/ops` has three tabs:
 
 - **Overview**: committee requests to approve, and map positions.
 - **Mandirs**: search every mandir, including hidden ones. Open one to:
-  - correct its details (changing the postcode updates the map position);
+  - correct its details (changing the postcode updates the map position),
+    including **Visiting**: ticks for a step-free way in, a lift, chairs,
+    an accessible toilet, a hearing loop, parking, shoe racks, baby
+    changing and the food served, plus a short note (what to wear, photos).
+    Committees set the same on their own page. They show on the mandir's
+    page, and in one line on each event's page. **Opening times** (up to
+    two sessions a day, with "Copy Monday's times to every day") and up to
+    six **aarti times** are set in the same form; the mandir's page shows
+    the week, the aartis, and "Open now · until 12pm" or "Closed now ·
+    opens at 4pm", worked out on the visitor's phone in UK time;
   - hide it from the public site the same day a mandir asks;
   - see who looks after its page and remove someone's access. When nobody
     is left, the page can be claimed again.
