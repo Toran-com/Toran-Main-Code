@@ -41,4 +41,10 @@ test("paste mandirs, check them, add the new ones", async ({ page }) => {
   const slug = page.url().split("/").pop();
   await page.goto(`/mandirs/${slug}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(name);
+
+  // Hide it again so other tests still see the starting 106.
+  await page.goto(`/ops/mandirs/${slug}`);
+  await page.getByLabel("Shown to the public?").selectOption("hidden");
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByText("Saved.")).toBeVisible();
 });
