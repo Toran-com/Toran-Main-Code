@@ -31,6 +31,11 @@ export default function AccessibilityPage() {
         <ul className="flex max-w-prose list-disc flex-col gap-2 pl-6">
           <li>Text is at least 18 pixels, and you can zoom to 400%.</li>
           <li>
+            The <strong>Aa</strong> button at the top of every page makes the
+            text larger and the colours higher in contrast. Your phone remembers
+            the choice.
+          </li>
+          <li>
             <strong>Read aloud</strong> on mandir and event pages reads the
             details out with your phone&apos;s own voice, in English or
             Gujarati. Nothing is sent anywhere.

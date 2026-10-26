@@ -6,6 +6,7 @@ import {
 } from "next/font/google";
 import { Suspense } from "react";
 import { CountVisits } from "@/components/count-visits";
+import { DISPLAY_SCRIPT } from "@/lib/display";
 import { pageMetadata, site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -60,7 +61,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en-GB"
       className={`${instrument.variable} ${gujaratiSerif.variable} ${figtree.variable} h-full antialiased`}
+      // The visitor's text size and contrast are set on <html> before the
+      // page is drawn (lib/display.ts), so it differs from the server's.
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: DISPLAY_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         {children}
         <Suspense fallback={null}>
