@@ -31,6 +31,7 @@ export const en = {
   "home.intro": "Events and seva at UK mandirs, all in one place.",
   "home.mandirs": "Browse mandirs",
   "home.comingUp": "Coming up",
+  "home.comingUpNear": "Coming up near {place}",
   "home.seeAll": "See everything that's on",
   "home.festivalsSoon": "Festivals coming up",
   "home.allFestivals": "All festival dates",

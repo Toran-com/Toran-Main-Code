@@ -33,6 +33,7 @@ export const gu: Record<MessageKey, string> = {
   "home.intro": "યુકેનાં મંદિરોના કાર્યક્રમો અને સેવા, બધું એક જ જગ્યાએ.",
   "home.mandirs": "મંદિરો જુઓ",
   "home.comingUp": "આવનારા કાર્યક્રમો",
+  "home.comingUpNear": "{place} નજીક આવનારા કાર્યક્રમો",
   "home.seeAll": "બધા કાર્યક્રમો જુઓ",
   "home.festivalsSoon": "આવનારા તહેવારો",
   "home.allFestivals": "તહેવારોની બધી તારીખો",
