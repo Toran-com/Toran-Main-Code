@@ -162,6 +162,16 @@ export const en = {
   "mandir.untilThenCheck": "Until then, check",
   "mandir.orNoticeboard": "or the mandir's noticeboard.",
   "mandir.untilThenNoticeboard": "Until then, check the mandir's noticeboard.",
+  "plan.title": "Our plan",
+  "plan.description":
+    "Events you've picked, to send to the family in one WhatsApp message.",
+  "plan.intro":
+    "Events picked on this phone. Send them to the family in one WhatsApp message; anyone with the link sees the same plan.",
+  "plan.send": "Send to the family on WhatsApp",
+  "plan.messageTitle": "Our plan:",
+  "plan.messageLink": "All of it on Toran:",
+  "plan.notShown":
+    "Not shown: {count} more that have finished or are no longer on Toran.",
 
   "event.repeats": "Repeats",
   "event.whenAt": "{when} at {name}, {town}.",
