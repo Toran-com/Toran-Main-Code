@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Badge, PageHeading } from "@/components/public-shell";
+import { PageHeading } from "@/components/public-shell";
 import { Card } from "@/components/ui";
 import { pageMetadata } from "@/lib/site";
 
@@ -20,15 +20,15 @@ const SOURCES = [
   },
   {
     label: "From the mandir's website",
-    body: "Read from the mandir's own website, which Toran checks once a night.",
+    body: "Read from the mandir's own website each night.",
   },
   {
     label: "From a poster or message",
-    body: "A poster or patrika sent to Toran, typed up and then checked.",
+    body: "A poster or patrika sent to Toran, then checked.",
   },
   {
     label: "Sent in by a visitor",
-    body: "Someone told us about it with the “Tell us about an event” form.",
+    body: "Someone told us with the “Tell us about an event” form.",
   },
 ];
 
@@ -37,7 +37,7 @@ export default function AboutPage() {
     <>
       <PageHeading
         title="About Toran"
-        intro="Toran brings together what's on at Hindu mandirs across the UK, so families can find it and mandir committees can share it."
+        intro="What's on at Hindu mandirs across the UK, in one place."
       />
 
       <section aria-labelledby="why" className="flex flex-col gap-3">
@@ -46,11 +46,8 @@ export default function AboutPage() {
         </h2>
         <p className="max-w-prose">
           Mandirs share their programmes on posters, in WhatsApp groups and on
-          their own websites. That works for the people already in the group,
-          but there&apos;s no one place to see what&apos;s on near you, or which
-          mandirs are marking a festival. Toran is that place, and it gives
-          committees simple tools to keep their page right and fill their seva
-          rota.
+          their websites, but there&apos;s no one place to see what&apos;s on
+          near you. Toran is that place.
         </p>
       </section>
 
@@ -59,26 +56,20 @@ export default function AboutPage() {
           Where the listings come from
         </h2>
         <p className="max-w-prose">
-          Every event says where it came from. Nothing from a website, a poster
-          or a visitor goes on the site until the mandir&apos;s committee, or
-          Toran, has checked it.
+          Every event says where it came from, and is checked by the
+          mandir&apos;s committee or Toran before it goes on the site.
         </p>
         <ul className="flex flex-col gap-3">
           {SOURCES.map((s) => (
             <li key={s.label} className="flex flex-col gap-1">
-              <span>
-                <Badge tone="peacock">{s.label}</Badge>
-              </span>
+              <span className="font-semibold">{s.label}</span>
               <span className="text-muted">{s.body}</span>
             </li>
           ))}
         </ul>
         <p className="max-w-prose">
-          Festival dates come from published panchangs. A date marked{" "}
-          <Badge tone="marigold">Date not yet checked</Badge> hasn&apos;t been
-          checked against a second calendar yet, and mandirs following a
-          different calendar may mark a festival on another day. Always check
-          with the mandir before you travel.
+          Festival dates come from published panchangs. Some mandirs follow a
+          different calendar, so check with yours before you travel.
         </p>
       </section>
 
@@ -88,18 +79,9 @@ export default function AboutPage() {
         </h2>
         <ul className="flex max-w-prose list-disc flex-col gap-2 pl-6">
           <li>Free for families and for mandirs.</li>
-          <li>
-            No adverts, no tracking cookies, and we never sell or share data for
-            marketing.
-          </li>
-          <li>
-            You don&apos;t need an account to look at anything. Committee
-            members log in with their email address.
-          </li>
-          <li>
-            We ask for as little as we can: you can take a seva slot without
-            giving your name.
-          </li>
+          <li>No adverts, no tracking cookies, and no selling data.</li>
+          <li>No account needed to look at anything.</li>
+          <li>A seva slot needs no name.</li>
         </ul>
         <p>
           The details are in our{" "}
@@ -119,10 +101,8 @@ export default function AboutPage() {
           Who runs it
         </h2>
         <p className="max-w-prose">
-          Toran is a small, independent project. It isn&apos;t part of any one
-          mandir, sampradaya or organisation, and it aims to list every Hindu
-          mandir in the UK. It&apos;s being tested with mandir committees now
-          and opens in 2027.
+          A small, independent project, not part of any one mandir, sampradaya
+          or organisation. It opens in 2027.
         </p>
       </section>
 

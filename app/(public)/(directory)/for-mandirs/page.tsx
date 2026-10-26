@@ -29,7 +29,7 @@ const icon = {
 const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   {
     title: "Your events, where families look",
-    body: "Every mandir has its own page on Toran with what's coming up. Families find it by postcode and share each event on WhatsApp in one tap.",
+    body: "Families find your page by postcode and share events on WhatsApp.",
     icon: (
       <svg {...icon}>
         <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
@@ -39,7 +39,7 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   },
   {
     title: "No new work: send what you already make",
-    body: "Forward your patrika or poster, the same one you share on WhatsApp, and we type it up. A committee member checks it before it goes live.",
+    body: "Forward your patrika or poster. You check it before it goes live.",
     icon: (
       <svg {...icon}>
         <path d="M6 3h9l4 4v14H6z" />
@@ -49,7 +49,7 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   },
   {
     title: "A seva rota for your volunteers",
-    body: "List the roles and shifts an event needs, and Toran writes the message for your volunteers' WhatsApp group.",
+    body: "List the roles and shifts. Toran writes the WhatsApp message.",
     icon: (
       <svg {...icon}>
         <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
@@ -58,7 +58,7 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   },
   {
     title: "Print it for the noticeboard",
-    body: "A one-page notice of what's on, with a QR code that always shows the latest, for the noticeboard or to hand out.",
+    body: "A one-page notice with a QR code to the latest.",
     icon: (
       <svg {...icon}>
         <path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2" />
@@ -68,7 +68,7 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   },
   {
     title: "In English and Gujarati",
-    body: "Give an event's name and description in Gujarati too, and families see both.",
+    body: "Families see both.",
     icon: (
       <span
         aria-hidden="true"
@@ -81,7 +81,7 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   },
   {
     title: "Confirmed by the mandir",
-    body: "One tap on “Still on” and families see that your committee has checked the details.",
+    body: "One tap on “Still on” shows families it's checked.",
     icon: (
       <svg {...icon}>
         <path d="M5 12.5l4.5 4.5L19 7.5" />
@@ -102,8 +102,8 @@ export default function ForMandirsPage() {
             Your events, <em className="text-peacock">where families look.</em>
           </p>
           <p className="text-muted max-w-xl text-lg leading-relaxed sm:text-xl">
-            Toran puts your mandir&apos;s events where families can find them,
-            and helps with your seva rota. It&apos;s free for mandirs.
+            Events where families find them, and help with your seva rota. Free
+            for mandirs.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/mandirs" className={`${buttonClass} sm:w-auto`}>
@@ -181,7 +181,7 @@ export default function ForMandirsPage() {
             id="start"
             className="font-display max-w-3xl text-[2.5rem] leading-[1.05] tracking-tight sm:text-6xl"
           >
-            How to start: no new work, just what you already make.
+            Three steps to start
           </h2>
           <ol className="grid gap-x-10 gap-y-8 md:grid-cols-3">
             <li className="border-on-night/20 flex flex-col gap-2 border-t pt-6">
@@ -200,8 +200,7 @@ export default function ForMandirsPage() {
                 </Link>
               </span>
               <span className="text-night-muted">
-                Most UK mandirs already have a page with their address and
-                website.
+                Most UK mandirs already have a page.
               </span>
             </li>
             <li className="border-on-night/20 flex flex-col gap-2 border-t pt-6">
@@ -215,8 +214,7 @@ export default function ForMandirsPage() {
                 Choose &ldquo;Look after this page&rdquo;
               </span>
               <span className="text-night-muted">
-                Log in with your email. We check with the mandir that
-                you&apos;re on the committee, usually within a few days.
+                Log in with your email. We check you&apos;re on the committee.
               </span>
             </li>
             <li className="border-on-night/20 flex flex-col gap-2 border-t pt-6">
@@ -228,8 +226,7 @@ export default function ForMandirsPage() {
               </span>
               <span className="text-xl font-semibold">Add your events</span>
               <span className="text-night-muted">
-                Or forward your patrika to the WhatsApp number in our email to
-                you, and we&apos;ll type it up for you to check.
+                Or forward your patrika and we&apos;ll type it up.
               </span>
             </li>
           </ol>
@@ -268,9 +265,7 @@ export default function ForMandirsPage() {
             The committee guide
           </h2>
           <p className="text-muted text-lg">
-            Every step, from adding your first event to planning seva and
-            inviting a colleague. With a one-page handout to print for your next
-            committee meeting.
+            Every step, with a one-page handout to print.
           </p>
           <div className="mt-auto flex flex-wrap gap-3 pt-2">
             <Link href="/for-mandirs/guide" className={quietButtonClass}>
@@ -294,9 +289,9 @@ export default function ForMandirsPage() {
           </h2>
           <ul className="flex flex-col gap-3">
             {[
-              "Families don't need an account to see your events.",
-              "Only events and your mandir's public details are shown. Your committee's contact details are never public.",
-              "Your committee can correct or remove your events at any time, and ask us to change anything else on your page.",
+              "Families don't need an account.",
+              "Your committee's contact details are never public.",
+              "You can correct or remove your events at any time.",
             ].map((line) => (
               <li key={line} className="flex gap-3">
                 <span aria-hidden="true" className="text-leaf-ink font-bold">
