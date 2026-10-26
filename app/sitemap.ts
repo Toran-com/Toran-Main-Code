@@ -1,20 +1,45 @@
 import type { MetadataRoute } from "next";
-import { getMandir, listFestivals, listMandirs } from "@/lib/directory";
+import {
+  getMandir,
+  listFestivalDates,
+  listFestivals,
+  listMandirs,
+} from "@/lib/directory";
+import { seasonDays, seasonEvents, seasonWindow } from "@/lib/festival-season";
 import { LOCALES } from "@/lib/i18n";
 import { hasGujarati, withLocale } from "@/lib/i18n/paths";
 import { SEASONS } from "@/lib/seasons";
 import { eventPath } from "@/lib/share";
 import { site, siteUrl } from "@/lib/site";
+import { townCounts } from "@/lib/towns";
+import { listUpcomingEvents } from "@/lib/whats-on";
 
 // Every public page, for search engines. Empty until launch, so nothing is
 // listed before the pages are ready.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!site.launched) return [];
   const base = siteUrl();
-  const [mandirs, festivals] = await Promise.all([
+  const [mandirs, festivals, dates, upcoming] = await Promise.all([
     listMandirs(),
     listFestivals(),
+    listFestivalDates(),
+    listUpcomingEvents(),
   ]);
+  // Each season's town pages, for the towns with something on (the rest
+  // aren't offered to search engines: see components/season-town-page.tsx).
+  const townPages =
+    dates.state === "ok" && upcoming.state === "ok"
+      ? SEASONS.flatMap((season) => {
+          const window = seasonWindow(seasonDays(dates.data, season));
+          if (!window) return [];
+          return townCounts(seasonEvents(upcoming.data, season, window)).map(
+            (town) => ({
+              url: `${base}/${season.slug}/${town.slug}`,
+              changeFrequency: "daily" as const,
+            }),
+          );
+        })
+      : [];
   const mandirList = mandirs.state === "ok" ? mandirs.data : [];
   const events = (
     await Promise.all(
@@ -48,6 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 0.8,
     })),
+    ...townPages,
     ...mandirList.map((m) => ({
       url: `${base}/mandirs/${m.slug}`,
       changeFrequency: "daily" as const,

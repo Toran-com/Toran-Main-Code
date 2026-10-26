@@ -28,6 +28,7 @@ test("public pages are accessible", async ({ page }) => {
     "/whats-on?view=map",
     "/whats-on?mandirs=geeta-bhavan-leicester",
     "/diwali",
+    "/diwali/leicester",
     "/search?q=diwali",
     "/seva?near=LE4&within=60",
     "/?near=LE4&within=60",

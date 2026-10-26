@@ -46,6 +46,9 @@ describe("Gujarati addresses", () => {
     }
     expect(hasGujarati("/easter")).toBe(false);
     expect(hasGujarati("/holi/calendar.ics")).toBe(false);
+    // And each season in a town.
+    expect(withLocale("/diwali/leicester", "gu")).toBe("/gu/diwali/leicester");
+    expect(hasGujarati("/diwali/leicester/x")).toBe(false);
   });
 
   it("switches between the two", () => {

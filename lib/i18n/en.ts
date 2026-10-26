@@ -300,6 +300,15 @@ export const en = {
   "season.tellFamily": "Tell family and friends",
   "season.share": "Share the {name} page",
   "season.allOf": "All of {period} at mandirs, in one place",
+  "season.inTown": "{name} in {town}",
+  "season.townDescription":
+    "{name} events at mandirs in {town}: what's on, when, and where, from the mandirs themselves.",
+  "season.acrossUk": "{name} across the UK",
+  "season.townEvents": "{name} events in {town}",
+  "season.noneInTown": "No {name} events listed in {town} yet.",
+  "season.townMandirs": "Mandirs in {town}",
+  "season.townShareText": "{name} events at mandirs in {town}:",
+  "season.byTown": "{name} by town",
   "season.diwali.period": "Diwali week",
   "season.diwali.title": "Diwali at UK mandirs",
   "season.diwali.description":

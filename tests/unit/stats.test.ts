@@ -17,6 +17,15 @@ const EVENT =
   "/mandirs/reading-hindu-temple/events/0b2c3d4e-0000-4000-8000-000000000001";
 
 describe("countablePath", () => {
+  it("counts a season's town pages", () => {
+    expect(countablePath("/diwali/milton-keynes")).toBe(
+      "/diwali/milton-keynes",
+    );
+    expect(countablePath("/gu/diwali/leicester")).toBe("/diwali/leicester");
+    expect(pageKind("/diwali/leicester")).toBe("Diwali town pages");
+    expect(countablePath("/diwali/calendar.ics")).toBeNull();
+  });
+
   it("counts public pages, without query, fragment or trailing slash", () => {
     expect(countablePath("/")).toBe("/");
     expect(countablePath("/whats-on?kind=festival#top")).toBe("/whats-on");
