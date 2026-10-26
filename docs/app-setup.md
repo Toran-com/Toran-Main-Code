@@ -496,6 +496,20 @@ Then redeploy. **Vercel → Project → Settings → Cron Jobs** lists the job,
 with a **Run** button to try it straight away; afterwards Needs attention
 shows "Nightly job last ran …".
 
+### Reading posters (`/ops` → Review queue → Read a poster)
+
+Toran's admins can send a poster's photo or PDF to Claude, which reads the
+events off it into the review queue for checking (decision 0018). It's off
+until it has a key:
+
+1. In **console.anthropic.com → Settings → API Keys**, create a key called
+   `toran-posters`. Setting a monthly spend limit there is a good idea.
+2. Add it in **Vercel → Project → Settings → Environment Variables** as
+   `ANTHROPIC_API_KEY`, for **Production** only. Type it there yourself;
+   never paste it into the chat.
+3. Redeploy. The "Read a poster" card in the review queue then shows the
+   form instead of "Not switched on yet".
+
 ### Weekly digest preview (`/ops` → Digest)
 
 Shows what the weekly email would say: every event in the next seven days,
