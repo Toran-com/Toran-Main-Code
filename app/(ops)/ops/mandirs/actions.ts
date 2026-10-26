@@ -3,7 +3,13 @@
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireToranAdmin } from "@/lib/auth";
-import { lookupPostcode, type Position } from "@/lib/geo";
+import {
+  lookupPostcode,
+  lookupPostcodes,
+  normalisePostcode,
+  type Position,
+} from "@/lib/geo";
+import { checkMandirRows, type CheckedRow } from "@/lib/mandir-import";
 import { parseMandirDetails, slugFor } from "@/lib/mandir-form";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -104,4 +110,65 @@ export async function removeMandirAdmin(formData: FormData) {
   updateTag("mandirs");
   updateTag("events");
   back("saved=removed");
+}
+
+export type ImportState = {
+  checked: CheckedRow[];
+  // Lines added, with their new pages' addresses.
+  added: { line: number; slug: string }[];
+  error?: string;
+};
+
+// Many mandirs at once (/ops/mandirs/import): "Check" shows what each
+// pasted row would be; "Add" adds the new ones (never a possible
+// duplicate or a row with a problem), with their map positions.
+export async function importMandirs(
+  _: ImportState,
+  formData: FormData,
+): Promise<ImportState> {
+  await requireToranAdmin("/ops/mandirs/import");
+  const text = String(formData.get("rows") ?? "").slice(0, 100_000);
+  const adding = formData.get("mode") === "add";
+  const supabase = await createSessionClient();
+  if (!supabase) return { checked: [], added: [], error: "failed" };
+  const { data: listed, error } = await supabase
+    .from("mandirs")
+    .select("slug, name, town, postcode, website, phone");
+  if (error) return { checked: [], added: [], error: "failed" };
+  const checked = checkMandirRows(text, listed);
+  if (!adding) return { checked, added: [] };
+
+  const fresh = checked.filter((c) => c.status === "new");
+  let positions = new Map<string, Position | null>();
+  try {
+    positions = await lookupPostcodes(
+      fresh.flatMap((c) => (c.values.postcode ? [c.values.postcode] : [])),
+    );
+  } catch {
+    // postcodes.io is down: save anyway; "Fill in map positions" catches up.
+  }
+  const used = new Set(listed.map((m) => m.slug));
+  const added: ImportState["added"] = [];
+  for (const row of fresh) {
+    const base = slugFor(row.values.name, row.values.town);
+    let slug = base;
+    for (let n = 2; used.has(slug); n++) slug = `${base}-${n}`;
+    const position = row.values.postcode
+      ? positions.get(normalisePostcode(row.values.postcode) ?? "")
+      : null;
+    const { error: insertError } = await supabase.from("mandirs").insert({
+      ...row.values,
+      latitude: position?.latitude ?? null,
+      longitude: position?.longitude ?? null,
+      slug,
+    });
+    if (insertError) continue;
+    used.add(slug);
+    added.push({ line: row.line, slug });
+  }
+  if (added.length) {
+    updateTag("mandirs");
+    updateTag("events");
+  }
+  return { checked, added };
 }

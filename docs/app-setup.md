@@ -337,6 +337,11 @@ After your authenticator code, `/ops` has three tabs:
     is left, the page can be claimed again.
 
   **Add a mandir** creates a new public listing straight away.
+  **Add many** takes rows pasted from a spreadsheet (name, town, region,
+  postcode, website, phone, tradition): **Check** marks each row new, a
+  possible duplicate (the same postcode, website or phone as a listed
+  mandir, or a very similar name in the same town) or a problem, and
+  **Add** adds only the new ones, with their map positions.
 
 - **Festival dates**: once you've checked a date against a London panchang,
   mark it checked and say where you checked it. Its "Date not yet checked"

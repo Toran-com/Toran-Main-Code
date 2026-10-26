@@ -66,6 +66,9 @@ async function MandirList({ searchParams }: PageProps<"/ops/mandirs">) {
         <Link href="/ops/mandirs/new" className={quietButtonClass}>
           Add a mandir
         </Link>
+        <Link href="/ops/mandirs/import" className={quietButtonClass}>
+          Add many
+        </Link>
       </div>
       <p className="text-muted">
         {mandirs.length} {mandirs.length === 1 ? "mandir" : "mandirs"}
