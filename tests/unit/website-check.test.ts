@@ -38,6 +38,33 @@ const jsonLd = (event: object) =>
   `<script type="application/ld+json">${JSON.stringify(event)}</script>`;
 
 describe("checkWebsite", () => {
+  it("reads hCalendar events and notes patrikas to type up", async () => {
+    site = {
+      "https://patrika.example.org/": {
+        body: '<a href="/programme">Programme</a>',
+      },
+      "https://patrika.example.org/programme": {
+        body: `<div class="vevent"><span class="summary">Annakut</span>
+          <abbr class="dtstart" title="2026-11-09T11:00">9 Nov</abbr></div>
+          <a href="/files/diwali-patrika-2026.pdf">Diwali patrika</a>
+          <img src="/img/navratri-poster.jpg" alt="Navratri poster">`,
+      },
+    };
+    const result = await checkWebsite("https://patrika.example.org/", now);
+    expect(result.events.map((e) => `${e.title} ${e.date} ${e.time}`)).toEqual([
+      "Annakut 2026-11-09 11:00",
+    ]);
+    expect(result.documents.map((d) => [d.kind, d.url])).toEqual([
+      ["pdf", "https://patrika.example.org/files/diwali-patrika-2026.pdf"],
+      ["picture", "https://patrika.example.org/img/navratri-poster.jpg"],
+    ]);
+    expect(result.notes).toContain("Found 2 patrikas or posters to type up.");
+    // Found, not fetched: Toran doesn't read them itself.
+    expect(fetched).not.toContain(
+      "https://patrika.example.org/files/diwali-patrika-2026.pdf",
+    );
+  });
+
   it("reads the home page, an events page and a calendar feed", async () => {
     site = {
       "https://mandir.example.org/robots.txt": {
@@ -85,6 +112,7 @@ describe("checkWebsite", () => {
     expect(await checkWebsite("https://plain.example.org/", now)).toEqual({
       outcome: "none",
       events: [],
+      documents: [],
       pagesRead: 1,
       notes: ["Read 1 page.", "No events found on the pages read."],
     });

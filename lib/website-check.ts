@@ -7,9 +7,12 @@ import {
   eventsFromIcs,
   eventsFromJsonLd,
   eventsFromMicrodata,
+  eventsFromMicroformats,
   eventsFromTribeApi,
+  type FoundDocument,
   type FoundEvent,
   mentionsDates,
+  patrikaLinks,
   type Platform,
   platformOf,
   robotsAllows,
@@ -32,6 +35,9 @@ export type CheckOutcome = "found" | "none" | "blocked" | "unreachable";
 export type CheckResult = {
   outcome: CheckOutcome;
   events: FoundEvent[];
+  // Patrikas and posters linked or shown on the pages read, for a person
+  // to type up (Toran can't read them itself).
+  documents: FoundDocument[];
   pagesRead: number;
   // What was read and, if nothing was found, why: shown on /ops/websites.
   notes: string[];
@@ -176,6 +182,7 @@ function describe(
   read: { pages: number; feeds: number; tribe: boolean; google: boolean },
   found: number,
   writtenOut: boolean,
+  documents: number,
 ): string[] {
   const notes: string[] = [];
   const pages = `${read.pages} ${read.pages === 1 ? "page" : "pages"}`;
@@ -189,6 +196,11 @@ function describe(
     );
   }
   if (read.google) notes.push("Read the Google Calendar shown on the site.");
+  if (documents) {
+    notes.push(
+      `Found ${documents} ${documents === 1 ? "patrika or poster" : "patrikas or posters"} to type up.`,
+    );
+  }
   if (found) return notes;
   if (platform === "wix") {
     notes.push(
@@ -199,6 +211,7 @@ function describe(
       "Built with a site builder that doesn't publish event data Toran can read.",
     );
   }
+  if (documents) return notes;
   notes.push(
     writtenOut
       ? "The site writes dates out for people (on a page or in a poster picture) but publishes no event data. Ask the committee to add events on Toran, or forward their posters."
@@ -210,6 +223,7 @@ function describe(
 // Checks one website: its home page and up to five pages that look like an
 // events list, then the event data they lead to: calendar feeds, Google
 // Calendars, WordPress's The Events Calendar, and single event pages.
+// Patrikas and posters on the pages read are noted too (at most five).
 // Stops after about 25 seconds.
 export async function checkWebsite(
   website: string,
@@ -231,6 +245,7 @@ export async function checkWebsite(
     return {
       outcome: "blocked",
       events: [],
+      documents: [],
       pagesRead: 0,
       notes: [
         "The site's robots.txt asks robots not to read it, so Toran stays away.",
@@ -243,10 +258,19 @@ export async function checkWebsite(
 
   const found: FoundEvent[] = [];
   const read = { pages: 1, feeds: 0, tribe: false, google: false };
-  const fromPage = (html: string, url: string) => [
-    ...eventsFromJsonLd(html, url),
-    ...eventsFromMicrodata(html, url),
-  ];
+  const documents = new Map<string, FoundDocument>();
+  const fromPage = (html: string, url: string) => {
+    for (const d of patrikaLinks(html, url)) {
+      if (documents.size < 5 && !documents.has(d.url)) {
+        documents.set(d.url, d);
+      }
+    }
+    return [
+      ...eventsFromJsonLd(html, url),
+      ...eventsFromMicrodata(html, url),
+      ...eventsFromMicroformats(html, url),
+    ];
+  };
   found.push(...fromPage(first.text, first.url));
   const platform = platformOf(first.text);
   let writtenOut = mentionsDates(first.text);
@@ -306,8 +330,9 @@ export async function checkWebsite(
   return {
     outcome: events.length ? "found" : "none",
     events,
+    documents: [...documents.values()],
     pagesRead: read.pages + read.feeds,
-    notes: describe(platform, read, events.length, writtenOut),
+    notes: describe(platform, read, events.length, writtenOut, documents.size),
   };
 }
 
@@ -315,6 +340,7 @@ function unreachable(): CheckResult {
   return {
     outcome: "unreachable",
     events: [],
+    documents: [],
     pagesRead: 0,
     notes: ["The site didn't answer, or answered with an error."],
   };

@@ -1,8 +1,10 @@
 // Reads events a mandir's own website already publishes in machine-readable
-// forms: schema.org event data in the page (JSON-LD or microdata), iCalendar
-// (.ics) feeds, Google Calendars embedded in the page, and the event list
-// of WordPress's The Events Calendar plugin. No guessing events from page
-// text; that would need AI and is a later step. Whatever it reads is
+// forms: schema.org event data in the page (JSON-LD or microdata), the
+// older hCalendar and h-event microformats, iCalendar (.ics) feeds, Google
+// Calendars embedded in the page, and the event list of WordPress's The
+// Events Calendar plugin. Patrikas and posters (PDFs and pictures) are
+// found but not read: they're listed for a person to type up. No guessing
+// events from page text; that would need AI. Whatever it reads is
 // cleaned into plain text a family can read, then checked by a person in
 // the poster queue. Pure functions, so the rules are tested without
 // fetching anything.
@@ -357,6 +359,84 @@ export function eventsFromMicrodata(
   return found;
 }
 
+// ---- Microformats: hCalendar and h-event ------------------------------------
+
+// The first tag inside a piece of HTML with one of these classes, and the
+// text inside it.
+function classProp(
+  html: string,
+  names: string[],
+): { attrs: string; inner: string } | null {
+  for (const tag of html.matchAll(/<([a-z0-9]+)\b([^>]*)>/gi)) {
+    const classes = attr(tag[2], "class")?.split(/\s+/) ?? [];
+    if (!classes.some((c) => names.includes(c))) continue;
+    const rest = html.slice(tag.index + tag[0].length);
+    const close = rest.search(new RegExp(`</${tag[1]}\\s*>`, "i"));
+    return { attrs: tag[2], inner: close >= 0 ? rest.slice(0, close) : "" };
+  }
+  return null;
+}
+
+// Events marked up with the older microformats many WordPress themes and
+// calendar plugins still use: class="vevent" (hCalendar) or "h-event",
+// with the name in "summary" or "p-name" and the start in "dtstart" or
+// "dt-start" (as a datetime or title, or a "value-title" inside).
+export function eventsFromMicroformats(
+  html: string,
+  pageUrl: string,
+): FoundEvent[] {
+  const found: FoundEvent[] = [];
+  const starts = [
+    ...html.matchAll(
+      /<[a-z0-9]+\b[^>]*\bclass\s*=\s*["'](?:[^"']*\s)?(?:vevent|h-event)(?:\s[^"']*)?["'][^>]*>/gi,
+    ),
+  ].map((m) => m.index);
+  starts.forEach((start, i) => {
+    const chunk = html.slice(start, starts[i + 1] ?? start + 8000);
+    const inner = chunk.slice(chunk.indexOf(">") + 1);
+    const name = classProp(inner, ["summary", "p-name"]);
+    const when = classProp(inner, ["dtstart", "dt-start"]);
+    if (!name || !when) return;
+    const valueTitle =
+      /class\s*=\s*["'][^"']*\bvalue-title\b[^"']*["'][^>]*\btitle\s*=\s*["']([^"']+)["']|\btitle\s*=\s*["']([^"']+)["'][^>]*class\s*=\s*["'][^"']*\bvalue-title\b/i.exec(
+        when.inner,
+      );
+    const startValue =
+      attr(when.attrs, "datetime") ??
+      attr(when.attrs, "title") ??
+      attr(when.attrs, "content") ??
+      valueTitle?.[1] ??
+      valueTitle?.[2] ??
+      plainText(when.inner);
+    // hCalendar also allows the compact form, "20261112T1800".
+    const compact = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2}))?/.exec(
+      startValue.trim(),
+    );
+    const parsed = parseStart(
+      compact
+        ? `${compact[1]}-${compact[2]}-${compact[3]}${compact[4] ? `T${compact[4]}:${compact[5]}` : ""}`
+        : startValue,
+    );
+    if (!parsed) return;
+    const description = classProp(inner, [
+      "description",
+      "p-summary",
+      "e-content",
+      "p-description",
+    ]);
+    const url = classProp(inner, ["url", "u-url"]);
+    const href = url ? (attr(url.attrs, "href") ?? "") : "";
+    const event = finish({
+      title: name.inner,
+      ...parsed,
+      summary: description?.inner ?? "",
+      link: (href && absolute(href, pageUrl)) || pageUrl,
+    });
+    if (event) found.push(event);
+  });
+  return found;
+}
+
 // ---- WordPress: The Events Calendar's list of events ------------------------
 
 // The address of The Events Calendar's list of upcoming events on a
@@ -562,6 +642,65 @@ export function eventPageLinks(html: string, pageUrl: string): string[] {
     }
   }
   return [...links].slice(0, 6);
+}
+
+// ---- Patrikas and posters ----------------------------------------------------
+
+// A patrika (programme) or poster the site links to or shows: Toran can't
+// read these by itself, so they're listed for a person to type up.
+export type FoundDocument = {
+  url: string;
+  kind: "pdf" | "picture";
+  label: string;
+};
+
+const PATRIKA_WORDS =
+  /patrika|programme|program|schedule|calendar|timetable|newsletter|events?\b|utsav|festival|poster|flyer|leaflet|diwali|deepavali|navratri|navaratri|janmashtami|annakut|holi|shivaratri|ganesh|ram\s*navami|hanuman|sharad|garba|dussehra|vijaya/i;
+const NOT_A_POSTER = /logo|icon|favicon|avatar|sprite|banner-bg|placeholder/i;
+
+// PDFs and pictures on a page that look like a programme or event poster:
+// by the link's words, the picture's description, or the file's name.
+export function patrikaLinks(html: string, pageUrl: string): FoundDocument[] {
+  const found = new Map<string, FoundDocument>();
+  for (const [, attrs, inner] of html.matchAll(
+    /<a\b([^>]*)>([\s\S]*?)<\/a\s*>/gi,
+  )) {
+    const href = attr(attrs, "href");
+    const url = href && absolute(href.replace(/&amp;/g, "&"), pageUrl);
+    if (!url || !/\.pdf(?:[?#]|$)/i.test(url)) continue;
+    const words = plainText(inner);
+    const file = decodeURIComponent(
+      new URL(url).pathname.split("/").pop() ?? "",
+    );
+    if (!PATRIKA_WORDS.test(`${words} ${file}`)) continue;
+    found.set(url, {
+      url,
+      kind: "pdf",
+      label: shorten(words || file.replace(/\.pdf$/i, ""), 80),
+    });
+  }
+  for (const [, attrs] of html.matchAll(/<img\b([^>]*)>/gi)) {
+    const src = attr(attrs, "src") ?? attr(attrs, "data-src");
+    const url = src && absolute(src.replace(/&amp;/g, "&"), pageUrl);
+    if (!url || !/\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(url)) continue;
+    const alt = plainText(attr(attrs, "alt") ?? "");
+    const file = decodeURIComponent(
+      new URL(url).pathname.split("/").pop() ?? "",
+    );
+    if (NOT_A_POSTER.test(`${alt} ${file}`)) continue;
+    if (!PATRIKA_WORDS.test(`${alt} ${file}`)) continue;
+    // Small pictures (thumbnails, icons) aren't posters.
+    const width = Number(attr(attrs, "width") ?? 0);
+    if (width && width < 200) continue;
+    if (!found.has(url)) {
+      found.set(url, {
+        url,
+        kind: "picture",
+        label: shorten(alt || file.replace(/\.\w+$/, ""), 80),
+      });
+    }
+  }
+  return [...found.values()].slice(0, 5);
 }
 
 // ---- What kind of site it is ------------------------------------------------

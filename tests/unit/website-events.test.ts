@@ -3,8 +3,10 @@ import {
   candidateLinks,
   eventsFromIcs,
   eventsFromJsonLd,
+  eventsFromMicroformats,
   parseIcsStart,
   parseStart,
+  patrikaLinks,
   plainText,
   robotsAllows,
   upcoming,
@@ -279,5 +281,109 @@ describe("robotsAllows", () => {
 
   it("allows everything when there are no rules", () => {
     expect(robotsAllows("", "/anything", "ToranBot")).toBe(true);
+  });
+});
+
+describe("eventsFromMicroformats", () => {
+  it("reads hCalendar events, with the start as a datetime or title", () => {
+    const html = `
+      <div class="vevent">
+        <h3 class="summary">Diwali &amp; fireworks</h3>
+        <time class="dtstart" datetime="2026-11-08T18:30:00+00:00">8 Nov</time>
+        <p class="description">Puja, then <b>fireworks</b> at 8pm.</p>
+        <a class="url" href="/events/diwali">More</a>
+      </div>
+      <li class="event vevent">
+        <span class="summary">Annakut darshan</span>
+        <abbr class="dtstart" title="20261109T1100">9 November, 11am</abbr>
+      </li>
+      <div class="vevent"><span class="summary">No date</span></div>`;
+    expect(eventsFromMicroformats(html, PAGE)).toEqual([
+      {
+        title: "Diwali & fireworks",
+        date: "2026-11-08",
+        time: "18:30",
+        summary: "Puja, then fireworks at 8pm.",
+        link: "https://mandir.example.org/events/diwali",
+        kind: "festival",
+      },
+      {
+        title: "Annakut darshan",
+        date: "2026-11-09",
+        time: "11:00",
+        summary: "",
+        link: PAGE,
+        kind: expect.any(String),
+      },
+    ]);
+  });
+
+  it("reads h-event, with a value-title start", () => {
+    const html = `
+      <article class="h-event">
+        <a class="p-name u-url" href="https://mandir.example.org/garba">Sharad Purnima Garba</a>
+        <span class="dt-start"><span class="value-title" title="2026-10-25"></span>Sunday</span>
+      </article>`;
+    expect(eventsFromMicroformats(html, PAGE)).toEqual([
+      expect.objectContaining({
+        title: "Sharad Purnima Garba",
+        date: "2026-10-25",
+        time: "",
+      }),
+    ]);
+  });
+
+  it("doesn't take a class that only contains the word", () => {
+    const html = `
+      <div class="vevent">
+        <p class="entry-summary">Not the name</p>
+        <span class="dtstart" title="2026-11-08">8 Nov</span>
+      </div>`;
+    expect(eventsFromMicroformats(html, PAGE)).toEqual([]);
+  });
+});
+
+describe("patrikaLinks", () => {
+  it("finds programme PDFs and event posters, not logos or other files", () => {
+    const html = `
+      <a href="/files/Diwali-2026-Patrika.pdf">Download</a>
+      <a href="https://cdn.example.com/x/programme.pdf?v=2">Our <b>programme</b></a>
+      <a href="/files/accounts-2025.pdf">Annual accounts</a>
+      <a href="/files/membership.docx">Membership form</a>
+      <img src="/uploads/navratri-poster.jpg" alt="">
+      <img src="/uploads/IMG_2041.png" alt="Diwali programme poster" width="800">
+      <img src="/uploads/logo.png" alt="Mandir logo">
+      <img src="/uploads/diwali-thumb.jpg" alt="Diwali" width="120">
+      <img src="/uploads/temple.jpg" alt="The mandir at night">`;
+    expect(patrikaLinks(html, PAGE)).toEqual([
+      {
+        url: "https://mandir.example.org/files/Diwali-2026-Patrika.pdf",
+        kind: "pdf",
+        label: "Download",
+      },
+      {
+        url: "https://cdn.example.com/x/programme.pdf?v=2",
+        kind: "pdf",
+        label: "Our programme",
+      },
+      {
+        url: "https://mandir.example.org/uploads/navratri-poster.jpg",
+        kind: "picture",
+        label: "navratri-poster",
+      },
+      {
+        url: "https://mandir.example.org/uploads/IMG_2041.png",
+        kind: "picture",
+        label: "Diwali programme poster",
+      },
+    ]);
+  });
+
+  it("keeps at most five", () => {
+    const html = Array.from(
+      { length: 8 },
+      (_, i) => `<a href="/p/patrika-${i}.pdf">Patrika</a>`,
+    ).join("");
+    expect(patrikaLinks(html, PAGE)).toHaveLength(5);
   });
 });

@@ -69,6 +69,7 @@ const found = (n: number): CheckResult => ({
     link: "https://example.org",
     kind: "other",
   })),
+  documents: [],
   pagesRead: 1,
   notes: [],
 });

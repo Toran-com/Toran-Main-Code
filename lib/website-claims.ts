@@ -99,6 +99,13 @@ export async function recordWebsiteCheck(
       last_outcome: result.outcome,
       last_found: result.events.length,
       last_notes: result.notes.join("\n").slice(0, 1000) || null,
+      last_documents: result.documents.length
+        ? result.documents.slice(0, 5).map((d) => ({
+            url: d.url.slice(0, 500),
+            kind: d.kind,
+            label: d.label.slice(0, 80),
+          }))
+        : null,
     })
     .eq("id", sourceId);
   return { added };
