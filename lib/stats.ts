@@ -99,6 +99,14 @@ function addDays(date: string, days: number): string {
 }
 
 // The days of a period ending today: ["2026-10-12", …, "2026-10-18"].
+// The periods a committee can look at on its Numbers page and download.
+export const MANDIR_PERIODS = [
+  { days: 7, label: "Last 7 days" },
+  { days: 28, label: "Last 4 weeks" },
+  { days: 90, label: "Last 3 months" },
+  { days: 365, label: "Last 12 months" },
+] as const;
+
 export function periodDays(today: string, days: number): string[] {
   return Array.from({ length: days }, (_, i) => addDays(today, i - days + 1));
 }

@@ -38,6 +38,7 @@ English and Gujarati, and by following every link from the home page.
 | Edit an event         | `/manage/<mandir>/events/<id>`      | Change an event                                                | The committee page                                 |
 | Seva                  | `/manage/<mandir>/seva`             | Every rota, what's still short, one message for the group      | Each seva rota, the Seva page                      |
 | Seva rota             | `/manage/<mandir>/seva/<id>`        | Roles and shifts; the message for the volunteers' group        | The public seva page                               |
+| Numbers               | `/manage/<mandir>/numbers`          | Views, calendar adds, shares; download as a spreadsheet        | The committee page                                 |
 | Print a notice        | `/mandirs/<mandir>/print`           | One page of what's on, with a QR code                          | —                                                  |
 
 ## Toran admins (`/ops`, with an authenticator app)
