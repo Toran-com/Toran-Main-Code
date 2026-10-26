@@ -104,6 +104,42 @@ export function onDay<T extends { next_starts_at: string }>(
     : [...events];
 }
 
+// "Today" or "This weekend" on What's on: worked out on the day the page
+// is seen, so a shared link means the same thing to whoever opens it.
+export type When = "" | "today" | "weekend";
+
+export function whenFrom(value: unknown): When {
+  return value === "today" || value === "weekend" ? value : "";
+}
+
+function addDays(date: string, days: number): string {
+  return new Date(Date.parse(`${date}T12:00:00Z`) + days * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+}
+
+// The dates (London) a choice covers. This weekend is the coming Saturday
+// and Sunday, or what's left of it on a Saturday or Sunday.
+export function datesFor(when: When, today: string): string[] {
+  if (when === "today") return [today];
+  if (when !== "weekend") return [];
+  const weekday = new Date(`${today}T12:00:00Z`).getUTCDay();
+  if (weekday === 0) return [today];
+  const saturday = addDays(today, 6 - weekday);
+  return [saturday, addDays(saturday, 1)];
+}
+
+export function onDays<T extends { next_starts_at: string }>(
+  events: readonly T[],
+  days: readonly string[],
+): T[] {
+  return days.length
+    ? events.filter((e) =>
+        days.includes(londonDate(new Date(e.next_starts_at))),
+      )
+    : [...events];
+}
+
 // How many events each area has, most first: for "Choose your area".
 export function regionCounts(
   events: readonly { mandir: { region: string } }[],

@@ -1,14 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { mentionsFestival } from "@/lib/festival-words";
 import {
+  datesFor,
   dayFrom,
   dayHeading,
   groupByDay,
   nearestFirstEachDay,
   nearTo,
   onDay,
+  onDays,
   pinsFor,
   radiusFrom,
+  whenFrom,
   regionCounts,
 } from "@/lib/whats-on-view";
 import type { ListedEvent } from "@/lib/whats-on";
@@ -192,5 +195,49 @@ describe("pinsFor", () => {
       }),
     };
     expect(pinsFor([at("a", "one", "cancelled"), nowhere])).toEqual([]);
+  });
+});
+
+describe("today and this weekend", () => {
+  it("reads only the two choices", () => {
+    expect(whenFrom("today")).toBe("today");
+    expect(whenFrom("weekend")).toBe("weekend");
+    expect(whenFrom("tomorrow")).toBe("");
+    expect(whenFrom(undefined)).toBe("");
+  });
+
+  it("works out the dates", () => {
+    // Wednesday 28 October 2026.
+    expect(datesFor("today", "2026-10-28")).toEqual(["2026-10-28"]);
+    expect(datesFor("weekend", "2026-10-28")).toEqual([
+      "2026-10-31",
+      "2026-11-01",
+    ]);
+    // On Saturday, the rest of the weekend; on Sunday, just Sunday.
+    expect(datesFor("weekend", "2026-10-31")).toEqual([
+      "2026-10-31",
+      "2026-11-01",
+    ]);
+    expect(datesFor("weekend", "2026-11-01")).toEqual(["2026-11-01"]);
+    // Friday: the weekend ahead, across a month's end.
+    expect(datesFor("weekend", "2026-10-30")).toEqual([
+      "2026-10-31",
+      "2026-11-01",
+    ]);
+    expect(datesFor("", "2026-10-28")).toEqual([]);
+  });
+
+  it("keeps the events on those dates (London time)", () => {
+    const events = [
+      event("fri", "2026-10-30T19:00:00Z", leicester),
+      // 11:30pm on Saturday in London is still Saturday.
+      event("sat-late", "2026-10-31T23:30:00Z", leicester),
+      event("sun", "2026-11-01T10:00:00Z", leicester),
+      event("mon", "2026-11-02T10:00:00Z", leicester),
+    ];
+    expect(
+      onDays(events, ["2026-10-31", "2026-11-01"]).map((e) => e.id),
+    ).toEqual(["sat-late", "sun"]);
+    expect(onDays(events, [])).toHaveLength(4);
   });
 });

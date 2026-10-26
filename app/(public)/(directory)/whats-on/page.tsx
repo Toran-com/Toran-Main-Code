@@ -9,22 +9,26 @@ import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading, Notice, pillButtonClass } from "@/components/ui";
 import { EVENT_KINDS, isEventKind, kindLabel } from "@/lib/event-kinds";
+import { londonDate } from "@/lib/format";
 import { cleanSlugs } from "@/lib/follow";
 import { regionKey } from "@/lib/i18n/client/mandirs";
 import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
 import {
+  datesFor,
   dayFrom,
   LONG_LIST,
   longDayHeading,
   nearestFirstEachDay,
   nearTo,
-  onDay,
+  onDays,
   PER_DAY,
   pinsFor,
   RADII,
   radiusFrom,
+  whenFrom,
+  type When,
 } from "@/lib/whats-on-view";
 import { pageT, localePath } from "@/lib/i18n/page";
 
@@ -63,6 +67,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const type = String(query.type ?? "");
   const kind = isEventKind(type) ? type : "";
   const day = dayFrom(query.day);
+  // "Today" or "This weekend" (a single day, from "more on this day", wins).
+  const when = day ? "" : whenFrom(query.when);
   const view = query.view === "map" ? "map" : "list";
   // The mandirs followed on the visitor's phone, when they ask for those.
   const mandirs = cleanSlugs(query.mandirs);
@@ -77,6 +83,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     type?: string;
     region?: string;
     day?: string;
+    when?: When;
     view?: string;
     mandirs?: string;
   }) => {
@@ -85,10 +92,13 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     if (within !== 15) params.set("within", String(within));
     const r = change.region ?? region;
     const k = change.type ?? kind;
-    const d = change.day ?? day;
+    // Choosing a day forgets "today" or "this weekend", and the other way.
+    const d = change.day ?? (change.when === undefined ? day : "");
+    const w = change.when ?? (change.day === undefined ? when : "");
     if (r) params.set("region", r);
     if (k) params.set("type", k);
     if (d) params.set("day", d);
+    if (w) params.set("when", w);
     if ((change.view ?? view) === "map") params.set("view", "map");
     const m = change.mandirs ?? mandirs.join(",");
     if (m) params.set("mandirs", m);
@@ -99,6 +109,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const keep = new URLSearchParams();
   if (kind) keep.set("type", kind);
   if (day) keep.set("day", day);
+  if (when) keep.set("when", when);
   if (view === "map") keep.set("view", "map");
   if (mandirs.length) keep.set("mandirs", mandirs.join(","));
   const place = (
@@ -142,14 +153,14 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     position = origin;
   }
 
-  const chosen = onDay(
+  const chosen = onDays(
     result.data.filter(
       (e) =>
         (!region || e.mandir.region === region) &&
         (!kind || e.kind === kind) &&
         (!mandirs.length || mandirs.includes(e.mandir.slug)),
     ),
-    day,
+    day ? [day] : datesFor(when, londonDate()),
   );
   // Near a place: each day's events nearest first.
   const nearby = nearTo(chosen, position, within);
@@ -159,6 +170,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     !region &&
     !kind &&
     !day &&
+    !when &&
     !mandirs.length &&
     events.length > LONG_LIST;
 
@@ -209,7 +221,25 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             here={here}
           />
         </div>
-        {!mandirs.length && <FollowedOnly href={here({})} />}
+        <div className="flex flex-wrap items-center gap-2">
+          <nav aria-label={t("whatsOn.when")} className="flex gap-2">
+            {(["today", "weekend"] as const).map((w) => (
+              <Link
+                key={w}
+                href={here({ when: when === w ? "" : w })}
+                aria-current={when === w ? "page" : undefined}
+                className={`inline-flex rounded-full border px-4 py-1.5 text-base no-underline ${
+                  when === w
+                    ? "border-ink bg-ink text-bg font-semibold"
+                    : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"
+                }`}
+              >
+                {w === "today" ? t("whatsOn.today") : t("whatsOn.weekend")}
+              </Link>
+            ))}
+          </nav>
+          {!mandirs.length && <FollowedOnly href={here({})} />}
+        </div>
         {active.length > 0 && (
           <ul aria-label={t("whatsOn.chosen")} className="flex flex-wrap gap-2">
             {active.map((f) => (
@@ -250,7 +280,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       ) : (
         <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
           <p className="font-semibold">
-            {position || region || kind || day || mandirs.length
+            {position || region || kind || day || when || mandirs.length
               ? t("whatsOn.noneThere")
               : t("whatsOn.noneYet")}
           </p>
