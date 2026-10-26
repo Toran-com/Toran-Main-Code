@@ -253,14 +253,14 @@ isOneToOne: false
                   ]
                 },"mandirs": {
                   Row: {
-                    "calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"getting_there": string | null,"id": string,"latitude": number | null,"longitude": number | null,"name": string,"phone": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"website": string | null
+                    "calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"facilities": string[],"getting_there": string | null,"id": string,"latitude": number | null,"longitude": number | null,"name": string,"phone": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"visiting_note": string | null,"website": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name": string,"phone"?: string | null,"postcode"?: string | null,"region": string,"slug": string,"status"?: string,"town": string,"tradition"?: string | null,"updated_at"?: string,"website"?: string | null
+                    "calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: string[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name": string,"phone"?: string | null,"postcode"?: string | null,"region": string,"slug": string,"status"?: string,"town": string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
                   }
                   Update: {
-                    "calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name"?: string,"phone"?: string | null,"postcode"?: string | null,"region"?: string,"slug"?: string,"status"?: string,"town"?: string,"tradition"?: string | null,"updated_at"?: string,"website"?: string | null
+                    "calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: string[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name"?: string,"phone"?: string | null,"postcode"?: string | null,"region"?: string,"slug"?: string,"status"?: string,"town"?: string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
                   }
                   Relationships: [
                     

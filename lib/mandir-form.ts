@@ -3,6 +3,11 @@
 // problem found, as a short code the page turns into a message.
 
 import { normalisePostcode } from "@/lib/geo";
+import {
+  type Facility,
+  facilitiesFrom,
+  VISITING_NOTE_MAX,
+} from "@/lib/visiting";
 
 export const REGIONS = [
   "East Midlands",
@@ -35,6 +40,10 @@ export type PracticalDetails = {
   phone: string | null;
   // Parking, entrance, nearest station: shown with directions.
   getting_there: string | null;
+  // Step-free access, chairs, food and so on (lib/visiting.ts), and a
+  // note for anything else visitors should know.
+  facilities: Facility[];
+  visiting_note: string | null;
 };
 
 export type MandirDetails = PracticalDetails & {
@@ -77,16 +86,34 @@ export function parsePracticalDetails(
   if (getting_there && getting_there.length > 400) {
     return { ok: false, error: "getting_there" };
   }
-  // It's shown publicly: no personal numbers or email addresses (decision
-  // 0006). The mandir's own number has its own field.
-  if (
-    getting_there &&
-    (/\S+@\S+\.\S+/.test(getting_there) ||
-      /(\d[\s()-]*){9,}/.test(getting_there))
-  ) {
+  if (getting_there && hasContactDetails(getting_there)) {
     return { ok: false, error: "getting_there_contact" };
   }
-  return { ok: true, values: { postcode, website, phone, getting_there } };
+  const facilities = facilitiesFrom(form.getAll("facilities"));
+  const visiting_note = text(form, "visiting_note") || null;
+  if (visiting_note && visiting_note.length > VISITING_NOTE_MAX) {
+    return { ok: false, error: "visiting_note" };
+  }
+  if (visiting_note && hasContactDetails(visiting_note)) {
+    return { ok: false, error: "visiting_note_contact" };
+  }
+  return {
+    ok: true,
+    values: {
+      postcode,
+      website,
+      phone,
+      getting_there,
+      facilities,
+      visiting_note,
+    },
+  };
+}
+
+// Notes are shown publicly: no personal numbers or email addresses
+// (decision 0006). The mandir's own number has its own field.
+function hasContactDetails(note: string): boolean {
+  return /\S+@\S+\.\S+/.test(note) || /(\d[\s()-]*){9,}/.test(note);
 }
 
 export function parseMandirDetails(form: FormData): Result<MandirDetails> {
@@ -138,6 +165,9 @@ export const FORM_ERRORS: Record<string, string> = {
   getting_there: 'Please keep "Getting there" under 400 characters.',
   getting_there_contact:
     "Please leave phone numbers and email addresses out of \"Getting there\": it's shown to everyone. The mandir's own number goes in its own box.",
+  visiting_note: `Please keep "Anything else visitors should know" under ${VISITING_NOTE_MAX} characters.`,
+  visiting_note_contact:
+    "Please leave phone numbers and email addresses out of the note for visitors: it's shown to everyone.",
   failed: "Something went wrong. Please try again.",
 };
 
