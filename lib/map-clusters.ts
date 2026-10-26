@@ -36,3 +36,22 @@ export function onTheMap<
       m.latitude !== null && m.longitude !== null,
   );
 }
+
+// Groups map circles that would touch: each joins the first group whose
+// circle is closer than "apart" pixels, else starts its own, which stays
+// where it is. So no two circles shown ever overlap, however big. Items
+// go in the order given (put the most important first).
+export function clusterApart<T>(
+  items: readonly T[],
+  position: (item: T) => { x: number; y: number },
+  apart: number,
+): Cluster<T>[] {
+  const groups: Cluster<T>[] = [];
+  for (const item of items) {
+    const { x, y } = position(item);
+    const near = groups.find((g) => Math.hypot(g.x - x, g.y - y) < apart);
+    if (near) near.items.push(item);
+    else groups.push({ items: [item], x, y });
+  }
+  return groups;
+}

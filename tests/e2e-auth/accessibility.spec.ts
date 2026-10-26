@@ -25,6 +25,7 @@ test("public pages are accessible", async ({ page }) => {
     "/whats-on?near=ZZ99&within=15",
     "/whats-on?type=festival&region=London",
     "/whats-on?pick=1",
+    "/whats-on?view=map",
     "/diwali",
     "/login",
   ]) {

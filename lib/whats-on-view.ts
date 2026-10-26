@@ -1,9 +1,12 @@
 // Pure helpers for laying out event lists: distance filtering and
 // grouping by day. Kept apart from data loading so they can be tested.
 
-import { londonDate } from "@/lib/format";
+import type { EventPin } from "@/components/events-map";
+import { formatEventStart, londonDate } from "@/lib/format";
 import { distanceMiles, type Position } from "@/lib/geo";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
+import { withLocale } from "@/lib/i18n/paths";
+import { eventPath } from "@/lib/share";
 import type { ListedEvent } from "@/lib/whats-on";
 
 export type EventNear = ListedEvent & { miles: number | null };
@@ -124,4 +127,43 @@ export const RADII = [5, 15, 30, 60] as const;
 export function radiusFrom(value: unknown): number {
   const n = Number(value);
   return (RADII as readonly number[]).includes(n) ? n : 15;
+}
+
+// What's on as a map: one pin per mandir with events in the list (not
+// cancelled ones, and only mandirs with a map position), with its next
+// few in words.
+const PIN_EVENTS = 3;
+
+export function pinsFor(events: readonly ListedEvent[]): EventPin[] {
+  const locale = pageLocale();
+  const pins = new Map<string, EventPin>();
+  for (const e of events) {
+    const { slug, name, town, latitude, longitude } = e.mandir;
+    if (e.status === "cancelled" || latitude === null || longitude === null) {
+      continue;
+    }
+    let pin = pins.get(slug);
+    if (!pin) {
+      pin = {
+        slug,
+        name,
+        town,
+        latitude,
+        longitude,
+        count: 0,
+        events: [],
+        more: withLocale(`/mandirs/${slug}`, locale),
+      };
+      pins.set(slug, pin);
+    }
+    pin.count++;
+    if (pin.events.length < PIN_EVENTS) {
+      pin.events.push({
+        when: formatEventStart(e.next_starts_at, e.all_day),
+        title: (locale === "gu" && e.title_gu) || e.title,
+        path: withLocale(eventPath(slug, e.id), locale),
+      });
+    }
+  }
+  return [...pins.values()];
 }
