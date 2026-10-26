@@ -73,8 +73,11 @@ test("a plan is made on one phone and opened on another", async ({
     .filter({ hasText: garba })
     .getByRole("button", { name: "Take out of the plan" })
     .click();
+  // Gone at once; the page before stays hidden for going back, so count
+  // only what is on screen.
+  await expect(items.filter({ hasText: garba })).toHaveCount(0);
   await expect(page).toHaveURL(new RegExp(`/plan\\?events=${aartiId}$`));
-  await expect(page.getByText(garba)).toHaveCount(0);
+  await expect(items.filter({ hasText: aarti })).toBeVisible();
   await page.getByRole("button", { name: "Clear the plan" }).click();
   await expect(page.getByText(/Nothing in your plan yet/)).toBeVisible();
 });

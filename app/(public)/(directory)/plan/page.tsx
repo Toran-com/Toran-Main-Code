@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { EventCard } from "@/components/event-list";
 import { WhatsAppIcon } from "@/components/icons";
-import { PlanButtons, PlanFromPhone, RemoveFromPlan } from "@/components/plan";
+import { PlanButtons, PlanEntry, PlanFromPhone } from "@/components/plan";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { Loading } from "@/components/ui";
 import { formatEventStart } from "@/lib/format";
@@ -89,16 +89,19 @@ async function Plan({ searchParams }: PageProps<"/plan">) {
       {events.length === 0 && <PlanFromPhone />}
       <div className="flex flex-col gap-8 sm:gap-10">
         {groupByDay(events, new Date()).map(({ day, heading, events: all }) => (
-          <section key={day} className="flex flex-col">
+          <section
+            key={day}
+            // Hidden once its last event is taken out.
+            className="flex flex-col [&:not(:has(li))]:hidden"
+          >
             <h2 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
               {heading}
             </h2>
             <ul className="divide-line flex flex-col divide-y">
               {all.map((e) => (
-                <li key={e.id} className="flex flex-col pb-4">
+                <PlanEntry key={e.id} id={e.id} shown={shown}>
                   <EventCard event={e} />
-                  <RemoveFromPlan id={e.id} shown={shown} />
-                </li>
+                </PlanEntry>
               ))}
             </ul>
           </section>

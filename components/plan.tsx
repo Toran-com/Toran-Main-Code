@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import {
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { actionPillClass, quietButtonClass } from "@/components/ui";
 import { useLocale, useT } from "@/components/use-t";
 import { enPlan } from "@/lib/i18n/client/plan";
@@ -123,37 +129,46 @@ export function PlanFromPhone() {
   );
 }
 
-// "Take out of the plan" under each event on the plan page.
-export function RemoveFromPlan({
+// An event on the plan page, with "Take out of the plan" under it. It
+// goes from the list at once, before the page is redrawn without it.
+export function PlanEntry({
   id,
   shown,
+  children,
 }: {
   id: string;
   // Every event in this plan's address, so the page can be redrawn
   // without it.
   shown: string[];
+  children: ReactNode;
 }) {
   const t = useT(enPlan);
   const locale = useLocale();
   const router = useRouter();
   const plan = usePlan();
+  const [gone, setGone] = useState(false);
+  if (gone) return null;
   return (
-    <button
-      type="button"
-      onClick={() => {
-        const event = plan.find((p) => p.id === id);
-        if (event) setPlanned(event, false);
-        router.replace(
-          planHref(
-            locale,
-            shown.filter((s) => s !== id),
-          ),
-        );
-      }}
-      className="text-muted cursor-pointer text-base font-semibold underline"
-    >
-      {t("plan.remove")}
-    </button>
+    <li className="flex flex-col pb-4">
+      {children}
+      <button
+        type="button"
+        onClick={() => {
+          const event = plan.find((p) => p.id === id);
+          if (event) setPlanned(event, false);
+          setGone(true);
+          router.replace(
+            planHref(
+              locale,
+              shown.filter((s) => s !== id),
+            ),
+          );
+        }}
+        className="text-muted cursor-pointer text-base font-semibold underline"
+      >
+        {t("plan.remove")}
+      </button>
+    </li>
   );
 }
 
