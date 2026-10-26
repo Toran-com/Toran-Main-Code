@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/ornaments";
+import { DisplaySettings } from "@/components/display-settings";
 
 // The narrow card layout used by login, account and admin pages.
 export function PageShell({
@@ -17,13 +18,16 @@ export function PageShell({
     <main
       className={`rise mx-auto flex w-full flex-1 flex-col gap-6 px-4 py-8 sm:gap-8 sm:px-6 sm:py-14 ${wide ? "max-w-3xl" : "max-w-lg"}`}
     >
-      <Link
-        href="/"
-        aria-label="Toran home"
-        className="text-ink self-start no-underline"
-      >
-        <Logo size="sm" />
-      </Link>
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          href="/"
+          aria-label="Toran home"
+          className="text-ink no-underline"
+        >
+          <Logo size="sm" />
+        </Link>
+        <DisplaySettings />
+      </div>
       <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
         {title}
       </h1>
