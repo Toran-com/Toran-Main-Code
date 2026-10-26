@@ -12,6 +12,7 @@ export const gu: Record<MessageKey, string> = {
   "shell.whatsOn": "કાર્યક્રમો",
   "shell.mandirs": "મંદિરો",
   "shell.festivals": "તહેવારો",
+  "shell.search": "શોધો",
   "shell.forMandirs": "મંદિર સમિતિઓ માટે",
   "shell.find": "શોધો",
   "shell.toran": "Toran",
@@ -51,6 +52,18 @@ export const gu: Record<MessageKey, string> = {
   "home.committeesBody":
     "તમે પહેલેથી શેર કરો છો તે પોસ્ટર મોકલો. મંદિરો માટે મફત.",
 
+  "search.title": "શોધો",
+  "search.description": "યુકેભરના કાર્યક્રમો, મંદિરો, શહેરો અને તહેવારો શોધો.",
+  "search.label": "કાર્યક્રમો, મંદિરો, શહેરો કે તહેવારો",
+  "search.example": "દા.ત. Diwali Leicester, ગરબા, BAPS",
+  "search.button": "શોધો",
+  "search.count.one": "{count} પરિણામ",
+  "search.count.other": "{count} પરિણામો",
+  "search.none":
+    "“{q}” માટે કંઈ મળ્યું નહીં. કોઈ શહેર, મંદિરનું નામ કે તહેવાર અજમાવો.",
+  "search.events": "કાર્યક્રમો",
+  "search.allMandirs": "બધાં મંદિરો જુઓ",
+  "search.allEvents": "બધા કાર્યક્રમો જુઓ",
   "whatsOn.title": "કાર્યક્રમો",
   "whatsOn.intro": "આગામી આઠ અઠવાડિયામાં યુકેનાં મંદિરોના કાર્યક્રમો.",
   "whatsOn.filter": "ફિલ્ટર",

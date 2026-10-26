@@ -27,6 +27,7 @@ test("public pages are accessible", async ({ page }) => {
     "/whats-on?pick=1",
     "/whats-on?view=map",
     "/diwali",
+    "/search?q=diwali",
     "/seva?near=LE4&within=60",
     "/?near=LE4&within=60",
     "/login",

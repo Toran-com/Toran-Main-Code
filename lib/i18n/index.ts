@@ -38,7 +38,8 @@ export function translator(locale: Locale = DEFAULT_LOCALE) {
       | "sevaList.free"
       | "sevaList.places"
       | "sevaList.atMandirs"
-      | "sevaList.taken",
+      | "sevaList.taken"
+      | "search.count",
     count: number,
   ) => t(count === 1 ? `${key}.one` : `${key}.other`, { count });
   return t;
