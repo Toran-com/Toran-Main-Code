@@ -119,6 +119,8 @@ export function calendarEntry(slot: MySlot, origin: string) {
     start: slot.starts_at,
     end: slot.ends_at,
     allDay: false,
+    // Two hours before the shift.
+    remind: true,
   };
 }
 

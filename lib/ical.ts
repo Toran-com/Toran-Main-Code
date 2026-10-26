@@ -21,6 +21,10 @@ export type CalendarEvent = {
   // YYYY-MM-DD for all-day events.
   skip?: string[];
   cancelled?: boolean;
+  // A reminder: two hours before a timed event (time to get there), or at
+  // 6pm the evening before an all-day one. Only for events someone adds
+  // one at a time; a whole subscribed calendar of reminders would nag.
+  remind?: boolean;
 };
 
 const LONDON = new Intl.DateTimeFormat("en-GB", {
@@ -146,6 +150,15 @@ function eventLines(event: CalendarEvent, now: Date): string[] {
   if (event.location) lines.push(`LOCATION:${escapeText(event.location)}`);
   if (event.url) lines.push(`URL:${event.url}`);
   lines.push(`STATUS:${event.cancelled ? "CANCELLED" : "CONFIRMED"}`);
+  if (event.remind && !event.cancelled) {
+    lines.push(
+      "BEGIN:VALARM",
+      "ACTION:DISPLAY",
+      `DESCRIPTION:${escapeText(event.title)}`,
+      `TRIGGER:${event.allDay ? "-PT6H" : "-PT2H"}`,
+      "END:VALARM",
+    );
+  }
   lines.push("END:VEVENT");
   return lines;
 }
