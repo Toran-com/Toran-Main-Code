@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { logIn, sql } from "./helpers";
 
@@ -54,7 +55,26 @@ test("a committee sees its own numbers, and only its own", async ({ page }) => {
     `${base}/events/${event}`,
   );
 
-  // Another mandir's numbers aren't theirs to see.
+  // The same as a spreadsheet file.
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("link", { name: "Download as a spreadsheet" }).click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(
+    new RegExp(
+      `^toran-${SLUG}-\\d{4}-\\d{2}-\\d{2}-to-\\d{4}-\\d{2}-\\d{2}\\.csv$`,
+    ),
+  );
+  const file = readFileSync((await download.path())!, "utf8");
+  expect(file).toMatch(/^\uFEFFDate,Starts,Ends,Event,/);
+  expect(file).toMatch(new RegExp(`${title},.*,12,5,2\\r\\n`));
+  expect(file).not.toContain("geeta-bhavan-leicester");
+
+  // Another mandir's numbers aren't theirs to see, nor its file.
+  const other = await page.request.get(
+    "/manage/geeta-bhavan-leicester/numbers/export.csv",
+  );
+  expect(other.status()).toBe(404);
   await page.goto("/manage/geeta-bhavan-leicester/numbers");
   await expect(
     page.getByRole("heading", { level: 1, name: "Page not found" }),

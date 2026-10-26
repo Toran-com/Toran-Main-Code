@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Card, cardClass, Loading, Notice, PageShell } from "@/components/ui";
+import {
+  Card,
+  cardClass,
+  Loading,
+  Notice,
+  PageShell,
+  pillButtonClass,
+} from "@/components/ui";
 import { londonDate } from "@/lib/format";
 import { requireMandirAccess } from "@/lib/manage-access";
 import { eventPath } from "@/lib/share";
 import { pageTitle } from "@/lib/site";
-import { mandirNumbers, periodDays, readSummary } from "@/lib/stats";
+import {
+  MANDIR_PERIODS as PERIODS,
+  mandirNumbers,
+  periodDays,
+  readSummary,
+} from "@/lib/stats";
 
 // A committee's own numbers: how often its page and events were seen on
 // Toran, added to calendars and shared. Toran's counter keeps only totals
@@ -17,12 +29,6 @@ export const metadata: Metadata = {
   title: pageTitle("Numbers"),
   robots: { index: false },
 };
-
-const PERIODS = [
-  { days: 7, label: "Last 7 days" },
-  { days: 28, label: "Last 4 weeks" },
-  { days: 90, label: "Last 3 months" },
-] as const;
 
 export default function NumbersPage(
   props: PageProps<"/manage/[slug]/numbers">,
@@ -130,6 +136,21 @@ async function Numbers({
         />
         <Tile label="Shared" value={numbers.totals.share} />
       </dl>
+
+      <div className="flex flex-col items-start gap-2">
+        <a
+          href={`/manage/${mandir.slug}/numbers/export.csv?days=${period.days}`}
+          download
+          className={pillButtonClass}
+        >
+          Download as a spreadsheet
+        </a>
+        <p className="text-muted text-base">
+          Your events from the {period.label.toLowerCase()} and everything
+          coming up, with these numbers, as a file that Excel, Google Sheets or
+          Numbers can open.
+        </p>
+      </div>
 
       <Card>
         <h2 className="text-xl font-bold sm:text-2xl">Your events</h2>

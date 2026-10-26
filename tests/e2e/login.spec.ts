@@ -59,6 +59,15 @@ test("claiming and managing a mandir need a login", async ({ page }) => {
   await expect(page).toHaveURL(
     /\/login\?next=%2Fmanage%2Fsome-mandir%2Fevents%2Fsome-event/,
   );
+  // Nor can its spreadsheet file be fetched without one.
+  const file = await page.request.get(
+    "/manage/some-mandir/numbers/export.csv",
+    { maxRedirects: 0 },
+  );
+  expect(file.status()).toBe(307);
+  expect(file.headers().location).toMatch(
+    /\/login\?next=%2Fmanage%2Fsome-mandir%2Fnumbers/,
+  );
 });
 
 test("the admin pages need a login", async ({ page }) => {
