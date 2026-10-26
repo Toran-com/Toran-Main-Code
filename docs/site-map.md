@@ -53,7 +53,7 @@ English and Gujarati, and by following every link from the home page.
 | Festival dates   | `/ops/festivals`    | Check dates against a second calendar                                                |
 | Stats            | `/ops/stats`        | Visits, calendar adds and shares, with no personal data                              |
 | Digest           | `/ops/digest`       | Preview of the weekly email (nobody receives it yet)                                 |
-| Translations     | `/ops/translations` | The Gujarati, numbered, for a native speaker to check                                |
+| Translations     | `/ops/translations` | The Gujarati review pack: what's new since the last check, to copy or print          |
 
 ## The journeys
 
