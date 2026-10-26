@@ -110,7 +110,9 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const { data: mandir } = supabase
     ? await supabase
         .from("mandirs")
-        .select("id, slug, name, town, postcode, website, phone, calendar")
+        .select(
+          "id, slug, name, town, postcode, website, phone, calendar, getting_there",
+        )
         .eq("slug", slug)
         .maybeSingle()
     : { data: null };
@@ -716,6 +718,21 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               name="phone"
               type="tel"
               defaultValue={mandir.phone ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Getting there</span>
+            <span className="text-muted -mt-1 text-base">
+              Parking, which entrance to use, the nearest station or bus. Shown
+              on your page and with every event, next to directions.
+            </span>
+            <textarea
+              name="getting_there"
+              rows={3}
+              maxLength={400}
+              defaultValue={mandir.getting_there ?? ""}
+              placeholder="e.g. Free parking behind the hall. Enter by the side gate on Station Road."
               className={inputClass}
             />
           </label>

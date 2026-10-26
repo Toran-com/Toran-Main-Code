@@ -129,6 +129,7 @@ export const gu: Record<MessageKey, string> = {
   "mandir.tradition": "સંપ્રદાય",
   "mandir.postcode": "પોસ્ટકોડ",
   "mandir.directions": "રસ્તો",
+  "mandir.gettingThere": "કેવી રીતે પહોંચવું",
   "mandir.website": "વેબસાઇટ",
   "mandir.phone": "ફોન",
   "mandir.call": "ફોન કરો",

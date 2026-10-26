@@ -20,6 +20,7 @@ type Values = {
   tradition?: string | null;
   calendar?: string | null;
   charity_number?: string | null;
+  getting_there?: string | null;
 };
 
 function Field({
@@ -136,6 +137,18 @@ export function MandirFields({ values = {} }: { values?: Values }) {
           name="charity_number"
           maxLength={20}
           defaultValue={values.charity_number ?? ""}
+          className={inputClass}
+        />
+      </Field>
+      <Field
+        label="Getting there"
+        hint="Parking, entrance, nearest station or bus. No personal numbers."
+      >
+        <textarea
+          name="getting_there"
+          rows={3}
+          maxLength={400}
+          defaultValue={values.getting_there ?? ""}
           className={inputClass}
         />
       </Field>
