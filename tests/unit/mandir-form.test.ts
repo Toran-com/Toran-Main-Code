@@ -41,6 +41,8 @@ describe("parseMandirDetails", () => {
         getting_there: null,
         facilities: [],
         visiting_note: null,
+        opening_hours: null,
+        aarti_times: null,
       },
     });
   });
@@ -71,6 +73,8 @@ describe("parsePracticalDetails", () => {
         getting_there: null,
         facilities: [],
         visiting_note: null,
+        opening_hours: null,
+        aarti_times: null,
       },
     });
   });
@@ -110,6 +114,34 @@ describe("parsePracticalDetails", () => {
     expect(
       parsePracticalDetails(form({ getting_there: "x".repeat(401) })),
     ).toEqual({ ok: false, error: "getting_there" });
+  });
+});
+
+describe("opening times", () => {
+  it("names the day that needs checking", () => {
+    expect(
+      parsePracticalDetails(
+        form({ "open-6-0": "09:00", "close-6-0": "08:00" }),
+      ),
+    ).toEqual({ ok: false, error: "hours_6" });
+  });
+  it("keeps sessions and aartis", () => {
+    expect(
+      parsePracticalDetails(
+        form({
+          "open-7-0": "09:00",
+          "close-7-0": "13:00",
+          "aarti-name-0": "Rajbhog aarti",
+          "aarti-time-0": "11:30",
+        }),
+      ),
+    ).toMatchObject({
+      ok: true,
+      values: {
+        opening_hours: [{ day: 7, opens: "09:00", closes: "13:00" }],
+        aarti_times: [{ name: "Rajbhog aarti", time: "11:30" }],
+      },
+    });
   });
 });
 

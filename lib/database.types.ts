@@ -253,14 +253,14 @@ isOneToOne: false
                   ]
                 },"mandirs": {
                   Row: {
-                    "calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"facilities": (string)[],"getting_there": string | null,"id": string,"latitude": number | null,"longitude": number | null,"name": string,"phone": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"visiting_note": string | null,"website": string | null
+                    "aarti_times": Json | null,"calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"facilities": (string)[],"getting_there": string | null,"id": string,"latitude": number | null,"longitude": number | null,"name": string,"opening_hours": Json | null,"phone": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"visiting_note": string | null,"website": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name": string,"phone"?: string | null,"postcode"?: string | null,"region": string,"slug": string,"status"?: string,"town": string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
+                    "aarti_times"?: Json | null,"calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name": string,"opening_hours"?: Json | null,"phone"?: string | null,"postcode"?: string | null,"region": string,"slug": string,"status"?: string,"town": string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
                   }
                   Update: {
-                    "calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name"?: string,"phone"?: string | null,"postcode"?: string | null,"region"?: string,"slug"?: string,"status"?: string,"town"?: string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
+                    "aarti_times"?: Json | null,"calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"longitude"?: number | null,"name"?: string,"opening_hours"?: Json | null,"phone"?: string | null,"postcode"?: string | null,"region"?: string,"slug"?: string,"status"?: string,"town"?: string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
                   }
                   Relationships: [
                     
@@ -482,6 +482,12 @@ isOneToOne: false
                            },
 "take_seva_slot":
 { Args: { "target_shift": string }; Returns: string
+                           },
+"valid_aarti_times":
+{ Args: { "aartis": Json }; Returns: boolean
+                           },
+"valid_opening_hours":
+{ Args: { "hours": Json }; Returns: boolean
                            }
           }
           Enums: {

@@ -242,6 +242,17 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member
     .getByLabel("Anything else visitors should know")
     .fill("Please cover your head in the inner mandir.");
+  // Opening times: Monday's, copied to every day, and an aarti.
+  const monday = member.getByRole("group", { name: "Monday" });
+  await monday.getByLabel("Opens", { exact: true }).fill("07:30");
+  await monday.getByLabel("Closes").first().fill("12:00");
+  await monday.getByLabel("Opens again").fill("16:00");
+  await monday.getByLabel("Closes").nth(1).fill("20:00");
+  await member
+    .getByRole("button", { name: "Copy Monday's times to every day" })
+    .click();
+  await member.getByLabel("Aarti 1").fill("Mangla aarti");
+  await member.getByLabel("Time", { exact: true }).first().fill("07:30");
   await member.getByRole("button", { name: "Save details" }).click();
   await expect(member.getByText("Saved. Your public page")).toBeVisible();
   await expect(member.getByLabel("Step-free way in")).toBeChecked();
@@ -259,6 +270,12 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     "Please cover your head in the inner mandir.",
   );
   await expect(visiting).not.toContainText("Hearing loop");
+  const hours = member.getByRole("region", { name: "Opening times" });
+  await expect(hours).toContainText("Mon – Sun");
+  await expect(hours).toContainText("7:30am – 12pm");
+  await expect(hours).toContainText("4pm – 8pm");
+  await expect(hours).toContainText("Mangla aarti");
+  await expect(member.getByText(/^(Open now|Closed now) · /)).toBeVisible();
 
   // Toran types up a poster someone forwarded; the committee publishes it.
   await admin.goto("/ops/posters");

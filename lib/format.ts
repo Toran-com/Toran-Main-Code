@@ -101,7 +101,11 @@ export function formatEventStart(startsAt: string, allDay: boolean): string {
 // "સાંજે 7:30" (evening 7:30) in UK time: Gujarati says the part of the
 // day rather than am or pm.
 function gujaratiTime(at: Date): string {
-  const [hour, minute] = londonTime(at).split(":").map(Number);
+  return gujaratiClock(londonTime(at));
+}
+
+function gujaratiClock(hhmm: string): string {
+  const [hour, minute] = hhmm.split(":").map(Number);
   const part =
     hour >= 4 && hour < 12
       ? "time.morning"
@@ -112,6 +116,24 @@ function gujaratiTime(at: Date): string {
           : "time.night";
   const clock = `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""}`;
   return sharedT()(part, { time: clock });
+}
+
+// A time of day given as "HH:MM" (opening and aarti times), in the
+// page's language: "7:30am", "4pm"; in Gujarati "સવારે 7:30".
+export function formatClock(clock: string): string {
+  if (pageLocale() === "gu") return gujaratiClock(clock);
+  const [hour, minute] = clock.split(":").map(Number);
+  return `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""}${hour < 12 ? "am" : "pm"}`;
+}
+
+// A day of the week (1 is Monday) in the page's language: "Mon" or
+// "Monday", "સોમ" or "સોમવાર".
+export function formatWeekday(day: number, style: "short" | "long"): string {
+  // 2 November 2026 was a Monday.
+  return new Intl.DateTimeFormat(dateLocale(), {
+    weekday: style,
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(2026, 10, 1 + day)));
 }
 
 // "7:30pm" in UK time.

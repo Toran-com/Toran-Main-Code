@@ -4,6 +4,12 @@
 
 import { normalisePostcode } from "@/lib/geo";
 import {
+  type Aarti,
+  parseHours,
+  type Session,
+  WEEKDAYS,
+} from "@/lib/opening-hours";
+import {
   type Facility,
   facilitiesFrom,
   VISITING_NOTE_MAX,
@@ -44,6 +50,10 @@ export type PracticalDetails = {
   // note for anything else visitors should know.
   facilities: Facility[];
   visiting_note: string | null;
+  // When it's open for darshan, and its aarti times (lib/opening-hours.ts);
+  // null when not given.
+  opening_hours: Session[] | null;
+  aarti_times: Aarti[] | null;
 };
 
 export type MandirDetails = PracticalDetails & {
@@ -97,6 +107,13 @@ export function parsePracticalDetails(
   if (visiting_note && hasContactDetails(visiting_note)) {
     return { ok: false, error: "visiting_note_contact" };
   }
+  const hours = parseHours(form);
+  if (!hours.ok) {
+    return {
+      ok: false,
+      error: hours.error === "hours" ? `hours_${hours.day}` : "aarti",
+    };
+  }
   return {
     ok: true,
     values: {
@@ -106,6 +123,8 @@ export function parsePracticalDetails(
       getting_there,
       facilities,
       visiting_note,
+      opening_hours: hours.sessions.length ? hours.sessions : null,
+      aarti_times: hours.aartis.length ? hours.aartis : null,
     },
   };
 }
@@ -153,6 +172,16 @@ export function parseMandirDetails(form: FormData): Result<MandirDetails> {
   };
 }
 
+const DAY_NAMES = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 export const FORM_ERRORS: Record<string, string> = {
   name: "Please give the mandir's name (2 to 160 characters).",
   town: "Please give the town (2 to 80 characters).",
@@ -168,6 +197,14 @@ export const FORM_ERRORS: Record<string, string> = {
   visiting_note: `Please keep "Anything else visitors should know" under ${VISITING_NOTE_MAX} characters.`,
   visiting_note_contact:
     "Please leave phone numbers and email addresses out of the note for visitors: it's shown to everyone.",
+  aarti:
+    "Please give each aarti a time, and keep its name under 40 characters.",
+  ...Object.fromEntries(
+    WEEKDAYS.map((day) => [
+      `hours_${day}`,
+      `Please check ${DAY_NAMES[day - 1]}'s opening times: each session needs an opening and a closing time, closing after it opens, and the second session after the first.`,
+    ]),
+  ),
   failed: "Something went wrong. Please try again.",
 };
 

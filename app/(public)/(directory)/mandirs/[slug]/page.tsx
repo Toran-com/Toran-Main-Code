@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
+import { OpeningTimes, OpenNowBadge } from "@/components/opening-times";
 import { VisitingInfo } from "@/components/visiting-info";
 import { actionPillClass, quietButtonClass } from "@/components/ui";
 import {
@@ -109,6 +110,7 @@ export default async function MandirPage({
               </Badge>
             )}
           </p>
+          <OpenNowBadge hours={mandir.opening_hours} />
           <QuickLinks mandir={mandir} />
           <FollowButton slug={mandir.slug} />
         </div>
@@ -176,6 +178,10 @@ export default async function MandirPage({
             night
           />
           <Facts mandir={mandir} />
+          <OpeningTimes
+            hours={mandir.opening_hours}
+            aartis={mandir.aarti_times}
+          />
           <VisitingInfo
             facilities={mandir.facilities}
             note={mandir.visiting_note}

@@ -181,6 +181,10 @@ export const gu: Record<MessageKey, string> = {
   "visit.jain_food": "જૈન ભોજન",
   "visit.no_onion_garlic": "ડુંગળી-લસણ વગરનું ભોજન",
   "visit.askFirst": "કોઈ બાબતે ખાતરી ન હોય? જતાં પહેલાં મંદિરને ફોન કરો.",
+  "hours.title": "દર્શનનો સમય",
+  "hours.closed": "બંધ",
+  "hours.aartis": "આરતીનો સમય",
+  "hours.festivals": "તહેવારના દિવસોમાં સમય જુદો હોઈ શકે.",
 
   "event.repeats": "દર વખતે",
   "event.whenAt": "{when}, {name}, {town}માં.",
