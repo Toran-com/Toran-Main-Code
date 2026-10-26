@@ -1,3 +1,4 @@
+import { enFollow } from "@/lib/i18n/client/follow";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { enPlace } from "@/lib/i18n/client/place";
 import { enReport } from "@/lib/i18n/client/report";
@@ -17,6 +18,7 @@ export const enClient = {
   ...enSeva,
   ...enReport,
   ...enPlace,
+  ...enFollow,
 } as const;
 
 export type ClientKey = keyof typeof enClient;

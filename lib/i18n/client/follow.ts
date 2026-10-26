@@ -1,0 +1,9 @@
+// Following a mandir on this phone. English; the Gujarati is in
+// lib/i18n/client-messages-gu.ts.
+export const enFollow = {
+  "follow.follow": "Follow",
+  "follow.following": "Following",
+  "follow.saved": "Saved on this phone only, no account needed.",
+  "follow.see": "See what's on at the mandirs you follow",
+  "follow.only": "Only mandirs I follow ({count})",
+} as const;

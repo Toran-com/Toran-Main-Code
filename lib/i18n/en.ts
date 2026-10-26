@@ -56,6 +56,7 @@ export const en = {
   "whatsOn.title": "What's on",
   "whatsOn.intro": "Events at UK mandirs in the next eight weeks.",
   "whatsOn.filter": "Filter",
+  "whatsOn.followed": "Mandirs you follow",
   "whatsOn.chosen": "Chosen filters",
   "whatsOn.removeFilter": "Remove {filter}",
   "whatsOn.nearExample": "e.g. HA9 or LE4 6AR",

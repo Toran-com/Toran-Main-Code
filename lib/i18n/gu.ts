@@ -58,6 +58,7 @@ export const gu: Record<MessageKey, string> = {
   "whatsOn.title": "કાર્યક્રમો",
   "whatsOn.intro": "આગામી આઠ અઠવાડિયામાં યુકેનાં મંદિરોના કાર્યક્રમો.",
   "whatsOn.filter": "ફિલ્ટર",
+  "whatsOn.followed": "તમે ફોલો કરો છો તે મંદિરો",
   "whatsOn.chosen": "પસંદ કરેલા ફિલ્ટર",
   "whatsOn.removeFilter": "{filter} કાઢી નાખો",
   "whatsOn.nearExample": "દા.ત. HA9 અથવા LE4 6AR",

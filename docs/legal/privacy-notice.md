@@ -57,6 +57,12 @@ within one month.
   phone remembers which slots you took, so you can see them, add them to
   your calendar or give them back; clearing the site's data in your
   browser forgets them.
+- **Following a mandir.** If you press "Follow" on a mandir's page, your
+  phone remembers that mandir; nothing is sent to us and you need no
+  account. When you choose "Only mandirs I follow" on What's on, the
+  mandirs' web addresses go in the page's address so Toran can show their
+  events, like any other choice on that page; we don't keep them.
+  Clearing the site's data in your browser forgets who you follow.
 - **Telling us about an event, or asking for a correction.** We keep only
   what you type into the form: the event's details, or what's wrong and on
   which page. We don't ask who you are or record your IP address, so please
