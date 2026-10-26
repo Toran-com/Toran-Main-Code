@@ -244,7 +244,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
       .getByRole("link", { name: "krishnatemple-leicester.example.org" })
       .first(),
   ).toBeVisible();
-  await expect(member.getByText("0116 000 0000")).toBeVisible();
+  await expect(member.getByText("0116 000 0000").first()).toBeVisible();
+  // A big "Call" button, with the number on it.
+  await expect(
+    member.getByRole("link", { name: /^Call .* on 0116 000 0000$/ }),
+  ).toHaveAttribute("href", "tel:01160000000");
 
   // Toran types up a poster someone forwarded; the committee publishes it.
   await admin.goto("/ops/posters");
