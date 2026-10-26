@@ -263,6 +263,10 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
       .first(),
   ).toBeVisible();
   await expect(member.getByText("0116 000 0000").first()).toBeVisible();
+  // A big "Call" button, with the number on it.
+  await expect(
+    member.getByRole("link", { name: /^Call .* on 0116 000 0000$/ }),
+  ).toHaveAttribute("href", "tel:01160000000");
   const visiting = member.getByRole("region", { name: "Visiting" });
   await expect(visiting).toContainText("Step-free way in");
   await expect(visiting).toContainText("Jain food");

@@ -151,6 +151,7 @@ export const en = {
   "mandir.website": "Website",
   "mandir.phone": "Phone",
   "mandir.call": "Call",
+  "mandir.callNumber": "Call {name} on {phone}",
   "mandir.charity": "Registered charity",
   "mandir.about": "About the mandir",
   "mandir.share": "Share this mandir",
