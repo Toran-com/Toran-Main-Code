@@ -1,3 +1,4 @@
+import { enEventsMap } from "@/lib/i18n/client/events-map";
 import { enFollow } from "@/lib/i18n/client/follow";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { enPlace } from "@/lib/i18n/client/place";
@@ -18,6 +19,7 @@ export const enClient = {
   ...enSeva,
   ...enReport,
   ...enPlace,
+  ...enEventsMap,
   ...enFollow,
 } as const;
 

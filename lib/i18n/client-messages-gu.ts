@@ -14,8 +14,7 @@ export const guClient: Record<ClientKey, string> = {
   "share.copyPrompt": "આ લિંક કૉપિ કરો:",
   "subscribe.apple": "Apple કે Outlook કેલેન્ડર",
   "subscribe.google": "Google કેલેન્ડર",
-  "subscribe.note":
-    "કોઈ એકાઉન્ટની જરૂર નથી. તમે ગમે ત્યારે તેને તમારા કેલેન્ડરમાંથી કાઢી શકો છો.",
+  "subscribe.note": "કોઈ ખાતાની જરૂર નથી.",
   "countdown.days": "{days} દિવસ બાકી",
   "mandirs.find": "મંદિર કે શહેર શોધો",
   "mandirs.findExample": "દા.ત. Leicester, BAPS, Harrow",
@@ -183,4 +182,11 @@ export const guClient: Record<ClientKey, string> = {
     "તમારા બ્રાઉઝરે તમારું સ્થાન શેર કર્યું નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
   "place.failed":
     "અમે હમણાં તમારો વિસ્તાર શોધી શક્યા નથી. તેના બદલે તમારો પોસ્ટકોડ લખો.",
+  "eventsMap.label": "મંદિરોમાં કાર્યક્રમોનો નકશો",
+  "eventsMap.pin.one": "{name}, {town}: {count} કાર્યક્રમ",
+  "eventsMap.pin.other": "{name}, {town}: {count} કાર્યક્રમો",
+  "eventsMap.group":
+    "અહીં નજીક {mandirs} મંદિરોમાં {count} કાર્યક્રમો. નજીકથી જુઓ",
+  "eventsMap.more": "આ મંદિરમાં વધુ {count} →",
+  "eventsMap.none": "આ કાર્યક્રમોનાં મંદિરો હજી નકશા પર નથી.",
 };

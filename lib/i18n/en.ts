@@ -24,14 +24,14 @@ export const en = {
   "page.somethingWrong": "Something wrong here? Tell us",
   "page.privacyNotice": "Privacy notice",
   "shell.footer":
-    "Toran is being tested with mandir committees and opens in 2027. Details come from mandirs' own websites and our research; if something is wrong, the mandir's committee can correct it.",
+    "Toran is being tested with mandir committees and opens in 2027.",
 
   "home.tagline": "What's on at mandirs near you",
   "home.findNear": "Find events near me",
-  "home.intro":
-    "Events from mandirs across the UK in one place, and a simple way for committees to organise seva. We are talking to mandir committees now and will open in 2027.",
+  "home.intro": "Events and seva at UK mandirs, all in one place.",
   "home.mandirs": "Browse mandirs",
   "home.comingUp": "Coming up",
+  "home.comingUpNear": "Coming up near {place}",
   "home.seeAll": "See everything that's on",
   "home.festivalsSoon": "Festivals coming up",
   "home.allFestivals": "All festival dates",
@@ -40,22 +40,21 @@ export const en = {
   "home.committeesTitle": "How it works for committees",
   "home.committeesHeading": "Your events, where families already look.",
   "home.mandirCount": "{count} mandirs across the UK",
-  "home.mandirsIntro":
-    "Find yours to see what's on, how to get there and how to get its events in your calendar.",
+  "home.mandirsIntro": "Find yours to see what's on.",
   "home.regionCount.one": "{count} mandir",
   "home.regionCount.other": "{count} mandirs",
   "home.step1Title": "Send what you already have",
-  "home.step1": "A poster, patrika or WhatsApp message.",
   "home.step2Title": "Check it in a minute",
-  "home.step2": "Nothing goes live until your committee says so.",
   "home.step3Title": "Families find it",
-  "home.step3": "On Toran, in their calendar and on WhatsApp.",
   "home.committeesBody":
-    "Committees send the patrika or poster they already share, and check it before it goes live. It's free for mandirs.",
+    "Send the poster you already share. It's free for mandirs.",
 
   "whatsOn.title": "What's on",
   "whatsOn.intro": "Events at UK mandirs in the next eight weeks.",
   "whatsOn.filter": "Filter",
+  "whatsOn.showAs": "Show as",
+  "whatsOn.list": "List",
+  "whatsOn.map": "Map",
   "whatsOn.followed": "Mandirs you follow",
   "whatsOn.chosen": "Chosen filters",
   "whatsOn.removeFilter": "Remove {filter}",
@@ -119,7 +118,7 @@ export const en = {
   "mandir.kit": "Share {period}: a picture and a noticeboard sheet →",
   "mandir.calendarTitle": "Get these events in your calendar",
   "mandir.calendarBody":
-    "Add {name}'s events to the calendar on your phone. New events and changes appear there automatically.",
+    "{name}'s events, kept up to date in your phone's calendar.",
   "mandir.committeeTitle": "Are you on this mandir's committee?",
   "mandir.claimedBefore": "This page is looked after by the committee.",
   "mandir.logIn": "Log in",
@@ -130,6 +129,7 @@ export const en = {
   "mandir.tradition": "Tradition",
   "mandir.postcode": "Postcode",
   "mandir.directions": "Directions",
+  "mandir.gettingThere": "Getting there",
   "mandir.website": "Website",
   "mandir.phone": "Phone",
   "mandir.call": "Call",
@@ -164,16 +164,14 @@ export const en = {
   "event.fromMandir": "From the mandir",
   "shell.seva": "Seva",
   "sevaList.title": "Seva",
-  "sevaList.intro":
-    "Help at a mandir near you: in the kitchen, with parking, shoes or decorations. Take a slot in a tap: no sign-up, and no name needed.",
+  "sevaList.intro": "Help at a mandir near you. No sign-up, no name needed.",
   "sevaList.description":
     "Mandirs across the UK that need volunteers. Take a seva slot in a tap, no sign-up needed.",
   "sevaList.count.one": "{count} event needs help",
   "sevaList.count.other": "{count} events need help",
   "sevaList.free.one": "{count} place free",
   "sevaList.free.other": "{count} places free",
-  "sevaList.none":
-    "No mandir is asking for seva on Toran just now. Committees add their rotas as festivals come up, so look again soon.",
+  "sevaList.none": "No mandir is asking for seva just now. Look again soon.",
   "sevaList.places.one": "place still needed",
   "sevaList.places.other": "places still needed",
   "sevaList.atMandirs.one": "at {count} mandir",
@@ -183,32 +181,26 @@ export const en = {
   "sevaList.postcode": "Or type a postcode",
   "sevaList.howTitle": "How it works",
   "sevaList.how1": "Choose a shift that suits you and press “Take this slot”.",
-  "sevaList.how2":
-    "Toran doesn't ask your name. Your phone remembers your slots, so you can add them to your calendar or give one back.",
-  "sevaList.how3":
-    "Some roles need a DBS check. For those, ask the mandir's committee.",
-  "sevaList.committee":
-    "On a mandir committee? Plan your rota on Toran and see at a glance which shifts are still short.",
+  "sevaList.how2": "No name needed. Your phone remembers your slots.",
+  "sevaList.how3": "Some roles need a DBS check: ask the mandir.",
+  "sevaList.committee": "On a mandir committee?",
   "sevaList.committeeLink": "How it works for committees →",
   "home.sevaTitle": "Seva near you",
   "home.sevaLink": "See where help is needed →",
   "seva.help": "Help with seva",
   "seva.takenOf": "{taken} of {needed}",
-  "seva.placesTaken":
-    "places taken. Take a slot in a tap: no sign-up, and no name needed.",
+  "seva.placesTaken": "places taken. No sign-up needed.",
   "seva.take": "Take a seva slot",
   "seva.seeRota": "See the seva rota",
 
   "festivals.description":
     "Dates of Navratri, Diwali, Holi and other Hindu festivals in the UK.",
-  "festivals.intro":
-    "Dates for the UK. A few festivals fall on different days depending on the calendar a mandir follows, so check with your mandir too.",
+  "festivals.intro": "Festival dates for the UK. Check with your mandir too.",
   "festivals.seasons": "Festival seasons at mandirs",
   "festivals.seasonsIntro":
     "Every mandir's events for the big festivals, in one place.",
   "festivals.calendarTitle": "Festival dates in your calendar",
-  "festivals.calendarBody":
-    "Add the festival dates to the calendar on your phone. Dates we check or add later appear there automatically.",
+  "festivals.calendarBody": "Kept up to date in your phone's calendar.",
   "festivals.none": "No festival dates are listed yet.",
   "load.festivalDates": "festival dates",
   "load.festivalPage": "festival page",
@@ -278,8 +270,7 @@ export const en = {
   "festival.summary.ganesh-chaturthi":
     "The birth of Ganeshji, with puja and visarjan.",
   "season.isOn": "{name} is on {dates}",
-  "season.otherCalendars":
-    "Some mandirs follow a different calendar, so check with yours.",
+  "season.otherCalendars": "Check with your mandir.",
   "season.notListed": "Next year's {name} dates aren't listed yet. See all the",
   "season.festivalDates": "festival dates",
   "season.loadDates": "{name} dates",
@@ -291,7 +282,7 @@ export const en = {
   "season.addProgramme": "Add your programme in a few minutes",
   "season.calendarTitle": "Put {name} events in your calendar",
   "season.calendarBody":
-    "Every mandir's {name} events in the calendar on your phone. New events and changes appear there automatically.",
+    "Every mandir's {name} events, kept up to date in your phone's calendar.",
   "season.tellFamily": "Tell family and friends",
   "season.share": "Share the {name} page",
   "season.allOf": "All of {period} at mandirs, in one place",
@@ -300,7 +291,7 @@ export const en = {
   "season.diwali.description":
     "Diwali week at Hindu mandirs across the UK: Dhanteras, Lakshmi puja, Annakut and New Year, and Bhai Dooj. Find what's on near you.",
   "season.diwali.intro":
-    "Lakshmi puja, fireworks, Annakut and the New Year: what mandirs across the UK are doing for Diwali week, all in one place.",
+    "Lakshmi puja, fireworks, Annakut and the New Year at UK mandirs.",
   "season.diwali.shareText":
     "Diwali at mandirs across the UK: what's on near you",
   "season.navratri.period": "Navratri",
@@ -308,7 +299,7 @@ export const en = {
   "season.navratri.description":
     "Navratri at Hindu mandirs across the UK: nine nights of Garba and Raas, Dussehra and Sharad Purnima. Find what's on near you.",
   "season.navratri.intro":
-    "Nine nights of Garba and Raas, then Dussehra and Sharad Purnima: what mandirs across the UK are doing for Navratri, all in one place.",
+    "Nine nights of Garba and Raas, then Dussehra and Sharad Purnima, at UK mandirs.",
   "season.navratri.shareText":
     "Navratri Garba at mandirs across the UK: what's on near you",
   "season.maha-shivaratri.period": "Maha Shivaratri",
@@ -316,7 +307,7 @@ export const en = {
   "season.maha-shivaratri.description":
     "Maha Shivaratri at Hindu mandirs across the UK: abhishek, bhajans and all-night worship of Shiva. Find what's on near you.",
   "season.maha-shivaratri.intro":
-    "Abhishek, bhajans and the all-night jagran: what mandirs across the UK are doing for Maha Shivaratri, all in one place.",
+    "Abhishek, bhajans and the all-night jagran at UK mandirs.",
   "season.maha-shivaratri.shareText":
     "Maha Shivaratri at mandirs across the UK: what's on near you",
   "season.holi.period": "Holi",
@@ -324,14 +315,14 @@ export const en = {
   "season.holi.description":
     "Holi at Hindu mandirs across the UK: the Holika Dahan bonfire and the festival of colours. Find what's on near you.",
   "season.holi.intro":
-    "The Holika Dahan bonfire, then a day of colours: what mandirs across the UK are doing for Holi, all in one place.",
+    "The Holika Dahan bonfire, then a day of colours, at UK mandirs.",
   "season.holi.shareText": "Holi at mandirs across the UK: what's on near you",
   "season.ram-navami.period": "Ram Navami",
   "season.ram-navami.title": "Ram Navami at UK mandirs",
   "season.ram-navami.description":
     "Ram Navami and Hanuman Jayanti at Hindu mandirs across the UK: the birth of Shri Ram, with puja, katha and bhajans. Find what's on near you.",
   "season.ram-navami.intro":
-    "The birth of Shri Ram, and Hanuman Jayanti a few days later: what mandirs across the UK are doing, all in one place.",
+    "The birth of Shri Ram, and Hanuman Jayanti, at UK mandirs.",
   "season.ram-navami.shareText":
     "Ram Navami at mandirs across the UK: what's on near you",
   "season.janmashtami.period": "Janmashtami",
@@ -339,7 +330,7 @@ export const en = {
   "season.janmashtami.description":
     "Janmashtami at Hindu mandirs across the UK: the birth of Shri Krishna, with bhajans, the midnight aarti and the cradle. Find what's on near you.",
   "season.janmashtami.intro":
-    "Bhajans, the cradle and the midnight aarti for the birth of Shri Krishna: what mandirs across the UK are doing, all in one place.",
+    "Bhajans, the cradle and the midnight aarti at UK mandirs.",
   "season.janmashtami.shareText":
     "Janmashtami at mandirs across the UK: what's on near you",
   "season.ganesh-chaturthi.period": "Ganesh Chaturthi",
@@ -347,7 +338,7 @@ export const en = {
   "season.ganesh-chaturthi.description":
     "Ganesh Chaturthi at Hindu mandirs across the UK: Ganesh puja, aarti and visarjan. Find what's on near you.",
   "season.ganesh-chaturthi.intro":
-    "Ganesh puja, modak and visarjan: what mandirs across the UK are doing for Ganesh Chaturthi, all in one place.",
+    "Ganesh puja, modak and visarjan at UK mandirs.",
   "season.ganesh-chaturthi.shareText":
     "Ganesh Chaturthi at mandirs across the UK: what's on near you",
 

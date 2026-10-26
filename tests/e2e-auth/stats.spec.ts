@@ -60,6 +60,12 @@ test("visits are counted without cookies and shown to admins", async ({
   await page.getByRole("link", { name: "Last 90 days" }).click();
   await expect(page).toHaveURL(/days=90/);
 
+  // And today's figures, against yesterday's.
+  await page.goto("/ops/today");
+  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
+  await expect(page.getByText("Page views today")).toBeVisible();
+  await expect(page.getByText(/^Yesterday: \d/).first()).toBeVisible();
+
   await context.close();
   await private_.close();
 });

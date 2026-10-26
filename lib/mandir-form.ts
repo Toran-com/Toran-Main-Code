@@ -33,6 +33,8 @@ export type PracticalDetails = {
   postcode: string | null;
   website: string | null;
   phone: string | null;
+  // Parking, entrance, nearest station: shown with directions.
+  getting_there: string | null;
 };
 
 export type MandirDetails = PracticalDetails & {
@@ -71,7 +73,20 @@ export function parsePracticalDetails(
   if (phone && !/^[0-9+() -]{6,40}$/.test(phone)) {
     return { ok: false, error: "phone" };
   }
-  return { ok: true, values: { postcode, website, phone } };
+  const getting_there = text(form, "getting_there") || null;
+  if (getting_there && getting_there.length > 400) {
+    return { ok: false, error: "getting_there" };
+  }
+  // It's shown publicly: no personal numbers or email addresses (decision
+  // 0006). The mandir's own number has its own field.
+  if (
+    getting_there &&
+    (/\S+@\S+\.\S+/.test(getting_there) ||
+      /(\d[\s()-]*){9,}/.test(getting_there))
+  ) {
+    return { ok: false, error: "getting_there_contact" };
+  }
+  return { ok: true, values: { postcode, website, phone, getting_there } };
 }
 
 export function parseMandirDetails(form: FormData): Result<MandirDetails> {
@@ -120,6 +135,9 @@ export const FORM_ERRORS: Record<string, string> = {
   postcode: "That doesn't look like a UK postcode.",
   website: "That doesn't look like a website address.",
   phone: "Please use only numbers, spaces and + ( ) in the phone number.",
+  getting_there: 'Please keep "Getting there" under 400 characters.',
+  getting_there_contact:
+    "Please leave phone numbers and email addresses out of \"Getting there\": it's shown to everyone. The mandir's own number goes in its own box.",
   failed: "Something went wrong. Please try again.",
 };
 

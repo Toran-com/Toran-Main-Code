@@ -260,7 +260,7 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
   if (mandir.charity_number) {
     rows.push({ label: t("mandir.charity"), value: mandir.charity_number });
   }
-  if (!rows.length) return null;
+  if (!rows.length && !mandir.getting_there) return null;
 
   return (
     <section aria-labelledby="about" className="flex flex-col gap-2">
@@ -278,6 +278,14 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
           </div>
         ))}
       </dl>
+      {mandir.getting_there && (
+        <div className="flex flex-col gap-1 pt-1">
+          <h3 className="font-semibold">{t("mandir.gettingThere")}</h3>
+          <p className="text-muted whitespace-pre-line">
+            {mandir.getting_there}
+          </p>
+        </div>
+      )}
     </section>
   );
 }

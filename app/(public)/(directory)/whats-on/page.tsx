@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
+import { EventsMapView } from "@/components/events-map-view";
 import { FollowedOnly } from "@/components/follow";
 import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
@@ -21,6 +22,7 @@ import {
   nearTo,
   onDay,
   PER_DAY,
+  pinsFor,
   RADII,
   radiusFrom,
 } from "@/lib/whats-on-view";
@@ -61,6 +63,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const type = String(query.type ?? "");
   const kind = isEventKind(type) ? type : "";
   const day = dayFrom(query.day);
+  const view = query.view === "map" ? "map" : "list";
   // The mandirs followed on the visitor's phone, when they ask for those.
   const mandirs = cleanSlugs(query.mandirs);
 
@@ -74,6 +77,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     type?: string;
     region?: string;
     day?: string;
+    view?: string;
     mandirs?: string;
   }) => {
     const params = new URLSearchParams();
@@ -85,6 +89,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     if (r) params.set("region", r);
     if (k) params.set("type", k);
     if (d) params.set("day", d);
+    if ((change.view ?? view) === "map") params.set("view", "map");
     const m = change.mandirs ?? mandirs.join(",");
     if (m) params.set("mandirs", m);
     const q = params.toString().replace(/%2C/g, ",");
@@ -94,6 +99,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const keep = new URLSearchParams();
   if (kind) keep.set("type", kind);
   if (day) keep.set("day", day);
+  if (view === "map") keep.set("view", "map");
   if (mandirs.length) keep.set("mandirs", mandirs.join(","));
   const place = (
     <PlacePicker
@@ -178,10 +184,23 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       <div className="flex flex-col gap-3">
         {place}
         <div className="flex items-center justify-between gap-3">
-          <p className="text-muted" aria-live="polite">
-            {t.count("whatsOn.count", events.length)}
-            {position && events.length > 1 && t("whatsOn.nearestFirst")}
-          </p>
+          <nav
+            aria-label={t("whatsOn.showAs")}
+            className="border-line-strong bg-surface flex rounded-full border p-1"
+          >
+            {(["list", "map"] as const).map((v) => (
+              <Link
+                key={v}
+                href={here({ view: v })}
+                aria-current={view === v ? "page" : undefined}
+                className={`rounded-full px-4 py-1 text-base font-semibold no-underline ${
+                  view === v ? "bg-ink text-bg" : "text-ink hover:bg-sunk"
+                }`}
+              >
+                {v === "list" ? t("whatsOn.list") : t("whatsOn.map")}
+              </Link>
+            ))}
+          </nav>
           <Filters
             key={`${kind}|${region}`}
             kind={kind}
@@ -207,9 +226,18 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             ))}
           </ul>
         )}
+        <p className="text-muted" aria-live="polite">
+          {t.count("whatsOn.count", events.length)}
+          {position &&
+            events.length > 1 &&
+            view === "list" &&
+            t("whatsOn.nearestFirst")}
+        </p>
       </div>
       {problem && <Notice tone="error">{problem}</Notice>}
-      {events.length ? (
+      {events.length && view === "map" ? (
+        <EventsMapView pins={pinsFor(events)} origin={position} />
+      ) : events.length ? (
         <EventList
           events={events}
           now={new Date()}

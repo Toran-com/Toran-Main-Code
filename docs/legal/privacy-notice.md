@@ -116,7 +116,10 @@ committee.
   sign-off.
 - **Forwarding posters by WhatsApp or email:** the message, any image,
   and the sender's number or address. We use them to create the listing,
-  then delete the message [within 90 days].
+  then delete the message [within 90 days]. If we have a poster read by
+  machine, only the picture goes to Anthropic, never who sent it; it's
+  told to leave out anyone's name or number, and Toran doesn't keep the
+  picture.
 
 ## Who we share data with
 
@@ -129,7 +132,7 @@ under contract:
 | Vercel                                    | Hosting the website                        | Servers in London; global network for speed |
 | Sentry                                    | Error reports (with personal data removed) | [EU / US: check the region chosen]          |
 | [Email provider, e.g. Postmark or Resend] | Sending login links (and later the digest) | [check]                                     |
-| [Anthropic (Claude API)], later           | Reading forwarded posters into listings    | [check]                                     |
+| Anthropic (Claude API)                    | Reading poster photos and PDFs into events | USA [check]                                 |
 | [Meta (WhatsApp)], later                  | Receiving forwarded posters                | [check]                                     |
 
 Some of these companies are based in the USA. Where data leaves the UK,

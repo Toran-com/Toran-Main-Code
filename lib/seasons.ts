@@ -29,8 +29,7 @@ export const DIWALI: Season = {
   title: "Diwali at UK mandirs",
   description:
     "Diwali week at Hindu mandirs across the UK: Dhanteras, Lakshmi puja, Annakut and New Year, and Bhai Dooj. Find what's on near you.",
-  intro:
-    "Lakshmi puja, fireworks, Annakut and the New Year: what mandirs across the UK are doing for Diwali week, all in one place.",
+  intro: "Lakshmi puja, fireworks, Annakut and the New Year at UK mandirs.",
   cardDetail: "Lakshmi puja, Annakut, fireworks and more, near you",
   shareText: "Diwali at mandirs across the UK: what's on near you",
 };
@@ -45,7 +44,7 @@ export const NAVRATRI: Season = {
   description:
     "Navratri at Hindu mandirs across the UK: nine nights of Garba and Raas, Dussehra and Sharad Purnima. Find what's on near you.",
   intro:
-    "Nine nights of Garba and Raas, then Dussehra and Sharad Purnima: what mandirs across the UK are doing for Navratri, all in one place.",
+    "Nine nights of Garba and Raas, then Dussehra and Sharad Purnima, at UK mandirs.",
   cardDetail: "Garba, Raas, Dussehra and more, near you",
   shareText: "Navratri Garba at mandirs across the UK: what's on near you",
 };
@@ -59,8 +58,7 @@ export const MAHA_SHIVARATRI: Season = {
   title: "Maha Shivaratri at UK mandirs",
   description:
     "Maha Shivaratri at Hindu mandirs across the UK: abhishek, bhajans and all-night worship of Shiva. Find what's on near you.",
-  intro:
-    "Abhishek, bhajans and the all-night jagran: what mandirs across the UK are doing for Maha Shivaratri, all in one place.",
+  intro: "Abhishek, bhajans and the all-night jagran at UK mandirs.",
   cardDetail: "Abhishek, bhajans and all-night worship, near you",
   shareText: "Maha Shivaratri at mandirs across the UK: what's on near you",
 };
@@ -74,8 +72,7 @@ export const HOLI: Season = {
   title: "Holi at UK mandirs",
   description:
     "Holi at Hindu mandirs across the UK: the Holika Dahan bonfire and the festival of colours. Find what's on near you.",
-  intro:
-    "The Holika Dahan bonfire, then a day of colours: what mandirs across the UK are doing for Holi, all in one place.",
+  intro: "The Holika Dahan bonfire, then a day of colours, at UK mandirs.",
   cardDetail: "Holika Dahan and the festival of colours, near you",
   shareText: "Holi at mandirs across the UK: what's on near you",
 };
@@ -89,8 +86,7 @@ export const RAM_NAVAMI: Season = {
   title: "Ram Navami at UK mandirs",
   description:
     "Ram Navami and Hanuman Jayanti at Hindu mandirs across the UK: the birth of Shri Ram, with puja, katha and bhajans. Find what's on near you.",
-  intro:
-    "The birth of Shri Ram, and Hanuman Jayanti a few days later: what mandirs across the UK are doing, all in one place.",
+  intro: "The birth of Shri Ram, and Hanuman Jayanti, at UK mandirs.",
   cardDetail: "Ram Navami and Hanuman Jayanti, near you",
   shareText: "Ram Navami at mandirs across the UK: what's on near you",
 };
@@ -104,8 +100,7 @@ export const JANMASHTAMI: Season = {
   title: "Janmashtami at UK mandirs",
   description:
     "Janmashtami at Hindu mandirs across the UK: the birth of Shri Krishna, with bhajans, the midnight aarti and the cradle. Find what's on near you.",
-  intro:
-    "Bhajans, the cradle and the midnight aarti for the birth of Shri Krishna: what mandirs across the UK are doing, all in one place.",
+  intro: "Bhajans, the cradle and the midnight aarti at UK mandirs.",
   cardDetail: "Bhajans and the midnight aarti, near you",
   shareText: "Janmashtami at mandirs across the UK: what's on near you",
 };
@@ -119,8 +114,7 @@ export const GANESH_CHATURTHI: Season = {
   title: "Ganesh Chaturthi at UK mandirs",
   description:
     "Ganesh Chaturthi at Hindu mandirs across the UK: Ganesh puja, aarti and visarjan. Find what's on near you.",
-  intro:
-    "Ganesh puja, modak and visarjan: what mandirs across the UK are doing for Ganesh Chaturthi, all in one place.",
+  intro: "Ganesh puja, modak and visarjan at UK mandirs.",
   cardDetail: "Ganesh puja, aarti and visarjan, near you",
   shareText: "Ganesh Chaturthi at mandirs across the UK: what's on near you",
 };
