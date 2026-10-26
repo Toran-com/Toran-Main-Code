@@ -114,6 +114,7 @@ export const gu: Record<MessageKey, string> = {
   "calendar.add": "કેલેન્ડરમાં ઉમેરો",
   "calendar.addLabel": "કેલેન્ડરમાં ઉમેરો: {title}",
   "calendar.file": "Apple, Outlook કે બીજું કેલેન્ડર",
+  "calendar.reminder": "શરૂ થાય તે પહેલાં યાદ અપાવશે.",
   "whatsOn.description":
     "યુકેભરના હિન્દુ મંદિરોમાં આવનારા આઠ અઠવાડિયાના કાર્યક્રમો: તહેવારો, આરતી, ભજન, વર્ગો અને વધુ.",
   "load.eventList": "કાર્યક્રમોની યાદી",

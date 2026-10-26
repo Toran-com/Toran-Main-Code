@@ -44,7 +44,7 @@ export function AddToCalendar({
         </svg>
         {t("calendar.add")}
       </summary>
-      <div className="border-line bg-surface shadow-lift absolute top-full left-0 z-20 mt-2 flex w-max flex-col rounded-2xl border p-1.5">
+      <div className="border-line bg-surface shadow-lift absolute top-full right-0 z-20 mt-2 flex w-56 flex-col rounded-2xl border p-1.5 sm:right-auto sm:left-0 sm:w-72">
         <a
           href={`/mandirs/${mandirSlug}/add-to-calendar${query}`}
           target="_blank"
@@ -61,6 +61,9 @@ export function AddToCalendar({
         >
           {t("calendar.file")}
         </a>
+        <p className="text-muted px-4 pb-2 text-base">
+          {t("calendar.reminder")}
+        </p>
       </div>
     </details>
   );

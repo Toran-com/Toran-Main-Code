@@ -159,3 +159,43 @@ describe("googleCalendarLink", () => {
     );
   });
 });
+
+describe("reminders", () => {
+  it("reminds two hours before a timed event someone adds", () => {
+    const file = lines(calendarFile("Ram", [{ ...aarti, remind: true }], now));
+    const alarm = file.slice(file.indexOf("BEGIN:VALARM"));
+    expect(alarm.slice(0, 5)).toEqual([
+      "BEGIN:VALARM",
+      "ACTION:DISPLAY",
+      "DESCRIPTION:Sandhya aarti",
+      "TRIGGER:-PT2H",
+      "END:VALARM",
+    ]);
+    // Inside the event.
+    expect(file.indexOf("END:VALARM")).toBeLessThan(file.indexOf("END:VEVENT"));
+  });
+
+  it("reminds the evening before an all-day event", () => {
+    const file = calendarFile(
+      "Ram",
+      [
+        {
+          ...aarti,
+          start: "2026-11-08",
+          end: null,
+          allDay: true,
+          remind: true,
+        },
+      ],
+      now,
+    );
+    expect(file).toContain("TRIGGER:-PT6H");
+  });
+
+  it("leaves reminders out of subscribed calendars and cancelled events", () => {
+    expect(calendarFile("Ram", [aarti], now)).not.toContain("VALARM");
+    expect(
+      calendarFile("Ram", [{ ...aarti, remind: true, cancelled: true }], now),
+    ).not.toContain("VALARM");
+  });
+});

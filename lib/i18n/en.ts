@@ -113,6 +113,7 @@ export const en = {
   "calendar.add": "Add to calendar",
   "calendar.addLabel": "Add to calendar: {title}",
   "calendar.file": "Apple, Outlook or another calendar",
+  "calendar.reminder": "Comes with a reminder before it starts.",
   "whatsOn.description":
     "Events at Hindu mandirs across the UK in the next eight weeks: festivals, aarti, bhajans, classes and more.",
   "load.eventList": "event list",

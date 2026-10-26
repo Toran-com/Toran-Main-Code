@@ -120,6 +120,8 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   expect(ics).toContain(`UID:event-${eventId}@toran`);
   expect(ics).toMatch(new RegExp(`URL:.*${eventPage}`));
   expect(ics).toMatch(/DTSTART;TZID=Europe\/London:\d{8}T183000/);
+  // With a reminder two hours before; a subscribed calendar has none.
+  expect(ics).toContain("TRIGGER:-PT2H");
   const google = await member.request.get(
     `/mandirs/${SLUG}/add-to-calendar?event=${eventId}`,
     { maxRedirects: 0 },
@@ -129,7 +131,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     /^https:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE/,
   );
   const feed = await member.request.get(`/mandirs/${SLUG}/calendar.ics`);
-  expect(await feed.text()).toContain("SUMMARY:Annakut darshan");
+  const feedText = await feed.text();
+  expect(feedText).toContain("SUMMARY:Annakut darshan");
+  expect(feedText).not.toContain("VALARM");
   await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
 
   // And on What's on, under the mandir's name.

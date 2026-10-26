@@ -31,7 +31,7 @@ export async function GET(
       after(() => recordCount("calendar", `/mandirs/${slug}/events/${only}`));
     }
     return calendarResponse(
-      calendarFile(mandir.name, [event]),
+      calendarFile(mandir.name, [{ ...event, remind: true }]),
       `${mandir.slug}-event`,
     );
   }
