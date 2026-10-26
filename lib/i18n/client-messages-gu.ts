@@ -179,6 +179,12 @@ export const guClient: Record<ClientKey, string> = {
   "plan.empty":
     "તમારા પ્લાનમાં હજી કંઈ નથી. કોઈ પણ કાર્યક્રમ પર “અમારા પ્લાનમાં ઉમેરો” દબાવો, પછી આખો પ્લાન એક સંદેશમાં પરિવારને મોકલો.",
   "plan.find": "કાર્યક્રમો જુઓ →",
+  "hours.openNow": "હમણાં ખુલ્લું",
+  "hours.until": "{time} સુધી",
+  "hours.closedNow": "હમણાં બંધ",
+  "hours.opensToday": "{time} ખૂલશે",
+  "hours.opensTomorrow": "આવતીકાલે {time} ખૂલશે",
+  "hours.opensOn": "{day} {time} ખૂલશે",
   "place.near": "{place} નજીક · {miles} માઇલ",
   "place.everywhere": "આખું યુકે",
   "place.change": "બદલો",

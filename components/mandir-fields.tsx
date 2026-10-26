@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 import { CALENDARS, REGIONS } from "@/lib/mandir-form";
 import { inputClass } from "@/components/ui";
+import { HoursFields } from "@/components/hours-fields";
+import { VisitingFields } from "@/components/visiting-fields";
+import type { Json } from "@/lib/database.types";
+import { readAartis, readSessions } from "@/lib/opening-hours";
 
 const CALENDAR_NAMES: Record<(typeof CALENDARS)[number], string> = {
   gujarati: "Gujarati",
@@ -21,6 +25,10 @@ type Values = {
   calendar?: string | null;
   charity_number?: string | null;
   getting_there?: string | null;
+  facilities?: readonly string[];
+  visiting_note?: string | null;
+  opening_hours?: Json | null;
+  aarti_times?: Json | null;
 };
 
 function Field({
@@ -152,6 +160,14 @@ export function MandirFields({ values = {} }: { values?: Values }) {
           className={inputClass}
         />
       </Field>
+      <HoursFields
+        sessions={readSessions(values.opening_hours)}
+        aartis={readAartis(values.aarti_times)}
+      />
+      <VisitingFields
+        facilities={values.facilities}
+        note={values.visiting_note}
+      />
     </>
   );
 }

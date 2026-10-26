@@ -1,6 +1,7 @@
 import { enEventsMap } from "@/lib/i18n/client/events-map";
 import { enFollow } from "@/lib/i18n/client/follow";
 import { enPlan } from "@/lib/i18n/client/plan";
+import { enHours } from "@/lib/i18n/client/hours";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { enPlace } from "@/lib/i18n/client/place";
 import { enReport } from "@/lib/i18n/client/report";
@@ -23,6 +24,7 @@ export const enClient = {
   ...enEventsMap,
   ...enFollow,
   ...enPlan,
+  ...enHours,
 } as const;
 
 export type ClientKey = keyof typeof enClient;
