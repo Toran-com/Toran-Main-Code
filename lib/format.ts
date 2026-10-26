@@ -141,6 +141,18 @@ function clockLabel(at: Date): string {
   return formatEventStart(at.toISOString(), false).split(", ")[1];
 }
 
+// When an event starts, for reading aloud: the day in full, as a voice
+// would say it ("Saturday 24 October, 7:30pm"), in the page's language.
+export function formatSpokenStart(startsAt: string, allDay: boolean): string {
+  const day = new Intl.DateTimeFormat(dateLocale(), {
+    timeZone: LONDON,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(startsAt));
+  return allDay ? day : `${day}, ${formatTimeOfDay(startsAt, false)}`;
+}
+
 // Just the time of day, for lists already grouped by day: "7pm",
 // "7:30pm", or "All day".
 export function formatTimeOfDay(startsAt: string, allDay: boolean): string {

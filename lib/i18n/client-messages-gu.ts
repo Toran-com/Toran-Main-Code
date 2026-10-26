@@ -168,6 +168,8 @@ export const guClient: Record<ClientKey, string> = {
   "follow.yours": "તમારાં મંદિરો",
   "follow.allEvents": "તેમના બધા કાર્યક્રમો",
   "follow.nothing": "હજી કંઈ નથી.",
+  "read.listen": "મોટેથી વાંચો",
+  "read.stop": "વાંચવાનું બંધ કરો",
   "plan.add": "અમારા પ્લાનમાં ઉમેરો",
   "plan.added": "અમારા પ્લાનમાં છે",
   "plan.see": "અમારો પ્લાન જુઓ ({count})",

@@ -9,6 +9,7 @@ import { CallAndDirections, directionsTo } from "@/components/call-directions";
 import { GlobeIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
+import { ReadAloud } from "@/components/read-aloud";
 import { ShareButtons } from "@/components/share-buttons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
 import { OpeningTimes, OpenNowBadge } from "@/components/opening-times";
@@ -21,7 +22,13 @@ import {
   type MandirEvent,
 } from "@/lib/directory";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
-import { formatEventStart, formatTimeOfDay, websiteLabel } from "@/lib/format";
+import {
+  formatEventStart,
+  formatSpokenStart,
+  formatTimeOfDay,
+  websiteLabel,
+} from "@/lib/format";
+import { readingText } from "@/lib/read-aloud";
 import { describeRule } from "@/lib/recurrence";
 import { eventPath, eventShareText } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
@@ -113,7 +120,10 @@ export default async function MandirPage({
           </p>
           <OpenNowBadge hours={mandir.opening_hours} />
           <QuickLinks mandir={mandir} />
-          <FollowButton slug={mandir.slug} />
+          <div className="flex flex-wrap items-start gap-3">
+            <FollowButton slug={mandir.slug} />
+            <ReadAloud text={spokenMandir(mandir)} />
+          </div>
         </div>
       </header>
 
@@ -224,6 +234,25 @@ export default async function MandirPage({
       </div>
     </div>
   );
+}
+
+// The mandir and its next few events in a few sentences, for "Read
+// aloud".
+function spokenMandir(mandir: MandirDetails): string {
+  const t = pageT();
+  const gu = pageLocale() === "gu";
+  return readingText([
+    `${mandir.name}, ${mandir.town}`,
+    mandir.tradition,
+    mandir.events.length > 0 && t("shell.whatsOn"),
+    ...mandir.events
+      .slice(0, 5)
+      .map(
+        (e) =>
+          `${gu && e.title_gu ? e.title_gu : e.title}: ${formatSpokenStart(e.next_starts_at, e.all_day)}`,
+      ),
+    mandir.getting_there,
+  ]);
 }
 
 function Facts({ mandir }: { mandir: MandirDetails }) {

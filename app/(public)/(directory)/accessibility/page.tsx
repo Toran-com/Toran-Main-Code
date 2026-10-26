@@ -36,6 +36,11 @@ export default function AccessibilityPage() {
             the choice.
           </li>
           <li>
+            <strong>Read aloud</strong> on mandir and event pages reads the
+            details out with your phone&apos;s own voice, in English or
+            Gujarati. Nothing is sent anywhere.
+          </li>
+          <li>
             Everything works with a keyboard, and with screen readers such as
             VoiceOver and NVDA.
           </li>
