@@ -27,6 +27,8 @@ const row = (
   website: more.website ?? null,
   phone: more.phone ?? null,
   getting_there: null,
+  facilities: [],
+  visiting_note: null,
 });
 
 describe("lookalike", () => {

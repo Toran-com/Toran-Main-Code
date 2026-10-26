@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CALENDARS, REGIONS } from "@/lib/mandir-form";
 import { inputClass } from "@/components/ui";
+import { VisitingFields } from "@/components/visiting-fields";
 
 const CALENDAR_NAMES: Record<(typeof CALENDARS)[number], string> = {
   gujarati: "Gujarati",
@@ -21,6 +22,8 @@ type Values = {
   calendar?: string | null;
   charity_number?: string | null;
   getting_there?: string | null;
+  facilities?: readonly string[];
+  visiting_note?: string | null;
 };
 
 function Field({
@@ -152,6 +155,10 @@ export function MandirFields({ values = {} }: { values?: Values }) {
           className={inputClass}
         />
       </Field>
+      <VisitingFields
+        facilities={values.facilities}
+        note={values.visiting_note}
+      />
     </>
   );
 }

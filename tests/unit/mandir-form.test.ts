@@ -39,6 +39,8 @@ describe("parseMandirDetails", () => {
         calendar: "north_indian",
         charity_number: "262605",
         getting_there: null,
+        facilities: [],
+        visiting_note: null,
       },
     });
   });
@@ -67,6 +69,8 @@ describe("parsePracticalDetails", () => {
         website: null,
         phone: null,
         getting_there: null,
+        facilities: [],
+        visiting_note: null,
       },
     });
   });
@@ -106,6 +110,38 @@ describe("parsePracticalDetails", () => {
     expect(
       parsePracticalDetails(form({ getting_there: "x".repeat(401) })),
     ).toEqual({ ok: false, error: "getting_there" });
+  });
+});
+
+describe("visiting information", () => {
+  it("keeps only known ticks, in the usual order", () => {
+    const data = new FormData();
+    for (const tick of ["jain_food", "helipad", "step_free", "step_free"]) {
+      data.append("facilities", tick);
+    }
+    const parsed = parsePracticalDetails(data);
+    expect(parsed.ok && parsed.values.facilities).toEqual([
+      "step_free",
+      "jain_food",
+    ]);
+  });
+  it("keeps a short note without contact details", () => {
+    expect(
+      parsePracticalDetails(
+        form({ visiting_note: " Please cover your head inside. " }),
+      ),
+    ).toMatchObject({
+      ok: true,
+      values: { visiting_note: "Please cover your head inside." },
+    });
+    expect(
+      parsePracticalDetails(form({ visiting_note: "x".repeat(401) })),
+    ).toEqual({ ok: false, error: "visiting_note" });
+    expect(
+      parsePracticalDetails(
+        form({ visiting_note: "Ask for Ramesh on 07700 900123" }),
+      ),
+    ).toEqual({ ok: false, error: "visiting_note_contact" });
   });
 });
 

@@ -236,15 +236,29 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByLabel("Website")
     .fill("krishnatemple-leicester.example.org");
   await member.getByLabel("Mandir phone number").fill("0116 000 0000");
+  // What visitors need to know before they set off.
+  await member.getByLabel("Step-free way in").check();
+  await member.getByLabel("Jain food").check();
+  await member
+    .getByLabel("Anything else visitors should know")
+    .fill("Please cover your head in the inner mandir.");
   await member.getByRole("button", { name: "Save details" }).click();
   await expect(member.getByText("Saved. Your public page")).toBeVisible();
+  await expect(member.getByLabel("Step-free way in")).toBeChecked();
   await member.goto(`/mandirs/${SLUG}`);
   await expect(
     member
       .getByRole("link", { name: "krishnatemple-leicester.example.org" })
       .first(),
   ).toBeVisible();
-  await expect(member.getByText("0116 000 0000")).toBeVisible();
+  await expect(member.getByText("0116 000 0000").first()).toBeVisible();
+  const visiting = member.getByRole("region", { name: "Visiting" });
+  await expect(visiting).toContainText("Step-free way in");
+  await expect(visiting).toContainText("Jain food");
+  await expect(visiting).toContainText(
+    "Please cover your head in the inner mandir.",
+  );
+  await expect(visiting).not.toContainText("Hearing loop");
 
   // Toran types up a poster someone forwarded; the committee publishes it.
   await admin.goto("/ops/posters");

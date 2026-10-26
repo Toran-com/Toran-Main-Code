@@ -16,6 +16,7 @@ import {
 } from "@/components/ui";
 import { mandirKit } from "@/lib/season-kit";
 import { CommitteeTodo } from "@/components/committee-todo";
+import { VisitingFields } from "@/components/visiting-fields";
 import { getCurrentUser } from "@/lib/auth";
 import { eventCount, shortSevaShifts } from "@/lib/committee-facts";
 import type { CommitteeFacts } from "@/lib/committee-tasks";
@@ -111,7 +112,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     ? await supabase
         .from("mandirs")
         .select(
-          "id, slug, name, town, postcode, website, phone, calendar, getting_there",
+          "id, slug, name, town, postcode, website, phone, calendar, getting_there, facilities, visiting_note",
         )
         .eq("slug", slug)
         .maybeSingle()
@@ -737,6 +738,10 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               className={inputClass}
             />
           </label>
+          <VisitingFields
+            facilities={mandir.facilities}
+            note={mandir.visiting_note}
+          />
           <button type="submit" className={quietButtonClass}>
             Save details
           </button>

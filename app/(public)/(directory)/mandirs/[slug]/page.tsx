@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
+import { VisitingInfo } from "@/components/visiting-info";
 import { actionPillClass, quietButtonClass } from "@/components/ui";
 import {
   getMandir,
@@ -175,6 +176,11 @@ export default async function MandirPage({
             night
           />
           <Facts mandir={mandir} />
+          <VisitingInfo
+            facilities={mandir.facilities}
+            note={mandir.visiting_note}
+            phone={mandir.phone}
+          />
           <section
             aria-labelledby="committee"
             className="bg-sunk flex flex-col gap-3 rounded-3xl p-6"
