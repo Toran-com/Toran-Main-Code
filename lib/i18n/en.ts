@@ -178,6 +178,10 @@ export const en = {
   "visit.jain_food": "Jain food",
   "visit.no_onion_garlic": "Food without onion or garlic",
   "visit.askFirst": "Not sure about something? Call the mandir before you go.",
+  "hours.title": "Opening times",
+  "hours.closed": "Closed",
+  "hours.aartis": "Aarti times",
+  "hours.festivals": "Times can be different on festival days.",
 
   "event.repeats": "Repeats",
   "event.whenAt": "{when} at {name}, {town}.",
