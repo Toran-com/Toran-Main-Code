@@ -56,3 +56,21 @@ test("the map view stays within the speed budget", async ({ page }) => {
     "JavaScript on /mandirs, map view (KB)",
   ).toBeLessThanOrEqual(BUDGET.js + MAP_JS);
 });
+
+test("groups of mandirs open from the keyboard", async ({ page }) => {
+  await openMap(page);
+  const groups = page.locator(".toran-cluster");
+  if (!(await groups.count())) return;
+  // Enter zooms into a group and keeps focus on it, until it's one
+  // mandir (or mandirs at one address, listed in a card).
+  await groups.first().focus();
+  const focusedDot = page.locator(".toran-dot:focus");
+  const card = page.locator(".leaflet-popup");
+  await expect(async () => {
+    await expect(page.locator(".leaflet-marker-icon:focus")).toHaveCount(1);
+    if (await page.locator(".toran-cluster:focus").count()) {
+      await page.keyboard.press("Enter");
+    }
+    await expect(focusedDot.or(card).first()).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+});

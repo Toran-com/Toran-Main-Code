@@ -1,14 +1,19 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
-import type { CircleMarker, LayerGroup, Map as LeafletMap } from "leaflet";
+import type {
+  CircleMarker,
+  LayerGroup,
+  LeafletKeyboardEvent,
+  Map as LeafletMap,
+} from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useT, type Locale } from "@/components/use-t";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { withLocale } from "@/lib/i18n/paths";
 
 type Translate = ReturnType<typeof useT<keyof typeof enMandirs>>;
-import { clusterPoints, onTheMap } from "@/lib/map-clusters";
+import { clusterApart, onTheMap } from "@/lib/map-clusters";
 
 // The mandirs on a map of the UK, from the map positions worked out from
 // their postcodes. Each mandir is a dot; dots close together merge into a
@@ -107,11 +112,22 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
     if (!ready || !now) return;
     const { L, map, dots } = now;
     const points = onTheMap(mandirs);
+    // After zooming in from the keyboard, the dot or group to keep focus on.
+    let refocus: string | null = null;
+    const keepFocus = (el: HTMLElement | undefined, slugs: string[]) => {
+      if (refocus && slugs.includes(refocus)) {
+        refocus = null;
+        el?.focus();
+      }
+    };
 
     const draw = () => {
       dots.clearLayers();
-      const clusters = clusterPoints(points, (m) =>
-        map.latLngToLayerPoint([m.latitude, m.longitude]),
+      // Far enough apart that no two circles touch (the biggest is 44px).
+      const clusters = clusterApart(
+        points,
+        (m) => map.latLngToLayerPoint([m.latitude, m.longitude]),
+        48,
       );
       for (const { items, x, y } of clusters) {
         if (items.length === 1) {
@@ -126,6 +142,7 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
             const el = dot.getElement();
             el?.setAttribute("role", "button");
             el?.setAttribute("aria-label", `${m.name}, ${m.town}`);
+            keepFocus(el, [m.slug]);
           });
           dots.addLayer(dot);
           continue;
@@ -145,8 +162,12 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
           const el = group.getElement();
           el?.setAttribute("role", "button");
           el?.setAttribute("aria-label", t("map.clusterLabel", { label }));
+          keepFocus(
+            el,
+            items.map((m) => m.slug),
+          );
         });
-        group.on("click", () => {
+        const open = () => {
           const bounds = L.latLngBounds(
             items.map((m) => [m.latitude, m.longitude] as [number, number]),
           );
@@ -160,8 +181,21 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
               .setContent(card(items, t, locale))
               .openOn(map);
           } else {
-            map.fitBounds(bounds, { padding: [48, 48], maxZoom: 15 });
+            // By at least a step, so the group splits.
+            const fit = map.getBoundsZoom(bounds, false, L.point(48, 48));
+            map.setView(
+              bounds.getCenter(),
+              Math.min(15, Math.max(map.getZoom() + 1, fit)),
+            );
           }
+        };
+        group.on("click", open);
+        // Leaflet only answers Enter on markers with a card of their own.
+        group.on("keypress", ({ originalEvent: key }: LeafletKeyboardEvent) => {
+          if (key.key !== "Enter" && key.key !== " ") return;
+          key.preventDefault();
+          refocus = items[0].slug;
+          open();
         });
         dots.addLayer(group);
       }
