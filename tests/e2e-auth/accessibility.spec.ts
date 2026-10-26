@@ -76,6 +76,8 @@ test("a committee's pages are accessible", async ({ page }) => {
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/events/${event}`);
   await expectAccessible(page);
+  await page.goto(`/manage/${slug}/numbers`);
+  await expectAccessible(page);
   // Give it a seva rota open for volunteers (before its pages are first
   // seen, as they are saved).
   sql(
