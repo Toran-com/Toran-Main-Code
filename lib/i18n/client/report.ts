@@ -18,6 +18,8 @@ export const enReport = {
   "report.error.repeat": "Please choose how often it repeats.",
   "report.error.until":
     "Please choose an end date after the first date, and within a year of it.",
+  "report.error.untilDaily":
+    "For an event every day, please choose a last day within a month of the first, as for a festival like Navratri.",
   "report.error.link":
     "Please give a web address starting with http:// or https://, or leave it empty.",
   "report.error.links": "Please include no more than two web addresses.",

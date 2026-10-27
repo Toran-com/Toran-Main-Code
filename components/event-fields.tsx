@@ -76,7 +76,7 @@ export function EventFields({
         open={!!values?.repeat && values.repeat !== "none"}
       >
         <summary className="cursor-pointer font-semibold">
-          Happens every week or month?
+          Happens every day, week or month?
         </summary>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           <label className="flex flex-col gap-2">
@@ -87,6 +87,9 @@ export function EventFields({
               className={inputClass}
             >
               <option value="none">Doesn&apos;t repeat</option>
+              <option value="daily">
+                Every day (a festival&apos;s run, like Navratri)
+              </option>
               <option value="weekly">Every week</option>
               <option value="fortnightly">Every other week</option>
               <option value="monthly">Once a month (e.g. 2nd Saturday)</option>
