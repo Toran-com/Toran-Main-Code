@@ -805,8 +805,8 @@ function CalendarCard({
       <p>
         Already keep your events in Google Calendar, Outlook or your
         website&apos;s calendar? Give Toran its address and it&apos;s checked
-        every night. New events wait above, under &ldquo;Posters waiting for
-        you&rdquo;, so nothing goes on your page until you publish it.
+        every night. New events wait above with the posters for you to check, so
+        nothing goes on your page until you publish it.
       </p>
       {calendar && (
         <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-4">
