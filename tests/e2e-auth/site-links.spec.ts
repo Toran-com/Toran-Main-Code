@@ -26,9 +26,14 @@ const PAGES = [
 const SKIP = /^\/(api|_next)\/|\.(ics|xml|txt|png|jpg|webmanifest)(\?|$)/;
 const MAX_LINKS = 400;
 
-async function internalLinks(page: Page): Promise<string[]> {
+// The language switch (marked with hreflang) goes to another language on
+// purpose; pass `"a[href]:not([hreflang])"` to leave it out.
+async function internalLinks(
+  page: Page,
+  selector = "a[href]",
+): Promise<string[]> {
   const hrefs = await page
-    .locator("a[href]")
+    .locator(selector)
     .evaluateAll((links) =>
       links.map((a) => (a as HTMLAnchorElement).getAttribute("href") ?? ""),
     );
@@ -66,16 +71,13 @@ test("every page opens and every link between pages works, in both languages", a
   for (const path of [...pages, ...translated]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBeLessThan(400);
-    for (const link of await internalLinks(page)) {
-      links.add(link);
-      // On a Gujarati or Hindi page, a link to a page that has a version
-      // in that language should go to it.
-      const locale = localeOfPath(path);
-      if (
-        locale !== "en" &&
-        localeOfPath(link) !== locale &&
-        hasTranslation(link)
-      ) {
+    for (const link of await internalLinks(page)) links.add(link);
+    // On a Gujarati or Hindi page, a link to a page that has a version in
+    // that language should go to it (the language switch aside).
+    const locale = localeOfPath(path);
+    if (locale === "en") continue;
+    for (const link of await internalLinks(page, "a[href]:not([hreflang])")) {
+      if (localeOfPath(link) !== locale && hasTranslation(link)) {
         stayEnglish.push(`${path} → ${link}`);
       }
     }
