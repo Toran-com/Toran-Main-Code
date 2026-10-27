@@ -4,6 +4,7 @@ import {
   parseStamps,
   reviewerText,
   reviewLines,
+  reviewLocale,
   stampsFor,
   toReview,
 } from "@/lib/translation-review";
@@ -19,7 +20,7 @@ const gujarati = {
   "region.East Midlands": "ઈસ્ટ મિડલેન્ડ્સ",
 };
 
-describe("the Gujarati review pack", () => {
+describe("the review packs", () => {
   it("marks lines nobody has checked as new", () => {
     const lines = reviewLines(english, gujarati, new Map());
     expect(lines.map((l) => [l.number, l.status])).toEqual([
@@ -34,12 +35,15 @@ describe("the Gujarati review pack", () => {
       english,
       gujarati,
       new Map([
-        ["shell.home", { english: "Toran home", gujarati: "તોરણ મુખ્ય પાનું" }],
-        ["shell.find", { english: "Search", gujarati: "શોધો" }],
+        [
+          "shell.home",
+          { english: "Toran home", translation: "તોરણ મુખ્ય પાનું" },
+        ],
+        ["shell.find", { english: "Search", translation: "શોધો" }],
       ]),
     );
     expect(lines.map((l) => l.status)).toEqual(["checked", "changed", "new"]);
-    expect(lines[1].was).toEqual({ english: "Search", gujarati: "શોધો" });
+    expect(lines[1].was).toEqual({ english: "Search", translation: "શોધો" });
     // The numbers stay those of the full list.
     expect(toReview(lines).map((l) => l.number)).toEqual([2, 3]);
   });
@@ -48,13 +52,35 @@ describe("the Gujarati review pack", () => {
     const lines = reviewLines(
       english,
       gujarati,
-      new Map([["shell.find", { english: "Search", gujarati: "શોધો" }]]),
+      new Map([["shell.find", { english: "Search", translation: "શોધો" }]]),
     );
-    const text = reviewerText(toReview(lines).slice(0, 2));
+    const text = reviewerText(toReview(lines).slice(0, 2), "gu");
     expect(text).toContain(
       "1. English: Toran home\n    ગુજરાતી: તોરણ મુખ્ય પાનું",
     );
     expect(text).toContain("2. (changed) English: Find");
+  });
+
+  it("says which language it is", () => {
+    const lines = reviewLines(
+      english,
+      { "shell.home": "Toran मुख्य पेज" },
+      new Map(),
+    );
+    const text = reviewerText(lines.slice(0, 1), "hi");
+    expect(text).toContain("Hindi wording to check");
+    expect(text).toContain(
+      "1. English: Toran home\n    हिन्दी: Toran मुख्य पेज",
+    );
+    // A line with no translation yet is still listed, to be written.
+    expect(lines[1].translation).toBe("");
+  });
+
+  it("reads the language from the address, Gujarati unless it's Hindi", () => {
+    expect(reviewLocale("hi")).toBe("hi");
+    expect(reviewLocale("gu")).toBe("gu");
+    expect(reviewLocale(undefined)).toBe("gu");
+    expect(reviewLocale(["hi"])).toBe("gu");
   });
 
   it("stamps each line so a changed one isn't marked by mistake", () => {

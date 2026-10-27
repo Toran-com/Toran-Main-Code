@@ -23,6 +23,7 @@ import {
 } from "@/lib/directory";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import {
+  dateLocale,
   formatEventStart,
   formatSpokenStart,
   formatTimeOfDay,
@@ -371,7 +372,7 @@ function EventRow({
   const confirmed =
     event.confirmed_at &&
     t("mandir.confirmedOn", {
-      date: new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
+      date: new Intl.DateTimeFormat(dateLocale(), {
         timeZone: "Europe/London",
         day: "numeric",
         month: "short",

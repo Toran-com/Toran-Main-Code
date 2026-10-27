@@ -110,12 +110,12 @@ export function describeRule(rule: string): string | null {
   if (!parsed) return null;
   if (parsed.repeat.kind === "daily") {
     const until = untilDay(parsed.until);
-    return pageLocale() === "gu"
+    return pageLocale() !== "en"
       ? sharedT()("repeat.daily", { until })
       : `Every day until ${until}`;
   }
-  if (pageLocale() === "gu") {
-    // Gujarati wording, from the translations (lib/i18n).
+  if (pageLocale() !== "en") {
+    // Gujarati or Hindi wording, from the translations (lib/i18n).
     const t = sharedT();
     const day = t(`repeat.day.${parsed.weekday}` as SharedKey);
     if (parsed.repeat.kind === "weekly") {

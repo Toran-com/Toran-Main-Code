@@ -2,7 +2,7 @@
 // grouping by day. Kept apart from data loading so they can be tested.
 
 import type { EventPin } from "@/components/events-map";
-import { formatEventStart, londonDate } from "@/lib/format";
+import { dateLocale, formatEventStart, londonDate } from "@/lib/format";
 import { distanceMiles, type Position } from "@/lib/geo";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
 import { withLocale } from "@/lib/i18n/paths";
@@ -52,7 +52,7 @@ export function dayHeading(iso: string, now: Date | null): string {
 }
 
 function longDay(day: string): string {
-  return new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
+  return new Intl.DateTimeFormat(dateLocale(), {
     timeZone: "UTC",
     weekday: "long",
     day: "numeric",

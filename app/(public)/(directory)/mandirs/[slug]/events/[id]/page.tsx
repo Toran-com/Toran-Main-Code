@@ -25,6 +25,7 @@ import {
 } from "@/lib/directory";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import {
+  dateLocale,
   formatEventStart,
   formatEventWhen,
   formatSpokenStart,
@@ -125,7 +126,7 @@ export default async function EventPage({
   const confirmedOn =
     event.confirmed_at &&
     t("mandir.confirmedOn", {
-      date: new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
+      date: new Intl.DateTimeFormat(dateLocale(), {
         timeZone: "Europe/London",
         day: "numeric",
         month: "short",

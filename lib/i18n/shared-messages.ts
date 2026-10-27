@@ -1,5 +1,6 @@
 // The text shared helpers put together on the server (dates and times,
-// kinds of event, repeats, distances), in English and the Gujarati draft.
+// kinds of event, repeats, distances), in English and the Gujarati and
+// Hindi drafts.
 // Kept apart from the page text so helpers that also run in the browser
 // don't bring every translation with them. Part of en.ts and gu.ts too.
 export const enShared = {
@@ -98,4 +99,52 @@ export const guShared: Record<SharedKey, string> = {
   "event.repeatsNext": "{rule}, હવે પછી {when}",
   "heading.today": "આજે",
   "heading.tomorrow": "આવતીકાલે",
+};
+
+export const hiShared: Record<SharedKey, string> = {
+  "share.event": "{name}, {town} में {title}: {when}",
+  "kind.festival": "त्योहार",
+  "kind.aarti": "आरती या दर्शन",
+  "kind.bhajan": "भजन या कीर्तन",
+  "kind.katha": "कथा या प्रवचन",
+  "kind.class": "कक्षा",
+  "kind.youth": "युवा",
+  "kind.seva": "सेवा दिवस",
+  "kind.community": "समुदाय (भोजन, स्वास्थ्य, खेल)",
+  "kind.other": "अन्य",
+  "source.confirmed": "मंदिर ने पुष्टि की है",
+  "source.website": "मंदिर की वेबसाइट से",
+  "source.visitor": "एक आगंतुक ने भेजा",
+  "source.poster": "पोस्टर या संदेश से",
+  "distance.mile": "{miles} मील",
+  "distance.miles": "{miles} मील",
+  "time.allDay": "पूरा दिन",
+  "time.morning": "सुबह {time}",
+  "time.afternoon": "दोपहर {time}",
+  "time.evening": "शाम {time}",
+  "time.night": "रात {time}",
+  "calendar.gujarati": "गुजराती पंचांग",
+  "calendar.north_indian": "उत्तर भारतीय पंचांग",
+  "calendar.tamil": "तमिल पंचांग",
+  "calendar.bengali": "बंगाली पंचांग",
+  "calendar.other": "अन्य पंचांग",
+  "repeat.weekly": "हर {day}",
+  "repeat.fortnightly": "हर दूसरे {day}",
+  "repeat.daily": "{until} तक हर दिन",
+  "repeat.monthly": "हर महीने के {ordinal} {day}",
+  "repeat.day.0": "रविवार",
+  "repeat.day.1": "सोमवार",
+  "repeat.day.2": "मंगलवार",
+  "repeat.day.3": "बुधवार",
+  "repeat.day.4": "गुरुवार",
+  "repeat.day.5": "शुक्रवार",
+  "repeat.day.6": "शनिवार",
+  "repeat.ordinal.1": "पहले",
+  "repeat.ordinal.2": "दूसरे",
+  "repeat.ordinal.3": "तीसरे",
+  "repeat.ordinal.4": "चौथे",
+  "repeat.ordinal.-1": "आख़िरी",
+  "event.repeatsNext": "{rule}, अगली बार {when}",
+  "heading.today": "आज",
+  "heading.tomorrow": "कल",
 };

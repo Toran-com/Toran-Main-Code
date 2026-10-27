@@ -1,10 +1,10 @@
 import { expect, type Page, test } from "@playwright/test";
-import { hasGujarati } from "../../lib/i18n/paths";
+import { hasTranslation, localeOfPath, withLocale } from "../../lib/i18n/paths";
 
-// Before the pilot: the public site with real data, in English and in
-// Gujarati. Every main page opens without an error in the browser, every
-// link between Toran's pages works, and the Gujarati pages keep visitors
-// in Gujarati wherever there's a Gujarati page to go to.
+// Before the pilot: the public site with real data, in English, Gujarati
+// and Hindi. Every main page opens without an error in the browser, every
+// link between Toran's pages works, and the Gujarati and Hindi pages keep
+// visitors in their language wherever there's a page in it to go to.
 
 const PAGES = [
   "/",
@@ -26,9 +26,14 @@ const PAGES = [
 const SKIP = /^\/(api|_next)\/|\.(ics|xml|txt|png|jpg|webmanifest)(\?|$)/;
 const MAX_LINKS = 400;
 
-async function internalLinks(page: Page): Promise<string[]> {
+// The language switch (marked with hreflang) goes to another language on
+// purpose; pass `"a[href]:not([hreflang])"` to leave it out.
+async function internalLinks(
+  page: Page,
+  selector = "a[href]",
+): Promise<string[]> {
   const hrefs = await page
-    .locator("a[href]")
+    .locator(selector)
     .evaluateAll((links) =>
       links.map((a) => (a as HTMLAnchorElement).getAttribute("href") ?? ""),
     );
@@ -57,31 +62,32 @@ test("every page opens and every link between pages works, in both languages", a
   const mandirHref = eventHref!.split("/events/")[0];
 
   const pages = [...PAGES, mandirHref, eventHref!];
-  const gujarati = pages
-    .filter((p) => hasGujarati(p))
-    .map((p) => (p === "/" ? "/gu" : `/gu${p}`));
+  const translated = (["gu", "hi"] as const).flatMap((locale) =>
+    pages.filter((p) => hasTranslation(p)).map((p) => withLocale(p, locale)),
+  );
 
   const links = new Set<string>();
   const stayEnglish: string[] = [];
-  for (const path of [...pages, ...gujarati]) {
+  for (const path of [...pages, ...translated]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBeLessThan(400);
-    for (const link of await internalLinks(page)) {
-      links.add(link);
-      // On a Gujarati page, a link to a page that has a Gujarati version
-      // should go to it.
-      if (
-        path.startsWith("/gu") &&
-        !link.startsWith("/gu") &&
-        hasGujarati(link)
-      ) {
+    for (const link of await internalLinks(page)) links.add(link);
+    // On a Gujarati or Hindi page, a link to a page that has a version in
+    // that language should go to it (the language switch aside).
+    const locale = localeOfPath(path);
+    if (locale === "en") continue;
+    for (const link of await internalLinks(page, "a[href]:not([hreflang])")) {
+      if (localeOfPath(link) !== locale && hasTranslation(link)) {
         stayEnglish.push(`${path} → ${link}`);
       }
     }
   }
 
   expect(errors, "errors in the browser").toEqual([]);
-  expect(stayEnglish, "Gujarati pages linking to English ones").toEqual([]);
+  expect(
+    stayEnglish,
+    "Gujarati or Hindi pages linking to English ones",
+  ).toEqual([]);
 
   const broken: string[] = [];
   const toCheck = [...links].slice(0, MAX_LINKS);

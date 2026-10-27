@@ -654,6 +654,17 @@ page, for example `/gu/mandirs/<a mandir>`, to read it in place.
 3. Optional: add a Gujarati font (Noto Sans Gujarati) and check the speed
    budget. Phones' own Gujarati fonts are used until then.
 
+**Hindi** works the same way: a first draft in `lib/i18n/hi.ts` (and
+`lib/i18n/client-messages-hi.ts`), with every Gujarati page also at `/hi`
+(`/hi/whats-on`, `/hi/mandirs/<a mandir>` and so on), marked as a draft
+and left out of search engines. Translations has a **Gujarati / Hindi**
+switch at the top: each language has its own review pack, numbers and
+"checked" marks. Events' Gujarati titles show only on Gujarati pages; on
+Hindi pages events keep the committee's English title. To switch Hindi
+on, follow the same steps with a native Hindi speaker, then set
+`ready: true` for `hi`. With more than one language switched on, the
+header offers each of them.
+
 ### Pages about Toran (footer)
 
 Every public page's footer links to **About**, **Contact**, **Correct or

@@ -8,15 +8,19 @@ import { Loading } from "@/components/ui";
 import { requireToranAdmin } from "@/lib/auth";
 import { pageTitle } from "@/lib/site";
 import { loadReviewLines } from "@/lib/translation-pack";
-import { toReview } from "@/lib/translation-review";
+import {
+  REVIEW_LANGUAGES,
+  reviewLocale,
+  toReview,
+} from "@/lib/translation-review";
 
-// The Gujarati review pack on paper: numbered lines, English and Gujarati
-// side by side, new and changed ones marked, and room to write a better
+// A review pack on paper: numbered lines, English and the Gujarati or
+// Hindi side by side, new and changed ones marked, and room to write a better
 // version. For a reviewer who'd rather mark up a printout than reply in
 // WhatsApp.
 
 export const metadata: Metadata = {
-  title: pageTitle("Print: Gujarati review pack"),
+  title: pageTitle("Print: review pack"),
   robots: { index: false },
 };
 
@@ -33,7 +37,9 @@ export default function TranslationPackPage(
 async function Pack({ searchParams }: PageProps<"/ops/translations/print">) {
   await requireToranAdmin("/ops/translations/print");
   const query = await searchParams;
-  const { lines } = await loadReviewLines();
+  const locale = reviewLocale(query.lang);
+  const language = REVIEW_LANGUAGES[locale].english;
+  const { lines } = await loadReviewLines(locale);
   const fresh = toReview(lines);
   const all = query.show === "all" || !fresh.length;
   const shown = all ? lines : fresh;
@@ -48,7 +54,7 @@ async function Pack({ searchParams }: PageProps<"/ops/translations/print">) {
     <>
       <div className="flex flex-col gap-3 print:hidden">
         <Link
-          href="/ops/translations"
+          href={`/ops/translations?lang=${locale}`}
           className="text-peacock self-start font-semibold"
         >
           ← Back to Translations
@@ -63,7 +69,7 @@ async function Pack({ searchParams }: PageProps<"/ops/translations/print">) {
             Toran · {today}
           </p>
           <h1 className="font-display text-5xl leading-[1.05] tracking-tight">
-            Gujarati wording to check
+            {language} wording to check
           </h1>
           <p className="text-xl">
             {all
@@ -71,7 +77,7 @@ async function Pack({ searchParams }: PageProps<"/ops/translations/print">) {
               : `${shown.length} lines that are new or have changed since the last check.`}
           </p>
           <p className="text-muted">
-            For each line: is the Gujarati right, natural and polite? If not,
+            For each line: is the {language} right, natural and polite? If not,
             write a better version underneath it. Words in {"{brackets}"} are
             filled in by the site, for example {"{name}"} becomes a
             mandir&apos;s name, so keep them as they are.
@@ -84,7 +90,7 @@ async function Pack({ searchParams }: PageProps<"/ops/translations/print">) {
               key={line.key}
               className="border-line grid break-inside-avoid grid-cols-[8rem_1fr_1fr] gap-x-4 gap-y-1 border-b py-2"
             >
-              <TranslationLine line={line} />
+              <TranslationLine line={line} locale={locale} />
               <div
                 aria-hidden
                 className="border-line-strong col-start-2 col-end-4 h-8 border-b border-dashed"

@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { EVENT_ERRORS } from "@/lib/event-form";
 import { en } from "@/lib/i18n/en";
-import { hasGujarati, otherLanguagePath, withLocale } from "@/lib/i18n/paths";
+import {
+  englishPath,
+  hasTranslation,
+  languagePath,
+  localeOfPath,
+  withLocale,
+} from "@/lib/i18n/paths";
 import { SEASONS } from "@/lib/seasons";
 
-describe("Gujarati addresses", () => {
+describe("Gujarati and Hindi addresses", () => {
   it("covers families' pages, not committees' or admins'", () => {
     for (const path of [
       "/",
@@ -18,7 +24,7 @@ describe("Gujarati addresses", () => {
       "/festivals/diwali",
       "/whats-on?near=LE4",
     ]) {
-      expect(hasGujarati(path), path).toBe(true);
+      expect(hasTranslation(path), path).toBe(true);
     }
     for (const path of [
       "/for-mandirs",
@@ -29,13 +35,16 @@ describe("Gujarati addresses", () => {
       "/mandirs/x/claim",
       "/login",
     ]) {
-      expect(hasGujarati(path), path).toBe(false);
+      expect(hasTranslation(path), path).toBe(false);
     }
   });
 
-  it("puts /gu in front only where there's a Gujarati page", () => {
+  it("puts /gu or /hi in front only where there's a translated page", () => {
     expect(withLocale("/mandirs/x", "gu")).toBe("/gu/mandirs/x");
     expect(withLocale("/", "gu")).toBe("/gu");
+    expect(withLocale("/mandirs/x", "hi")).toBe("/hi/mandirs/x");
+    expect(withLocale("/", "hi")).toBe("/hi");
+    expect(withLocale("/for-mandirs", "hi")).toBe("/for-mandirs");
     expect(withLocale("/for-mandirs", "gu")).toBe("/for-mandirs");
     expect(withLocale("/mandirs/x", "en")).toBe("/mandirs/x");
   });
@@ -44,18 +53,34 @@ describe("Gujarati addresses", () => {
     for (const { slug } of SEASONS) {
       expect(withLocale(`/${slug}`, "gu")).toBe(`/gu/${slug}`);
     }
-    expect(hasGujarati("/easter")).toBe(false);
-    expect(hasGujarati("/holi/calendar.ics")).toBe(false);
+    expect(hasTranslation("/easter")).toBe(false);
+    expect(hasTranslation("/holi/calendar.ics")).toBe(false);
     // And each season in a town.
     expect(withLocale("/diwali/leicester", "gu")).toBe("/gu/diwali/leicester");
-    expect(hasGujarati("/diwali/leicester/x")).toBe(false);
+    expect(hasTranslation("/diwali/leicester/x")).toBe(false);
   });
 
-  it("switches between the two", () => {
-    expect(otherLanguagePath("/gu/festivals/holi")).toBe("/festivals/holi");
-    expect(otherLanguagePath("/gu")).toBe("/");
-    expect(otherLanguagePath("/whats-on")).toBe("/gu/whats-on");
-    expect(otherLanguagePath("/for-mandirs")).toBe("/for-mandirs");
+  it("knows a page's language", () => {
+    expect(localeOfPath("/gu")).toBe("gu");
+    expect(localeOfPath("/hi/whats-on")).toBe("hi");
+    expect(localeOfPath("/whats-on")).toBe("en");
+    // Only a whole first part of the address counts.
+    expect(localeOfPath("/guide")).toBe("en");
+    expect(localeOfPath("/hindu-temples")).toBe("en");
+    expect(englishPath("/hi")).toBe("/");
+    expect(englishPath("/gu/mandirs/x")).toBe("/mandirs/x");
+    expect(englishPath("/mandirs/x")).toBe("/mandirs/x");
+  });
+
+  it("switches between the languages", () => {
+    expect(languagePath("/gu/festivals/holi", "en")).toBe("/festivals/holi");
+    expect(languagePath("/gu", "en")).toBe("/");
+    expect(languagePath("/whats-on", "gu")).toBe("/gu/whats-on");
+    expect(languagePath("/gu/whats-on", "hi")).toBe("/hi/whats-on");
+    expect(languagePath("/hi/mandirs/x", "gu")).toBe("/gu/mandirs/x");
+    // Pages only in English go to that language's home page.
+    expect(languagePath("/for-mandirs", "hi")).toBe("/hi");
+    expect(languagePath("/for-mandirs", "en")).toBe("/for-mandirs");
   });
 });
 

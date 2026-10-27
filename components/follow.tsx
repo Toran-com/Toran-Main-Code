@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
 import { actionPillClass } from "@/components/ui";
-import { useLocale, useT } from "@/components/use-t";
+import { type Locale, useLocale, useT } from "@/components/use-t";
 import {
   followingSnapshot,
   onFollowingChange,
@@ -11,6 +11,7 @@ import {
   setFollowing,
 } from "@/lib/follow";
 import { enFollow } from "@/lib/i18n/client/follow";
+import { withLocale } from "@/lib/i18n/paths";
 
 // Following mandirs on this phone (lib/follow.ts): a button on a mandir's
 // page, and on What's on a way to show only the mandirs followed.
@@ -26,11 +27,11 @@ export function useFollowing(): string[] {
 }
 
 export function whatsOnHref(
-  locale: string,
+  locale: Locale,
   base: string,
   slugs: string[],
 ): string {
-  const page = base || (locale === "gu" ? "/gu/whats-on" : "/whats-on");
+  const page = base || withLocale("/whats-on", locale);
   const [path, query = ""] = page.split("?");
   const params = new URLSearchParams(query);
   params.set("mandirs", slugs.join(","));
@@ -56,14 +57,14 @@ export function Star({ filled }: { filled: boolean }) {
 // Asks the service worker (public/sw.js) to keep the followed mandirs'
 // pages for offline use, and to forget ones no longer followed. Just the
 // addresses go to the phone's own service worker; nothing reaches Toran.
-export function keepOffline(locale: string) {
+export function keepOffline(locale: Locale) {
   const worker =
     typeof navigator === "undefined"
       ? null
       : navigator.serviceWorker?.controller;
   if (!worker) return;
-  const paths = parseFollowing(followingSnapshot()).map(
-    (slug) => `${locale === "gu" ? "/gu" : ""}/mandirs/${slug}`,
+  const paths = parseFollowing(followingSnapshot()).map((slug) =>
+    withLocale(`/mandirs/${slug}`, locale),
   );
   worker.postMessage({ type: "followed", paths });
 }

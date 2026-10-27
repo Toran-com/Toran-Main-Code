@@ -6,6 +6,8 @@ import { useLocale, useT } from "@/components/use-t";
 import { enRead } from "@/lib/i18n/client/read";
 import { pickVoice, sentences } from "@/lib/read-aloud";
 
+const SPEECH_LANGS = { en: "en-GB", gu: "gu-IN", hi: "hi-IN" } as const;
+
 const speech = () =>
   typeof window !== "undefined" && "speechSynthesis" in window
     ? window.speechSynthesis
@@ -22,7 +24,7 @@ function subscribe(update: () => void) {
 // page's language. Shown only when the phone has a voice for it.
 export function ReadAloud({ text }: { text: string }) {
   const t = useT(enRead);
-  const lang = useLocale() === "gu" ? "gu-IN" : "en-GB";
+  const lang = SPEECH_LANGS[useLocale()];
   const hasVoice = useSyncExternalStore(
     subscribe,
     () => !!pickVoice(speech()?.getVoices() ?? [], lang),

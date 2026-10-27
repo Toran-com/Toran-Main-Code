@@ -12,6 +12,7 @@ import {
 import { actionPillClass, quietButtonClass } from "@/components/ui";
 import { useLocale, useT } from "@/components/use-t";
 import { enPlan } from "@/lib/i18n/client/plan";
+import { withLocale } from "@/lib/i18n/paths";
 import {
   addAllPlanned,
   clearPlan,
@@ -120,7 +121,7 @@ export function PlanFromPhone() {
     <div className="bg-sunk flex flex-col gap-3 rounded-3xl p-6">
       <p>{t("plan.empty")}</p>
       <Link
-        href={locale === "gu" ? "/gu/whats-on" : "/whats-on"}
+        href={withLocale("/whats-on", locale)}
         className="text-peacock font-semibold"
       >
         {t("plan.find")}
@@ -202,7 +203,7 @@ export function PlanButtons({ events }: { events: Planned[] }) {
           type="button"
           onClick={() => {
             clearPlan();
-            router.replace(locale === "gu" ? "/gu/plan" : "/plan");
+            router.replace(withLocale("/plan", locale));
           }}
           className="text-muted cursor-pointer text-base font-semibold underline"
         >
