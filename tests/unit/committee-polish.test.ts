@@ -52,7 +52,7 @@ describe("what's changed", () => {
   };
   const committee = new Set(["me", "colleague"]);
 
-  it("says what happened and who added it", () => {
+  it("says what happened and who added it, apart from your own", () => {
     const changes = recentChanges(
       [
         { ...base, id: "1" },
@@ -74,7 +74,6 @@ describe("what's changed", () => {
     expect(changes.map((c) => [c.id, c.what, c.by])).toEqual([
       ["6", "Cancelled", null],
       ["5", "Changed", null],
-      ["1", "Added", "by you"],
       ["2", "Added", "by your committee"],
       ["3", "Added", "by Toran"],
       ["4", "Added", "from your website"],

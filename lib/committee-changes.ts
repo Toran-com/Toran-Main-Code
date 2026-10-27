@@ -1,6 +1,7 @@
 // "What's changed": events on a mandir's page added, changed, cancelled
 // or removed in the last fortnight, and by whom where that's known, so a
 // committee sees what Toran, its website or a visitor's tip put there.
+// What you added yourself is left out: you know about it already.
 
 export const CHANGES_DAYS = 14;
 const MINUTE_MS = 60_000;
@@ -68,13 +69,15 @@ export function recentChanges(
               ? "Changed"
               : "Added";
       if (what === "Added" && created < since) return [];
+      const by = what === "Added" ? who(e, me, committee) : null;
+      if (by === "by you") return [];
       return [
         {
           id: e.id,
           title: e.title,
           what,
           // Only who added it is recorded, not who changed it since.
-          by: what === "Added" ? who(e, me, committee) : null,
+          by,
           at: e.updated_at,
         },
       ];
