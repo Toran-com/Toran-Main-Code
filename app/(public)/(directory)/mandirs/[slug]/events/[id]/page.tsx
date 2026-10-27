@@ -301,6 +301,8 @@ export default async function EventPage({
             </section>
           )}
 
+          {upcoming && event.recurrence && <Dates event={event} />}
+
           {upcoming && !cancelled && seva.state === "ok" && seva.data?.open && (
             <Seva
               path={localePath(sevaPath(mandir.slug, event.id))}
@@ -405,6 +407,55 @@ function spokenEvent({ mandir, event }: MandirEventPage): string {
     event.cost_note,
     mandir.getting_there,
   ]);
+}
+
+// Every date still to come of a repeating event: a festival's run of
+// nights, or the next few weeks of a weekly one, with cancelled ones
+// crossed out.
+const DATES_SHOWN = 12;
+
+function Dates({ event }: { event: MandirEventPage["event"] }) {
+  const t = pageT();
+  const dates = [...(event.event_occurrences ?? [])].sort((a, b) =>
+    a.starts_at.localeCompare(b.starts_at),
+  );
+  if (dates.length < 2) return null;
+  const shown = dates.slice(0, DATES_SHOWN);
+  return (
+    <section aria-labelledby="dates" className="flex flex-col">
+      <h2
+        id="dates"
+        className="font-display mb-2 text-4xl leading-tight sm:text-5xl"
+      >
+        {t("event.dates")}
+      </h2>
+      <ul className="divide-line flex flex-col divide-y">
+        {shown.map((d) => (
+          <li
+            key={d.starts_at}
+            className="flex items-center gap-4 py-3 sm:gap-5"
+          >
+            <DateTile
+              date={d.starts_at}
+              label={formatEventStart(d.starts_at, true)}
+              size="sm"
+            />
+            <span
+              className={`text-lg font-semibold ${d.cancelled ? "text-muted line-through" : ""}`}
+            >
+              {formatEventStart(d.starts_at, event.all_day)}
+            </span>
+            {d.cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
+          </li>
+        ))}
+      </ul>
+      {dates.length > shown.length && (
+        <p className="text-muted mt-2">
+          {t("event.moreDates", { count: dates.length - shown.length })}
+        </p>
+      )}
+    </section>
+  );
 }
 
 function Details({ page }: { page: MandirEventPage }) {

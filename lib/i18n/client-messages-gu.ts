@@ -80,6 +80,8 @@ export const guClient: Record<ClientKey, string> = {
   "report.error.repeat": "કૃપા કરીને તે કેટલી વાર થાય છે તે પસંદ કરો.",
   "report.error.until":
     "કૃપા કરીને પહેલી તારીખ પછીની અને એક વર્ષની અંદરની છેલ્લી તારીખ પસંદ કરો.",
+  "report.error.untilDaily":
+    "દરરોજના કાર્યક્રમ માટે, પહેલા દિવસથી એક મહિનાની અંદરનો છેલ્લો દિવસ પસંદ કરો.",
   "report.error.link":
     "કૃપા કરીને http:// કે https://થી શરૂ થતું વેબ સરનામું લખો, અથવા ખાલી રાખો.",
   "report.error.links": "કૃપા કરીને બેથી વધુ વેબ સરનામાં ન લખો.",

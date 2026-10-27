@@ -210,6 +210,8 @@ export const gu: Record<MessageKey, string> = {
   "event.everythingAt": "{name}ના બધા કાર્યક્રમો →",
   "event.whatsOnNear": "તમારી નજીકના કાર્યક્રમો →",
   "event.when": "ક્યારે",
+  "event.dates": "બધી તારીખો",
+  "event.moreDates": "આ પછી બીજી {count}.",
   "event.next": "હવે પછી: {when}",
   "event.where": "ક્યાં",
   "event.cost": "ખર્ચ",

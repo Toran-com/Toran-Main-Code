@@ -163,9 +163,11 @@ export default function CommitteeGuidePage() {
             Leave the time empty for an all-day event.
           </li>
           <li>
-            For a weekly aarti or a monthly bhajan evening, open{" "}
-            <Ui>Happens every week or month?</Ui> and choose how often. It shows
-            once on your page, with its next date.
+            For a weekly aarti, a monthly bhajan evening or a festival&apos;s
+            nights in a row (like Navratri garba), open{" "}
+            <Ui>Happens every day, week or month?</Ui> and choose how often. It
+            shows once on your page, with its next date, and every date is
+            listed on the event&apos;s own page.
           </li>
           <li>
             Add a short description, and the name and description in Gujarati if

@@ -133,6 +133,7 @@ export const IMPORT_PROBLEMS: Record<ImportProblem["problem"], string> = {
   time: "the time isn't HH:MM (leave it empty for all day)",
   repeat: "it can't repeat",
   until: "it can't repeat",
+  untilDaily: "an event every day can run for a month at most",
   columns:
     "it needs at least mandir, date, time, name and link, separated by tabs",
   mandir: "Toran has no mandir with that page address",

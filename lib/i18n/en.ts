@@ -207,6 +207,8 @@ export const en = {
   "event.everythingAt": "Everything at {name} →",
   "event.whatsOnNear": "What's on near you →",
   "event.when": "When",
+  "event.dates": "Every date",
+  "event.moreDates": "And {count} more after these.",
   "event.next": "Next: {when}",
   "event.where": "Where",
   "event.cost": "Cost",

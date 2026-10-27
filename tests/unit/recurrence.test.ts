@@ -37,7 +37,7 @@ describe("rules", () => {
     ).toBe("Last Friday of the month");
   });
   it("rejects rules it doesn't understand", () => {
-    expect(parseRule("RRULE:FREQ=DAILY;UNTIL=20261231")).toBeNull();
+    expect(parseRule("RRULE:FREQ=YEARLY;UNTIL=20261231")).toBeNull();
     expect(parseRule("RRULE:FREQ=WEEKLY;BYDAY=SA")).toBeNull();
     expect(describeRule("nonsense")).toBeNull();
   });
@@ -108,5 +108,22 @@ describe("weekOfMonth", () => {
     expect(weekOfMonth("2026-10-03")).toEqual({ week: 1, last: false });
     expect(weekOfMonth("2026-10-31")).toEqual({ week: 5, last: true });
     expect(weekOfMonth("2026-10-24")).toEqual({ week: 4, last: false });
+  });
+});
+
+describe("a festival's run of days", () => {
+  it("writes, reads and describes an every-day rule", () => {
+    const rule = toRule({ kind: "daily" }, "2026-10-02", "2026-10-10");
+    expect(rule).toBe("RRULE:FREQ=DAILY;UNTIL=20261010");
+    expect(parseRule(rule)?.repeat).toEqual({ kind: "daily" });
+    expect(describeRule(rule)).toBe("Every day until Sat 10 Oct");
+  });
+
+  it("lists every night, from the first to the last", () => {
+    const rule = toRule({ kind: "daily" }, "2026-10-02", "2026-10-10");
+    const dates = occurrenceDates(rule, "2026-10-02");
+    expect(dates).toHaveLength(9);
+    expect(dates[0]).toBe("2026-10-02");
+    expect(dates.at(-1)).toBe("2026-10-10");
   });
 });
