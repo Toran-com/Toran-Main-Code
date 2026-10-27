@@ -9,8 +9,8 @@ test("Toran sends a reviewer only what's new in the Gujarati", async ({
   test.setTimeout(90_000);
   // "What's on" was checked when its Gujarati said something else.
   sql(`delete from public.translation_checks;
-    insert into public.translation_checks (key, english, gujarati)
-      values ('shell.whatsOn', 'What''s on', 'શું ચાલી રહ્યું છે');`);
+    insert into public.translation_checks (locale, key, english, translation)
+      values ('gu', 'shell.whatsOn', 'What''s on', 'શું ચાલી રહ્યું છે');`);
   await logInAsAdmin(page, `gu-pack-${Date.now()}@example.com`);
   await page.goto("/ops/translations");
 
@@ -53,4 +53,19 @@ test("Toran sends a reviewer only what's new in the Gujarati", async ({
   await expect(
     page.getByText("Changed", { exact: true }).filter({ visible: true }),
   ).toHaveCount(0);
+
+  // Hindi has its own pack: nothing checked there yet.
+  await page.getByRole("link", { name: "Hindi", exact: true }).click();
+  await expect(page.getByText(/The Hindi is a/)).toBeVisible();
+  await expect(
+    page
+      .getByRole("listitem")
+      .filter({ hasText: "Toran home" })
+      .filter({ hasText: "Toran मुख्य पेज" })
+      .getByText("New"),
+  ).toBeVisible();
+  await page.getByRole("link", { name: /^Print these \d+ lines$/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hindi wording to check" }),
+  ).toBeVisible();
 });

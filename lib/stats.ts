@@ -4,6 +4,7 @@
 // the page's address and a running total (decision 0015). Pure, so the
 // rules are tested on their own.
 
+import { englishPath } from "@/lib/i18n/paths";
 import { SEASONS } from "@/lib/seasons";
 
 export const METRICS = ["view", "calendar", "subscribe", "share"] as const;
@@ -48,9 +49,8 @@ export function countablePath(value: unknown): string | null {
   if (typeof value !== "string" || value.length > 200) return null;
   let path = value.split(/[?#]/)[0].toLowerCase();
   if (path.length > 1) path = path.replace(/\/+$/, "");
-  // A Gujarati page counts as its English page.
-  if (path === "/gu") path = "/";
-  else if (path.startsWith("/gu/")) path = path.slice(3);
+  // A Gujarati or Hindi page counts as its English page.
+  path = englishPath(path);
   return PAGES.some(([pattern]) => pattern.test(path)) ? path : null;
 }
 

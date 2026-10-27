@@ -375,14 +375,14 @@ isOneToOne: false
                   ]
                 },"translation_checks": {
                   Row: {
-                    "checked_at": string,"english": string,"gujarati": string,"key": string
+                    "checked_at": string,"english": string,"key": string,"locale": string,"translation": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "checked_at"?: string,"english": string,"gujarati": string,"key": string
+                    "checked_at"?: string,"english": string,"key": string,"locale": string,"translation": string
                   }
                   Update: {
-                    "checked_at"?: string,"english"?: string,"gujarati"?: string,"key"?: string
+                    "checked_at"?: string,"english"?: string,"key"?: string,"locale"?: string,"translation"?: string
                   }
                   Relationships: [
                     

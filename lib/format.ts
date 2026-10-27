@@ -14,8 +14,9 @@ import { pageLocale, sharedT } from "@/lib/i18n/locale";
 
 const LONDON = "Europe/London";
 
-// The page's language for dates: English (UK) or Gujarati.
-const dateLocale = () => (pageLocale() === "gu" ? "gu-IN" : "en-GB");
+// The page's language for dates: English (UK), Gujarati or Hindi.
+const DATE_LOCALES = { en: "en-GB", gu: "gu-IN", hi: "hi-IN" } as const;
+export const dateLocale = () => DATE_LOCALES[pageLocale()];
 
 // A date-only value (YYYY-MM-DD) as a Date at midnight UTC, so formatting in
 // UTC never shifts it a day.
@@ -85,7 +86,7 @@ export function formatEventStart(startsAt: string, allDay: boolean): string {
   const at = new Date(startsAt);
   const day = dayLabel(at, LONDON);
   if (allDay) return day;
-  if (pageLocale() === "gu") return `${day}, ${gujaratiTime(at)}`;
+  if (pageLocale() !== "en") return `${day}, ${partOfDayTime(at)}`;
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: LONDON,
     hour: "numeric",
@@ -98,13 +99,13 @@ export function formatEventStart(startsAt: string, allDay: boolean): string {
   return `${day}, ${time}`;
 }
 
-// "સાંજે 7:30" (evening 7:30) in UK time: Gujarati says the part of the
-// day rather than am or pm.
-function gujaratiTime(at: Date): string {
-  return gujaratiClock(londonTime(at));
+// "સાંજે 7:30" or "शाम 7:30" (evening 7:30) in UK time: Gujarati and
+// Hindi say the part of the day rather than am or pm.
+function partOfDayTime(at: Date): string {
+  return partOfDayClock(londonTime(at));
 }
 
-function gujaratiClock(hhmm: string): string {
+function partOfDayClock(hhmm: string): string {
   const [hour, minute] = hhmm.split(":").map(Number);
   const part =
     hour >= 4 && hour < 12
@@ -121,7 +122,7 @@ function gujaratiClock(hhmm: string): string {
 // A time of day given as "HH:MM" (opening and aarti times), in the
 // page's language: "7:30am", "4pm"; in Gujarati "સવારે 7:30".
 export function formatClock(clock: string): string {
-  if (pageLocale() === "gu") return gujaratiClock(clock);
+  if (pageLocale() !== "en") return partOfDayClock(clock);
   const [hour, minute] = clock.split(":").map(Number);
   return `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""}${hour < 12 ? "am" : "pm"}`;
 }
@@ -191,7 +192,7 @@ const CALENDARS: Record<string, string> = {
 
 export function calendarLabel(calendar: string | null): string | null {
   if (!calendar || !(calendar in CALENDARS)) return null;
-  return pageLocale() === "gu"
+  return pageLocale() !== "en"
     ? sharedT()(`calendar.${calendar}` as SharedKey)
     : CALENDARS[calendar];
 }

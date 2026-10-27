@@ -16,7 +16,13 @@ import { requireToranAdmin } from "@/lib/auth";
 import { LOCALES } from "@/lib/i18n";
 import { pageTitle } from "@/lib/site";
 import { loadReviewLines } from "@/lib/translation-pack";
-import { reviewerText, stampsFor, toReview } from "@/lib/translation-review";
+import {
+  REVIEW_LANGUAGES,
+  reviewerText,
+  reviewLocale,
+  stampsFor,
+  toReview,
+} from "@/lib/translation-review";
 import { markChecked } from "./actions";
 
 export const metadata: Metadata = {
@@ -40,7 +46,10 @@ export default function OpsTranslationsPage(
 async function Translations({ searchParams }: PageProps<"/ops/translations">) {
   await requireToranAdmin("/ops/translations");
   const query = await searchParams;
-  const { lines, saved } = await loadReviewLines();
+  const locale = reviewLocale(query.lang);
+  const language = REVIEW_LANGUAGES[locale].english;
+  const here = `/ops/translations?lang=${locale}`;
+  const { lines, saved } = await loadReviewLines(locale);
   const fresh = toReview(lines);
   // What's new, unless everything has been checked or all was asked for.
   const all = query.show === "all" || !fresh.length;
@@ -49,12 +58,30 @@ async function Translations({ searchParams }: PageProps<"/ops/translations">) {
 
   return (
     <>
-      {!LOCALES.gu.ready && (
+      <nav aria-label="Language" className="flex flex-wrap gap-2">
+        {(
+          Object.keys(REVIEW_LANGUAGES) as (keyof typeof REVIEW_LANGUAGES)[]
+        ).map((l) => (
+          <Link
+            key={l}
+            href={`/ops/translations?lang=${l}`}
+            aria-current={l === locale ? "page" : undefined}
+            className={`rounded-full border px-4 py-1.5 text-base font-semibold no-underline ${
+              l === locale
+                ? "border-peacock bg-peacock text-on-peacock"
+                : "border-line text-ink hover:bg-sunk"
+            }`}
+          >
+            {REVIEW_LANGUAGES[l].english}
+          </Link>
+        ))}
+      </nav>
+      {!LOCALES[locale].ready && (
         <Notice>
-          The Gujarati is a <strong>draft</strong> and isn&apos;t shown on the
-          site. Before it is, a native Gujarati speaker (ideally someone from a
-          mandir committee) should check every line. Send them the pack below;
-          then the corrections go into <code>lib/i18n/gu.ts</code> and{" "}
+          The {language} is a <strong>draft</strong> and isn&apos;t shown on the
+          site. Before it is, a native {language} speaker (ideally someone from
+          a mandir committee) should check every line. Send them the pack below;
+          then the corrections go into <code>lib/i18n/{locale}.ts</code> and{" "}
           <code>ready</code> is switched on in <code>lib/i18n/index.ts</code>.
         </Notice>
       )}
@@ -99,9 +126,7 @@ async function Translations({ searchParams }: PageProps<"/ops/translations">) {
             ).map(([show, label, current]) => (
               <Link
                 key={show}
-                href={
-                  show ? `/ops/translations?show=${show}` : "/ops/translations"
-                }
+                href={show ? `${here}&show=${show}` : here}
                 aria-current={current ? "page" : undefined}
                 className={`rounded-full border px-4 py-1.5 text-base font-semibold no-underline ${
                   current
@@ -116,17 +141,17 @@ async function Translations({ searchParams }: PageProps<"/ops/translations">) {
         )}
         <div className="flex flex-wrap items-center gap-4">
           <Link
-            href={`/ops/translations/print${all && fresh.length ? "?show=all" : ""}`}
+            href={`/ops/translations/print?lang=${locale}${all && fresh.length ? "&show=all" : ""}`}
             className={pillButtonClass}
           >
             Print these {shown.length} lines
           </Link>
-          <CopyText text={reviewerText(shown)} label="Copy the list" />
+          <CopyText text={reviewerText(shown, locale)} label="Copy the list" />
         </div>
         <p className="text-muted text-base">
-          The printout puts English and Gujarati side by side with room to write
-          a better version. The numbers stay the same in every pack, so a reply
-          like &ldquo;312: better as …&rdquo; always means the same line.
+          The printout puts English and {language} side by side with room to
+          write a better version. The numbers stay the same in every pack, so a
+          reply like &ldquo;312: better as …&rdquo; always means the same line.
         </p>
       </Card>
 
@@ -139,6 +164,7 @@ async function Translations({ searchParams }: PageProps<"/ops/translations">) {
             today.
           </p>
           <form action={markChecked}>
+            <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="lines" value={stampsFor(fresh)} />
             <button type="submit" className={pillPrimaryClass}>
               Mark the {fresh.length} new lines as checked
@@ -153,7 +179,7 @@ async function Translations({ searchParams }: PageProps<"/ops/translations">) {
             key={line.key}
             className="border-line bg-surface shadow-card grid gap-2 rounded-2xl border p-4 sm:grid-cols-[6rem_1fr_1fr]"
           >
-            <TranslationLine line={line} />
+            <TranslationLine line={line} locale={locale} />
           </li>
         ))}
       </ol>

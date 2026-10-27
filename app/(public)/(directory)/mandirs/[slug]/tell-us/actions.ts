@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
+import { TRANSLATED_LOCALES } from "@/lib/i18n/paths";
 import { checkLink } from "@/lib/posters";
 import { senderAddress, sendLimiter, spamCheck } from "@/lib/spam";
 import { createPublicServerClient } from "@/lib/supabase/server";
@@ -12,7 +13,8 @@ import { createPublicServerClient } from "@/lib/supabase/server";
 export async function reportEvent(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
   // Back to the form in the language it was sent from.
-  const base = formData.get("lang") === "gu" ? "/gu/mandirs" : "/mandirs";
+  const lang = TRANSLATED_LOCALES.find((l) => l === formData.get("lang"));
+  const base = lang ? `/${lang}/mandirs` : "/mandirs";
   const back: (query: string) => never = (query) =>
     redirect(`${base}/${encodeURIComponent(slug)}/tell-us?${query}`);
 

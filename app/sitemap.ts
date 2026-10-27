@@ -7,7 +7,11 @@ import {
 } from "@/lib/directory";
 import { seasonDays, seasonEvents, seasonWindow } from "@/lib/festival-season";
 import { LOCALES } from "@/lib/i18n";
-import { hasGujarati, withLocale } from "@/lib/i18n/paths";
+import {
+  hasTranslation,
+  TRANSLATED_LOCALES,
+  withLocale,
+} from "@/lib/i18n/paths";
 import { SEASONS } from "@/lib/seasons";
 import { eventPath } from "@/lib/share";
 import { site, siteUrl } from "@/lib/site";
@@ -84,13 +88,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...events,
   ];
-  if (!LOCALES.gu.ready) return english;
-  // Once the Gujarati has been checked, its pages too.
-  const gujarati = english.flatMap((entry) => {
-    const path = entry.url.slice(base.length) || "/";
-    return hasGujarati(path)
-      ? [{ ...entry, url: `${base}${withLocale(path, "gu")}` }]
-      : [];
-  });
-  return [...english, ...gujarati];
+  // Once a translation has been checked, its pages too.
+  const translated = TRANSLATED_LOCALES.filter((l) => LOCALES[l].ready).flatMap(
+    (locale) =>
+      english.flatMap((entry) => {
+        const path = entry.url.slice(base.length) || "/";
+        return hasTranslation(path)
+          ? [{ ...entry, url: `${base}${withLocale(path, locale)}` }]
+          : [];
+      }),
+  );
+  return [...english, ...translated];
 }

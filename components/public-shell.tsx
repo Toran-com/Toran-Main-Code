@@ -7,7 +7,8 @@ import { LanguageSwitch } from "@/components/language-switch";
 import { Logo, Toran } from "@/components/ornaments";
 import { SiteNav } from "@/components/site-nav";
 import { LOCALES } from "@/lib/i18n";
-import { localePath, pageT } from "@/lib/i18n/page";
+import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
+import { TRANSLATED_LOCALES } from "@/lib/i18n/paths";
 
 // Header, footer and page width for the public directory pages. Pages
 // are a narrow column for reading, unless the page's content is wrapped in
@@ -34,6 +35,12 @@ export const wideClass = "mx-auto w-full max-w-6xl px-4 sm:px-8";
 // except where the page hangs its own over a bold moment.
 export function SiteHeader({ toran = true }: { toran?: boolean }) {
   const t = pageT();
+  // English, the translations that have been checked, and the page's own
+  // language (so a draft page links back to English).
+  const locale = pageLocale();
+  const languages = (["en", ...TRANSLATED_LOCALES] as const)
+    .filter((l) => l === "en" || LOCALES[l].ready || l === locale)
+    .map((l) => ({ locale: l, name: LOCALES[l].name, lang: LOCALES[l].lang }));
   return (
     <>
       <header className="bg-bg/90 z-30 backdrop-blur-md sm:sticky sm:top-0">
@@ -76,7 +83,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               </svg>
             </Link>
             <DisplaySettings />
-            {LOCALES.gu.ready && <LanguageSwitch />}
+            {languages.length > 1 && <LanguageSwitch languages={languages} />}
             <Link
               href="/for-mandirs"
               className="border-line-strong hover:border-peacock/60 text-ink hidden rounded-full border px-5 py-2 text-base font-semibold no-underline lg:inline-flex"

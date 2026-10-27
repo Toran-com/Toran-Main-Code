@@ -9,7 +9,7 @@ const ASSETS = `toran-assets-${VERSION}`;
 // The pages of the mandirs a visitor follows (components/follow.tsx), kept
 // apart so they're never pushed out by other pages.
 const FOLLOWED = `toran-followed-${VERSION}`;
-const FOLLOWED_PAGE = /^(\/gu)?\/mandirs\/[a-z0-9-]+$/;
+const FOLLOWED_PAGE = /^(\/gu|\/hi)?\/mandirs\/[a-z0-9-]+$/;
 const REFRESH_MS = 12 * 60 * 60 * 1000;
 const OFFLINE = "/offline";
 const MAX_PAGES = 40;

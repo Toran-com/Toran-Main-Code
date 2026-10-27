@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { en } from "@/lib/i18n/en";
 import { gu } from "@/lib/i18n/gu";
+import { hi } from "@/lib/i18n/hi";
 import { LOCALES, placeholders, translator } from "@/lib/i18n";
 
 describe("translator", () => {
@@ -19,6 +20,8 @@ describe("translator", () => {
     expect(t.count("whatsOn.count", 1)).toBe("1 event");
     expect(t.count("whatsOn.count", 3)).toBe("3 events");
     expect(translator("gu").count("whatsOn.count", 3)).toBe("3 કાર્યક્રમો");
+    expect(translator("hi").count("sevaList.free", 1)).toBe("1 जगह खाली");
+    expect(translator("hi").count("sevaList.free", 3)).toBe("3 जगहें खाली");
   });
 
   it("uses English by default", () => {
@@ -42,6 +45,27 @@ describe("the Gujarati draft", () => {
     const gujarati = /[઀-૿]/;
     const untranslated = (Object.keys(en) as (keyof typeof en)[]).filter(
       (key) => !gujarati.test(gu[key]) && gu[key] !== en[key],
+    );
+    expect(untranslated).toEqual([]);
+  });
+});
+
+describe("the Hindi draft", () => {
+  it("is not shown to the public until a native speaker has checked it", () => {
+    expect(LOCALES.hi.ready).toBe(false);
+  });
+
+  it.each(Object.keys(en) as (keyof typeof en)[])(
+    "%s keeps the same {values} as the English",
+    (key) => {
+      expect(placeholders(hi[key])).toEqual(placeholders(en[key]));
+    },
+  );
+
+  it("is in Devanagari script", () => {
+    const devanagari = /[\u0900-\u097F]/;
+    const untranslated = (Object.keys(en) as (keyof typeof en)[]).filter(
+      (key) => !devanagari.test(hi[key]) && hi[key] !== en[key],
     );
     expect(untranslated).toEqual([]);
   });

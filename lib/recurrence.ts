@@ -88,8 +88,8 @@ export function parseRule(rule: string): Parsed | null {
 export function describeRule(rule: string): string | null {
   const parsed = parseRule(rule);
   if (!parsed) return null;
-  if (pageLocale() === "gu") {
-    // Gujarati wording, from the translations (lib/i18n).
+  if (pageLocale() !== "en") {
+    // Gujarati or Hindi wording, from the translations (lib/i18n).
     const t = sharedT();
     const day = t(`repeat.day.${parsed.weekday}` as SharedKey);
     if (parsed.repeat.kind === "weekly") {

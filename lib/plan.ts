@@ -3,6 +3,9 @@
 // page (/plan?events=…) when they open it or send it to the family on
 // WhatsApp. Nothing about the visitor is stored (decision 0006).
 
+import type { Locale } from "@/lib/i18n";
+import { withLocale } from "@/lib/i18n/paths";
+
 const KEY = "toran:plan";
 const CHANGED = "toran:plan-changed";
 export const MAX_PLANNED = 30;
@@ -99,7 +102,7 @@ export function onPlanChange(callback: () => void) {
 }
 
 // The plan page's address for these events.
-export function planHref(locale: string, ids: string[]): string {
-  const base = locale === "gu" ? "/gu/plan" : "/plan";
+export function planHref(locale: Locale, ids: string[]): string {
+  const base = withLocale("/plan", locale);
   return ids.length ? `${base}?events=${ids.join(",")}` : base;
 }
