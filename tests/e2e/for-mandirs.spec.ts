@@ -44,3 +44,30 @@ test("committees can read the guide and print the handout", async ({
     page.getByRole("button", { name: "Print this page" }),
   ).toBeVisible();
 });
+
+// "Create an account" from For mandirs: a choice between running a mandir
+// and visiting (who don't need an account).
+test("committees can create an account from For mandirs", async ({ page }) => {
+  await page.goto("/for-mandirs");
+  await page
+    .getByRole("link", { name: "Create an account", exact: false })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/join$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Create an account",
+  );
+  await expect(
+    page.getByRole("heading", { name: "I help run a mandir" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "I'm visiting mandirs" }),
+  ).toBeVisible();
+  await expect(page.getByText("You don't need an account.")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Open My Toran" }),
+  ).toHaveAttribute("href", "/my");
+  await expect(
+    page.getByRole("link", { name: "Log in" }).last(),
+  ).toHaveAttribute("href", "/login");
+});

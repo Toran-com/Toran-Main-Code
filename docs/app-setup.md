@@ -281,8 +281,13 @@ the database and refreshed hourly, so they stay fast and cheap.
 
 What it adds:
 
-1. **Claim:** on any mandir's page, "Look after this page" → log in → say
-   your role at the mandir → send.
+1. **Claim:** "For mandir committees" → **Create an account** (`/join`) →
+   email link → **Choose your mandir** (`/join/mandir`, search by name or
+   town) → say your role at the mandir → send. "Look after this page" on
+   any mandir's page still goes straight to the last step. `/join` also
+   tells visitors they don't need an account (what they save stays on
+   their phone, in My Toran); visitor accounts wait for ICO registration
+   and the DPIA (decision 0006).
 2. **Approve:** claims appear on `/ops` (Toran admins, after the
    authenticator code) with the person's email, their role, and the
    mandir's public phone and website. **Check with the mandir first**,
