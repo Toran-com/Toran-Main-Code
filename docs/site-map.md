@@ -8,23 +8,24 @@ English and Gujarati, and by following every link from the home page.
 
 ## Families
 
-| Page                   | Address                              | For                                                                     | Leads to                                                                          |
-| ---------------------- | ------------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Home                   | `/`                                  | What's on near you, the next festival season, coming up                 | What's on, a season page, festival dates, mandirs, each event                     |
-| What's on              | `/whats-on`                          | Every event, by date; asks where you are first; by kind, region         | Each event, each mandir                                                           |
-| Seva                   | `/seva`                              | Seva mandirs are asking for: near me, kind, day, map; take a slot there | Each event's seva rota                                                            |
-| Mandirs                | `/mandirs`                           | Every mandir, on a map or as a list by region and town                  | Each mandir; What's on near one                                                   |
-| A mandir               | `/mandirs/<mandir>`                  | Its events, address, website, calendar feed, print                      | Each event, "Tell us about an event", look after this page, festival dates, print |
-| An event               | `/mandirs/<mandir>/events/<id>`      | One event to share: when, where, calendar, WhatsApp                     | Its seva rota, the mandir, What's on                                              |
-| Help with seva         | `/mandirs/<mandir>/events/<id>/seva` | Take a seva slot, no name needed                                        | The event                                                                         |
-| Tell us about an event | `/mandirs/<mandir>/tell-us`          | Send in an event the mandir hasn't listed                               | Back to the mandir                                                                |
-| Festival dates         | `/festivals`                         | Every festival's dates, by month; the season pages                      | Each season page, each festival                                                   |
-| A festival             | `/festivals/<festival>`              | Its dates and which mandirs are marking it                              | Its season page, each event                                                       |
-| Festival seasons       | `/diwali`, `/navratri`, `/holi`, …   | Every mandir's events for one season, near you                          | Each festival day, each event, calendar feed, each town's page                    |
-| A season in a town     | `/diwali/<town>`, …                  | The season's events at one town's mandirs, and those mandirs            | The season page, each festival day, each event, each mandir                       |
-| Our plan               | `/plan`                              | Events picked on this phone, sent to the family in one message          | Each event, What's on                                                             |
-| Calendar feeds         | `…/calendar.ics`                     | Subscribe in a phone's calendar                                         | —                                                                                 |
-| Offline                | `/offline`                           | Shown by the installed app with no signal                               | Pages already opened                                                              |
+| Page                   | Address                              | For                                                                                   | Leads to                                                                          |
+| ---------------------- | ------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Home                   | `/`                                  | What's on near you, the next festival season, coming up                               | What's on, a season page, festival dates, mandirs, each event                     |
+| What's on              | `/whats-on`                          | Every event, by date; asks where you are first; by kind, region                       | Each event, each mandir                                                           |
+| Seva                   | `/seva`                              | Seva mandirs are asking for: near me, kind, day, map; take a slot there               | Each event's seva rota                                                            |
+| Mandirs                | `/mandirs`                           | Every mandir, on a map or as a list by region and town                                | Each mandir; What's on near one                                                   |
+| A mandir               | `/mandirs/<mandir>`                  | Its events, address, website, calendar feed, print                                    | Each event, "Tell us about an event", look after this page, festival dates, print |
+| An event               | `/mandirs/<mandir>/events/<id>`      | One event to share: when, where, calendar, WhatsApp                                   | Its seva rota, the mandir, What's on                                              |
+| Help with seva         | `/mandirs/<mandir>/events/<id>/seva` | Take a seva slot, no name needed                                                      | The event                                                                         |
+| Tell us about an event | `/mandirs/<mandir>/tell-us`          | Send in an event the mandir hasn't listed                                             | Back to the mandir                                                                |
+| Festival dates         | `/festivals`                         | Every festival's dates, by month; the season pages                                    | Each season page, each festival                                                   |
+| A festival             | `/festivals/<festival>`              | Its dates and which mandirs are marking it                                            | Its season page, each event                                                       |
+| Festival seasons       | `/diwali`, `/navratri`, `/holi`, …   | Every mandir's events for one season, near you                                        | Each festival day, each event, calendar feed, each town's page                    |
+| A season in a town     | `/diwali/<town>`, …                  | The season's events at one town's mandirs, and those mandirs                          | The season page, each festival day, each event, each mandir                       |
+| Our plan               | `/plan`                              | Events picked on this phone, sent to the family in one message                        | Each event, What's on                                                             |
+| My Toran               | `/my`                                | Mandirs followed, plan, seva done and past events, on this phone; move to a new phone | Each part's page, What's on, Seva                                                 |
+| Calendar feeds         | `…/calendar.ics`                     | Subscribe in a phone's calendar                                                       | —                                                                                 |
+| Offline                | `/offline`                           | Shown by the installed app with no signal                                             | Pages already opened                                                              |
 
 ## Mandir committees
 

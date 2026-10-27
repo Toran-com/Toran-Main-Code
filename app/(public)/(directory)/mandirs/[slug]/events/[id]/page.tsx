@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { CallAndDirections } from "@/components/call-directions";
 import { DateTile } from "@/components/date-tile";
+import { IWent } from "@/components/i-went";
 import { CalendarIcon, ClockIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Toran } from "@/components/ornaments";
@@ -262,6 +263,7 @@ export default async function EventPage({
                   path={localePath(path)}
                 />
                 <PlanButton id={event.id} at={event.next_starts_at} />
+                <IWent id={event.id} at={event.next_starts_at} />
               </div>
             )}
           </div>

@@ -211,6 +211,11 @@ export const en = {
   "event.where": "Where",
   "event.cost": "Cost",
   "event.fromMandir": "From the mandir",
+  "shell.my": "My Toran",
+  "my.title": "My Toran",
+  "my.description":
+    "The mandirs you follow, your plan, seva and past events, together on your phone.",
+  "my.intro": "Your mandirs, plan, seva and past events, in one place.",
   "shell.seva": "Seva",
   "sevaList.title": "Seva",
   "sevaList.intro": "Help at a mandir near you. No sign-up, no name needed.",

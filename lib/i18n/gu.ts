@@ -214,6 +214,11 @@ export const gu: Record<MessageKey, string> = {
   "event.where": "ક્યાં",
   "event.cost": "ખર્ચ",
   "event.fromMandir": "મંદિર તરફથી",
+  "shell.my": "મારું Toran",
+  "my.title": "મારું Toran",
+  "my.description":
+    "તમે ફોલો કરો છો તે મંદિરો, તમારો પ્લાન, સેવા અને ગયેલા કાર્યક્રમો, તમારા ફોનમાં એક જગ્યાએ.",
+  "my.intro": "તમારાં મંદિરો, પ્લાન, સેવા અને ગયેલા કાર્યક્રમો, એક જગ્યાએ.",
   "shell.seva": "સેવા",
   "sevaList.title": "સેવા",
   "sevaList.intro": "તમારી નજીકના મંદિરમાં મદદ કરો. નોંધણી નહીં, નામ પણ નહીં.",

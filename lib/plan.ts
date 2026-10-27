@@ -1,7 +1,11 @@
 // A family's plan: events a visitor has picked, kept on their phone only
 // (localStorage), never sent to Toran except as the address of the plan
 // page (/plan?events=…) when they open it or send it to the family on
-// WhatsApp. Nothing about the visitor is stored (decision 0006).
+// WhatsApp. Nothing about the visitor is stored (decision 0006). Planned
+// events are also noted in lib/event-history.ts, so My Toran can ask
+// "Did you go?" once they've happened.
+
+import { forgetPlanned, notePlanned } from "@/lib/event-history";
 
 const KEY = "toran:plan";
 const CHANGED = "toran:plan-changed";
@@ -76,16 +80,27 @@ function save(plan: Planned[]) {
 export function setPlanned(event: Planned, on: boolean) {
   const now = parsePlan(planSnapshot()).filter((p) => p.id !== event.id);
   save(on ? [...now, event] : now);
+  if (on) notePlanned([event]);
+  else forgetPlanned([event.id]);
 }
 
 export function addAllPlanned(events: Planned[]) {
   const now = parsePlan(planSnapshot());
   const ids = new Set(now.map((p) => p.id));
-  save([...now, ...events.filter((e) => !ids.has(e.id))]);
+  const added = events.filter((e) => !ids.has(e.id));
+  save([...now, ...added]);
+  notePlanned(added);
 }
 
 export function clearPlan() {
+  forgetPlanned(parsePlan(planSnapshot()).map((p) => p.id));
   save([]);
+}
+
+// Adds events to the plan as they were saved on another phone (My Toran's
+// "move to a new phone"). Past ones are dropped as usual.
+export function mergePlan(events: Planned[]) {
+  addAllPlanned(parsePlan(JSON.stringify(events)));
 }
 
 // For useSyncExternalStore: changes here, and in other tabs.
