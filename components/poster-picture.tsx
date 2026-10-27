@@ -5,7 +5,8 @@ import { useFormStatus } from "react-dom";
 import { buttonClass, inputClass } from "@/components/ui";
 
 // "Read a poster": a photo or PDF of a poster, sent to be read
-// (readPosterPicture in app/(ops)/ops/posters/actions.ts). Phone photos are
+// (readPosterPicture in app/(ops)/ops/posters/actions.ts, or
+// readPosterAsCommittee for a committee's own mandir). Phone photos are
 // shrunk here first, to well under the 4 MB that can be sent, and so
 // they're quicker to send on a phone's connection.
 
@@ -29,16 +30,20 @@ async function shrink(file: File): Promise<File> {
   return blob ? new File([blob], "poster.jpg", { type: "image/jpeg" }) : file;
 }
 
+// Toran chooses the mandir and where the poster came from; a committee
+// sends its own mandir's (mandir and from are then fixed).
 export function PosterPicture({
   action,
   mandirs,
   chosen,
   sources,
+  label = "Photo or PDF of the poster",
 }: {
   action: (formData: FormData) => Promise<void>;
-  mandirs: { slug: string; name: string; town: string }[];
+  mandirs?: { slug: string; name: string; town: string }[];
   chosen: string;
-  sources: { value: string; label: string }[];
+  sources?: { value: string; label: string }[];
+  label?: string;
 }) {
   const [problem, setProblem] = useState("");
   return (
@@ -60,26 +65,30 @@ export function PosterPicture({
       }}
       className="flex flex-col gap-5"
     >
-      <label className="flex flex-col gap-2">
-        <span className="font-semibold">Mandir</span>
-        <select
-          name="mandir"
-          required
-          defaultValue={chosen}
-          className={inputClass}
-        >
-          <option value="" disabled>
-            Choose a mandir
-          </option>
-          {mandirs.map((m) => (
-            <option key={m.slug} value={m.slug}>
-              {m.name}, {m.town}
+      {!mandirs && <input type="hidden" name="mandir" value={chosen} />}
+      {!sources && <input type="hidden" name="from" value="printed" />}
+      {mandirs && (
+        <label className="flex flex-col gap-2">
+          <span className="font-semibold">Mandir</span>
+          <select
+            name="mandir"
+            required
+            defaultValue={chosen}
+            className={inputClass}
+          >
+            <option value="" disabled>
+              Choose a mandir
             </option>
-          ))}
-        </select>
-      </label>
+            {mandirs.map((m) => (
+              <option key={m.slug} value={m.slug}>
+                {m.name}, {m.town}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className="flex flex-col gap-2">
-        <span className="font-semibold">Photo or PDF of the poster</span>
+        <span className="font-semibold">{label}</span>
         <input
           name="poster"
           type="file"
@@ -88,21 +97,23 @@ export function PosterPicture({
           className={inputClass}
         />
       </label>
-      <label className="flex flex-col gap-2">
-        <span className="font-semibold">Where it came from</span>
-        <select
-          name="from"
-          required
-          defaultValue="whatsapp"
-          className={inputClass}
-        >
-          {sources.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      {sources && (
+        <label className="flex flex-col gap-2">
+          <span className="font-semibold">Where it came from</span>
+          <select
+            name="from"
+            required
+            defaultValue="whatsapp"
+            className={inputClass}
+          >
+            {sources.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       {problem && (
         <p role="alert" className="text-kumkum font-semibold">
           {problem}
