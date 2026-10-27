@@ -19,6 +19,20 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"digest_subscribers": {
+                  Row: {
+                    "confirm_hash": string,"confirmed_at": string | null,"created_at": string,"email": string,"id": string,"last_sent_at": string | null,"region": string | null,"unsubscribe_hash": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "confirm_hash": string,"confirmed_at"?: string | null,"created_at"?: string,"email": string,"id"?: string,"last_sent_at"?: string | null,"region"?: string | null,"unsubscribe_hash": string
+                  }
+                  Update: {
+                    "confirm_hash"?: string,"confirmed_at"?: string | null,"created_at"?: string,"email"?: string,"id"?: string,"last_sent_at"?: string | null,"region"?: string | null,"unsubscribe_hash"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"distinct_events": {
                   Row: {
                     "decided_at": string,"decided_by": string | null,"first_id": string,"second_id": string
@@ -187,6 +201,26 @@ isOneToOne: false
       foreignKeyName: "mandir_admins_mandir_id_fkey"
       columns: ["mandir_id"]
 isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"mandir_calendars": {
+                  Row: {
+                    "added_at": string,"last_added": number | null,"last_found": number | null,"last_outcome": string | null,"last_read_at": string | null,"mandir_id": string,"url": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_at"?: string,"last_added"?: number | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_read_at"?: string | null,"mandir_id": string,"url": string
+                  }
+                  Update: {
+                    "added_at"?: string,"last_added"?: number | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_read_at"?: string | null,"mandir_id"?: string,"url"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mandir_calendars_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: true
       referencedRelation: "mandirs"
       referencedColumns: ["id"]
     }
@@ -401,6 +435,9 @@ isOneToOne: false
               "added_at": string,"added_by_me": boolean,"email": string,"user_id": string
             }[]
                            },
+"confirm_digest":
+{ Args: { "code_hash": string }; Returns: boolean
+                           },
 "count_visit":
 { Args: { "page": string,"what": string }; Returns: undefined
                            },
@@ -480,8 +517,14 @@ isOneToOne: false
 "run_retention":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
+"subscribe_digest":
+{ Args: { "address": string,"area": string,"confirm": string,"leave": string }; Returns: undefined
+                           },
 "take_seva_slot":
 { Args: { "target_shift": string }; Returns: string
+                           },
+"unsubscribe_digest":
+{ Args: { "code_hash": string }; Returns: boolean
                            },
 "valid_aarti_times":
 { Args: { "aartis": Json }; Returns: boolean

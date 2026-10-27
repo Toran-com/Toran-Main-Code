@@ -40,16 +40,29 @@ export function parseFollowing(snapshot: string): string[] {
   }
 }
 
-export function setFollowing(slug: string, on: boolean) {
-  const now = parseFollowing(followingSnapshot()).filter((s) => s !== slug);
-  const next = on ? cleanSlugs([slug, ...now]) : now;
+function save(slugs: string[]) {
   try {
-    if (next.length) localStorage.setItem(KEY, JSON.stringify(next));
+    if (slugs.length) localStorage.setItem(KEY, JSON.stringify(slugs));
     else localStorage.removeItem(KEY);
   } catch {
     // Not saved; nothing else to do.
   }
   window.dispatchEvent(new Event(CHANGED));
+}
+
+export function setFollowing(slug: string, on: boolean) {
+  const now = parseFollowing(followingSnapshot()).filter((s) => s !== slug);
+  save(on ? cleanSlugs([slug, ...now]) : now);
+}
+
+// Mandirs followed on another phone (My Toran's "move to a new phone"),
+// added to the ones here.
+export function mergeFollowing(slugs: string[]) {
+  save(cleanSlugs([...parseFollowing(followingSnapshot()), ...slugs]));
+}
+
+export function clearFollowing() {
+  save([]);
 }
 
 // For useSyncExternalStore: changes here, and in other tabs.

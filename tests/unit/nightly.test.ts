@@ -7,11 +7,21 @@ import type { CheckResult } from "@/lib/website-check";
 
 // A stand-in for the database: every query method returns the same
 // builder, and awaiting it gives what that table would.
-function fakeDb(mandirs: { id: string; website: string }[]) {
+function fakeDb(
+  mandirs: { id: string; website: string }[],
+  calendars: {
+    mandir_id: string;
+    url: string;
+    mandir: { website: string | null; status: string };
+  }[] = [],
+) {
   const written: { table: string; op: string; value: unknown }[] = [];
   const answer = (table: string, op: string) => {
     if (op === "insert" && table === "sources") return { data: { id: "src" } };
     if (op === "select" && table === "mandirs") return { data: mandirs };
+    if (op === "select" && table === "mandir_calendars") {
+      return { data: calendars };
+    }
     if (op === "select" && table === "sources") return { data: null };
     if (op === "select") return { data: [] };
     return { data: null, error: null };
@@ -94,6 +104,7 @@ describe("runNightly", () => {
     expect(checked.sort()).toEqual(MANDIRS.map((m) => m.website));
     expect(summary).toEqual({
       retention: { invites: 2, approved_claims: 0 },
+      calendars: { checked: 0, added: 0, failed: 0 },
       websites: { checked: 4, added: 2, failed: 0 },
     });
     expect(written.filter((w) => w.table === "job_runs")).toEqual([
@@ -115,6 +126,50 @@ describe("runNightly", () => {
     );
     // Three start at once; none start after the first finishes late.
     expect(summary.websites.checked).toBe(3);
+  });
+});
+
+describe("runNightly with mandirs' own calendars", () => {
+  it("reads every calendar first, without showing its address", async () => {
+    const secret =
+      "https://calendar.google.com/calendar/ical/x%40group.calendar.google.com/private-abc/basic.ics";
+    const { db, written } = fakeDb(
+      [],
+      [
+        {
+          mandir_id: "m1",
+          url: secret,
+          mandir: { website: "https://m1.example.org", status: "claimed" },
+        },
+      ],
+    );
+    const read: string[] = [];
+    const summary = await runNightly(
+      db,
+      async () => found(0),
+      () => 0,
+      async (url) => {
+        read.push(url);
+        const result = found(2);
+        // The first has no link of its own: calendars give their own
+        // address instead.
+        result.events[0].link = secret;
+        return result;
+      },
+    );
+    expect(read).toEqual([secret]);
+    expect(summary.calendars).toEqual({ checked: 1, added: 2, failed: 0 });
+    const claims = written.find((w) => w.table === "event_claims")!.value as {
+      proposed: { link: string };
+    }[];
+    expect(claims.map((c) => c.proposed.link)).toEqual([
+      "https://m1.example.org",
+      "https://example.org",
+    ]);
+    expect(JSON.stringify(written)).not.toContain("private-abc");
+    expect(
+      written.find((w) => w.table === "mandir_calendars")?.value,
+    ).toMatchObject({ last_outcome: "found", last_found: 2, last_added: 2 });
   });
 });
 

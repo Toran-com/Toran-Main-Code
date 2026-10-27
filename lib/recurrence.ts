@@ -1,11 +1,16 @@
 // Repeating events, kept to the patterns mandirs actually use: weekly,
-// fortnightly, and "the first / second / … / last Saturday of the month".
+// fortnightly, "the first / second / … / last Saturday of the month", and
+// every day for a festival's run of nights (Navratri, Diwali week).
 // Stored as a small iCalendar RRULE in events.recurrence, with each actual
 // date written to event_occurrences so pages can query by date.
 
 export type Repeat =
+  | { kind: "daily" }
   | { kind: "weekly"; interval: 1 | 2 }
   | { kind: "monthly"; week: 1 | 2 | 3 | 4 | -1 }; // -1 = last
+
+// A festival's run: at most a month of days.
+export const MAX_DAILY_DAYS = 31;
 
 import type { SharedKey } from "@/lib/i18n/shared-messages";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
@@ -47,6 +52,7 @@ export function toRule(
 ): string {
   const day = DAYS[dateOnly(firstDate).getUTCDay()];
   const end = until.replaceAll("-", "");
+  if (repeat.kind === "daily") return `RRULE:FREQ=DAILY;UNTIL=${end}`;
   if (repeat.kind === "weekly") {
     return `RRULE:FREQ=WEEKLY;INTERVAL=${repeat.interval};BYDAY=${day};UNTIL=${end}`;
   }
@@ -69,6 +75,9 @@ export function parseRule(rule: string): Parsed | null {
   const untilMatch = /^(\d{4})(\d{2})(\d{2})$/.exec(parts.UNTIL ?? "");
   if (!untilMatch) return null;
   const until = `${untilMatch[1]}-${untilMatch[2]}-${untilMatch[3]}`;
+  if (parts.FREQ === "DAILY") {
+    return { repeat: { kind: "daily" }, weekday: -1, until };
+  }
   const byday = /^(-1|[1-4])?(SU|MO|TU|WE|TH|FR|SA)$/.exec(parts.BYDAY ?? "");
   if (!byday) return null;
   const weekday = DAYS.indexOf(byday[2] as (typeof DAYS)[number]);
@@ -84,10 +93,27 @@ export function parseRule(rule: string): Parsed | null {
   return null;
 }
 
-// "Every Saturday", "Every other Sunday", "First Saturday of the month".
+// "Sat 10 Oct", for the end of a festival's run.
+function untilDay(until: string): string {
+  return new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(dateOnly(until));
+}
+
+// "Every Saturday", "Every other Sunday", "First Saturday of the month",
+// "Every day until Sat 10 Oct".
 export function describeRule(rule: string): string | null {
   const parsed = parseRule(rule);
   if (!parsed) return null;
+  if (parsed.repeat.kind === "daily") {
+    const until = untilDay(parsed.until);
+    return pageLocale() !== "en"
+      ? sharedT()("repeat.daily", { until })
+      : `Every day until ${until}`;
+  }
   if (pageLocale() !== "en") {
     // Gujarati or Hindi wording, from the translations (lib/i18n).
     const t = sharedT();
@@ -117,8 +143,9 @@ export function occurrenceDates(rule: string, firstDate: string): string[] {
   if (!parsed) return [firstDate];
   const out: string[] = [];
   const until = dateOnly(parsed.until);
-  if (parsed.repeat.kind === "weekly") {
-    const step = 7 * parsed.repeat.interval;
+  if (parsed.repeat.kind === "daily" || parsed.repeat.kind === "weekly") {
+    const step =
+      parsed.repeat.kind === "daily" ? 1 : 7 * parsed.repeat.interval;
     for (
       let d = dateOnly(firstDate);
       d <= until && out.length < 60;

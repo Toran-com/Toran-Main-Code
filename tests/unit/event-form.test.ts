@@ -221,3 +221,40 @@ describe("checkEvent kinds", () => {
     });
   });
 });
+
+describe("an event every day", () => {
+  it("takes a festival's nine nights as one event", () => {
+    const result = checkEvent(
+      {
+        ...base,
+        date: "2026-11-01",
+        time: "20:00",
+        repeat: "daily",
+        until: "2026-11-09",
+      },
+      now,
+    );
+    expect(result.ok && result.event.rule).toBe(
+      "RRULE:FREQ=DAILY;UNTIL=20261109",
+    );
+    expect(result.ok && result.event.occurrences).toHaveLength(9);
+    expect(result.ok && result.event.occurrences[8].toISOString()).toBe(
+      "2026-11-09T20:00:00.000Z",
+    );
+  });
+
+  it("keeps a run of days to a month", () => {
+    expect(
+      checkEvent(
+        { ...base, date: "2026-11-01", repeat: "daily", until: "2026-12-15" },
+        now,
+      ),
+    ).toEqual({ ok: false, error: "untilDaily" });
+    expect(
+      checkEvent(
+        { ...base, date: "2026-11-01", repeat: "daily", until: "2026-12-01" },
+        now,
+      ).ok,
+    ).toBe(true);
+  });
+});

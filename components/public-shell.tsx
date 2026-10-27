@@ -4,6 +4,7 @@ import { Notice } from "@/components/ui";
 import { InstallApp } from "@/components/install-app";
 import { DisplaySettings } from "@/components/display-settings";
 import { LanguageSwitch } from "@/components/language-switch";
+import { MyToranLink } from "@/components/my-toran-link";
 import { Logo, Toran } from "@/components/ornaments";
 import { SiteNav } from "@/components/site-nav";
 import { LOCALES } from "@/lib/i18n";
@@ -62,7 +63,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               { href: localePath("/festivals"), label: t("shell.festivals") },
             ]}
           />
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2">
             <Link
               href={localePath("/search")}
               aria-label={t("shell.search")}
@@ -82,6 +83,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
                 <path d="M16 16l4.5 4.5" />
               </svg>
             </Link>
+            <MyToranLink label={t("shell.my")} href={localePath("/my")} />
             <DisplaySettings />
             {languages.length > 1 && <LanguageSwitch languages={languages} />}
             <Link
@@ -122,6 +124,7 @@ export function SiteFooter() {
         { href: localePath("/seva"), label: t("shell.seva") },
         { href: localePath("/mandirs"), label: t("shell.mandirs") },
         { href: localePath("/festivals"), label: t("shell.festivals") },
+        { href: localePath("/my"), label: t("shell.my") },
         { href: "/for-mandirs", label: t("shell.forMandirs") },
       ],
     },

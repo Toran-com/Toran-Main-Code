@@ -5,6 +5,7 @@
 import { type EventKind, isEventKind } from "@/lib/event-kinds";
 import { londonDate, londonTime, londonToUtc } from "@/lib/format";
 import {
+  MAX_DAILY_DAYS,
   occurrenceDates,
   parseRule,
   type Repeat,
@@ -38,7 +39,8 @@ export type EventError =
   | "date"
   | "time"
   | "repeat"
-  | "until";
+  | "until"
+  | "untilDaily";
 
 export type CheckedEvent = {
   title: string;
@@ -108,6 +110,7 @@ export function eventInputFromEvent(event: {
 }
 
 function repeatChoiceFor(repeat: Repeat): string {
+  if (repeat.kind === "daily") return "daily";
   if (repeat.kind === "weekly") {
     return repeat.interval === 1 ? "weekly" : "fortnightly";
   }
@@ -158,6 +161,16 @@ export function checkEvent(
     ) {
       return fail("until");
     }
+    // A run of days is a festival's: a month at most.
+    if (
+      repeat.kind === "daily" &&
+      until >
+        new Date(first + (MAX_DAILY_DAYS - 1) * DAY_MS)
+          .toISOString()
+          .slice(0, 10)
+    ) {
+      return fail("untilDaily");
+    }
     rule = toRule(repeat, date, until);
     occurrences = occurrenceDates(rule, date).flatMap((d) => {
       const at = londonToUtc(d, allDay ? "00:00" : time);
@@ -182,6 +195,7 @@ export function checkEvent(
 }
 
 function repeatFromChoice(choice: string, date: string): Repeat | null {
+  if (choice === "daily") return { kind: "daily" };
   if (choice === "weekly") return { kind: "weekly", interval: 1 };
   if (choice === "fortnightly") return { kind: "weekly", interval: 2 };
   if (choice === "monthly") {
@@ -204,4 +218,6 @@ export const EVENT_ERRORS: Record<EventError, string> = {
   repeat: "Please choose how often it repeats.",
   until:
     "Please choose an end date after the first date, and within a year of it.",
+  untilDaily:
+    "For an event every day, please choose a last day within a month of the first, as for a festival like Navratri.",
 };

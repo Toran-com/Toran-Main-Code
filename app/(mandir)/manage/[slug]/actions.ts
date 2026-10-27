@@ -1,7 +1,9 @@
 "use server";
 
 import { updateTag } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 import {
   comparableEvent,
   draftParam,
@@ -9,12 +11,21 @@ import {
   listedEvents,
   matchesFor,
 } from "@/lib/duplicate-check";
+import { feedAddress } from "@/lib/calendar-feed";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
 import { londonDate } from "@/lib/london";
 import { parsePracticalDetails } from "@/lib/mandir-form";
+import { queueRead } from "@/lib/poster-queue";
+import {
+  isPosterType,
+  MAX_POSTER_BYTES,
+  posterReadingOn,
+  readPoster,
+} from "@/lib/poster-reader";
 import { likenessFrom, reviewPoster } from "@/lib/poster-review";
+import { senderAddress, sendLimiter } from "@/lib/spam";
 import { picksFromForm } from "@/lib/quick-events";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -230,6 +241,56 @@ export async function updatePracticalDetails(formData: FormData) {
   back("done=details");
 }
 
+// The mandir's own events calendar, read every night for new events
+// (lib/nightly.ts). A new address starts afresh: it's read tonight.
+export async function saveCalendar(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#calendar`);
+  const address = feedAddress(String(formData.get("calendar_url") ?? ""));
+  if (!address.ok) back(`error=calendar-${address.error}`);
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  const { error } = await supabase.from("mandir_calendars").upsert({
+    mandir_id: mandir.id,
+    url: address.url,
+    added_at: new Date().toISOString(),
+    last_read_at: null,
+    last_outcome: null,
+    last_found: null,
+    last_added: null,
+  });
+  if (error) back("error=failed");
+  back("done=calendar");
+}
+
+export async function removeCalendar(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#calendar`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  const { error } = await supabase
+    .from("mandir_calendars")
+    .delete()
+    .eq("mandir_id", mandir.id);
+  if (error) back("error=failed");
+  back("done=calendar-removed");
+}
+
 // The committee publishes a poster someone forwarded to Toran (which
 // confirms it), or says it's not right.
 export async function reviewPosterAsCommittee(formData: FormData) {
@@ -265,6 +326,69 @@ export async function reviewPosterAsCommittee(formData: FormData) {
   back(
     `done=${decision === "discard" ? "discarded" : result.merged ? "merged" : "published"}`,
   );
+}
+
+// The committee sends a photo or PDF of its own poster; Claude reads the
+// events off it and they wait under "Posters waiting for you", to check
+// and publish like any other. Only someone on the committee (or a Toran
+// admin) can, and only a few at a time, since each one costs a little.
+export async function readPosterAsCommittee(formData: FormData) {
+  const slug = String(formData.get("mandir") ?? "");
+  const file = formData.get("poster");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
+
+  if (!posterReadingOn()) back("error=readingOff#read-poster");
+  if (!(file instanceof File) || file.size === 0) {
+    back("error=picture#read-poster");
+  }
+  if (!isPosterType(file.type)) back("error=pictureType#read-poster");
+  if (file.size > MAX_POSTER_BYTES) back("error=pictureSize#read-poster");
+
+  const user = await getCurrentUser();
+  const supabase = await createSessionClient();
+  if (!user || !supabase) back("error=failed#read-poster");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, name, town")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed#read-poster");
+  const { data: admin } = await supabase
+    .from("mandir_admins")
+    .select("mandir_id")
+    .eq("mandir_id", mandir.id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!admin && !(user.isToranAdmin && user.aal === "aal2")) {
+    back("error=failed#read-poster");
+  }
+  if (
+    !sendLimiter.allow(`poster:${mandir.id}`, senderAddress(await headers()))
+  ) {
+    back("error=slow#read-poster");
+  }
+
+  const read = await readPoster(
+    { data: Buffer.from(await file.arrayBuffer()), type: file.type },
+    {
+      mandir: `${mandir.name}, ${mandir.town}`,
+      today: londonDate(new Date()),
+    },
+  );
+  if (!read.ok) {
+    back(
+      `error=${read.error === "refused" ? "pictureRefused" : "pictureFailed"}#read-poster`,
+    );
+  }
+  const { added, skipped } = await queueRead(
+    supabase,
+    mandir.id,
+    "printed",
+    read.events,
+    "",
+  );
+  back(`read=${added}&skipped=${skipped}#posters`);
 }
 
 // The committee on Toran: invite a colleague by email, cancel an invite,

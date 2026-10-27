@@ -1,7 +1,14 @@
 import { expect, test } from "@playwright/test";
 import { BUDGET, ownDownloadsOnly, pageWeight } from "../speed";
 
-for (const path of ["/", "/mandirs", "/festivals", "/whats-on", "/login"]) {
+for (const path of [
+  "/",
+  "/mandirs",
+  "/festivals",
+  "/whats-on",
+  "/my",
+  "/login",
+]) {
   test(`${path} stays within the speed budget`, async ({ page }) => {
     await ownDownloadsOnly(page);
     await page.goto(path);

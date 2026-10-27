@@ -9,6 +9,7 @@ import {
   whatsOnHref,
 } from "@/components/follow";
 import { useLocale, useT } from "@/components/use-t";
+import { hubPath } from "@/lib/hub";
 import { enFollow } from "@/lib/i18n/client/follow";
 
 // "Your mandirs" on the home page: the mandirs this phone follows, each
@@ -50,12 +51,20 @@ export function YourMandirs({
           </span>
           {t("follow.yours")}
         </h2>
-        <Link
-          href={whatsOnHref(locale, "", following)}
-          className="text-peacock text-lg font-semibold"
-        >
-          {t("follow.allEvents")} →
-        </Link>
+        <p className="flex flex-wrap gap-x-5 gap-y-1">
+          <Link
+            href={whatsOnHref(locale, "", following)}
+            className="text-peacock text-lg font-semibold"
+          >
+            {t("follow.allEvents")} →
+          </Link>
+          <Link
+            href={hubPath(locale)}
+            className="text-peacock text-lg font-semibold"
+          >
+            {t("follow.myToran")} →
+          </Link>
+        </p>
       </div>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {following.map((slug) => {

@@ -9,4 +9,5 @@ export const enFollow = {
   "follow.yours": "Your mandirs",
   "follow.allEvents": "All their events",
   "follow.nothing": "Nothing listed yet.",
+  "follow.myToran": "My Toran",
 } as const;

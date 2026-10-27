@@ -15,6 +15,11 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { mandirKit } from "@/lib/season-kit";
+import { CopyText } from "@/components/copy-text";
+import { PosterPicture } from "@/components/poster-picture";
+import { CHANGES_DAYS, recentChanges } from "@/lib/committee-changes";
+import { weekEvents, weekMessage } from "@/lib/committee-week";
+import { posterReadingOn } from "@/lib/poster-reader";
 import { CommitteeTodo } from "@/components/committee-todo";
 import { VisitingFields } from "@/components/visiting-fields";
 import { HoursFields } from "@/components/hours-fields";
@@ -23,6 +28,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { eventCount, shortSevaShifts } from "@/lib/committee-facts";
 import type { CommitteeFacts } from "@/lib/committee-tasks";
 import { upcomingFilter, withNextStart } from "@/lib/events";
+import { feedLabel } from "@/lib/calendar-feed";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { inviteShareText, whatsAppLink } from "@/lib/share";
@@ -49,8 +55,11 @@ import {
   cancelInvite,
   changeEvent,
   inviteMember,
+  removeCalendar,
   removeMember,
+  readPosterAsCommittee,
   reviewPosterAsCommittee,
+  saveCalendar,
   updatePracticalDetails,
 } from "./actions";
 
@@ -70,7 +79,21 @@ const ERRORS: Record<string, string> = {
   "invite-member": "They're already on your committee.",
   "invite-too-many":
     "You have five invites waiting. Cancel one, or wait for them to be accepted.",
+  "calendar-empty": "Paste your calendar's address first.",
+  "calendar-address":
+    "That doesn't look like a calendar address. Copy the iCal address (it often ends in .ics) from your calendar's settings.",
   ...DUPLICATE_ERRORS,
+  readingOff:
+    "Reading posters isn't switched on yet. Please add the event below.",
+  picture: "Please choose a photo or PDF of the poster.",
+  pictureType: "Please send a JPEG, PNG, WebP or GIF photo, or a PDF.",
+  pictureSize:
+    "That file is over 4 MB. Try a smaller photo, or one page of the PDF.",
+  pictureRefused:
+    "That picture couldn't be read. Please add the event below instead.",
+  pictureFailed:
+    "The poster couldn't be read just now. Please try again, or add the event below.",
+  slow: "You've sent a few posters just now. Please wait ten minutes, or add the event below.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -92,6 +115,9 @@ const DONE: Record<string, string> = {
   uninvited: "Invite cancelled.",
   removed: "Taken off your committee.",
   joined: "Welcome. You now help run this mandir's page on Toran.",
+  calendar:
+    "Saved. Toran reads your calendar tonight, and new events will wait here for you to check.",
+  "calendar-removed": "Toran won't read your calendar any more.",
 };
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
@@ -129,6 +155,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     .maybeSingle();
   if (!admin && !(user.isToranAdmin && user.aal === "aal2")) notFound();
 
+  const { data: calendar } = await supabase!
+    .from("mandir_calendars")
+    .select("url, last_read_at, last_outcome, last_found, last_added")
+    .eq("mandir_id", mandir.id)
+    .maybeSingle();
+
   const from = `${londonDate()}T00:00:00Z`;
   const { data: rows } = await supabase!
     .from("events")
@@ -153,16 +185,36 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     return poster ? [{ id: c.id, poster }] : [];
   });
 
-  // Who runs the page, and who has been invited.
-  const [{ data: members }, { data: invites }] = await Promise.all([
-    supabase!.rpc("committee_members", { target: mandir.id }),
-    supabase!
-      .from("mandir_invites")
-      .select("id, email, expires_at")
-      .eq("mandir_id", mandir.id)
-      .gt("expires_at", new Date().toISOString())
-      .order("created_at"),
-  ]);
+  // Who runs the page, who has been invited, and what's changed lately.
+  const now = new Date();
+  const changesSince = new Date(
+    now.getTime() - CHANGES_DAYS * 86_400_000,
+  ).toISOString();
+  const [{ data: members }, { data: invites }, { data: changed }] =
+    await Promise.all([
+      supabase!.rpc("committee_members", { target: mandir.id }),
+      supabase!
+        .from("mandir_invites")
+        .select("id, email, expires_at")
+        .eq("mandir_id", mandir.id)
+        .gt("expires_at", new Date().toISOString())
+        .order("created_at"),
+      supabase!
+        .from("events")
+        .select("id, title, status, origin, created_at, created_by, updated_at")
+        .eq("mandir_id", mandir.id)
+        .gte("updated_at", changesSince)
+        .order("updated_at", { ascending: false })
+        .limit(20),
+    ]);
+  const changes = recentChanges(
+    changed ?? [],
+    user.id,
+    new Set((members ?? []).map((m) => m.user_id)),
+    now,
+  );
+  const thisWeek = weekEvents(events, now);
+  const publicUrl = `${siteUrl()}/mandirs/${mandir.slug}`;
 
   // Festivals coming up and last year's events, ready to tick.
   const today = londonDate();
@@ -272,14 +324,24 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const leftOut = skipped
     ? ` ${skipped === 1 ? "One was" : `${skipped} were`} already on your page, so ${skipped === 1 ? "it wasn't" : "they weren't"} added again.`
     : "";
+  const read = Number(query.read ?? -1);
+  const readDone =
+    read > 0
+      ? `Read ${read === 1 ? "1 event" : `${read} events`} off your poster. Check ${read === 1 ? "it" : "them"} below, then publish.`
+      : read === 0
+        ? skipped
+          ? "Everything on that poster is already on your page or waiting below."
+          : "No dated events could be read off that poster. Please add them below."
+        : null;
   const done =
-    added > 1
+    readDone ??
+    (added > 1
       ? `Added ${added} events. They're on your public page now.${leftOut}`
       : added === 1
         ? `${DONE.added}${leftOut}`
         : skipped
           ? leftOut.trim()
-          : DONE[String(query.done ?? "")];
+          : DONE[String(query.done ?? "")]);
 
   return (
     <>
@@ -301,6 +363,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               ["#upcoming", `Coming up (${events.length})`],
               ...(festivals.length ? [["#festivals", "Festivals"]] : []),
               ["#add-event", "Add an event"],
+              ...(posterReadingOn() ? [["#read-poster", "Send a poster"]] : []),
               [`/manage/${mandir.slug}/seva`, "Seva"],
               [`/manage/${mandir.slug}/numbers`, "Numbers"],
               ["#committee", "Committee"],
@@ -320,6 +383,60 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       {done && <Notice tone="success">{done}</Notice>}
 
       <CommitteeTodo facts={facts} />
+
+      {thisWeek.length > 0 && (
+        <Card>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            Send this week&apos;s events
+          </h2>
+          <p className="text-muted">
+            One message for your WhatsApp groups: the next seven days, with a
+            link to everything else.
+          </p>
+          <p className="bg-sunk rounded-2xl p-4 whitespace-pre-line">
+            {weekMessage(mandir, thisWeek, publicUrl)}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={whatsAppLink(weekMessage(mandir, thisWeek, publicUrl), "")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={pillPrimaryClass}
+            >
+              Send on WhatsApp
+            </a>
+            <CopyText
+              text={weekMessage(mandir, thisWeek, publicUrl)}
+              label="Copy the message"
+            />
+          </div>
+        </Card>
+      )}
+
+      {changes.length > 0 && (
+        <Card>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            What&apos;s changed in the last two weeks
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {changes.map((c) => (
+              <li
+                key={`${c.id}-${c.at}`}
+                className="border-line flex flex-wrap items-baseline gap-x-2 rounded-2xl border p-3"
+              >
+                <Badge tone={c.what === "Added" ? "peacock" : "marigold"}>
+                  {c.what}
+                </Badge>
+                <span className="font-semibold">{c.title}</span>
+                <span className="text-muted text-base">
+                  {c.by ? `${c.by}, ` : ""}
+                  {formatEventStart(c.at, true)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       {kit && (
         <Card>
@@ -494,6 +611,27 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             picks={lastYear}
             action={addPickedEvents}
             button="Add the ticked events"
+          />
+        </Card>
+      )}
+
+      {posterReadingOn() && (
+        <Card>
+          <h2
+            id="read-poster"
+            className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+          >
+            Have a poster? Send a photo
+          </h2>
+          <p className="text-muted">
+            Toran reads the events off it and fills them in for you. They wait
+            under &ldquo;Posters waiting for you&rdquo; until you check and
+            publish them. The photo isn&apos;t kept.
+          </p>
+          <PosterPicture
+            action={readPosterAsCommittee}
+            chosen={mandir.slug}
+            label="Photo or PDF of your poster"
           />
         </Card>
       )}
@@ -753,7 +891,99 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           </button>
         </form>
       </Card>
+
+      <CalendarCard slug={mandir.slug} calendar={calendar} />
     </>
+  );
+}
+
+// "Your events calendar": the address of the calendar the mandir already
+// keeps, which Toran reads every night (lib/nightly.ts). Its address is
+// never shown in full: Google's secret address works like a password.
+function CalendarCard({
+  slug,
+  calendar,
+}: {
+  slug: string;
+  calendar: {
+    url: string;
+    last_read_at: string | null;
+    last_outcome: string | null;
+    last_found: number | null;
+    last_added: number | null;
+  } | null;
+}) {
+  const status = !calendar
+    ? null
+    : !calendar.last_read_at
+      ? "Not read yet: Toran reads it tonight."
+      : calendar.last_outcome === "unreachable"
+        ? "Toran couldn't read it last time. Check the address still works, or paste it again."
+        : `Last read ${formatEventStart(calendar.last_read_at, true)}: ${calendar.last_found ?? 0} coming up, ${calendar.last_added ?? 0} new for you to check.`;
+  return (
+    <Card>
+      <h2 id="calendar" className="scroll-mt-24 text-xl font-bold sm:text-2xl">
+        Your events calendar
+      </h2>
+      <p>
+        Already keep your events in Google Calendar, Outlook or your
+        website&apos;s calendar? Give Toran its address and it&apos;s checked
+        every night. New events wait above with the posters for you to check, so
+        nothing goes on your page until you publish it.
+      </p>
+      {calendar && (
+        <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-4">
+          <p className="font-semibold">Reading: {feedLabel(calendar.url)}</p>
+          {status && <p className="text-muted">{status}</p>}
+          <form action={removeCalendar}>
+            <input type="hidden" name="slug" value={slug} />
+            <button type="submit" className={pillButtonClass}>
+              Stop reading it
+            </button>
+          </form>
+        </div>
+      )}
+      <form action={saveCalendar} className="flex flex-col gap-3">
+        <input type="hidden" name="slug" value={slug} />
+        <label className="flex flex-col gap-2">
+          <span className="font-semibold">
+            {calendar ? "A different calendar address" : "Calendar address"}
+          </span>
+          <input
+            name="calendar_url"
+            inputMode="url"
+            autoComplete="off"
+            placeholder="https://calendar.google.com/calendar/ical/…/basic.ics"
+            className={inputClass}
+          />
+        </label>
+        <details className="text-base">
+          <summary className="text-peacock cursor-pointer font-semibold">
+            Where do I find it?
+          </summary>
+          <ul className="text-muted mt-2 flex list-disc flex-col gap-2 pl-6">
+            <li>
+              <strong>Google Calendar</strong>, on a computer: Settings (the
+              cog), then your mandir&apos;s calendar on the left, then
+              &ldquo;Integrate calendar&rdquo;. Copy &ldquo;Public address in
+              iCal format&rdquo;, or &ldquo;Secret address in iCal format&rdquo;
+              if the calendar isn&apos;t public. Toran keeps it private.
+            </li>
+            <li>
+              <strong>Outlook</strong>: Settings, Calendar, Shared calendars,
+              Publish a calendar. Copy the ICS link.
+            </li>
+            <li>
+              <strong>Your website</strong>: look for &ldquo;Subscribe&rdquo;,
+              &ldquo;iCal&rdquo; or &ldquo;Export&rdquo; on its events page.
+            </li>
+          </ul>
+        </details>
+        <button type="submit" className={`${quietButtonClass} self-start`}>
+          Save calendar
+        </button>
+      </form>
+    </Card>
   );
 }
 

@@ -33,6 +33,8 @@ below.
    phone (pull requests 8 and 9).
 8. **Read the legal drafts** (pull request 11) before showing Toran to
    anyone outside the pilot committees.
+9. **When it's time to go live** on its own database: docs/go-live.md is
+   the checklist, in order.
 
 ---
 
@@ -460,6 +462,22 @@ add a first event, invite a colleague. Each step ticks itself off. The
 account page shows each mandir with how many things need doing and a link
 to the first.
 
+Below that:
+
+- **Send this week's events**: the next seven days as one message, with a
+  link to the mandir's page, to send on WhatsApp or copy. Shown when
+  there's something on this week.
+- **What's changed in the last two weeks**: events added (and by whom: the
+  committee, Toran, the mandir's website, a visitor's tip or a poster),
+  changed, cancelled or removed. Events you added yourself are left out.
+  Only who added an event is recorded, so changes don't say who made them.
+- **Have a poster? Send a photo**: the committee sends a photo or PDF of
+  its own poster and Claude reads the events off it, as Toran can in the
+  review queue. They wait under "Posters waiting for you" to be checked
+  and published; nothing goes on the page by itself. Only shown once
+  `ANTHROPIC_API_KEY` is set, and limited to 5 posters in 10 minutes per
+  mandir.
+
 ### Reading mandirs' websites (`/ops` → Websites)
 
 **Check** reads one mandir's website; **Check the next 5 websites** works
@@ -501,8 +519,12 @@ machine". Only files a check found for that mandir can be read.
 
 Every night at about 02:15 UTC, Vercel runs `/api/cron/nightly`. It
 deletes what the retention policy says to delete (expired invites, old
-committee requests, visit totals over three years old), then checks up to
-12 mandir websites, oldest check first, like **Check the next 5 websites**.
+committee requests, visit totals over three years old), then reads every
+mandir's own events calendar (the address a committee gives under **Your
+events calendar** on its page; kept private, as Google's secret address
+works like a password), then checks up to 12 mandir websites, oldest
+check first, like **Check the next 5 websites**. New events from both go
+to the review queue.
 `/ops` → Needs attention shows when it last ran and what it did, and warns
 if it hasn't run for a day and a half.
 
@@ -542,9 +564,51 @@ Shows what the weekly email would say: every event in the next seven days,
 by day, and festivals in the next fortnight, for the whole UK or one region.
 There's a plain-text version to copy.
 
-**Nobody receives it yet.** There's no sign-up form or subscriber list until
-Toran is registered with the ICO and the DPIA is done (decision 0006).
-Sending it for real is a later step.
+**Nobody receives it yet.** The weekly email below is built but switched
+off.
+
+### Weekly email (built, switched off)
+
+People can ask for the digest above by email every Thursday morning, for
+the whole UK or one region. It's built and tested, but **off**: the sign-up
+page (`/weekly`) doesn't exist and no address can be saved until you switch
+it on. Leave it off until both of these are done (decision 0006):
+
+- Toran is registered with the ICO (ico.org.uk, about £52 a year).
+- The DPIA (data protection impact assessment) covers the email list.
+
+What it keeps: an email address and, if chosen, a region. Nothing else. A
+sign-up is only used once it's confirmed from the email; unconfirmed ones
+are deleted after 7 days by the nightly job. "Stop these emails" in any
+email deletes the address at once, and email programs' own Unsubscribe
+button works too. Nobody can read the list, not even from `/ops`. Once an
+address is confirmed, signing it up again can't change its area (so
+nobody can change someone else's); to change area, stop and sign up again.
+
+To switch it on, in Vercel → Settings → Environment Variables (Production
+only), then redeploy:
+
+1. `RESEND_API_KEY`: from resend.com → API Keys (the same account as the
+   login emails, if you set that up). Type it in yourself.
+2. `DIGEST_FROM`: who it's from, such as `Toran <weekly@your-domain>`. The
+   domain must be verified in Resend.
+3. `DIGEST_SIGNUPS`: `on`.
+4. `CRON_SECRET` is already there from the nightly job; the unsubscribe
+   links are made from it, so **don't change it afterwards** or old links
+   stop working.
+
+Before switching on, add a paragraph like this to the privacy notice
+(`/privacy`):
+
+> **The weekly email.** If you ask for it, we keep your email address and
+> the region you chose, to send you what's on at mandirs once a week. We
+> use Resend to send it. We don't use your address for anything else or
+> share it. Every email has a link to stop it, which deletes your address
+> straight away; if you never confirm, it's deleted after 7 days.
+
+To switch it off again, set `DIGEST_SIGNUPS` to `off` and redeploy: the
+sign-up page goes and nothing more is sent, but unsubscribe links still
+work.
 
 ### Translations (`/ops` → Translations)
 

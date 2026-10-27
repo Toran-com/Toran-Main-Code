@@ -1,7 +1,7 @@
 // The weekly digest: what's on in the coming week, and festivals in the
-// next fortnight, optionally for one region. Only previewed by Toran
-// admins for now: there is no sign-up or subscriber list until ICO
-// registration and the DPIA (decision 0006).
+// next fortnight, optionally for one region. Previewed by Toran admins,
+// and sent as the weekly email (lib/weekly-send.ts), which stays off
+// until ICO registration and the DPIA (decision 0006).
 
 import type { FestivalDate } from "@/lib/directory";
 import { formatDateRange, formatEventStart, londonDate } from "@/lib/format";
@@ -84,10 +84,14 @@ function dates(digest: Digest): string {
   return `${formatDateRange(digest.start, digest.end)}${where ? ` (${where})` : ""}`;
 }
 
+// The email's subject line.
+export function digestTitle(digest: Digest): string {
+  return `What's on at mandirs: ${dates(digest)}`;
+}
+
 // The digest as plain text, for an email's text part.
 export function digestText(digest: Digest, siteUrl: string): string {
-  const title = `What's on at mandirs: ${dates(digest)}`;
-  const parts = [title];
+  const parts = [digestTitle(digest)];
   if (digest.festivals.length) {
     parts.push(
       [
