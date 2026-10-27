@@ -501,8 +501,12 @@ machine". Only files a check found for that mandir can be read.
 
 Every night at about 02:15 UTC, Vercel runs `/api/cron/nightly`. It
 deletes what the retention policy says to delete (expired invites, old
-committee requests, visit totals over three years old), then checks up to
-12 mandir websites, oldest check first, like **Check the next 5 websites**.
+committee requests, visit totals over three years old), then reads every
+mandir's own events calendar (the address a committee gives under **Your
+events calendar** on its page; kept private, as Google's secret address
+works like a password), then checks up to 12 mandir websites, oldest
+check first, like **Check the next 5 websites**. New events from both go
+to the review queue.
 `/ops` → Needs attention shows when it last ran and what it did, and warns
 if it hasn't run for a day and a half.
 
