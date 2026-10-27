@@ -185,13 +185,15 @@ async function Account({ searchParams }: PageProps<"/account">) {
           </p>
         ))}
         {mandirs.length === 0 && !claims?.length && !invites?.length && (
-          <p className="text-muted">
-            On a mandir&apos;s committee? Find it on the{" "}
-            <Link href="/mandirs" className="text-peacock underline">
-              mandir list
-            </Link>{" "}
-            and choose &ldquo;Look after this page&rdquo;.
-          </p>
+          <div className="flex flex-col gap-3">
+            <p>
+              On a mandir&apos;s committee? Choose your mandir, and once
+              we&apos;ve checked, you can update its page.
+            </p>
+            <Link href="/join/mandir" className={`${buttonClass} self-start`}>
+              Choose your mandir
+            </Link>
+          </div>
         )}
         {user.isToranAdmin && (
           <Link href="/ops" className="text-peacock font-semibold underline">

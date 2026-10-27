@@ -86,6 +86,12 @@ async function LoginForm({
         For mandir committees. Enter your email and we&apos;ll send you a link
         to log in. No password needed.
       </p>
+      <p>
+        New to Toran?{" "}
+        <Link href="/join" className="text-peacock font-semibold underline">
+          Create an account
+        </Link>
+      </p>
       {error && errors[error] && <Notice tone="error">{errors[error]}</Notice>}
       <form action={requestLoginLink} className="flex flex-col gap-4">
         <input type="hidden" name="next" value={next} />

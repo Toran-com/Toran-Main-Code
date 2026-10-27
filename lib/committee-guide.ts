@@ -7,12 +7,12 @@ export const GUIDE_PATH = "/for-mandirs/guide";
 // meets them.
 export const HANDOUT_STEPS = [
   {
-    title: "Find your mandir",
-    body: "Go to the Toran website and search for your mandir by name or town. Most UK mandirs already have a page.",
+    title: "Create an account",
+    body: "On the Toran website, go to “For mandir committees” and choose “Create an account”. Give your email: we send you a link, so there’s no password.",
   },
   {
-    title: "Choose “Look after this page”",
-    body: "Log in with your email and say what you do at the mandir. We check with the mandir, usually within a few days.",
+    title: "Choose your mandir",
+    body: "Search for your mandir by name or town (most UK mandirs already have a page) and say what you do there. We check with the mandir, usually within a few days.",
   },
   {
     title: "Add what’s coming up",

@@ -101,16 +101,17 @@ export default function CommitteeGuidePage() {
       <Section id="start">
         <Steps>
           <li>
-            <Link href="/mandirs" className="text-peacock underline">
-              Find your mandir
+            <Link href="/join" className="text-peacock underline">
+              Create an account
             </Link>{" "}
-            by name, town or postcode. Most UK mandirs already have a page with
-            their address and website.
+            with your email. We send you a link, so there&apos;s no password to
+            remember.
           </li>
           <li>
-            At the bottom of your mandir&apos;s page, choose{" "}
-            <Ui>Look after this page</Ui>. Log in with your email (we send you a
-            link, so there&apos;s no password to remember).
+            Choose your mandir by its name or town. Most UK mandirs already have
+            a page with their address and website. (You can also choose{" "}
+            <Ui>Look after this page</Ui> at the bottom of your mandir&apos;s
+            page.)
           </li>
           <li>
             Say what you do at the mandir, for example Secretary or Trustee. We
@@ -296,8 +297,8 @@ export default function CommitteeGuidePage() {
       </Section>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Link href="/mandirs" className={`${buttonClass} sm:w-auto`}>
-          Find your mandir
+        <Link href="/join" className={`${buttonClass} sm:w-auto`}>
+          Create an account
         </Link>
         <Link
           href="/for-mandirs"

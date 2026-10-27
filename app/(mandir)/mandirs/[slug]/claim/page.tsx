@@ -91,10 +91,20 @@ async function Claim({
 
   if (pending) {
     return (
-      <Notice tone="success">
-        Thank you. We&apos;ve got your request for {name}. We&apos;ll check with
-        the mandir, usually by phone, and let you know when it&apos;s approved.
-      </Notice>
+      <Card>
+        <Notice tone="success">
+          Thank you. We&apos;ve got your request for {name}. We&apos;ll check
+          with the mandir, usually by phone, and let you know when it&apos;s
+          approved.
+        </Notice>
+        <p className="text-muted">
+          Once it is, log in and your mandir&apos;s page is under{" "}
+          <Link href="/account" className="text-peacock underline">
+            Your account
+          </Link>
+          .
+        </p>
+      </Card>
     );
   }
 
@@ -106,6 +116,12 @@ async function Claim({
       <p className="text-lg">
         Committee members can keep <strong>{name}</strong>&apos;s page up to
         date: add events, correct details, and later organise seva.
+      </p>
+      <p className="text-muted">
+        Not this one?{" "}
+        <Link href="/join/mandir" className="text-peacock underline">
+          Choose another mandir
+        </Link>
       </p>
       {error && <Notice tone="error">{error}</Notice>}
       <form action={submitClaim} className="flex flex-col gap-5">

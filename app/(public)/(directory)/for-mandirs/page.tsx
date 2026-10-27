@@ -106,14 +106,23 @@ export default function ForMandirsPage() {
             for mandirs.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/mandirs" className={`${buttonClass} sm:w-auto`}>
-              Find your mandir
+            <Link href="/join" className={`${buttonClass} sm:w-auto`}>
+              Create an account
               <span aria-hidden="true">→</span>
             </Link>
             <Link href="/demo" className={quietButtonClass}>
               Try the example
             </Link>
           </div>
+          <p className="text-muted">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="text-peacock font-semibold underline"
+            >
+              Log in
+            </Link>
+          </p>
         </div>
 
         {/* A committee's home on a phone: what Toran asks of them. */}
@@ -193,14 +202,14 @@ export default function ForMandirsPage() {
               </span>
               <span className="text-xl font-semibold">
                 <Link
-                  href="/mandirs"
+                  href="/join"
                   className="text-on-night underline decoration-1 underline-offset-4"
                 >
-                  Find your mandir
+                  Create an account
                 </Link>
               </span>
               <span className="text-night-muted">
-                Most UK mandirs already have a page.
+                With your email. No password needed.
               </span>
             </li>
             <li className="border-on-night/20 flex flex-col gap-2 border-t pt-6">
@@ -210,11 +219,10 @@ export default function ForMandirsPage() {
               >
                 2
               </span>
-              <span className="text-xl font-semibold">
-                Choose &ldquo;Look after this page&rdquo;
-              </span>
+              <span className="text-xl font-semibold">Choose your mandir</span>
               <span className="text-night-muted">
-                Log in with your email. We check you&apos;re on the committee.
+                Most UK mandirs already have a page. We check you&apos;re on the
+                committee.
               </span>
             </li>
             <li className="border-on-night/20 flex flex-col gap-2 border-t pt-6">
