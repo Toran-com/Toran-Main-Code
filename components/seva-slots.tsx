@@ -12,6 +12,7 @@ import { useOrigin } from "@/components/use-origin";
 import { buttonClass } from "@/components/ui";
 import { calendarFile, googleCalendarLink } from "@/lib/ical";
 import { giveBackSlot, takeSlot, type TakeResult } from "@/lib/seva-actions";
+import { keepEnded } from "@/lib/seva-history";
 import { useT } from "@/components/use-t";
 import { enSlots } from "@/lib/i18n/client/slots";
 
@@ -59,7 +60,9 @@ function read(): MySlot[] {
 }
 
 function write(slots: MySlot[]) {
-  // Forget slots more than a week after their shift ended.
+  // Shifts that have ended go into the record of seva done (My Toran),
+  // then slots are forgotten here a week after their shift ended.
+  keepEnded(slots);
   const cutoff = Date.now() - 7 * 86_400_000;
   const kept = slots.filter((s) => Date.parse(s.ends_at) > cutoff);
   try {
@@ -77,6 +80,13 @@ function subscribe(onChange: () => void) {
     window.removeEventListener("storage", onChange);
     window.removeEventListener(CHANGED, onChange);
   };
+}
+
+// Slots saved on another phone (My Toran's "move to a new phone"), added
+// to the ones here.
+export function addSlots(slots: MySlot[]) {
+  const known = new Set(read().map((s) => s.slot));
+  write([...read(), ...slots.filter((s) => !known.has(s.slot))]);
 }
 
 export function useMySlots(): MySlot[] {

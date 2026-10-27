@@ -72,6 +72,16 @@ within one month.
   to someone on WhatsApp, the events' codes go in the page's address so
   Toran can show them, like any other link; we don't keep them. Clearing
   the plan, or the site's data in your browser, forgets it.
+- **My Toran.** My Toran puts together what your phone keeps: the mandirs
+  you follow, your plan, the seva you've done and the events you say you
+  went to (after an event in your plan, or by pressing "I went" on an
+  event's page). All of it stays on your phone; you need no account. To
+  show their names, the page sends Toran the mandirs' web addresses and
+  the events' codes, with nothing about you, and we don't keep them.
+  "Moving to a new phone" makes a link with all of it inside, in the part
+  of the address that browsers never send to a website, so it goes from
+  your phone to your new one without reaching us. "Clear everything" on
+  My Toran, or clearing the site's data in your browser, forgets it.
 - **Telling us about an event, or asking for a correction.** We keep only
   what you type into the form: the event's details, or what's wrong and on
   which page. We don't ask who you are or record your IP address, so please
