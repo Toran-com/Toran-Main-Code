@@ -542,9 +542,51 @@ Shows what the weekly email would say: every event in the next seven days,
 by day, and festivals in the next fortnight, for the whole UK or one region.
 There's a plain-text version to copy.
 
-**Nobody receives it yet.** There's no sign-up form or subscriber list until
-Toran is registered with the ICO and the DPIA is done (decision 0006).
-Sending it for real is a later step.
+**Nobody receives it yet.** The weekly email below is built but switched
+off.
+
+### Weekly email (built, switched off)
+
+People can ask for the digest above by email every Thursday morning, for
+the whole UK or one region. It's built and tested, but **off**: the sign-up
+page (`/weekly`) doesn't exist and no address can be saved until you switch
+it on. Leave it off until both of these are done (decision 0006):
+
+- Toran is registered with the ICO (ico.org.uk, about £52 a year).
+- The DPIA (data protection impact assessment) covers the email list.
+
+What it keeps: an email address and, if chosen, a region. Nothing else. A
+sign-up is only used once it's confirmed from the email; unconfirmed ones
+are deleted after 7 days by the nightly job. "Stop these emails" in any
+email deletes the address at once, and email programs' own Unsubscribe
+button works too. Nobody can read the list, not even from `/ops`. Once an
+address is confirmed, signing it up again can't change its area (so
+nobody can change someone else's); to change area, stop and sign up again.
+
+To switch it on, in Vercel → Settings → Environment Variables (Production
+only), then redeploy:
+
+1. `RESEND_API_KEY`: from resend.com → API Keys (the same account as the
+   login emails, if you set that up). Type it in yourself.
+2. `DIGEST_FROM`: who it's from, such as `Toran <weekly@your-domain>`. The
+   domain must be verified in Resend.
+3. `DIGEST_SIGNUPS`: `on`.
+4. `CRON_SECRET` is already there from the nightly job; the unsubscribe
+   links are made from it, so **don't change it afterwards** or old links
+   stop working.
+
+Before switching on, add a paragraph like this to the privacy notice
+(`/privacy`):
+
+> **The weekly email.** If you ask for it, we keep your email address and
+> the region you chose, to send you what's on at mandirs once a week. We
+> use Resend to send it. We don't use your address for anything else or
+> share it. Every email has a link to stop it, which deletes your address
+> straight away; if you never confirm, it's deleted after 7 days.
+
+To switch it off again, set `DIGEST_SIGNUPS` to `off` and redeploy: the
+sign-up page goes and nothing more is sent, but unsubscribe links still
+work.
 
 ### Translations (`/ops` → Translations)
 
