@@ -15,6 +15,11 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { mandirKit } from "@/lib/season-kit";
+import { CopyText } from "@/components/copy-text";
+import { PosterPicture } from "@/components/poster-picture";
+import { CHANGES_DAYS, recentChanges } from "@/lib/committee-changes";
+import { weekEvents, weekMessage } from "@/lib/committee-week";
+import { posterReadingOn } from "@/lib/poster-reader";
 import { CommitteeTodo } from "@/components/committee-todo";
 import { VisitingFields } from "@/components/visiting-fields";
 import { HoursFields } from "@/components/hours-fields";
@@ -50,6 +55,7 @@ import {
   changeEvent,
   inviteMember,
   removeMember,
+  readPosterAsCommittee,
   reviewPosterAsCommittee,
   updatePracticalDetails,
 } from "./actions";
@@ -71,6 +77,17 @@ const ERRORS: Record<string, string> = {
   "invite-too-many":
     "You have five invites waiting. Cancel one, or wait for them to be accepted.",
   ...DUPLICATE_ERRORS,
+  readingOff:
+    "Reading posters isn't switched on yet. Please add the event below.",
+  picture: "Please choose a photo or PDF of the poster.",
+  pictureType: "Please send a JPEG, PNG, WebP or GIF photo, or a PDF.",
+  pictureSize:
+    "That file is over 4 MB. Try a smaller photo, or one page of the PDF.",
+  pictureRefused:
+    "That picture couldn't be read. Please add the event below instead.",
+  pictureFailed:
+    "The poster couldn't be read just now. Please try again, or add the event below.",
+  slow: "You've sent a few posters just now. Please wait ten minutes, or add the event below.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -153,16 +170,36 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     return poster ? [{ id: c.id, poster }] : [];
   });
 
-  // Who runs the page, and who has been invited.
-  const [{ data: members }, { data: invites }] = await Promise.all([
-    supabase!.rpc("committee_members", { target: mandir.id }),
-    supabase!
-      .from("mandir_invites")
-      .select("id, email, expires_at")
-      .eq("mandir_id", mandir.id)
-      .gt("expires_at", new Date().toISOString())
-      .order("created_at"),
-  ]);
+  // Who runs the page, who has been invited, and what's changed lately.
+  const now = new Date();
+  const changesSince = new Date(
+    now.getTime() - CHANGES_DAYS * 86_400_000,
+  ).toISOString();
+  const [{ data: members }, { data: invites }, { data: changed }] =
+    await Promise.all([
+      supabase!.rpc("committee_members", { target: mandir.id }),
+      supabase!
+        .from("mandir_invites")
+        .select("id, email, expires_at")
+        .eq("mandir_id", mandir.id)
+        .gt("expires_at", new Date().toISOString())
+        .order("created_at"),
+      supabase!
+        .from("events")
+        .select("id, title, status, origin, created_at, created_by, updated_at")
+        .eq("mandir_id", mandir.id)
+        .gte("updated_at", changesSince)
+        .order("updated_at", { ascending: false })
+        .limit(20),
+    ]);
+  const changes = recentChanges(
+    changed ?? [],
+    user.id,
+    new Set((members ?? []).map((m) => m.user_id)),
+    now,
+  );
+  const thisWeek = weekEvents(events, now);
+  const publicUrl = `${siteUrl()}/mandirs/${mandir.slug}`;
 
   // Festivals coming up and last year's events, ready to tick.
   const today = londonDate();
@@ -272,14 +309,24 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const leftOut = skipped
     ? ` ${skipped === 1 ? "One was" : `${skipped} were`} already on your page, so ${skipped === 1 ? "it wasn't" : "they weren't"} added again.`
     : "";
+  const read = Number(query.read ?? -1);
+  const readDone =
+    read > 0
+      ? `Read ${read === 1 ? "1 event" : `${read} events`} off your poster. Check ${read === 1 ? "it" : "them"} below, then publish.`
+      : read === 0
+        ? skipped
+          ? "Everything on that poster is already on your page or waiting below."
+          : "No dated events could be read off that poster. Please add them below."
+        : null;
   const done =
-    added > 1
+    readDone ??
+    (added > 1
       ? `Added ${added} events. They're on your public page now.${leftOut}`
       : added === 1
         ? `${DONE.added}${leftOut}`
         : skipped
           ? leftOut.trim()
-          : DONE[String(query.done ?? "")];
+          : DONE[String(query.done ?? "")]);
 
   return (
     <>
@@ -301,6 +348,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               ["#upcoming", `Coming up (${events.length})`],
               ...(festivals.length ? [["#festivals", "Festivals"]] : []),
               ["#add-event", "Add an event"],
+              ...(posterReadingOn() ? [["#read-poster", "Send a poster"]] : []),
               [`/manage/${mandir.slug}/seva`, "Seva"],
               [`/manage/${mandir.slug}/numbers`, "Numbers"],
               ["#committee", "Committee"],
@@ -320,6 +368,60 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       {done && <Notice tone="success">{done}</Notice>}
 
       <CommitteeTodo facts={facts} />
+
+      {thisWeek.length > 0 && (
+        <Card>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            Send this week&apos;s events
+          </h2>
+          <p className="text-muted">
+            One message for your WhatsApp groups: the next seven days, with a
+            link to everything else.
+          </p>
+          <p className="bg-sunk rounded-2xl p-4 whitespace-pre-line">
+            {weekMessage(mandir, thisWeek, publicUrl)}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={whatsAppLink(weekMessage(mandir, thisWeek, publicUrl), "")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={pillPrimaryClass}
+            >
+              Send on WhatsApp
+            </a>
+            <CopyText
+              text={weekMessage(mandir, thisWeek, publicUrl)}
+              label="Copy the message"
+            />
+          </div>
+        </Card>
+      )}
+
+      {changes.length > 0 && (
+        <Card>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            What&apos;s changed in the last two weeks
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {changes.map((c) => (
+              <li
+                key={`${c.id}-${c.at}`}
+                className="border-line flex flex-wrap items-baseline gap-x-2 rounded-2xl border p-3"
+              >
+                <Badge tone={c.what === "Added" ? "peacock" : "marigold"}>
+                  {c.what}
+                </Badge>
+                <span className="font-semibold">{c.title}</span>
+                <span className="text-muted text-base">
+                  {c.by ? `${c.by}, ` : ""}
+                  {formatEventStart(c.at, true)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       {kit && (
         <Card>
@@ -494,6 +596,27 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             picks={lastYear}
             action={addPickedEvents}
             button="Add the ticked events"
+          />
+        </Card>
+      )}
+
+      {posterReadingOn() && (
+        <Card>
+          <h2
+            id="read-poster"
+            className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+          >
+            Have a poster? Send a photo
+          </h2>
+          <p className="text-muted">
+            Toran reads the events off it and fills them in for you. They wait
+            under &ldquo;Posters waiting for you&rdquo; until you check and
+            publish them. The photo isn&apos;t kept.
+          </p>
+          <PosterPicture
+            action={readPosterAsCommittee}
+            chosen={mandir.slug}
+            label="Photo or PDF of your poster"
           />
         </Card>
       )}

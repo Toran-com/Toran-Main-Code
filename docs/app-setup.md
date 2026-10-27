@@ -460,6 +460,22 @@ add a first event, invite a colleague. Each step ticks itself off. The
 account page shows each mandir with how many things need doing and a link
 to the first.
 
+Below that:
+
+- **Send this week's events**: the next seven days as one message, with a
+  link to the mandir's page, to send on WhatsApp or copy. Shown when
+  there's something on this week.
+- **What's changed in the last two weeks**: events added (and by whom: the
+  committee, Toran, the mandir's website, a visitor's tip or a poster),
+  changed, cancelled or removed. Only who added an event is recorded, so
+  changes don't say who made them.
+- **Have a poster? Send a photo**: the committee sends a photo or PDF of
+  its own poster and Claude reads the events off it, as Toran can in the
+  review queue. They wait under "Posters waiting for you" to be checked
+  and published; nothing goes on the page by itself. Only shown once
+  `ANTHROPIC_API_KEY` is set, and limited to 5 posters in 10 minutes per
+  mandir.
+
 ### Reading mandirs' websites (`/ops` → Websites)
 
 **Check** reads one mandir's website; **Check the next 5 websites** works

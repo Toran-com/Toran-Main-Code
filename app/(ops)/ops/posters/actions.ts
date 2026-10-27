@@ -3,11 +3,12 @@
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireToranAdmin } from "@/lib/auth";
-import { checkEvent, eventInputFrom, type EventInput } from "@/lib/event-form";
+import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { correctPoster, likenessFrom, reviewPoster } from "@/lib/poster-review";
 import { checkLink, POSTER_SOURCES, type PosterSource } from "@/lib/posters";
 import { createSessionClient } from "@/lib/supabase/session";
 import { alreadyKnown, comparableInput, knownFor } from "@/lib/duplicate-check";
+import { posterSource, queueRead } from "@/lib/poster-queue";
 import { londonDate } from "@/lib/london";
 import {
   isPosterType,
@@ -17,30 +18,6 @@ import {
 } from "@/lib/poster-reader";
 import { fetchDocument } from "@/lib/website-check";
 import { parseWebsiteEvents } from "@/lib/website-import";
-
-// One source per mandir and kind of message, reused.
-async function posterSource(
-  supabase: NonNullable<Awaited<ReturnType<typeof createSessionClient>>>,
-  mandirId: string,
-  from: PosterSource,
-): Promise<string | null> {
-  const source = POSTER_SOURCES[from];
-  const { data: existing } = await supabase
-    .from("sources")
-    .select("id")
-    .eq("mandir_id", mandirId)
-    .eq("kind", source.kind)
-    .eq("label", source.label)
-    .limit(1)
-    .maybeSingle();
-  if (existing) return existing.id;
-  const { data: created } = await supabase
-    .from("sources")
-    .insert({ mandir_id: mandirId, kind: source.kind, label: source.label })
-    .select("id")
-    .single();
-  return created?.id ?? null;
-}
 
 // Toran types up a poster or message forwarded about a mandir's event. It
 // waits in the queue for the mandir's committee to publish, or for Toran
@@ -248,50 +225,6 @@ export async function readPosterPicture(formData: FormData) {
     "",
   );
   redirect(`/ops/posters?read=${added}&skipped=${skipped}`);
-}
-
-// Events read off a poster go to the review queue, marked as read by
-// machine, apart from ones already listed, waiting or discarded (and the
-// same event twice on one poster).
-async function queueRead(
-  supabase: NonNullable<Awaited<ReturnType<typeof createSessionClient>>>,
-  mandirId: string,
-  from: PosterSource,
-  events: EventInput[],
-  link: string,
-): Promise<{ added: number; skipped: number }> {
-  const known = (await knownFor(supabase, [mandirId])).get(mandirId) ?? [];
-  const sourceId = await posterSource(supabase, mandirId, from);
-  let added = 0;
-  let skipped = 0;
-  for (const input of events) {
-    const item = comparableInput(input);
-    if (!checkEvent(input).ok || alreadyKnown(item, known)) {
-      skipped += 1;
-      continue;
-    }
-    const { error } = await supabase.from("event_claims").insert({
-      mandir_id: mandirId,
-      source_id: sourceId,
-      proposed: { ...input, from, link, read: "machine" },
-      // Lower than a typed-up poster: nobody has looked at it yet.
-      confidence: 0.4,
-    });
-    if (error) {
-      skipped += 1;
-      continue;
-    }
-    added += 1;
-    // The same event twice on one poster is queued once.
-    known.push({
-      ...item,
-      time: input.time,
-      kind: "queue",
-      id: "",
-      discarded: false,
-    });
-  }
-  return { added, skipped };
 }
 
 // A patrika or poster the website check found on a mandir's site
