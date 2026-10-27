@@ -33,6 +33,8 @@ below.
    phone (pull requests 8 and 9).
 8. **Read the legal drafts** (pull request 11) before showing Toran to
    anyone outside the pilot committees.
+9. **When it's time to go live** on its own database: docs/go-live.md is
+   the checklist, in order.
 
 ---
 
