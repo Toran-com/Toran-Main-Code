@@ -174,6 +174,7 @@ export function nightlyStatus(
   if (!run) return { state: "never" };
   const s = (run.summary ?? {}) as {
     retention?: Record<string, unknown> | null;
+    calendars?: { checked?: unknown; added?: unknown; failed?: unknown };
     websites?: { checked?: unknown; added?: unknown; failed?: unknown };
   };
   const n = (v: unknown) => (typeof v === "number" ? v : 0);
@@ -182,9 +183,13 @@ export function nightlyStatus(
     0,
   );
   const checked = n(s.websites?.checked);
-  const added = n(s.websites?.added);
-  const failed = n(s.websites?.failed);
+  const calendars = n(s.calendars?.checked);
+  const added = n(s.websites?.added) + n(s.calendars?.added);
+  const failed = n(s.websites?.failed) + n(s.calendars?.failed);
   const text = [
+    ...(calendars
+      ? [`read ${calendars} ${calendars === 1 ? "calendar" : "calendars"}`]
+      : []),
     `checked ${checked} ${checked === 1 ? "website" : "websites"}`,
     ...(failed ? [`${failed} couldn't be saved`] : []),
     `${added} new ${added === 1 ? "event" : "events"} to the review queue`,

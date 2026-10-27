@@ -9,6 +9,7 @@ import {
   listedEvents,
   matchesFor,
 } from "@/lib/duplicate-check";
+import { feedAddress } from "@/lib/calendar-feed";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
@@ -228,6 +229,56 @@ export async function updatePracticalDetails(formData: FormData) {
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");
   back("done=details");
+}
+
+// The mandir's own events calendar, read every night for new events
+// (lib/nightly.ts). A new address starts afresh: it's read tonight.
+export async function saveCalendar(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#calendar`);
+  const address = feedAddress(String(formData.get("calendar_url") ?? ""));
+  if (!address.ok) back(`error=calendar-${address.error}`);
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  const { error } = await supabase.from("mandir_calendars").upsert({
+    mandir_id: mandir.id,
+    url: address.url,
+    added_at: new Date().toISOString(),
+    last_read_at: null,
+    last_outcome: null,
+    last_found: null,
+    last_added: null,
+  });
+  if (error) back("error=failed");
+  back("done=calendar");
+}
+
+export async function removeCalendar(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#calendar`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  const { error } = await supabase
+    .from("mandir_calendars")
+    .delete()
+    .eq("mandir_id", mandir.id);
+  if (error) back("error=failed");
+  back("done=calendar-removed");
 }
 
 // The committee publishes a poster someone forwarded to Toran (which

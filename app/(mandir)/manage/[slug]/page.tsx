@@ -23,6 +23,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { eventCount, shortSevaShifts } from "@/lib/committee-facts";
 import type { CommitteeFacts } from "@/lib/committee-tasks";
 import { upcomingFilter, withNextStart } from "@/lib/events";
+import { feedLabel } from "@/lib/calendar-feed";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { inviteShareText, whatsAppLink } from "@/lib/share";
@@ -49,8 +50,10 @@ import {
   cancelInvite,
   changeEvent,
   inviteMember,
+  removeCalendar,
   removeMember,
   reviewPosterAsCommittee,
+  saveCalendar,
   updatePracticalDetails,
 } from "./actions";
 
@@ -70,6 +73,9 @@ const ERRORS: Record<string, string> = {
   "invite-member": "They're already on your committee.",
   "invite-too-many":
     "You have five invites waiting. Cancel one, or wait for them to be accepted.",
+  "calendar-empty": "Paste your calendar's address first.",
+  "calendar-address":
+    "That doesn't look like a calendar address. Copy the iCal address (it often ends in .ics) from your calendar's settings.",
   ...DUPLICATE_ERRORS,
   failed: "Something went wrong. Please try again.",
 };
@@ -92,6 +98,9 @@ const DONE: Record<string, string> = {
   uninvited: "Invite cancelled.",
   removed: "Taken off your committee.",
   joined: "Welcome. You now help run this mandir's page on Toran.",
+  calendar:
+    "Saved. Toran reads your calendar tonight, and new events will wait here for you to check.",
+  "calendar-removed": "Toran won't read your calendar any more.",
 };
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
@@ -128,6 +137,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     .eq("user_id", user.id)
     .maybeSingle();
   if (!admin && !(user.isToranAdmin && user.aal === "aal2")) notFound();
+
+  const { data: calendar } = await supabase!
+    .from("mandir_calendars")
+    .select("url, last_read_at, last_outcome, last_found, last_added")
+    .eq("mandir_id", mandir.id)
+    .maybeSingle();
 
   const from = `${londonDate()}T00:00:00Z`;
   const { data: rows } = await supabase!
@@ -753,7 +768,99 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           </button>
         </form>
       </Card>
+
+      <CalendarCard slug={mandir.slug} calendar={calendar} />
     </>
+  );
+}
+
+// "Your events calendar": the address of the calendar the mandir already
+// keeps, which Toran reads every night (lib/nightly.ts). Its address is
+// never shown in full: Google's secret address works like a password.
+function CalendarCard({
+  slug,
+  calendar,
+}: {
+  slug: string;
+  calendar: {
+    url: string;
+    last_read_at: string | null;
+    last_outcome: string | null;
+    last_found: number | null;
+    last_added: number | null;
+  } | null;
+}) {
+  const status = !calendar
+    ? null
+    : !calendar.last_read_at
+      ? "Not read yet: Toran reads it tonight."
+      : calendar.last_outcome === "unreachable"
+        ? "Toran couldn't read it last time. Check the address still works, or paste it again."
+        : `Last read ${formatEventStart(calendar.last_read_at, true)}: ${calendar.last_found ?? 0} coming up, ${calendar.last_added ?? 0} new for you to check.`;
+  return (
+    <Card>
+      <h2 id="calendar" className="scroll-mt-24 text-xl font-bold sm:text-2xl">
+        Your events calendar
+      </h2>
+      <p>
+        Already keep your events in Google Calendar, Outlook or your
+        website&apos;s calendar? Give Toran its address and it&apos;s checked
+        every night. New events wait above with the posters for you to check, so
+        nothing goes on your page until you publish it.
+      </p>
+      {calendar && (
+        <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-4">
+          <p className="font-semibold">Reading: {feedLabel(calendar.url)}</p>
+          {status && <p className="text-muted">{status}</p>}
+          <form action={removeCalendar}>
+            <input type="hidden" name="slug" value={slug} />
+            <button type="submit" className={pillButtonClass}>
+              Stop reading it
+            </button>
+          </form>
+        </div>
+      )}
+      <form action={saveCalendar} className="flex flex-col gap-3">
+        <input type="hidden" name="slug" value={slug} />
+        <label className="flex flex-col gap-2">
+          <span className="font-semibold">
+            {calendar ? "A different calendar address" : "Calendar address"}
+          </span>
+          <input
+            name="calendar_url"
+            inputMode="url"
+            autoComplete="off"
+            placeholder="https://calendar.google.com/calendar/ical/…/basic.ics"
+            className={inputClass}
+          />
+        </label>
+        <details className="text-base">
+          <summary className="text-peacock cursor-pointer font-semibold">
+            Where do I find it?
+          </summary>
+          <ul className="text-muted mt-2 flex list-disc flex-col gap-2 pl-6">
+            <li>
+              <strong>Google Calendar</strong>, on a computer: Settings (the
+              cog), then your mandir&apos;s calendar on the left, then
+              &ldquo;Integrate calendar&rdquo;. Copy &ldquo;Public address in
+              iCal format&rdquo;, or &ldquo;Secret address in iCal format&rdquo;
+              if the calendar isn&apos;t public. Toran keeps it private.
+            </li>
+            <li>
+              <strong>Outlook</strong>: Settings, Calendar, Shared calendars,
+              Publish a calendar. Copy the ICS link.
+            </li>
+            <li>
+              <strong>Your website</strong>: look for &ldquo;Subscribe&rdquo;,
+              &ldquo;iCal&rdquo; or &ldquo;Export&rdquo; on its events page.
+            </li>
+          </ul>
+        </details>
+        <button type="submit" className={`${quietButtonClass} self-start`}>
+          Save calendar
+        </button>
+      </form>
+    </Card>
   );
 }
 

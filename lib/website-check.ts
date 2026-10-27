@@ -363,6 +363,39 @@ export async function checkWebsite(
   };
 }
 
+// Reads a mandir's own events calendar, at the address its committee gave
+// (lib/calendar-feed.ts). Asked for by the mandir, so it's read like a
+// person subscribing to it would, without robots.txt, but with the same
+// care: public addresses only, a few seconds, a size limit.
+export async function readCalendar(
+  url: string,
+  now = new Date(),
+): Promise<CheckResult> {
+  const result = await fetchText(url);
+  if (!result) return unreachable();
+  if (!/BEGIN:VCALENDAR/i.test(result.text)) {
+    return {
+      outcome: "none",
+      events: [],
+      documents: [],
+      pagesRead: 1,
+      notes: ["The address answered, but not with a calendar."],
+    };
+  }
+  const events = upcoming(eventsFromIcs(result.text, result.url), now);
+  return {
+    outcome: events.length ? "found" : "none",
+    events,
+    documents: [],
+    pagesRead: 1,
+    notes: [
+      events.length
+        ? `Read the calendar: ${events.length} upcoming ${events.length === 1 ? "event" : "events"}.`
+        : "Read the calendar: nothing coming up in it.",
+    ],
+  };
+}
+
 function unreachable(): CheckResult {
   return {
     outcome: "unreachable",

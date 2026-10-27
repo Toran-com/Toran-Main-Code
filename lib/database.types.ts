@@ -191,6 +191,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"mandir_calendars": {
+                  Row: {
+                    "added_at": string,"last_added": number | null,"last_found": number | null,"last_outcome": string | null,"last_read_at": string | null,"mandir_id": string,"url": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_at"?: string,"last_added"?: number | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_read_at"?: string | null,"mandir_id": string,"url": string
+                  }
+                  Update: {
+                    "added_at"?: string,"last_added"?: number | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_read_at"?: string | null,"mandir_id"?: string,"url"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mandir_calendars_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: true
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"mandir_claims": {
                   Row: {
                     "created_at": string,"decided_at": string | null,"decided_by": string | null,"id": string,"mandir_id": string,"message": string | null,"role_at_mandir": string,"status": string,"user_id": string
