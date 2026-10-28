@@ -98,7 +98,7 @@ export function digestText(digest: Digest, siteUrl: string): string {
         "Festivals coming up",
         ...digest.festivals.map(
           (f) =>
-            `• ${f.name}: ${f.when}${f.checked ? "" : " (date not yet checked)"}`,
+            `• ${f.name}: ${f.when}${f.checked ? "" : " (date may vary: check with your mandir)"}`,
         ),
       ].join("\n"),
     );
@@ -131,7 +131,7 @@ export function digestWhatsApp(digest: Digest, siteUrl: string): string {
         "*Festivals coming up*",
         ...digest.festivals.map(
           (f) =>
-            `• ${f.name}: ${f.when}${f.checked ? "" : " (date not yet checked)"}`,
+            `• ${f.name}: ${f.when}${f.checked ? "" : " (date may vary: check with your mandir)"}`,
         ),
       ].join("\n"),
     );
@@ -179,7 +179,7 @@ export function digestHtml(digest: Digest, siteUrl: string): string {
     );
     for (const f of digest.festivals) {
       out.push(
-        `<li><a href="${escape(`${siteUrl}/festivals/${f.slug}`)}" style="${link}">${escape(f.name)}</a>: ${escape(f.when)}${f.checked ? "" : " <em>(date not yet checked)</em>"}</li>`,
+        `<li><a href="${escape(`${siteUrl}/festivals/${f.slug}`)}" style="${link}">${escape(f.name)}</a>: ${escape(f.when)}${f.checked ? "" : " <em>(date may vary: check with your mandir)</em>"}</li>`,
       );
     }
     out.push("</ul>");

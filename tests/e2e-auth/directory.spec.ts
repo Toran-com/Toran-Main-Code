@@ -48,7 +48,7 @@ test("a mandir page shows its details and an empty events list", async ({
   await expect(page).toHaveTitle(/Geeta Bhavan Leicester, Leicester/);
 });
 
-test("upcoming festival dates show, marked not yet checked", async ({
+test("upcoming festival dates show, marked as dates that may vary", async ({
   page,
 }) => {
   await page.goto("/festivals");
@@ -56,7 +56,7 @@ test("upcoming festival dates show, marked not yet checked", async ({
   // shape rather than a particular festival.
   const first = page.getByRole("article").first();
   await expect(first).toContainText(/(19|20)\d\d/);
-  await expect(first).toContainText("Date not yet checked");
+  await expect(first).toContainText("Date may vary: check with your mandir");
 });
 
 test("a festival card opens the festival's own page", async ({ page }) => {
@@ -67,7 +67,9 @@ test("a festival card opens the festival's own page", async ({ page }) => {
   await expect(page).toHaveURL(/\/festivals\/[a-z0-9-]+$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(name!);
   await expect(page.getByText(/(19|20)\d\d/).first()).toBeVisible();
-  await expect(page.getByText("Date not yet checked").first()).toBeVisible();
+  await expect(
+    page.getByText("Date may vary: check with your mandir").first(),
+  ).toBeVisible();
 });
 
 test("a mandir's print page has a QR code to its page", async ({ page }) => {

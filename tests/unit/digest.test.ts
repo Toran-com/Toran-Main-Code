@@ -132,7 +132,7 @@ describe("digestText", () => {
       "What's on at mandirs: Tue 13 Oct – Mon 19 Oct 2026",
     );
     expect(text).toContain(
-      "• Navratri: Sun 11 Oct – Mon 19 Oct 2026 (date not yet checked)",
+      "• Navratri: Sun 11 Oct – Mon 19 Oct 2026 (date may vary: check with your mandir)",
     );
     expect(text).toContain("• Dussehra: Tue 20 Oct 2026\n");
     expect(text).toContain(
@@ -189,7 +189,7 @@ describe("digestHtml", () => {
       '<a href="https://example.org/mandirs/geeta-bhavan-leicester/events/Garba night"',
     );
     expect(html).toContain('href="https://example.org/festivals/navratri"');
-    expect(html).toContain("<em>(date not yet checked)</em>");
+    expect(html).toContain("<em>(date may vary: check with your mandir)</em>");
     expect(html).not.toContain("Called off");
   });
 

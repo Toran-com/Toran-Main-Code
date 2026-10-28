@@ -21,6 +21,8 @@ import { CHANGES_DAYS, recentChanges } from "@/lib/committee-changes";
 import { weekEvents, weekMessage } from "@/lib/committee-week";
 import { posterReadingOn } from "@/lib/poster-reader";
 import { CommitteeTodo } from "@/components/committee-todo";
+import { Fold } from "@/components/fold";
+import { OpenFromHash } from "@/components/open-from-hash";
 import { VisitingFields } from "@/components/visiting-fields";
 import { HoursFields } from "@/components/hours-fields";
 import { readAartis, readSessions } from "@/lib/opening-hours";
@@ -360,9 +362,9 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         <nav aria-label="On this page">
           <ul className="flex flex-wrap gap-2">
             {[
+              ["#add-event", "Add an event"],
               ["#upcoming", `Coming up (${events.length})`],
               ...(festivals.length ? [["#festivals", "Festivals"]] : []),
-              ["#add-event", "Add an event"],
               ...(posterReadingOn() ? [["#read-poster", "Send a poster"]] : []),
               [`/manage/${mandir.slug}/seva`, "Seva"],
               [`/manage/${mandir.slug}/numbers`, "Numbers"],
@@ -379,10 +381,90 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </nav>
       </div>
 
+      <OpenFromHash />
       {error && <Notice tone="error">{error}</Notice>}
       {done && <Notice tone="success">{done}</Notice>}
 
       <CommitteeTodo facts={facts} />
+
+      <Card>
+        <h2
+          id="add-event"
+          className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+        >
+          {copy ? `Add a copy of \u201c${copy.title}\u201d` : "Add an event"}
+        </h2>
+        {copy && (
+          <p className="text-muted">
+            Everything is filled in from that event: choose the new date.{" "}
+            <Link
+              href={`/manage/${mandir.slug}#add-event`}
+              className="text-peacock font-semibold underline"
+            >
+              Start blank instead
+            </Link>
+          </p>
+        )}
+        {query.dup && lookalikes?.[0] && (
+          <p className="bg-sunk rounded-2xl p-4">
+            Already on your page:{" "}
+            <Link
+              href={`/manage/${mandir.slug}/events/${lookalikes[0].id}`}
+              className="text-peacock font-semibold underline"
+            >
+              {lookalikes[0].title},{" "}
+              {formatEventStart(lookalikes[0].starts_at, lookalikes[0].all_day)}
+            </Link>
+            . Change that one instead.
+          </p>
+        )}
+        <form
+          key={copy ? copyId : draft ? String(query.draft) : "blank"}
+          action={addEvent}
+          className="flex flex-col gap-5"
+        >
+          <input type="hidden" name="slug" value={mandir.slug} />
+          {asking.length > 0 && (
+            <div
+              role="note"
+              className="border-marigold bg-marigold/10 flex flex-col gap-2 rounded-xl border-l-4 px-4 py-3"
+            >
+              <p className="font-semibold">Is this already on your page?</p>
+              <ul className="flex flex-col gap-1">
+                {asking.map((e) => (
+                  <li key={e.id}>
+                    <Link
+                      href={`/manage/${mandir.slug}/events/${e.id}`}
+                      className="text-peacock font-semibold underline"
+                    >
+                      {e.title}
+                    </Link>
+                    , {formatEventStart(e.starts_at, e.all_day)}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-muted text-base">
+                If it&apos;s the same event, change that one instead, so
+                it&apos;s only listed once.
+              </p>
+              <label className="flex items-start gap-3 font-semibold">
+                <input
+                  type="checkbox"
+                  name="different"
+                  value={asking.map((e) => e.id).join(",")}
+                  required
+                  className="mt-1 size-5"
+                />
+                It&apos;s a different event: add it as well
+              </label>
+            </div>
+          )}
+          <EventFields gujarati kinds values={formValues} />
+          <button type="submit" className={buttonClass}>
+            Add event
+          </button>
+        </form>
+      </Card>
 
       {thisWeek.length > 0 && (
         <Card>
@@ -524,48 +606,72 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                     </p>
                   )}
                 </div>
-                <form action={changeEvent} className="flex flex-wrap gap-2">
-                  <input type="hidden" name="slug" value={mandir.slug} />
-                  <input type="hidden" name="event" value={event.id} />
-                  {event.status === "cancelled" ? (
-                    <EventButton intent="restore">
-                      It&apos;s back on
-                    </EventButton>
-                  ) : (
-                    <>
-                      <EventButton intent="confirm">Still on</EventButton>
-                      <EventButton intent="cancel">Cancel</EventButton>
-                    </>
-                  )}
+                <div className="flex flex-wrap items-start gap-2">
                   <Link
                     href={`/manage/${mandir.slug}/events/${event.id}`}
                     className={pillButtonClass}
                   >
                     Edit
                   </Link>
-                  <Link
-                    href={`/manage/${mandir.slug}?copy=${event.id}#add-event`}
-                    className={pillButtonClass}
-                  >
-                    Duplicate
-                  </Link>
-                  {event.status !== "cancelled" && (
-                    <Link
-                      href={`/manage/${mandir.slug}/seva/${event.id}`}
-                      className={pillButtonClass}
+                  <details className="group/more min-w-0 flex-1">
+                    <summary
+                      className={`${pillButtonClass} w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
                     >
-                      Seva rota
-                    </Link>
-                  )}
-                  <ConfirmButton
-                    name="intent"
-                    value="remove"
-                    question={`Remove "${event.title}" from your page?`}
-                    className={pillButtonClass}
-                  >
-                    Remove
-                  </ConfirmButton>
-                </form>
+                      More
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className="ml-1 inline-block size-5 transition-transform group-open/more:rotate-180"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </summary>
+                    <form
+                      action={changeEvent}
+                      className="bg-sunk mt-2 flex flex-wrap gap-2 rounded-2xl p-3"
+                    >
+                      <input type="hidden" name="slug" value={mandir.slug} />
+                      <input type="hidden" name="event" value={event.id} />
+                      {event.status === "cancelled" ? (
+                        <EventButton intent="restore">
+                          It&apos;s back on
+                        </EventButton>
+                      ) : (
+                        <>
+                          <EventButton intent="confirm">Still on</EventButton>
+                          <EventButton intent="cancel">Cancel</EventButton>
+                        </>
+                      )}
+                      <Link
+                        href={`/manage/${mandir.slug}?copy=${event.id}#add-event`}
+                        className={pillButtonClass}
+                      >
+                        Duplicate
+                      </Link>
+                      {event.status !== "cancelled" && (
+                        <Link
+                          href={`/manage/${mandir.slug}/seva/${event.id}`}
+                          className={pillButtonClass}
+                        >
+                          Seva rota
+                        </Link>
+                      )}
+                      <ConfirmButton
+                        name="intent"
+                        value="remove"
+                        question={`Remove "${event.title}" from your page?`}
+                        className={pillButtonClass}
+                      >
+                        Remove
+                      </ConfirmButton>
+                    </form>
+                  </details>
+                </div>
               </li>
             ))}
           </ul>
@@ -578,13 +684,11 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       </section>
 
       {festivals.length > 0 && (
-        <Card>
-          <h2
-            id="festivals"
-            className="scroll-mt-24 text-xl font-bold sm:text-2xl"
-          >
-            Festivals coming up
-          </h2>
+        <Fold
+          id="festivals"
+          title="Festivals coming up"
+          hint={`${festivals.length} you could add in a few taps`}
+        >
           <p className="text-muted">
             Tick the ones your mandir is celebrating, change the name or add a
             start time if you like, and add them all at once.
@@ -595,12 +699,15 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             action={addPickedEvents}
             button="Add the ticked festivals"
           />
-        </Card>
+        </Fold>
       )}
 
       {lastYear.length > 0 && (
-        <Card>
-          <h2 className="text-xl font-bold sm:text-2xl">Again this year?</h2>
+        <Fold
+          id="again"
+          title="Again this year?"
+          hint={`${lastYear.length} from this time last year`}
+        >
           <p className="text-muted">
             Your events from this time last year, moved to this year&apos;s
             dates. Festival events follow this year&apos;s festival date. Check
@@ -612,17 +719,11 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             action={addPickedEvents}
             button="Add the ticked events"
           />
-        </Card>
+        </Fold>
       )}
 
       {posterReadingOn() && (
-        <Card>
-          <h2
-            id="read-poster"
-            className="scroll-mt-24 text-xl font-bold sm:text-2xl"
-          >
-            Have a poster? Send a photo
-          </h2>
+        <Fold id="read-poster" title="Have a poster? Send a photo">
           <p className="text-muted">
             Toran reads the events off it and fills them in for you. They wait
             under &ldquo;Posters waiting for you&rdquo; until you check and
@@ -633,95 +734,17 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             chosen={mandir.slug}
             label="Photo or PDF of your poster"
           />
-        </Card>
+        </Fold>
       )}
 
-      <Card>
-        <h2
-          id="add-event"
-          className="scroll-mt-24 text-xl font-bold sm:text-2xl"
-        >
-          {copy ? `Add a copy of \u201c${copy.title}\u201d` : "Add an event"}
-        </h2>
-        {copy && (
-          <p className="text-muted">
-            Everything is filled in from that event: choose the new date.{" "}
-            <Link
-              href={`/manage/${mandir.slug}#add-event`}
-              className="text-peacock font-semibold underline"
-            >
-              Start blank instead
-            </Link>
-          </p>
+      <Fold
+        id="committee"
+        title="Your committee on Toran"
+        hint={`${(members ?? []).length} on Toran${invites?.length ? `, ${invites.length} invited` : ""}`}
+        open={["invited", "uninvited", "removed", "joined"].includes(
+          String(query.done ?? ""),
         )}
-        {query.dup && lookalikes?.[0] && (
-          <p className="bg-sunk rounded-2xl p-4">
-            Already on your page:{" "}
-            <Link
-              href={`/manage/${mandir.slug}/events/${lookalikes[0].id}`}
-              className="text-peacock font-semibold underline"
-            >
-              {lookalikes[0].title},{" "}
-              {formatEventStart(lookalikes[0].starts_at, lookalikes[0].all_day)}
-            </Link>
-            . Change that one instead.
-          </p>
-        )}
-        <form
-          key={copy ? copyId : draft ? String(query.draft) : "blank"}
-          action={addEvent}
-          className="flex flex-col gap-5"
-        >
-          <input type="hidden" name="slug" value={mandir.slug} />
-          {asking.length > 0 && (
-            <div
-              role="note"
-              className="border-marigold bg-marigold/10 flex flex-col gap-2 rounded-xl border-l-4 px-4 py-3"
-            >
-              <p className="font-semibold">Is this already on your page?</p>
-              <ul className="flex flex-col gap-1">
-                {asking.map((e) => (
-                  <li key={e.id}>
-                    <Link
-                      href={`/manage/${mandir.slug}/events/${e.id}`}
-                      className="text-peacock font-semibold underline"
-                    >
-                      {e.title}
-                    </Link>
-                    , {formatEventStart(e.starts_at, e.all_day)}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-muted text-base">
-                If it&apos;s the same event, change that one instead, so
-                it&apos;s only listed once.
-              </p>
-              <label className="flex items-start gap-3 font-semibold">
-                <input
-                  type="checkbox"
-                  name="different"
-                  value={asking.map((e) => e.id).join(",")}
-                  required
-                  className="mt-1 size-5"
-                />
-                It&apos;s a different event: add it as well
-              </label>
-            </div>
-          )}
-          <EventFields gujarati kinds values={formValues} />
-          <button type="submit" className={buttonClass}>
-            Add event
-          </button>
-        </form>
-      </Card>
-
-      <Card>
-        <h2
-          id="committee"
-          className="scroll-mt-24 text-xl font-bold sm:text-2xl"
-        >
-          Your committee on Toran
-        </h2>
+      >
         <p className="text-muted">
           Everyone here can add and change your mandir&apos;s events. Invite a
           colleague so you&apos;re not the only one.
@@ -820,12 +843,17 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             Invite
           </button>
         </form>
-      </Card>
+      </Fold>
 
-      <Card>
-        <h2 id="details" className="scroll-mt-24 text-xl font-bold sm:text-2xl">
-          Your mandir&apos;s details
-        </h2>
+      <Fold
+        id="details"
+        title="Your mandir's details"
+        hint="Postcode, website, opening times, visiting"
+        // Open again after saving, or to fix what wasn't saved.
+        open={
+          query.done === "details" || String(query.error ?? "") in FORM_ERRORS
+        }
+      >
         <p className="text-muted">
           Shown on your public page. To change the mandir&apos;s name or town,
           ask Toran.
@@ -890,9 +918,15 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             Save details
           </button>
         </form>
-      </Card>
+      </Fold>
 
-      <CalendarCard slug={mandir.slug} calendar={calendar} />
+      <CalendarCard
+        slug={mandir.slug}
+        calendar={calendar}
+        open={["calendar", "calendar-removed"].includes(
+          String(query.done ?? ""),
+        )}
+      />
     </>
   );
 }
@@ -903,8 +937,11 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
 function CalendarCard({
   slug,
   calendar,
+  open,
 }: {
   slug: string;
+  // Open again after saving or removing it.
+  open: boolean;
   calendar: {
     url: string;
     last_read_at: string | null;
@@ -921,10 +958,16 @@ function CalendarCard({
         ? "Toran couldn't read it last time. Check the address still works, or paste it again."
         : `Last read ${formatEventStart(calendar.last_read_at, true)}: ${calendar.last_found ?? 0} coming up, ${calendar.last_added ?? 0} new for you to check.`;
   return (
-    <Card>
-      <h2 id="calendar" className="scroll-mt-24 text-xl font-bold sm:text-2xl">
-        Your events calendar
-      </h2>
+    <Fold
+      id="calendar"
+      title="Your events calendar"
+      open={open}
+      hint={
+        calendar
+          ? `Reading ${feedLabel(calendar.url)}`
+          : "Google Calendar, Outlook or your website"
+      }
+    >
       <p>
         Already keep your events in Google Calendar, Outlook or your
         website&apos;s calendar? Give Toran its address and it&apos;s checked
@@ -983,7 +1026,7 @@ function CalendarCard({
           Save calendar
         </button>
       </form>
-    </Card>
+    </Fold>
   );
 }
 

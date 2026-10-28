@@ -32,11 +32,11 @@ test("a committee plans a seva rota and volunteers take slots", async ({
   await page.getByRole("button", { name: "Add event" }).click();
   await expect(page.getByText("Added.")).toBeVisible();
 
-  await page
+  const diwali = page
     .getByRole("listitem")
-    .filter({ hasText: "Diwali celebrations" })
-    .getByRole("link", { name: "Seva rota" })
-    .click();
+    .filter({ hasText: "Diwali celebrations" });
+  await diwali.getByText("More", { exact: true }).click();
+  await diwali.getByRole("link", { name: "Seva rota" }).click();
   await expect(page.getByText("Diwali celebrations")).toBeVisible();
 
   await page.getByLabel("Role", { exact: true }).fill("Kitchen");

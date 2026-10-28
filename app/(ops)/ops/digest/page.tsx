@@ -161,7 +161,9 @@ async function DigestPreview({ searchParams }: PageProps<"/ops/digest">) {
                   </Link>
                   <span>{f.when}</span>
                   {!f.checked && (
-                    <Badge tone="marigold">Date not yet checked</Badge>
+                    <Badge tone="marigold">
+                      Date may vary: check with your mandir
+                    </Badge>
                   )}
                 </li>
               ))}

@@ -215,11 +215,12 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
 
   // Cancelling shows on the public page too.
   await member.goto(`/manage/${SLUG}`);
-  await member
+  const annakut = member
     .getByRole("listitem")
-    .filter({ hasText: "Annakut darshan" })
-    .getByRole("button", { name: "Cancel" })
-    .click();
+    .filter({ hasText: "Annakut darshan" });
+  // Everything but Edit is under More.
+  await annakut.getByText("More", { exact: true }).click();
+  await annakut.getByRole("button", { name: "Cancel" }).click();
   await expect(member.getByText("Marked as cancelled")).toBeVisible();
   await member.goto(`/mandirs/${SLUG}`);
   await expect(
@@ -230,8 +231,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     member.getByText("The mandir has cancelled this event."),
   ).toBeVisible();
 
-  // The committee corrects its own details.
+  // The committee corrects its own details, which fold away until wanted.
   await member.goto(`/manage/${SLUG}`);
+  await member.getByText("Your mandir's details").click();
   await member
     .getByLabel("Website")
     .fill("krishnatemple-leicester.example.org");
@@ -318,11 +320,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     asked = dialog.message();
     void dialog.accept();
   });
-  await member
+  const removing = member
     .getByRole("listitem")
-    .filter({ hasText: "Annakut darshan" })
-    .getByRole("button", { name: "Remove" })
-    .click();
+    .filter({ hasText: "Annakut darshan" });
+  await removing.getByText("More", { exact: true }).click();
+  await removing.getByRole("button", { name: "Remove" }).click();
   await expect(member.getByText("Removed from your page.")).toBeVisible();
   expect(asked).toContain("Annakut darshan");
 });

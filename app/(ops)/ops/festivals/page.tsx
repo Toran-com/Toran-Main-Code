@@ -49,7 +49,7 @@ async function FestivalDates({ searchParams }: PageProps<"/ops/festivals">) {
       <p className="text-muted">
         Check each date against a published panchang for London, then mark it
         checked and say where you checked it. Checked dates lose the &ldquo;Date
-        not yet checked&rdquo; label on the public site.
+        may vary: check with your mandir&rdquo; label on the public site.
       </p>
       {query.error === "source" && (
         <Notice tone="error">

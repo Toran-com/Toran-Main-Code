@@ -105,7 +105,7 @@ export const gu: Record<MessageKey, string> = {
   "event.cancelled": "રદ",
 
   "festival.all": "← બધા તહેવારો",
-  "festival.dateNotChecked": "તારીખ હજી ચકાસાઈ નથી",
+  "festival.dateNotChecked": "તારીખ બદલાઈ શકે: તમારા મંદિરને પૂછો",
   "festival.noDate": "હજી કોઈ આગામી તારીખ નોંધાયેલ નથી.",
   "festival.atMandirs": "મંદિરોમાં {name}",
   "festival.noEvents": "હજી સુધી કોઈ મંદિરે {name}ના કાર્યક્રમો નોંધાવ્યા નથી.",
