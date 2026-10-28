@@ -131,7 +131,6 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       region={region}
       keep={keep.toString()}
       pick={query.pick === "1"}
-      ask
     />
   );
 

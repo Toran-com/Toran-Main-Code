@@ -8,10 +8,10 @@ import {
   Card,
   Loading,
   Notice,
-  PageShell,
   pillButtonClass,
   pillPrimaryClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { LOCALES } from "@/lib/i18n";
 import { pageTitle } from "@/lib/site";

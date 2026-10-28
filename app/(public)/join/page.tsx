@@ -7,9 +7,9 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { getCurrentUser } from "@/lib/auth";
 import { readSupabaseEnv } from "@/lib/env";
 import { pageTitle } from "@/lib/site";

@@ -8,9 +8,9 @@ import {
   Card,
   Loading,
   Notice,
-  PageShell,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { formatEventStart, websiteLabel } from "@/lib/format";
 import { pageTitle } from "@/lib/site";

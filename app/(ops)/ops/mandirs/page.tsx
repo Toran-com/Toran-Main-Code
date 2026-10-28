@@ -3,12 +3,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { OpsNav } from "@/components/ops-nav";
 import { Badge } from "@/components/public-shell";
-import {
-  inputClass,
-  Loading,
-  PageShell,
-  quietButtonClass,
-} from "@/components/ui";
+import { inputClass, Loading, quietButtonClass } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { matchesSearch } from "@/lib/format";
 import { pageTitle } from "@/lib/site";

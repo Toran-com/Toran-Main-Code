@@ -7,10 +7,10 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
   pillPrimaryClass,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { getCurrentUser } from "@/lib/auth";
 import { listMandirs } from "@/lib/directory";
 import { findMandirs } from "@/lib/join";

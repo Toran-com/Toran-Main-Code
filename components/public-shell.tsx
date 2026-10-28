@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Notice } from "@/components/ui";
+import { AccountLink } from "@/components/account-link";
 import { InstallApp } from "@/components/install-app";
 import { DisplaySettings } from "@/components/display-settings";
 import { LanguageSwitch } from "@/components/language-switch";
@@ -84,6 +85,10 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               </svg>
             </Link>
             <MyToranLink label={t("shell.my")} href={localePath("/my")} />
+            <AccountLink
+              logIn={t("shell.logIn")}
+              account={t("shell.account")}
+            />
             <DisplaySettings />
             {languages.length > 1 && <LanguageSwitch languages={languages} />}
             <Link

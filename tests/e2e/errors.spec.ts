@@ -20,3 +20,21 @@ test("the Sentry test route throws outside the live site", async ({
   const response = await request.get("/api/debug/error");
   expect(response.status()).toBe(500);
 });
+
+test("login and not-found pages have the full header, with a way to log in", async ({
+  page,
+}) => {
+  for (const path of ["/login", "/no-such-page"]) {
+    await page.goto(path);
+    await expect(
+      page.getByRole("link", { name: "My Toran" }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Search" })).toBeVisible();
+  }
+  await page.goto("/");
+  await page.getByRole("link", { name: "Committee log in" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(
+    page.getByRole("link", { name: "Committee log in" }),
+  ).toHaveAttribute("aria-current", "page");
+});

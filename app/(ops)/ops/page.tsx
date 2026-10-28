@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
-import {
-  Card,
-  Loading,
-  Notice,
-  PageShell,
-  quietButtonClass,
-} from "@/components/ui";
+import { Card, Loading, Notice, quietButtonClass } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { OpsNav } from "@/components/ops-nav";
 import { getCurrentUser } from "@/lib/auth";
 import { pageTitle } from "@/lib/site";

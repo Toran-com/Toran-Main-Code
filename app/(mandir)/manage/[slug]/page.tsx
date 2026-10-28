@@ -9,11 +9,11 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
   pillButtonClass,
   pillPrimaryClass,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { mandirKit } from "@/lib/season-kit";
 import { CopyText } from "@/components/copy-text";
 import { PosterPicture } from "@/components/poster-picture";
@@ -350,8 +350,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           <p className="text-xl font-semibold">
             {mandir.name}, {mandir.town}
           </p>
+          {/* Not prefetched: the committee changes this page from here,
+              and a background fetch at the same moment could keep the
+              version from before. */}
           <Link
             href={`/mandirs/${mandir.slug}`}
+            prefetch={false}
             className="text-peacock w-fit font-semibold underline"
           >
             See your public page

@@ -1,15 +1,21 @@
 import { expect, test } from "@playwright/test";
 
-// "Where are you?" on What's on: asked the first time, answered with the
-// browser's location (turned into the nearest postcode district by the
+// "Where are you?" on What's on: opened with "Find near me" (never by
+// itself, so the events come first), answered with the browser's location (turned into the nearest postcode district by the
 // browser at postcodes.io, faked here), a postcode or all of the UK, and
 // remembered on the phone.
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test("asks on the first visit, and remembers a postcode", async ({ page }) => {
+test("doesn't ask by itself; Find near me does, and a postcode is remembered", async ({
+  page,
+}) => {
   await page.goto("/whats-on");
   const ask = page.getByRole("dialog", { name: "Where are you?" });
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await page.waitForTimeout(500);
+  await expect(ask).toBeHidden();
+  await page.getByRole("link", { name: "Find near me" }).click();
   await expect(ask).toBeVisible();
   await ask.getByLabel("Your postcode").fill("le4 6ar");
   await ask.getByLabel("Within").selectOption("30");
@@ -25,10 +31,11 @@ test("asks on the first visit, and remembers a postcode", async ({ page }) => {
 });
 
 test("all of the UK isn't asked again", async ({ page }) => {
-  await page.goto("/whats-on");
+  await page.goto("/whats-on?pick=1");
   const ask = page.getByRole("dialog", { name: "Where are you?" });
   await ask.getByRole("link", { name: "Show all of the UK" }).click();
   await expect(ask).toBeHidden();
+  await expect(page).toHaveURL(/\/whats-on$/);
   await page.reload();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.waitForTimeout(500);
@@ -40,19 +47,18 @@ test("all of the UK isn't asked again", async ({ page }) => {
 });
 
 test("closing it counts as an answer", async ({ page }) => {
-  await page.goto("/whats-on");
+  await page.goto("/whats-on?pick=1");
   const ask = page.getByRole("dialog", { name: "Where are you?" });
   await ask.getByRole("button", { name: "Close" }).click();
   await expect(ask).toBeHidden();
+  await expect(page).not.toHaveURL(/pick=1/);
   await page.reload();
   await page.waitForTimeout(500);
   await expect(ask).toBeHidden();
 });
 
 test("a link can open it (?pick=1)", async ({ page }) => {
-  await page.goto("/whats-on");
   const ask = page.getByRole("dialog", { name: "Where are you?" });
-  await ask.getByRole("link", { name: "Show all of the UK" }).click();
   await page.goto("/whats-on?type=festival&pick=1");
   // It's in the page from the start, and becomes a pop-up (which Escape
   // closes) once the page has loaded.
@@ -76,7 +82,7 @@ test.describe("with location allowed", () => {
         json: { status: 200, result: [{ outcode: "LE4" }] },
       });
     });
-    await page.goto("/whats-on?type=festival");
+    await page.goto("/whats-on?type=festival&pick=1");
     const ask = page.getByRole("dialog", { name: "Where are you?" });
     await ask.getByLabel("Within").selectOption("30");
     await ask.getByRole("button", { name: "Use my location" }).click();
@@ -93,12 +99,12 @@ test.describe("with location allowed", () => {
     await page.route("https://api.postcodes.io/outcodes?**", (route) =>
       route.fulfill({ json: { status: 200, result: null } }),
     );
-    await page.goto("/whats-on");
+    await page.goto("/whats-on?pick=1");
     await page.getByRole("button", { name: "Use my location" }).click();
     await expect(
       page.getByText("We couldn't find your area just now."),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/whats-on$/);
+    expect(page.url()).not.toContain("near=");
   });
 });
 
@@ -114,7 +120,7 @@ test("says so when the browser won't share a location", async ({ page }) => {
         message: "denied",
       } as GeolocationPositionError);
   });
-  await page.goto("/whats-on");
+  await page.goto("/whats-on?pick=1");
   await page.getByRole("button", { name: "Use my location" }).click();
   await expect(
     page.getByText("Your browser didn't share your location."),

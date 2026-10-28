@@ -214,6 +214,8 @@ export const en = {
   "event.cost": "Cost",
   "event.fromMandir": "From the mandir",
   "shell.my": "My Toran",
+  "shell.logIn": "Committee log in",
+  "shell.account": "Your account",
   "my.title": "My Toran",
   "my.description":
     "The mandirs you follow, your plan, seva and past events, together on your phone.",

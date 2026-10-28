@@ -7,8 +7,8 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { readSupabaseEnv } from "@/lib/env";
 import { safeNextPath } from "@/lib/redirect";
 import { pageTitle } from "@/lib/site";

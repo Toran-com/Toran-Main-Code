@@ -7,9 +7,9 @@ import {
   Card,
   Loading,
   Notice,
-  PageShell,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { getCurrentUser } from "@/lib/auth";
 import { loadCommitteeFacts } from "@/lib/committee-facts";
 import {
