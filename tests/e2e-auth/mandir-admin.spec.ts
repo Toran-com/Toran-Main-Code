@@ -77,6 +77,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   );
   await expect(event).toContainText("Festival");
   await expect(event).toContainText("Confirmed by the mandir");
+  await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
   const eventId = (await event.getAttribute("id"))!.replace(/^event-/, "");
   const eventPage = `/mandirs/${SLUG}/events/${eventId}`;
 
@@ -138,7 +139,6 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   const feedText = await feed.text();
   expect(feedText).toContain("SUMMARY:Annakut darshan");
   expect(feedText).not.toContain("VALARM");
-  await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
 
   // And on What's on, under the mandir's name.
   await member.goto("/whats-on");
