@@ -146,6 +146,7 @@ export const hi: Record<MessageKey, string> = {
   "mandir.lookAfterBody":
     "इस पेज की देखभाल करें: एक मिनट में कार्यक्रम जोड़ें और कोई भी जानकारी सुधारें।",
   "mandir.lookAfter": "इस पेज की देखभाल करें",
+  "mandir.more": "और",
   "mandir.tradition": "परंपरा",
   "mandir.postcode": "पोस्टकोड",
   "mandir.directions": "रास्ता",
@@ -176,6 +177,7 @@ export const hi: Record<MessageKey, string> = {
   "plan.notShown":
     "नहीं दिखाए गए: {count} और, जो ख़त्म हो चुके हैं या अब Toran पर नहीं हैं।",
   "visit.title": "दर्शन के लिए जाना",
+  "visit.more": "जाने के बारे में और →",
   "visit.access": "अंदर आना और घूमना",
   "visit.food": "भोजन",
   "visit.step_free": "बिना सीढ़ी का रास्ता",

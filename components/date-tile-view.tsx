@@ -54,3 +54,41 @@ export function DateTileView({
     </span>
   );
 }
+
+// In lists already grouped by day, where the date would only repeat the
+// heading: the time on the same tile, "7:30" over "pm", or "All day".
+export function TimeTileView({
+  parts,
+  label,
+}: {
+  // Null for all-day events.
+  parts: { clock: string; part: string } | null;
+  // The time in words, read out in place of the tile.
+  label: string;
+}) {
+  return (
+    <span className="bg-tile border-tile-line text-ink flex min-h-[5.25rem] w-[4.25rem] shrink-0 flex-col items-center justify-center self-start rounded-2xl border px-1 py-2 text-center sm:w-20">
+      <span className="sr-only">{label}</span>
+      {parts ? (
+        <>
+          <span
+            aria-hidden="true"
+            className={`font-display ${parts.clock.length > 2 ? "text-[1.625rem] leading-[1.75rem] sm:text-[1.875rem] sm:leading-[2rem]" : "text-[2.25rem] leading-[2.125rem] sm:text-[2.5rem] sm:leading-[2.375rem]"}`}
+          >
+            {parts.clock}
+          </span>
+          <span
+            aria-hidden="true"
+            className="text-date text-base leading-snug font-bold"
+          >
+            {parts.part}
+          </span>
+        </>
+      ) : (
+        <span aria-hidden="true" className="text-base leading-snug font-bold">
+          {label}
+        </span>
+      )}
+    </span>
+  );
+}

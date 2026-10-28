@@ -9,7 +9,7 @@ import { Toran } from "@/components/ornaments";
 import { RememberPlace } from "@/components/remember-place";
 import { YourMandirs, type MandirBrief } from "@/components/your-mandirs";
 import { SiteFooter, SiteHeader, wideClass } from "@/components/public-shell";
-import { buttonClass } from "@/components/ui";
+import { buttonClass, quietButtonClass } from "@/components/ui";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
 import { EVENT_KINDS, kindLabel } from "@/lib/event-kinds";
 import { formatDateRange, formatEventStart } from "@/lib/format";
@@ -357,6 +357,13 @@ async function ComingUp({
       <EventList
         events={nearby.length ? nearby : nearTo(published.slice(0, 5), null, 0)}
       />
+      {/* Only the next five here; the rest is one tap away at the end too. */}
+      <Link
+        href={localePath(nearby.length ? `/whats-on?${params}` : "/whats-on")}
+        className={`${quietButtonClass} self-start no-underline`}
+      >
+        {t("home.seeAll")} →
+      </Link>
       {nearby.length > 0 && (
         <p className="text-muted text-base">{POSTCODE_CREDIT}</p>
       )}

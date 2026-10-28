@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
-import { EventActions } from "@/components/event-actions";
 import { FollowButton } from "@/components/follow";
 import { CallAndDirections, directionsTo } from "@/components/call-directions";
 import { GlobeIcon } from "@/components/icons";
@@ -31,7 +30,7 @@ import {
 } from "@/lib/format";
 import { readingText } from "@/lib/read-aloud";
 import { describeRule } from "@/lib/recurrence";
-import { eventPath, eventShareText } from "@/lib/share";
+import { eventPath } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData, mandirData } from "@/lib/structured-data";
 import { regionKey } from "@/lib/i18n/client/mandirs";
@@ -104,9 +103,12 @@ export default async function MandirPage({
           {t("mandir.all")}
         </Link>
         <div className="rise relative flex max-w-4xl flex-col gap-4">
-          <h1 className="font-display text-5xl leading-[1.02] tracking-tight sm:text-7xl">
-            {mandir.name}
-          </h1>
+          <div className="flex flex-wrap items-start gap-x-4 gap-y-3 sm:gap-x-6">
+            <h1 className="font-display min-w-0 flex-1 text-5xl leading-[1.02] tracking-tight sm:text-7xl">
+              {mandir.name}
+            </h1>
+            <FollowButton slug={mandir.slug} beside />
+          </div>
           <p className="text-muted flex flex-wrap items-center gap-x-4 gap-y-2 text-lg sm:text-xl">
             <span>
               {mandir.town}, {regionName(mandir.region)}
@@ -121,10 +123,6 @@ export default async function MandirPage({
           </p>
           <OpenNowBadge hours={mandir.opening_hours} />
           <QuickLinks mandir={mandir} />
-          <div className="flex flex-wrap items-start gap-3">
-            <FollowButton slug={mandir.slug} />
-            <ReadAloud text={spokenMandir(mandir)} />
-          </div>
         </div>
       </header>
 
@@ -150,36 +148,28 @@ export default async function MandirPage({
           ) : (
             <NoEvents website={mandir.website} />
           )}
-          <div className="flex flex-wrap gap-x-6 gap-y-2 pt-6">
-            <Link
-              href={localePath(`/mandirs/${mandir.slug}/tell-us`)}
-              className="text-peacock font-semibold"
-            >
-              {t("mandir.tellUs")}
-            </Link>
-            <Link
-              href={localePath("/festivals")}
-              className="text-peacock font-semibold"
-            >
-              {t("mandir.festivalDates")}
-            </Link>
-            {mandir.events.length > 0 && (
-              <Link
-                href={localePath(`/mandirs/${mandir.slug}/print`)}
-                className="text-peacock font-semibold"
-              >
-                {t("mandir.print")}
-              </Link>
-            )}
-            {kit && (
-              <Link
-                href={`/mandirs/${mandir.slug}/kit/${kit.season.slug}`}
-                className="text-peacock font-semibold"
-              >
-                {t("mandir.kit", { period: seasonText(kit.season).period })}
-              </Link>
-            )}
-          </div>
+          <More
+            links={[
+              {
+                href: localePath(`/mandirs/${mandir.slug}/tell-us`),
+                label: t("mandir.tellUs"),
+              },
+              mandir.events.length > 0 && {
+                href: localePath(`/mandirs/${mandir.slug}/print`),
+                label: t("mandir.print"),
+              },
+              kit && {
+                href: `/mandirs/${mandir.slug}/kit/${kit.season.slug}`,
+                label: t("mandir.kit", {
+                  period: seasonText(kit.season).period,
+                }),
+              },
+              {
+                href: localePath("/festivals"),
+                label: t("mandir.festivalDates"),
+              },
+            ]}
+          />
         </section>
 
         <aside className="flex min-w-0 flex-[1_1_20rem] flex-col gap-8">
@@ -334,13 +324,14 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
 }
 
 // The things people most often want, in one tap: directions and a call
-// as big buttons, then the mandir's own website or sharing the page.
+// as big buttons, then one row for the mandir's own website, sharing the
+// page and hearing it read aloud.
 function QuickLinks({ mandir }: { mandir: MandirDetails }) {
   const t = pageT();
   return (
     <div className="flex flex-col gap-3 pt-1">
       <CallAndDirections mandir={mandir} />
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-start gap-2">
         {mandir.website && (
           <a href={mandir.website} rel="noopener" className={actionPillClass}>
             <GlobeIcon />
@@ -351,14 +342,17 @@ function QuickLinks({ mandir }: { mandir: MandirDetails }) {
           label={t("mandir.share")}
           text={t("mandir.shareText", { name: mandir.name, town: mandir.town })}
           path={localePath(`/mandirs/${mandir.slug}`)}
+          copy={false}
         />
+        <ReadAloud text={spokenMandir(mandir)} />
       </div>
     </div>
   );
 }
 
-// One of the mandir's events as a row: its date tile, the details from
-// the patrika, and buttons to add it to a calendar or share it.
+// One of the mandir's events as a tidy row: its date tile, name, time,
+// a line of what it is and its badges. The whole row opens the event's
+// page, which has the calendar, sharing and plan buttons.
 function EventRow({
   event,
   mandir,
@@ -369,6 +363,7 @@ function EventRow({
   const t = pageT();
   const cancelled = event.status === "cancelled";
   const rule = event.recurrence && describeRule(event.recurrence);
+  const kind = kindLabel(event.kind);
   const confirmed =
     event.confirmed_at &&
     t("mandir.confirmedOn", {
@@ -378,28 +373,29 @@ function EventRow({
         month: "short",
       }).format(new Date(event.confirmed_at)),
     });
+  const summary = (pageLocale() === "gu" && event.summary_gu) || event.summary;
   return (
     <article
       id={`event-${event.id}`}
-      className="flex scroll-mt-28 gap-4 py-6 sm:gap-6"
+      className="has-card-link group flex scroll-mt-28 gap-4 py-5 sm:gap-6 sm:py-6"
     >
       <DateTile
         date={event.next_starts_at}
         label={formatEventStart(event.next_starts_at, true)}
       />
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         <h3
           className={`text-xl leading-snug font-semibold ${cancelled ? "line-through" : ""}`}
         >
           <Link
             href={localePath(eventPath(mandir.slug, event.id))}
-            className="hover:text-peacock no-underline hover:underline"
+            className="card-link group-hover:text-peacock no-underline"
           >
             {event.title}
           </Link>
         </h3>
         {event.title_gu && (
-          <p lang="gu" className="-mt-1 text-lg font-semibold">
+          <p lang="gu" className="font-semibold">
             {event.title_gu}
           </p>
         )}
@@ -408,36 +404,25 @@ function EventRow({
             ? `${t("event.repeatNext", { rule: rule ?? "" })}${formatEventStart(event.next_starts_at, event.all_day)}`
             : formatTimeOfDay(event.next_starts_at, event.all_day)}
         </p>
-        {event.summary && <p>{event.summary}</p>}
-        {event.summary_gu && <p lang="gu">{event.summary_gu}</p>}
-        {(event.location_note || event.cost_note) && (
-          <p className="text-muted">
-            {[event.location_note, event.cost_note].filter(Boolean).join(" · ")}
+        {summary && <p className="text-muted line-clamp-2">{summary}</p>}
+        {(cancelled || confirmed || kind || sourceLabel(event)) && (
+          <p className="mt-1 flex flex-wrap items-center gap-2">
+            {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
+            {confirmed ? (
+              <Badge tone="leaf">
+                <span aria-hidden="true">✓ </span>
+                {confirmed}
+              </Badge>
+            ) : (
+              sourceLabel(event) && (
+                <span className="text-muted text-base">
+                  {sourceLabel(event)}
+                </span>
+              )
+            )}
+            {kind && <Badge>{kind}</Badge>}
           </p>
         )}
-        {event.link && (
-          <a
-            href={event.link}
-            rel="noopener"
-            className="text-peacock w-fit font-semibold underline"
-          >
-            {t("event.moreDetails")}
-          </a>
-        )}
-        <p className="flex flex-wrap items-center gap-2">
-          {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
-          {confirmed ? (
-            <Badge tone="leaf">
-              <span aria-hidden="true">✓ </span>
-              {confirmed}
-            </Badge>
-          ) : (
-            sourceLabel(event) && (
-              <span className="text-muted text-base">{sourceLabel(event)}</span>
-            )
-          )}
-          {kindLabel(event.kind) && <Badge>{kindLabel(event.kind)}</Badge>}
-        </p>
         <JsonLd
           data={eventData(
             event,
@@ -445,21 +430,50 @@ function EventRow({
             `${siteUrl()}${eventPath(mandir.slug, event.id)}`,
           )}
         />
-        {!cancelled && (
-          <div className="pt-2">
-            <EventActions
-              mandirSlug={mandir.slug}
-              eventId={event.id}
-              title={event.title}
-              shareText={eventShareText(event, mandir)}
-              path={localePath(eventPath(mandir.slug, event.id))}
-              copy={false}
-              nextStartsAt={event.next_starts_at}
-            />
-          </div>
-        )}
       </div>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="text-peacock mt-1 size-6 shrink-0 transition-transform group-hover:translate-x-1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
     </article>
+  );
+}
+
+// The other things to do from here, together under "More" rather than
+// loose links under the events.
+function More({
+  links,
+}: {
+  links: (false | null | undefined | { href: string; label: string })[];
+}) {
+  const t = pageT();
+  const shown = links.filter((l) => !!l);
+  return (
+    <section aria-labelledby="more" className="flex flex-col gap-2 pt-8">
+      <h2 id="more" className="text-xl font-semibold">
+        {t("mandir.more")}
+      </h2>
+      <ul className="divide-line border-line flex flex-col divide-y border-y">
+        {shown.map(({ href, label }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              className="text-peacock flex min-h-12 items-center py-3 font-semibold no-underline hover:underline"
+            >
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

@@ -11,6 +11,7 @@ import {
   londonToUtc,
   matchesSearch,
   monthOf,
+  timeTileParts,
   websiteLabel,
 } from "@/lib/format";
 
@@ -168,5 +169,22 @@ describe("formatEventWhen", () => {
     expect(
       formatEventWhen("2026-11-07T00:00:00Z", "2026-11-08T00:00:00Z", true),
     ).toBe("Sat 7 Nov – Sun 8 Nov");
+  });
+});
+
+describe("timeTileParts", () => {
+  it("splits the UK time into the clock and am or pm", () => {
+    expect(timeTileParts("2026-10-17T18:30:00Z")).toEqual({
+      clock: "7:30",
+      part: "pm",
+    });
+    expect(timeTileParts("2026-11-08T07:00:00Z")).toEqual({
+      clock: "7",
+      part: "am",
+    });
+    expect(timeTileParts("2026-11-08T12:00:00Z")).toEqual({
+      clock: "12",
+      part: "pm",
+    });
   });
 });

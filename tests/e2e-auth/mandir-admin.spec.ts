@@ -75,16 +75,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(event.locator('[lang="gu"]').first()).toHaveText(
     "અન્નકૂટ દર્શન",
   );
-  await expect(event).toContainText("સૌનું સ્વાગત છે.");
   await expect(event).toContainText("Festival");
   await expect(event).toContainText("Confirmed by the mandir");
-  const whatsApp = await event
-    .getByRole("link", { name: "WhatsApp" })
-    .getAttribute("href");
-  expect(decodeURIComponent(whatsApp!)).toContain(`Annakut darshan at ${NAME}`);
+  await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
   const eventId = (await event.getAttribute("id"))!.replace(/^event-/, "");
   const eventPage = `/mandirs/${SLUG}/events/${eventId}`;
-  expect(decodeURIComponent(whatsApp!)).toContain(eventPage);
 
   // It has its own page, which its name links to. Older links to its card
   // on the mandir's page still work.
@@ -103,13 +98,23 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByText(/Confirmed by the mandir/).filter({ visible: true }),
   ).toBeVisible();
-  await member.goto(`/mandirs/${SLUG}`);
+  await expect(
+    member.getByText("સૌનું સ્વાગત છે.").filter({ visible: true }),
+  ).toBeVisible();
+  const whatsApp = await member
+    .getByRole("link", { name: "WhatsApp" })
+    .filter({ visible: true })
+    .first()
+    .getAttribute("href");
+  expect(decodeURIComponent(whatsApp!)).toContain(`Annakut darshan at ${NAME}`);
+  expect(decodeURIComponent(whatsApp!)).toContain(eventPage);
 
-  // It can be added to a calendar: as a file, or in Google Calendar; and
-  // it's in the mandir's calendar feed.
-  await event.getByText("Add to calendar").click();
+  // It can be added to a calendar from its page: as a file, or in Google
+  // Calendar; and it's in the mandir's calendar feed.
+  await member.goto(eventPage);
+  await member.getByText("Add to calendar").click();
   const file = await member.request.get(
-    await event
+    await member
       .getByRole("link", { name: "Apple, Outlook or another calendar" })
       .getAttribute("href")
       .then((href) => href!),
@@ -134,7 +139,6 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   const feedText = await feed.text();
   expect(feedText).toContain("SUMMARY:Annakut darshan");
   expect(feedText).not.toContain("VALARM");
-  await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
 
   // And on What's on, under the mandir's name.
   await member.goto("/whats-on");

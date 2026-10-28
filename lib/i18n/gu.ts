@@ -147,6 +147,7 @@ export const gu: Record<MessageKey, string> = {
   "mandir.lookAfterBody":
     "આ પાનું સંભાળો: એક મિનિટમાં કાર્યક્રમો ઉમેરો અને કોઈપણ વિગત સુધારો.",
   "mandir.lookAfter": "આ પાનું સંભાળો",
+  "mandir.more": "વધુ",
   "mandir.tradition": "સંપ્રદાય",
   "mandir.postcode": "પોસ્ટકોડ",
   "mandir.directions": "રસ્તો",
@@ -177,6 +178,7 @@ export const gu: Record<MessageKey, string> = {
   "plan.notShown":
     "દેખાતા નથી: {count} વધુ, જે પૂરા થઈ ગયા છે કે હવે Toran પર નથી.",
   "visit.title": "મુલાકાત",
+  "visit.more": "મુલાકાત વિશે વધુ →",
   "visit.access": "પ્રવેશ અને અંદર ફરવું",
   "visit.food": "ભોજન",
   "visit.step_free": "પગથિયાં વગર પ્રવેશ",

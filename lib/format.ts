@@ -107,16 +107,39 @@ function partOfDayTime(at: Date): string {
 
 function partOfDayClock(hhmm: string): string {
   const [hour, minute] = hhmm.split(":").map(Number);
+  return sharedT()(partOfDay(hour), { time: twelveHour(hour, minute) });
+}
+
+function partOfDay(hour: number) {
+  return hour >= 4 && hour < 12
+    ? "time.morning"
+    : hour >= 12 && hour < 16
+      ? "time.afternoon"
+      : hour >= 16 && hour < 20
+        ? "time.evening"
+        : "time.night";
+}
+
+// "7" or "7:30", without am or pm.
+function twelveHour(hour: number, minute: number): string {
+  return `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""}`;
+}
+
+// The time for a tile in lists already grouped by day, in UK time: the
+// clock, and beneath it am or pm (in Gujarati and Hindi, the part of the
+// day, as they say it).
+export function timeTileParts(startsAt: string): {
+  clock: string;
+  part: string;
+} {
+  const [hour, minute] = londonTime(new Date(startsAt)).split(":").map(Number);
   const part =
-    hour >= 4 && hour < 12
-      ? "time.morning"
-      : hour >= 12 && hour < 16
-        ? "time.afternoon"
-        : hour >= 16 && hour < 20
-          ? "time.evening"
-          : "time.night";
-  const clock = `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""}`;
-  return sharedT()(part, { time: clock });
+    pageLocale() === "en"
+      ? hour < 12
+        ? "am"
+        : "pm"
+      : sharedT()(partOfDay(hour), { time: "" }).trim();
+  return { clock: twelveHour(hour, minute), part };
 }
 
 // A time of day given as "HH:MM" (opening and aarti times), in the

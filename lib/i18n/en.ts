@@ -144,6 +144,7 @@ export const en = {
   "mandir.lookAfterBody":
     "Look after this page: add events in a minute and correct any details.",
   "mandir.lookAfter": "Look after this page",
+  "mandir.more": "More",
   "mandir.tradition": "Tradition",
   "mandir.postcode": "Postcode",
   "mandir.directions": "Directions",
@@ -174,6 +175,7 @@ export const en = {
   "plan.notShown":
     "Not shown: {count} more that have finished or are no longer on Toran.",
   "visit.title": "Visiting",
+  "visit.more": "More about visiting →",
   "visit.access": "Getting in and around",
   "visit.food": "Food",
   "visit.step_free": "Step-free way in",

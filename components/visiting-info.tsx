@@ -29,19 +29,9 @@ export function VisitingInfo({
       {groups.map(({ group, items }) => (
         <div key={group} className="flex flex-col gap-1.5">
           <h3 className="text-muted font-semibold">{t(`visit.${group}`)}</h3>
-          <ul className="flex flex-col gap-1.5">
-            {items.map((item) => (
-              <li key={item} className="flex items-start gap-2.5">
-                <span
-                  aria-hidden="true"
-                  className="bg-leaf-tint text-leaf-ink mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-base font-bold"
-                >
-                  ✓
-                </span>
-                {t(`visit.${item}` as MessageKey)}
-              </li>
-            ))}
-          </ul>
+          <TickList
+            items={items.map((item) => t(`visit.${item}` as MessageKey))}
+          />
         </div>
       ))}
       {note && <p className="whitespace-pre-line">{note}</p>}
@@ -60,11 +50,29 @@ export function VisitingInfo({
   );
 }
 
-// The same ticks in one line, for an event's page.
-export function visitingSummary(facilities: readonly string[]): string {
+// The same ticks, for an event's page.
+export function visitingItems(facilities: readonly string[]): string[] {
   const t = pageT();
   return groupFacilities(facilities)
     .flatMap(({ items }) => items)
-    .map((item) => t(`visit.${item}` as MessageKey))
-    .join(" · ");
+    .map((item) => t(`visit.${item}` as MessageKey));
+}
+
+// A short list of ticks.
+export function TickList({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="flex flex-col gap-1.5">
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            className="bg-leaf-tint text-leaf-ink mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-base font-bold"
+          >
+            ✓
+          </span>
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
 }

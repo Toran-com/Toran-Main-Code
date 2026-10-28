@@ -70,13 +70,21 @@ export function keepOffline(locale: Locale) {
 }
 
 // "Follow" on a mandir's page; once followed, where to see its events.
-export function FollowButton({ slug }: { slug: string }) {
+// "beside": the button sits beside a heading in a wrapping row, and the
+// note drops onto a line of its own below them.
+export function FollowButton({
+  slug,
+  beside = false,
+}: {
+  slug: string;
+  beside?: boolean;
+}) {
   const t = useT(enFollow);
   const locale = useLocale();
   const following = useFollowing();
   const on = following.includes(slug);
   return (
-    <div className="flex flex-col gap-2">
+    <div className={beside ? "contents" : "flex flex-col gap-2"}>
       <button
         type="button"
         aria-pressed={on}
@@ -90,7 +98,10 @@ export function FollowButton({ slug }: { slug: string }) {
         {on ? t("follow.following") : t("follow.follow")}
       </button>
       {on && (
-        <p className="text-muted text-base" aria-live="polite">
+        <p
+          className={`text-muted text-base ${beside ? "basis-full" : ""}`}
+          aria-live="polite"
+        >
           {t("follow.saved")}{" "}
           <Link
             href={whatsOnHref(locale, "", following)}
