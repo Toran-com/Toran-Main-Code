@@ -14,7 +14,7 @@ import { PlanButton } from "@/components/plan";
 import { ReadAloud } from "@/components/read-aloud";
 import { ShareButtons } from "@/components/share-buttons";
 import { cardClass, Notice, quietButtonClass } from "@/components/ui";
-import { visitingSummary } from "@/components/visiting-info";
+import { TickList, visitingItems } from "@/components/visiting-info";
 import {
   getEventSeva,
   getMandir,
@@ -513,18 +513,25 @@ function Details({ page }: { page: MandirEventPage }) {
         <span className="whitespace-pre-line">{mandir.getting_there}</span>
       ),
     });
-  const visiting = visitingSummary(mandir.facilities);
-  if (visiting || mandir.visiting_note)
+  const visiting = visitingItems(mandir.facilities);
+  if (visiting.length || mandir.visiting_note)
     rows.push({
       label: t("visit.title"),
       icon: null,
       value: (
-        <Link
-          href={`${localePath(`/mandirs/${mandir.slug}`)}#visiting`}
-          className="text-peacock underline"
-        >
-          {visiting || mandir.visiting_note}
-        </Link>
+        <div className="flex flex-col gap-2 pt-1">
+          {visiting.length > 0 ? (
+            <TickList items={visiting} />
+          ) : (
+            <p className="whitespace-pre-line">{mandir.visiting_note}</p>
+          )}
+          <Link
+            href={`${localePath(`/mandirs/${mandir.slug}`)}#visiting`}
+            className="text-peacock self-start font-semibold underline"
+          >
+            {t("visit.more")}
+          </Link>
+        </div>
       ),
     });
   if (event.cost_note)

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DateTile } from "@/components/date-tile";
+import { DateTile, TimeTile } from "@/components/date-tile";
 import { Badge } from "@/components/public-shell";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import { formatEventStart, formatMiles, formatTimeOfDay } from "@/lib/format";
@@ -37,7 +37,7 @@ export function EventList({
             <ul className="divide-line flex flex-col divide-y">
               {shown.map((e) => (
                 <li key={e.id}>
-                  <EventCard event={e} />
+                  <EventCard event={e} underDay />
                 </li>
               ))}
             </ul>
@@ -61,7 +61,15 @@ export function EventList({
   );
 }
 
-export function EventCard({ event: e }: { event: EventNear }) {
+// Under a day heading ("underDay") the tile shows the time, since the
+// date would only repeat the heading.
+export function EventCard({
+  event: e,
+  underDay = false,
+}: {
+  event: EventNear;
+  underDay?: boolean;
+}) {
   const t = pageT();
   const cancelled = e.status === "cancelled";
   const rule = e.recurrence && describeRule(e.recurrence);
@@ -69,10 +77,14 @@ export function EventCard({ event: e }: { event: EventNear }) {
   const kind = kindLabel(e.kind);
   return (
     <article className="has-card-link group flex gap-4 py-5 sm:gap-6 sm:py-6">
-      <DateTile
-        date={e.next_starts_at}
-        label={formatEventStart(e.next_starts_at, true)}
-      />
+      {underDay ? (
+        <TimeTile at={e.next_starts_at} allDay={e.all_day} />
+      ) : (
+        <DateTile
+          date={e.next_starts_at}
+          label={formatEventStart(e.next_starts_at, true)}
+        />
+      )}
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <h3
           className={`text-lg leading-snug font-semibold sm:text-xl ${cancelled ? "line-through" : ""}`}
@@ -94,11 +106,19 @@ export function EventCard({ event: e }: { event: EventNear }) {
           {` · ${e.mandir.town}`}
           {e.miles !== null && ` · ${formatMiles(e.miles)}`}
         </p>
-        <p className="text-muted">
-          {formatTimeOfDay(e.next_starts_at, e.all_day)}
-          {rule && ` · ${rule}`}
-          {kind && ` · ${kind}`}
-        </p>
+        {underDay ? (
+          (rule || kind) && (
+            <p className="text-muted">
+              {[rule, kind].filter(Boolean).join(" · ")}
+            </p>
+          )
+        ) : (
+          <p className="text-muted">
+            {formatTimeOfDay(e.next_starts_at, e.all_day)}
+            {rule && ` · ${rule}`}
+            {kind && ` · ${kind}`}
+          </p>
+        )}
         {e.summary && <p className="text-muted line-clamp-2">{e.summary}</p>}
         {(cancelled || source) && (
           <p className="text-muted mt-1 flex flex-wrap items-center gap-x-2 text-base">
