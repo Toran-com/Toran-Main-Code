@@ -330,7 +330,6 @@ export const en = {
   "festival.summary.ganesh-chaturthi":
     "The birth of Ganeshji, with puja and visarjan.",
   "season.isOn": "{name} is on {dates}",
-  "season.otherCalendars": "Check with your mandir.",
   "season.notListed": "Next year's {name} dates aren't listed yet. See all the",
   "season.festivalDates": "festival dates",
   "season.loadDates": "{name} dates",

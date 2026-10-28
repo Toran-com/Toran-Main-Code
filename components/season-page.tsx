@@ -53,8 +53,10 @@ export function SeasonPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const text = seasonText(season);
+  // Full width from laptop size up: the events, with the towns, calendar
+  // and sharing in a column beside them.
   return (
-    <>
+    <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <JsonLd
         data={breadcrumbData([
           { name: "Toran", url: `${siteUrl()}${localePath("/")}` },
@@ -86,7 +88,7 @@ export function SeasonPage({
       <Suspense fallback={<Loading />}>
         <SeasonBody season={season} searchParams={searchParams} />
       </Suspense>
-    </>
+    </div>
   );
 }
 
@@ -113,7 +115,7 @@ export async function SeasonDays({ season }: { season: Season }) {
         </h2>
         <Countdown date={main.starts_on} night />
       </div>
-      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
         {days.map((d) => (
           <li
             key={d.slug}
@@ -148,8 +150,7 @@ export async function SeasonDays({ season }: { season: Season }) {
         <p className="text-night-muted text-base">
           <span className="bg-night-accent/15 text-night-accent rounded-full px-3 py-0.5 font-semibold">
             {t("festival.dateNotChecked")}
-          </span>{" "}
-          {t("season.otherCalendars")}
+          </span>
         </p>
       )}
     </section>
@@ -236,130 +237,137 @@ async function SeasonBody({
   const towns = townCounts(during);
 
   return (
-    <>
-      <PlacePicker
-        page={localePath(`/${season.slug}`)}
-        near={near}
-        within={within}
-        radii={RADII}
-        status={
-          !near
-            ? "none"
-            : origin === "unavailable"
-              ? "unavailable"
-              : origin
-                ? "found"
-                : "unknown"
-        }
-        region={region}
-        keep={day ? `day=${day}` : ""}
-        pick={query.pick === "1"}
-      />
-
-      {problem && <Notice tone="error">{problem}</Notice>}
-      {events.state !== "ok" ? (
-        <LoadProblem state={events.state} what={t("load.eventList")} />
-      ) : shown.length ? (
-        <section aria-labelledby="events" className="flex flex-col gap-4">
-          <h2
-            id="events"
-            className="font-display text-3xl leading-tight sm:text-4xl"
-          >
-            {t("festival.atMandirs", { name: text.name })}
-          </h2>
-          <p className="text-muted" aria-live="polite">
-            {t.count("whatsOn.count", shown.length)}
-            {region && t("whatsOn.countRegion", { region: regionName(region) })}
-            {day && t("whatsOn.onDay", { day: longDayHeading(day) })}
-            {position && t("whatsOn.nearestFirst")}
-            {day && (
-              <>
-                {" · "}
-                <Link
-                  href={here({ day: "" })}
-                  className="text-peacock underline"
-                >
-                  {t("whatsOn.everyDay")}
-                </Link>
-              </>
-            )}
-          </p>
-          <AreaChips
-            areas={areas}
-            total={onDay(during, day).length}
-            chosen={region}
-            href={(r) => here({ region: r })}
-          />
-          <EventList
-            events={shown}
-            now={new Date()}
-            more={
-              long
-                ? { perDay: PER_DAY, href: (d) => here({ day: d }) }
-                : undefined
-            }
-          />
-        </section>
-      ) : (
-        <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
-          <p className="font-semibold">
-            {t(position ? "season.noneNear" : "season.none", {
-              name: text.name,
-            })}
-          </p>
-          <p className="text-muted">
-            {t("season.adding", { name: text.name })}{" "}
-            <Link
-              href={localePath("/mandirs")}
-              className="text-peacock underline"
-            >
-              {t("festival.nearestMandir")}
-            </Link>
-            {t("festival.appearAfter")} {t("season.committee")}{" "}
-            <Link href="/for-mandirs" className="text-peacock underline">
-              {t("season.addProgramme")}
-            </Link>
-            {t("festival.appearAfter")}
-          </p>
-        </div>
-      )}
-      {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
-
-      {towns.length > 0 && (
-        <nav aria-labelledby="by-town" className="flex flex-col gap-3">
-          <h2 id="by-town" className="text-xl font-semibold sm:text-2xl">
-            {t("season.byTown", { name: text.name })}
-          </h2>
-          <ul className="flex flex-wrap gap-2">
-            {towns.map((town) => (
-              <li key={town.slug}>
-                <Link
-                  href={localePath(`/${season.slug}/${town.slug}`)}
-                  prefetch={false}
-                  className="border-line-strong bg-surface text-ink hover:border-peacock/60 inline-flex items-baseline gap-2 rounded-full border px-4 py-1.5 text-base font-medium no-underline"
-                >
-                  {town.town}
-                  <span className="text-muted tabular-nums">{town.count}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
-
-      <SubscribeCalendar
-        path={`/${season.slug}/calendar.ics`}
-        title={t("season.calendarTitle", { name: text.name })}
-        body={t("season.calendarBody", { name: text.name })}
-      />
-      <div className="flex flex-col gap-2">
-        <p className="font-semibold">{t("season.tellFamily")}</p>
-        <ShareButtons
-          label={t("season.share", { name: text.name })}
-          text={text.shareText}
-          path={localePath(`/${season.slug}`)}
+    <div className="flex flex-col gap-6 sm:gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start lg:gap-12">
+      <div className="flex min-w-0 flex-col gap-6 sm:gap-8">
+        <PlacePicker
+          page={localePath(`/${season.slug}`)}
+          near={near}
+          within={within}
+          radii={RADII}
+          status={
+            !near
+              ? "none"
+              : origin === "unavailable"
+                ? "unavailable"
+                : origin
+                  ? "found"
+                  : "unknown"
+          }
+          region={region}
+          keep={day ? `day=${day}` : ""}
+          pick={query.pick === "1"}
         />
+
+        {problem && <Notice tone="error">{problem}</Notice>}
+        {events.state !== "ok" ? (
+          <LoadProblem state={events.state} what={t("load.eventList")} />
+        ) : shown.length ? (
+          <section aria-labelledby="events" className="flex flex-col gap-4">
+            <h2
+              id="events"
+              className="font-display text-3xl leading-tight sm:text-4xl"
+            >
+              {t("festival.atMandirs", { name: text.name })}
+            </h2>
+            <p className="text-muted" aria-live="polite">
+              {t.count("whatsOn.count", shown.length)}
+              {region &&
+                t("whatsOn.countRegion", { region: regionName(region) })}
+              {day && t("whatsOn.onDay", { day: longDayHeading(day) })}
+              {position && t("whatsOn.nearestFirst")}
+              {day && (
+                <>
+                  {" · "}
+                  <Link
+                    href={here({ day: "" })}
+                    className="text-peacock underline"
+                  >
+                    {t("whatsOn.everyDay")}
+                  </Link>
+                </>
+              )}
+            </p>
+            <AreaChips
+              areas={areas}
+              total={onDay(during, day).length}
+              chosen={region}
+              href={(r) => here({ region: r })}
+            />
+            <EventList
+              events={shown}
+              now={new Date()}
+              more={
+                long
+                  ? { perDay: PER_DAY, href: (d) => here({ day: d }) }
+                  : undefined
+              }
+            />
+          </section>
+        ) : (
+          <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
+            <p className="font-semibold">
+              {t(position ? "season.noneNear" : "season.none", {
+                name: text.name,
+              })}
+            </p>
+            <p className="text-muted">
+              {t("season.adding", { name: text.name })}{" "}
+              <Link
+                href={localePath("/mandirs")}
+                className="text-peacock underline"
+              >
+                {t("festival.nearestMandir")}
+              </Link>
+              {t("festival.appearAfter")} {t("season.committee")}{" "}
+              <Link href="/for-mandirs" className="text-peacock underline">
+                {t("season.addProgramme")}
+              </Link>
+              {t("festival.appearAfter")}
+            </p>
+          </div>
+        )}
+        {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
       </div>
-    </>
+
+      <aside className="flex flex-col gap-6 sm:gap-8">
+        {towns.length > 0 && (
+          <nav aria-labelledby="by-town" className="flex flex-col gap-3">
+            <h2 id="by-town" className="text-xl font-semibold sm:text-2xl">
+              {t("season.byTown", { name: text.name })}
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {towns.map((town) => (
+                <li key={town.slug}>
+                  <Link
+                    href={localePath(`/${season.slug}/${town.slug}`)}
+                    prefetch={false}
+                    className="border-line-strong bg-surface text-ink hover:border-peacock/60 inline-flex items-baseline gap-2 rounded-full border px-4 py-1.5 text-base font-medium no-underline"
+                  >
+                    {town.town}
+                    <span className="text-muted tabular-nums">
+                      {town.count}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+
+        <SubscribeCalendar
+          path={`/${season.slug}/calendar.ics`}
+          title={t("season.calendarTitle", { name: text.name })}
+          body={t("season.calendarBody", { name: text.name })}
+        />
+        <div className="flex flex-col gap-2">
+          <p className="font-semibold">{t("season.tellFamily")}</p>
+          <ShareButtons
+            label={t("season.share", { name: text.name })}
+            text={text.shareText}
+            path={localePath(`/${season.slug}`)}
+          />
+        </div>
+      </aside>
+    </div>
   );
 }

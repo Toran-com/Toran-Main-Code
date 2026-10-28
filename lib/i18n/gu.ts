@@ -330,7 +330,6 @@ export const gu: Record<MessageKey, string> = {
   "festival.summary.ganesh-chaturthi":
     "ગણેશજીનો જન્મોત્સવ, પૂજા અને વિસર્જન સાથે.",
   "season.isOn": "{name}ની તારીખ: {dates}",
-  "season.otherCalendars": "તમારા મંદિરમાં પૂછી લો.",
   "season.notListed": "આવતા વર્ષની {name}ની તારીખો હજી મુકાઈ નથી. બધા",
   "season.festivalDates": "તહેવારોની તારીખો જુઓ",
   "season.loadDates": "{name}ની તારીખો",

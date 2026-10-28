@@ -53,13 +53,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function SevaPage(props: PageProps<"/seva">) {
   const t = pageT();
+  // Full width from laptop size up (the finder lays itself out in two
+  // columns there: components/seva-explorer.tsx).
   return (
-    <>
+    <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <PageHeading title={t("sevaList.title")} intro={t("sevaList.intro")} />
       <Suspense fallback={<Loading />}>
         <SevaNeeds {...props} />
       </Suspense>
-    </>
+    </div>
   );
 }
 

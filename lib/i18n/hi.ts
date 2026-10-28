@@ -323,7 +323,6 @@ export const hi: Record<MessageKey, string> = {
   "festival.summary.ganesh-chaturthi":
     "गणेशजी का जन्म, पूजा और विसर्जन के साथ।",
   "season.isOn": "{name} {dates} को है",
-  "season.otherCalendars": "अपने मंदिर से पूछ लें।",
   "season.notListed":
     "अगले साल के {name} की तारीख़ें अभी नहीं दी गई हैं। देखें सभी",
   "season.festivalDates": "त्योहारों की तारीख़ें",
