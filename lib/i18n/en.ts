@@ -104,7 +104,7 @@ export const en = {
   "event.cancelled": "Cancelled",
 
   "festival.all": "← All festivals",
-  "festival.dateNotChecked": "Date not yet checked",
+  "festival.dateNotChecked": "Date may vary: check with your mandir",
   "festival.noDate": "No upcoming date is listed yet.",
   "festival.atMandirs": "{name} at mandirs",
   "festival.noEvents": "No mandir has listed {name} events yet.",

@@ -110,9 +110,9 @@ describe("festivalCalendarEvents", () => {
       start: "2026-11-08",
       url: "https://toran.example/festivals/diwali",
     });
-    expect(plain.description).not.toContain("not yet checked");
+    expect(plain.description).not.toContain("may vary");
     expect(gujarati.title).toMatch(/^Diwali \(.+\)$/);
-    expect(gujarati.description).toContain("Date not yet checked");
+    expect(gujarati.description).toContain("Date may vary");
   });
 
   it("leaves out dates with no festival", () => {

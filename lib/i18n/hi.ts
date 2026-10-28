@@ -106,7 +106,7 @@ export const hi: Record<MessageKey, string> = {
   "event.cancelled": "रद्द",
 
   "festival.all": "← सभी त्योहार",
-  "festival.dateNotChecked": "तारीख़ अभी जाँची नहीं गई",
+  "festival.dateNotChecked": "तारीख़ बदल सकती है: अपने मंदिर से पूछें",
   "festival.noDate": "अभी आने वाली कोई तारीख़ नहीं दी गई है।",
   "festival.atMandirs": "मंदिरों में {name}",
   "festival.noEvents": "अभी किसी मंदिर ने {name} के कार्यक्रम नहीं डाले हैं।",

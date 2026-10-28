@@ -177,7 +177,7 @@ async function NeedsAttention() {
       <Section
         id="festival_dates"
         list={a.festival_dates}
-        intro="Festival dates in the next 60 days not yet checked against a panchang. They show “Date not yet checked” on the public site."
+        intro="Festival dates in the next 60 days not yet checked against a panchang. They show “Date may vary: check with your mandir” on the public site."
         empty="Every festival date in the next 60 days is checked."
         more={{ href: "/ops/festivals", label: "Festival dates" }}
         render={(d) => (

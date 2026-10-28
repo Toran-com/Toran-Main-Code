@@ -70,7 +70,7 @@ export function festivalCalendarEvents(
         description: [
           date.festival.summary,
           !date.verified &&
-            "Date not yet checked. Check with your mandir, as some follow a different calendar.",
+            "Date may vary: check with your mandir, as some follow a different calendar.",
           `On Toran: ${url}`,
         ]
           .filter(Boolean)

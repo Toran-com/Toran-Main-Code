@@ -49,6 +49,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await page.goto(`/manage/${SLUG}`);
 
   // The festival, with a start time, in one go.
+  await page.getByText("Festivals coming up", { exact: true }).click();
   await page.getByRole("checkbox", { name: /^Test Utsav/ }).check();
   await page.getByLabel("Time for Test Utsav").fill("18:00");
   await page.getByRole("button", { name: "Add the ticked festivals" }).click();
@@ -64,6 +65,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   );
 
   // Last year's bhajans, the evening before this year's festival.
+  await page.getByText("Again this year?", { exact: true }).click();
   const again = page.getByRole("checkbox", { name: /^Utsav eve bhajans/ });
   await expect(again).toBeVisible();
   await expect(page.getByLabel("Day for Utsav eve bhajans")).toHaveValue(
@@ -83,6 +85,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await expect(bhajans).toContainText("7pm");
 
   // Duplicate it for another evening.
+  await bhajans.getByText("More", { exact: true }).click();
   await bhajans.getByRole("link", { name: "Duplicate" }).click();
   await expect(
     page.getByRole("heading", { name: /Add a copy of .Utsav eve bhajans./ }),
