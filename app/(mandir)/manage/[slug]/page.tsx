@@ -350,8 +350,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           <p className="text-xl font-semibold">
             {mandir.name}, {mandir.town}
           </p>
+          {/* Not prefetched: the committee changes this page from here,
+              and a background fetch at the same moment could keep the
+              version from before. */}
           <Link
             href={`/mandirs/${mandir.slug}`}
+            prefetch={false}
             className="text-peacock w-fit font-semibold underline"
           >
             See your public page

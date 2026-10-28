@@ -234,8 +234,12 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
                 cancelHref={`${here}#item-${c.id}`}
                 header={
                   <div className="flex flex-wrap items-center gap-2">
+                    {/* Not prefetched: fetching the public page in the
+                        background while it's being published here could
+                        keep the version from before. */}
                     <Link
                       href={`/mandirs/${c.mandir.slug}`}
+                      prefetch={false}
                       className="text-peacock font-semibold underline"
                     >
                       {c.mandir.name}, {c.mandir.town}

@@ -62,7 +62,9 @@ test("visits are counted without cookies and shown to admins", async ({
 
   // And today's figures, against yesterday's.
   await page.goto("/ops/today");
-  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Today", exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("Page views today")).toBeVisible();
   await expect(page.getByText(/^Yesterday: \d/).first()).toBeVisible();
 
