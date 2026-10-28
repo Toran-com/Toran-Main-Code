@@ -175,188 +175,199 @@ export function SevaExplorer({
     <>
       <MySeva />
 
-      <section
-        aria-label={t("sevaFind.nearMe")}
-        className="border-line bg-surface shadow-card flex flex-col gap-4 rounded-3xl border p-5 sm:p-6"
-      >
-        <NearMeButton
-          t={t}
-          origin={origin}
-          within={within}
-          onFound={setOrigin}
-          onWithin={setWithin}
-          onClear={() => {
-            setOrigin(null);
-            // "Anywhere": next time too.
-            savePlace({ skip: true });
-          }}
-        />
-        {postcode}
-      </section>
-
-      <section aria-labelledby="help-with" className="flex flex-col gap-3">
-        <h2 id="help-with" className="text-xl font-bold sm:text-2xl">
-          {t("sevaFind.helpWith")}
-        </h2>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
-          <Tile
-            pressed={!choice.kind}
-            onClick={() => choose({ kind: "" })}
-            icon="💛"
-            label={t("sevaFind.anything")}
-            count={places(t, sum(byKind))}
-          />
-          {kinds.map((k) => (
-            <Tile
-              key={k}
-              pressed={choice.kind === k}
-              onClick={() => choose({ kind: choice.kind === k ? "" : k })}
-              icon={KIND_ICONS[k]}
-              label={t(`sevaKind.${k}`)}
-              count={places(t, byKind.get(k) ?? 0)}
-              quiet={!byKind.get(k)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section aria-labelledby="when-free" className="flex flex-col gap-3">
-        <h2 id="when-free" className="text-xl font-bold sm:text-2xl">
-          {t("sevaFind.whenFree")}
-        </h2>
-        <div
-          role="group"
-          aria-labelledby="when-free"
-          className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
-        >
-          <DayChip
-            pressed={!choice.day}
-            onClick={() => choose({ day: "" })}
-            label={t("sevaFind.anyDay")}
-            count={places(t, sum(byDay))}
-          />
-          {days.map((d) => (
-            <DayChip
-              key={d.day}
-              pressed={choice.day === d.day}
-              onClick={() => choose({ day: choice.day === d.day ? "" : d.day })}
-              label={d.label}
-              count={places(t, byDay.get(d.day) ?? 0)}
-              quiet={!byDay.get(d.day)}
-            />
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Chip pressed={!choice.part} onClick={() => choose({ part: "" })}>
-            {t("sevaFind.anyTime")}
-          </Chip>
-          {PARTS_OF_DAY.map((p) => (
-            <Chip
-              key={p}
-              pressed={choice.part === p}
-              onClick={() => choose({ part: choice.part === p ? "" : p })}
-              quiet={!byPart.get(p)}
-            >
-              <span aria-hidden="true">{PART_ICONS[p]}</span>{" "}
-              {t(`sevaFind.${p}`)}
-            </Chip>
-          ))}
-        </div>
-      </section>
-
-      <section aria-labelledby="needed" className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2
-            id="needed"
-            className="scroll-mt-24 text-xl font-bold sm:text-2xl"
-            aria-live="polite"
+      {/* From laptop size up: where, what and when on the left, the
+          places that need help beside them. */}
+      <div className="flex flex-col gap-6 sm:gap-8 lg:grid lg:grid-cols-[minmax(20rem,27rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
+        <div className="flex flex-col gap-6 sm:gap-8">
+          <section
+            aria-label={t("sevaFind.nearMe")}
+            className="border-line bg-surface shadow-card flex flex-col gap-4 rounded-3xl border p-5 sm:p-6"
           >
-            {t(
-              found.length === 1
-                ? "sevaFind.found.one"
-                : "sevaFind.found.other",
-              { count: found.length },
-            )}
-          </h2>
-          <div
-            role="group"
-            aria-label={t("sevaFind.showAs")}
-            className="bg-sunk flex rounded-full p-1"
-          >
-            {(["list", "map"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                aria-pressed={view === v}
-                onClick={() => setView(v)}
-                className={`cursor-pointer rounded-full px-4 py-1.5 text-base font-semibold transition ${
-                  view === v
-                    ? "bg-surface text-ink shadow-card"
-                    : "text-muted hover:text-ink"
-                }`}
-              >
-                {t(`sevaFind.${v}`)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {!found.length ? (
-          <div className="bg-sunk flex flex-col items-start gap-3 rounded-3xl p-6">
-            <p className="font-semibold">{t("sevaFind.none")}</p>
-            <button
-              type="button"
-              onClick={() => {
-                setChoice({ kind: "", day: "", part: "" });
+            <NearMeButton
+              t={t}
+              origin={origin}
+              within={within}
+              onFound={setOrigin}
+              onWithin={setWithin}
+              onClear={() => {
                 setOrigin(null);
+                // "Anywhere": next time too.
+                savePlace({ skip: true });
               }}
-              className={quietButtonClass}
+            />
+            {postcode}
+          </section>
+
+          <section aria-labelledby="help-with" className="flex flex-col gap-3">
+            <h2 id="help-with" className="text-xl font-bold sm:text-2xl">
+              {t("sevaFind.helpWith")}
+            </h2>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-2">
+              <Tile
+                pressed={!choice.kind}
+                onClick={() => choose({ kind: "" })}
+                icon="💛"
+                label={t("sevaFind.anything")}
+                count={places(t, sum(byKind))}
+              />
+              {kinds.map((k) => (
+                <Tile
+                  key={k}
+                  pressed={choice.kind === k}
+                  onClick={() => choose({ kind: choice.kind === k ? "" : k })}
+                  icon={KIND_ICONS[k]}
+                  label={t(`sevaKind.${k}`)}
+                  count={places(t, byKind.get(k) ?? 0)}
+                  quiet={!byKind.get(k)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="when-free" className="flex flex-col gap-3">
+            <h2 id="when-free" className="text-xl font-bold sm:text-2xl">
+              {t("sevaFind.whenFree")}
+            </h2>
+            <div
+              role="group"
+              aria-labelledby="when-free"
+              className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
             >
-              {t("sevaFind.showAll")}
-            </button>
+              <DayChip
+                pressed={!choice.day}
+                onClick={() => choose({ day: "" })}
+                label={t("sevaFind.anyDay")}
+                count={places(t, sum(byDay))}
+              />
+              {days.map((d) => (
+                <DayChip
+                  key={d.day}
+                  pressed={choice.day === d.day}
+                  onClick={() =>
+                    choose({ day: choice.day === d.day ? "" : d.day })
+                  }
+                  label={d.label}
+                  count={places(t, byDay.get(d.day) ?? 0)}
+                  quiet={!byDay.get(d.day)}
+                />
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Chip pressed={!choice.part} onClick={() => choose({ part: "" })}>
+                {t("sevaFind.anyTime")}
+              </Chip>
+              {PARTS_OF_DAY.map((p) => (
+                <Chip
+                  key={p}
+                  pressed={choice.part === p}
+                  onClick={() => choose({ part: choice.part === p ? "" : p })}
+                  quiet={!byPart.get(p)}
+                >
+                  <span aria-hidden="true">{PART_ICONS[p]}</span>{" "}
+                  {t(`sevaFind.${p}`)}
+                </Chip>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <section
+          aria-labelledby="needed"
+          className="flex min-w-0 flex-col gap-4"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2
+              id="needed"
+              className="scroll-mt-24 text-xl font-bold sm:text-2xl"
+              aria-live="polite"
+            >
+              {t(
+                found.length === 1
+                  ? "sevaFind.found.one"
+                  : "sevaFind.found.other",
+                { count: found.length },
+              )}
+            </h2>
+            <div
+              role="group"
+              aria-label={t("sevaFind.showAs")}
+              className="bg-sunk flex rounded-full p-1"
+            >
+              {(["list", "map"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  aria-pressed={view === v}
+                  onClick={() => setView(v)}
+                  className={`cursor-pointer rounded-full px-4 py-1.5 text-base font-semibold transition ${
+                    view === v
+                      ? "bg-surface text-ink shadow-card"
+                      : "text-muted hover:text-ink"
+                  }`}
+                >
+                  {t(`sevaFind.${v}`)}
+                </button>
+              ))}
+            </div>
           </div>
-        ) : view === "map" ? (
-          <SevaMap found={found} origin={origin} />
-        ) : (
-          <div className="flex flex-col gap-8">
-            {groups.map(({ day, items }) => (
-              <section key={day} className="flex flex-col gap-3">
-                <h3 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
-                  {headings.get(day) ?? day}
-                </h3>
-                <ul className="flex flex-col gap-4">
-                  {items.map((item) => (
-                    <li key={item.need.id}>
-                      <NeedCard
-                        item={item}
-                        today={today}
-                        tomorrow={tomorrow}
-                        onTaken={(slot) =>
-                          setCelebrating({ slot, mandir: item.need.mandir })
-                        }
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-            {shown.length < found.length && (
-              <a
-                href="?all=1#needed"
-                onClick={(event) => {
-                  event.preventDefault();
-                  setAll(true);
+
+          {!found.length ? (
+            <div className="bg-sunk flex flex-col items-start gap-3 rounded-3xl p-6">
+              <p className="font-semibold">{t("sevaFind.none")}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setChoice({ kind: "", day: "", part: "" });
+                  setOrigin(null);
                 }}
-                className={`${quietButtonClass} self-center`}
+                className={quietButtonClass}
               >
-                {t("sevaFind.showMore", {
-                  count: found.length - shown.length,
-                })}
-              </a>
-            )}
-          </div>
-        )}
-      </section>
+                {t("sevaFind.showAll")}
+              </button>
+            </div>
+          ) : view === "map" ? (
+            <SevaMap found={found} origin={origin} />
+          ) : (
+            <div className="flex flex-col gap-8">
+              {groups.map(({ day, items }) => (
+                <section key={day} className="flex flex-col gap-3">
+                  <h3 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
+                    {headings.get(day) ?? day}
+                  </h3>
+                  <ul className="flex flex-col gap-4">
+                    {items.map((item) => (
+                      <li key={item.need.id}>
+                        <NeedCard
+                          item={item}
+                          today={today}
+                          tomorrow={tomorrow}
+                          onTaken={(slot) =>
+                            setCelebrating({ slot, mandir: item.need.mandir })
+                          }
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+              {shown.length < found.length && (
+                <a
+                  href="?all=1#needed"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setAll(true);
+                  }}
+                  className={`${quietButtonClass} self-center`}
+                >
+                  {t("sevaFind.showMore", {
+                    count: found.length - shown.length,
+                  })}
+                </a>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
 
       {celebrating && (
         <Celebration

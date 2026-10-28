@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Notice } from "@/components/ui";
-import { AccountLink } from "@/components/account-link";
+import { AccountLink, CommitteeLink } from "@/components/account-link";
 import { InstallApp } from "@/components/install-app";
 import { DisplaySettings } from "@/components/display-settings";
 import { LanguageSwitch } from "@/components/language-switch";
@@ -20,7 +20,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 pt-4 pb-10 has-[>.page-wide]:max-w-6xl sm:gap-8 sm:px-6 sm:pt-6 sm:has-[>.page-wide]:px-8">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 pt-4 pb-10 has-[>.page-wide]:max-w-[88rem] sm:gap-8 sm:px-6 sm:pt-6 sm:has-[>.page-wide]:px-8 lg:has-[>.page-wide]:px-12">
         {children}
       </main>
       <SiteFooter />
@@ -29,7 +29,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
 }
 
 // The page width for headers, footers and wide pages.
-export const wideClass = "mx-auto w-full max-w-6xl px-4 sm:px-8";
+export const wideClass = "mx-auto w-full max-w-[88rem] px-4 sm:px-8 lg:px-12";
 
 // The name, the main menu and the other language. On a phone the menu
 // takes its own row, so every page stays one tap away. From tablet size
@@ -91,12 +91,10 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
             />
             <DisplaySettings />
             {languages.length > 1 && <LanguageSwitch languages={languages} />}
-            <Link
-              href="/for-mandirs"
-              className="border-line-strong hover:border-peacock/60 text-ink hidden rounded-full border px-5 py-2 text-base font-semibold no-underline lg:inline-flex"
-            >
-              {t("shell.forMandirs")}
-            </Link>
+            <CommitteeLink
+              forMandirs={t("shell.forMandirs")}
+              account={t("shell.account")}
+            />
           </div>
         </div>
       </header>

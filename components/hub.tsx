@@ -778,7 +778,7 @@ function Welcome({ t, locale }: { t: T; locale: Locale }) {
         {t("hub.welcome.title")}
       </h2>
       <p>{t("hub.welcome.text")}</p>
-      <ul className="flex flex-col gap-3">
+      <ul className="grid gap-3 lg:grid-cols-3">
         {starts.map(([href, label, hint, icon]) => (
           <li key={href}>
             <Link

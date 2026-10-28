@@ -44,13 +44,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function WhatsOnPage(props: PageProps<"/whats-on">) {
   const t = pageT();
+  // Full width from laptop size up: the choices in a column on the left
+  // that stays in view, the events beside them.
   return (
-    <>
+    <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <PageHeading title={t("whatsOn.title")} intro={t("whatsOn.intro")} />
       <Suspense fallback={<Loading />}>
         <WhatsOn {...props} />
       </Suspense>
-    </>
+    </div>
   );
 }
 
@@ -192,8 +194,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   ].filter((f): f is { label: string; href: string } => !!f);
 
   return (
-    <>
-      <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(19rem,24rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
+      <div className="flex flex-col gap-3 lg:sticky lg:top-28">
         {place}
         <div className="flex items-center justify-between gap-3">
           <nav
@@ -267,40 +269,42 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             t("whatsOn.nearestFirst")}
         </p>
       </div>
-      {problem && <Notice tone="error">{problem}</Notice>}
-      {events.length && view === "map" ? (
-        <EventsMapView pins={pinsFor(events)} origin={position} />
-      ) : events.length ? (
-        <EventList
-          events={events}
-          now={new Date()}
-          more={
-            long
-              ? { perDay: PER_DAY, href: (d) => here({ day: d }) }
-              : undefined
-          }
-        />
-      ) : (
-        <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
-          <p className="font-semibold">
-            {position || region || kind || day || when || mandirs.length
-              ? t("whatsOn.noneThere")
-              : t("whatsOn.noneYet")}
-          </p>
-          <p className="text-muted">
-            {t("whatsOn.emptyBefore")}
-            <Link
-              href={localePath("/mandirs")}
-              className="text-peacock underline"
-            >
-              {t("whatsOn.emptyLink")}
-            </Link>
-            {t("whatsOn.emptyAfter")}
-          </p>
-        </div>
-      )}
-      {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
-    </>
+      <div className="flex min-w-0 flex-col gap-6">
+        {problem && <Notice tone="error">{problem}</Notice>}
+        {events.length && view === "map" ? (
+          <EventsMapView pins={pinsFor(events)} origin={position} />
+        ) : events.length ? (
+          <EventList
+            events={events}
+            now={new Date()}
+            more={
+              long
+                ? { perDay: PER_DAY, href: (d) => here({ day: d }) }
+                : undefined
+            }
+          />
+        ) : (
+          <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
+            <p className="font-semibold">
+              {position || region || kind || day || when || mandirs.length
+                ? t("whatsOn.noneThere")
+                : t("whatsOn.noneYet")}
+            </p>
+            <p className="text-muted">
+              {t("whatsOn.emptyBefore")}
+              <Link
+                href={localePath("/mandirs")}
+                className="text-peacock underline"
+              >
+                {t("whatsOn.emptyLink")}
+              </Link>
+              {t("whatsOn.emptyAfter")}
+            </p>
+          </div>
+        )}
+        {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
+      </div>
+    </div>
   );
 }
 
@@ -348,7 +352,7 @@ function Filters({
           </span>
         )}
       </summary>
-      <div className="border-line bg-surface absolute top-full right-0 z-20 mt-2 flex w-[min(calc(100vw-2rem),32rem)] flex-col gap-5 rounded-3xl border p-5 shadow-[0_20px_48px_rgba(0,0,0,0.18)]">
+      <div className="border-line bg-surface absolute top-full right-0 z-20 mt-2 flex w-[min(calc(100vw-2rem),32rem)] flex-col gap-5 rounded-3xl border p-5 shadow-[0_20px_48px_rgba(0,0,0,0.18)] lg:right-auto lg:left-0">
         <Choices
           title={t("whatsOn.type")}
           all={t("whatsOn.anyType")}
