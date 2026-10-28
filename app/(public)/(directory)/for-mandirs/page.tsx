@@ -92,7 +92,8 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
 
 export default function ForMandirsPage() {
   return (
-    <div className="page-wide flex flex-col gap-16 sm:gap-24">
+    // Clipped sideways: the rangoli behind the phone is wider than a phone.
+    <div className="page-wide flex flex-col gap-16 overflow-x-clip sm:gap-24">
       <section className="flex flex-wrap items-center gap-x-16 gap-y-12 pt-2 sm:pt-8">
         <div className="rise flex min-w-0 flex-[1_1_30rem] flex-col gap-6">
           <h1 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
