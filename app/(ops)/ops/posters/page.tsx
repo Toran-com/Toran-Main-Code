@@ -12,8 +12,8 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { londonDate } from "@/lib/london";
 import { daysBetween } from "@/lib/quick-events";

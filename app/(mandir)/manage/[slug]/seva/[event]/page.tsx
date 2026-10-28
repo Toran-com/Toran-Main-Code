@@ -11,9 +11,9 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { withNextStart } from "@/lib/events";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { requireMandirAccess } from "@/lib/manage-access";

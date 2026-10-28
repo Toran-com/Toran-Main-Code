@@ -6,7 +6,8 @@ import {
   FigureTile as Tile,
 } from "@/components/ops-figures";
 import { OpsNav } from "@/components/ops-nav";
-import { Loading, Notice, PageShell } from "@/components/ui";
+import { Loading, Notice } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { londonDate } from "@/lib/format";
 import { pageTitle } from "@/lib/site";

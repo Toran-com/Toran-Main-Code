@@ -2,13 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { OpsNav } from "@/components/ops-nav";
-import {
-  cardClass,
-  Loading,
-  Notice,
-  PageShell,
-  pillButtonClass,
-} from "@/components/ui";
+import { cardClass, Loading, Notice, pillButtonClass } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import {
   attentionCount,
   daysSince,

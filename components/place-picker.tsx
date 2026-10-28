@@ -25,9 +25,9 @@ import { placeHref, readSaved, savePlace as save } from "@/lib/place-memory";
 // which opens a pop-up: the browser's location (turned into the nearest
 // postcode district by postcodes.io, in the browser, so Toran only sees
 // the district), a typed postcode, or all of the UK. The answer is kept
-// on the phone, so the next visit starts near the same place. On What's
-// on, the pop-up opens by itself the first time; a link can open it
-// with ?pick=1.
+// on the phone, so the next visit starts near the same place. It opens
+// only when asked ("Find near me", or a link with ?pick=1): the events
+// come first.
 
 const noSubscribe = () => () => {};
 
@@ -48,7 +48,6 @@ export function PlacePicker({
   status,
   region = "",
   keep = "",
-  ask = false,
   pick = false,
 }: {
   // The page to show events on: What's on or a season's page.
@@ -61,8 +60,6 @@ export function PlacePicker({
   region?: string;
   // The visitor's other choices (type, day) as a query string.
   keep?: string;
-  // Open the pop-up by itself the first time.
-  ask?: boolean;
   // The address asks for the pop-up (?pick=1).
   pick?: boolean;
 }) {
@@ -81,7 +78,7 @@ export function PlacePicker({
     "idle",
   );
 
-  // First visit: ask. Later visits: the place this phone chose last time.
+  // Later visits: the place this phone chose last time.
   useEffect(() => {
     const saved = readSaved();
     if (status === "unknown" && saved && "near" in saved && saved.near === near)
@@ -93,10 +90,8 @@ export function PlacePicker({
     if (near || region) return;
     if (saved && "near" in saved) {
       router.replace(placeHref(page, keep, saved));
-    } else if (!saved && ask) {
-      popUp(box.current);
     }
-  }, [near, region, status, pick, ask, page, keep, router]);
+  }, [near, region, status, pick, page, keep, router]);
 
   function choose(place: string, distance: number) {
     save({ near: place, within: distance });

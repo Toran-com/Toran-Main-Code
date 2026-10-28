@@ -9,11 +9,11 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
   pillButtonClass,
   pillPrimaryClass,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { mandirKit } from "@/lib/season-kit";
 import { CopyText } from "@/components/copy-text";
 import { PosterPicture } from "@/components/poster-picture";

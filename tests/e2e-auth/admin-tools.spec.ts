@@ -23,7 +23,10 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
   await logInAsAdmin(page, `ops-${Date.now()}@example.com`);
 
   // Find and edit a mandir.
-  await page.getByRole("link", { name: "Mandirs", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Admin" })
+    .getByRole("link", { name: "Mandirs", exact: true })
+    .click();
   await page.getByLabel("Search mandirs").fill("Reading");
   await page.getByRole("button", { name: "Search" }).click();
   await page.getByRole("link", { name: /Reading Hindu Temple/ }).click();

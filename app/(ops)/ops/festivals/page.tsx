@@ -2,13 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { OpsNav } from "@/components/ops-nav";
 import { Badge } from "@/components/public-shell";
-import {
-  inputClass,
-  Loading,
-  Notice,
-  PageShell,
-  quietButtonClass,
-} from "@/components/ui";
+import { inputClass, Loading, Notice, quietButtonClass } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { calendarLabel, formatDateRange } from "@/lib/format";
 import { pageTitle } from "@/lib/site";

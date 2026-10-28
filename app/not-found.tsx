@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageShell } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 
 // Shown for any address that isn't a page: the ways back into the site,
 // not just the home page.

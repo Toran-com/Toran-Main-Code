@@ -436,6 +436,8 @@ export const hi: Record<MessageKey, string> = {
   "event.dates": "सभी तारीख़ें",
   "event.moreDates": "और इनके बाद {count} और।",
   "shell.my": "मेरा Toran",
+  "shell.logIn": "समिति लॉग इन",
+  "shell.account": "आपका खाता",
   "my.title": "मेरा Toran",
   "my.description":
     "आपके फ़ॉलो किए मंदिर, आपकी योजना, सेवा और पिछले कार्यक्रम, आपके फ़ोन पर एक साथ।",

@@ -6,9 +6,9 @@ import {
   cardClass,
   Loading,
   Notice,
-  PageShell,
   pillButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { londonDate } from "@/lib/format";
 import { requireMandirAccess } from "@/lib/manage-access";
 import { eventPath } from "@/lib/share";

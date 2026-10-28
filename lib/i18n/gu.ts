@@ -217,6 +217,8 @@ export const gu: Record<MessageKey, string> = {
   "event.cost": "ખર્ચ",
   "event.fromMandir": "મંદિર તરફથી",
   "shell.my": "મારું Toran",
+  "shell.logIn": "સમિતિ લૉગ ઇન",
+  "shell.account": "તમારું ખાતું",
   "my.title": "મારું Toran",
   "my.description":
     "તમે ફોલો કરો છો તે મંદિરો, તમારો પ્લાન, સેવા અને ગયેલા કાર્યક્રમો, તમારા ફોનમાં એક જગ્યાએ.",

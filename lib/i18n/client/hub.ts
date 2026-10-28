@@ -20,6 +20,15 @@ export const enHub = {
   "hub.tile.plan": "Our plan",
   "hub.tile.settings": "Settings",
   "hub.tile.nothing": "Nothing yet",
+  "hub.welcome.title": "Start your Toran",
+  "hub.welcome.text":
+    "Toran keeps what matters to you on this phone. Start with one of these:",
+  "hub.welcome.follow": "Follow your mandir",
+  "hub.welcome.followHint": "See its events here first",
+  "hub.welcome.plan": "Plan a day out",
+  "hub.welcome.planHint": "Pick events and send them to the family",
+  "hub.welcome.seva": "Help with seva",
+  "hub.welcome.sevaHint": "Take a slot at a mandir near you",
   "hub.tile.count": "{count}",
   "hub.tile.ask": "{count} to answer",
 

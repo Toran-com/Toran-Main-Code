@@ -11,9 +11,9 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import {
   buildDigest,

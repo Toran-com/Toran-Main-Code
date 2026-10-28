@@ -27,7 +27,8 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { useOrigin } from "@/components/use-origin";
-import { useLocale, useT } from "@/components/use-t";
+import { type Locale, useLocale, useT } from "@/components/use-t";
+import { withLocale } from "@/lib/i18n/paths";
 import {
   clearVisits,
   forgetVisit,
@@ -150,6 +151,8 @@ function plainDate(at: string, locale: string): string {
   }).format(new Date(at));
 }
 
+type Part = "coming" | "mandirs" | "seva" | "past" | "plan";
+
 export function Hub() {
   const t = useT(enHub) as T;
   const locale = useLocale();
@@ -176,6 +179,7 @@ export function Hub() {
     [plan, visits],
   );
   const details = useDetails(locale, following, asked);
+  const [seen, setSeen] = useState<Part[]>([]);
 
   if (minute === null) {
     return <p className="text-muted">{t("hub.loading")}</p>;
@@ -202,11 +206,29 @@ export function Hub() {
     return loaded?.when[`${id}@${at}`] ?? plainDate(at, locale);
   }
 
+  // What this phone has saved: a part of My Toran shows only once it has
+  // something in it, and a phone with nothing yet gets a welcome instead.
+  const has: Record<Part, boolean> = {
+    coming: upcoming.length > 0,
+    mandirs: following.length > 0,
+    seva: comingSeva.length > 0 || done.length > 0,
+    past: past.ask.length > 0 || past.went.length > 0,
+    plan: plan.length > 0,
+  };
+  // Once a part has shown, it stays for the rest of the visit, so
+  // unfollowing or clearing doesn't make it jump away.
+  const parts = Object.keys(has) as Part[];
+  const newly = parts.filter((p) => has[p] && !seen.includes(p));
+  if (newly.length) setSeen([...seen, ...newly]);
+  const shows = (p: Part) => has[p] || seen.includes(p);
+  const fresh = !parts.some(shows) && slots.length === 0;
+
   const tiles: {
     href: string;
     label: string;
     detail: string;
     icon: ReactNode;
+    show: boolean;
   }[] = [
     {
       href: "#coming",
@@ -215,6 +237,7 @@ export function Hub() {
         ? t("hub.tile.count", { count: upcoming.length })
         : t("hub.tile.nothing"),
       icon: <CalendarIcon />,
+      show: shows("coming"),
     },
     {
       href: "#mandirs",
@@ -223,6 +246,7 @@ export function Hub() {
         ? t("hub.tile.count", { count: following.length })
         : t("hub.tile.nothing"),
       icon: <Star filled />,
+      show: shows("mandirs"),
     },
     {
       href: "#seva",
@@ -232,6 +256,7 @@ export function Hub() {
           ? t("hub.tile.count", { count: comingSeva.length + done.length })
           : t("hub.tile.nothing"),
       icon: <HandsIcon />,
+      show: shows("seva"),
     },
     {
       href: "#past",
@@ -242,6 +267,7 @@ export function Hub() {
           ? t("hub.tile.count", { count: past.went.length })
           : t("hub.tile.nothing"),
       icon: <ClockIcon />,
+      show: shows("past"),
     },
     {
       href: planHref(
@@ -253,12 +279,14 @@ export function Hub() {
         ? t("hub.tile.count", { count: plan.length })
         : t("hub.tile.nothing"),
       icon: <ListIcon />,
+      show: shows("plan"),
     },
     {
       href: "#settings",
       label: t("hub.tile.settings"),
       detail: "",
       icon: <GearIcon />,
+      show: true,
     },
   ];
 
@@ -267,28 +295,38 @@ export function Hub() {
       <MoveIn t={t} />
       <p className="text-muted -mt-4 text-lg sm:-mt-6">{t("hub.onlyHere")}</p>
 
-      <nav aria-label={t("hub.parts")}>
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {tiles.map((tile) => (
-            <li key={tile.href}>
-              <a
-                href={tile.href}
-                className={`${cardClass} hover:border-peacock/60 flex h-full min-h-28 flex-col justify-between gap-2 p-4 no-underline transition active:scale-[0.98] sm:p-5`}
-              >
-                <span className="text-peacock [&_svg]:size-7">{tile.icon}</span>
-                <span className="flex flex-col">
-                  <span className="text-ink text-xl font-semibold">
-                    {tile.label}
-                  </span>
-                  {tile.detail && (
-                    <span className="text-muted text-base">{tile.detail}</span>
-                  )}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {fresh ? (
+        <Welcome t={t} locale={locale} />
+      ) : (
+        <nav aria-label={t("hub.parts")}>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {tiles
+              .filter((tile) => tile.show)
+              .map((tile) => (
+                <li key={tile.href}>
+                  <a
+                    href={tile.href}
+                    className={`${cardClass} hover:border-peacock/60 flex h-full min-h-28 flex-col justify-between gap-2 p-4 no-underline transition active:scale-[0.98] sm:p-5`}
+                  >
+                    <span className="text-peacock [&_svg]:size-7">
+                      {tile.icon}
+                    </span>
+                    <span className="flex flex-col">
+                      <span className="text-ink text-xl font-semibold">
+                        {tile.label}
+                      </span>
+                      {tile.detail && (
+                        <span className="text-muted text-base">
+                          {tile.detail}
+                        </span>
+                      )}
+                    </span>
+                  </a>
+                </li>
+              ))}
+          </ul>
+        </nav>
+      )}
 
       {(totals.events > 0 || totals.shifts > 0) && (
         <section aria-labelledby="year" className="flex flex-col gap-3">
@@ -324,293 +362,49 @@ export function Hub() {
       )}
       {details && details.state !== "ok" && <Notice>{t("hub.offline")}</Notice>}
 
-      <Section id="coming" title={t("hub.tile.coming")} t={t}>
-        {upcoming.length ? (
-          <ul className="divide-line flex flex-col divide-y">
-            {upcoming.map((item) => {
-              const badge = soon(item.at, now, t);
-              if (item.kind === "seva") {
-                const s = item.slot;
+      {shows("coming") && (
+        <Section id="coming" title={t("hub.tile.coming")} t={t}>
+          {upcoming.length ? (
+            <ul className="divide-line flex flex-col divide-y">
+              {upcoming.map((item) => {
+                const badge = soon(item.at, now, t);
+                if (item.kind === "seva") {
+                  const s = item.slot;
+                  return (
+                    <li
+                      key={`seva-${s.slot}`}
+                      className="flex flex-col gap-1 py-3"
+                    >
+                      <p className="flex flex-wrap items-center gap-2">
+                        {badge && <Pill>{badge}</Pill>}
+                        <span className="text-marigold-ink font-semibold">
+                          {s.label}
+                        </span>
+                      </p>
+                      <Link
+                        href={s.path}
+                        className="text-ink text-lg font-semibold"
+                      >
+                        {t("hub.coming.seva", { role: s.role })}: {s.title}
+                      </Link>
+                      <p className="text-muted">{s.place}</p>
+                    </li>
+                  );
+                }
+                const e = loaded?.events[item.id];
                 return (
                   <li
-                    key={`seva-${s.slot}`}
+                    key={`event-${item.id}`}
                     className="flex flex-col gap-1 py-3"
                   >
                     <p className="flex flex-wrap items-center gap-2">
                       {badge && <Pill>{badge}</Pill>}
                       <span className="text-marigold-ink font-semibold">
-                        {s.label}
+                        {when(item.id, item.at)}
                       </span>
-                    </p>
-                    <Link
-                      href={s.path}
-                      className="text-ink text-lg font-semibold"
-                    >
-                      {t("hub.coming.seva", { role: s.role })}: {s.title}
-                    </Link>
-                    <p className="text-muted">{s.place}</p>
-                  </li>
-                );
-              }
-              const e = loaded?.events[item.id];
-              return (
-                <li
-                  key={`event-${item.id}`}
-                  className="flex flex-col gap-1 py-3"
-                >
-                  <p className="flex flex-wrap items-center gap-2">
-                    {badge && <Pill>{badge}</Pill>}
-                    <span className="text-marigold-ink font-semibold">
-                      {when(item.id, item.at)}
-                    </span>
-                    {e?.cancelled && (
-                      <Pill tone="kumkum">{t("hub.cancelled")}</Pill>
-                    )}
-                  </p>
-                  {e ? (
-                    <Link
-                      href={e.path}
-                      className="text-ink text-lg font-semibold"
-                    >
-                      {e.title}
-                    </Link>
-                  ) : (
-                    <p className="text-lg font-semibold">{t("hub.event")}</p>
-                  )}
-                  <p className="text-muted">
-                    {e ? `${e.mandir}, ${e.town} · ` : ""}
-                    {t("hub.coming.plan")}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <Empty
-            text={t("hub.coming.empty")}
-            links={[
-              [
-                locale === "gu" ? "/gu/whats-on" : "/whats-on",
-                t("hub.findEvents"),
-              ],
-              [locale === "gu" ? "/gu/seva" : "/seva", t("hub.findSeva")],
-            ]}
-          />
-        )}
-      </Section>
-
-      <Section id="mandirs" title={t("hub.tile.mandirs")} t={t}>
-        {following.length ? (
-          <>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {following.map((slug) => {
-                const m = loaded?.mandirs[slug];
-                const name = m?.name ?? slug.replace(/-/g, " ");
-                return (
-                  <li
-                    key={slug}
-                    className={`${cardClass} flex flex-col gap-3 p-5`}
-                  >
-                    <div className="flex flex-col gap-1">
-                      <Link
-                        href={
-                          m?.path ??
-                          `${locale === "gu" ? "/gu" : ""}/mandirs/${slug}`
-                        }
-                        className="text-ink text-xl font-semibold"
-                      >
-                        {name}
-                      </Link>
-                      {m && <p className="text-muted">{m.town}</p>}
-                    </div>
-                    {m?.hours && <OpenNow {...m.hours} />}
-                    {m &&
-                      (m.next ? (
-                        <p>
-                          <span className="text-muted block text-base">
-                            {t("hub.mandirs.next")}
-                          </span>
-                          <span className="text-marigold-ink block font-semibold">
-                            {m.next.when}
-                          </span>
-                          <Link
-                            href={m.next.path}
-                            className="text-peacock underline"
-                          >
-                            {m.next.title}
-                          </Link>
-                        </p>
-                      ) : (
-                        <p className="text-muted">{t("hub.mandirs.nothing")}</p>
-                      ))}
-                    <p className="mt-auto flex flex-wrap gap-2">
-                      <Link
-                        href={`${locale === "gu" ? "/gu" : ""}/whats-on?mandirs=${slug}`}
-                        className={pillButtonClass}
-                      >
-                        {t("hub.mandirs.events")}
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => setFollowing(slug, false)}
-                        aria-label={t("hub.mandirs.unfollowLabel", { name })}
-                        className={pillButtonClass}
-                      >
-                        {t("hub.mandirs.unfollow")}
-                      </button>
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-            <Link
-              href={`${locale === "gu" ? "/gu" : ""}/whats-on?mandirs=${following.join(",")}`}
-              className={`${actionPillClass} self-start`}
-            >
-              <Star filled />
-              {t("hub.mandirs.events")}
-            </Link>
-          </>
-        ) : (
-          <Empty
-            text={t("hub.mandirs.empty")}
-            links={[
-              [
-                locale === "gu" ? "/gu/mandirs" : "/mandirs",
-                t("hub.findMandirs"),
-              ],
-            ]}
-          />
-        )}
-      </Section>
-
-      <Section id="seva" title={t("hub.tile.seva")} t={t}>
-        {comingSeva.length > 0 && (
-          <div className="border-peacock/30 bg-peacock/5 flex flex-col gap-3 rounded-2xl border p-5">
-            <h3 className="font-display text-2xl">{t("hub.seva.coming")}</h3>
-            <ul className="flex flex-col gap-4">
-              {[...comingSeva]
-                .sort((a, b) => a.starts_at.localeCompare(b.starts_at))
-                .map((s) => (
-                  <MySlotItem key={s.slot} slug={slotMandir(s)} slot={s}>
-                    <p>
-                      <Link
-                        href={s.path}
-                        className="text-peacock font-semibold"
-                      >
-                        {s.title}
-                      </Link>
-                      <span className="text-muted">, {s.place}</span>
-                    </p>
-                  </MySlotItem>
-                ))}
-            </ul>
-          </div>
-        )}
-        {done.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <h3 className="font-display text-2xl">{t("hub.seva.done")}</h3>
-            <ul className="divide-line flex flex-col divide-y">
-              {done.map((s) => {
-                const hours = shiftHours(s);
-                return (
-                  <li key={s.slot} className="flex flex-col gap-1 py-3">
-                    <p className="text-marigold-ink font-semibold">{s.label}</p>
-                    <p className="text-lg font-semibold">
-                      {s.role} ·{" "}
-                      <Link href={s.path} className="text-ink">
-                        {s.title}
-                      </Link>
-                    </p>
-                    <p className="text-muted flex flex-wrap items-center gap-x-3">
-                      <span>{s.place}</span>
-                      {hours > 0 && (
-                        <span>
-                          {hours === 1
-                            ? t("hub.seva.hour")
-                            : t("hub.seva.hours", { count: hours })}
-                        </span>
+                      {e?.cancelled && (
+                        <Pill tone="kumkum">{t("hub.cancelled")}</Pill>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => forgetDone(s.slot)}
-                        aria-label={t("hub.seva.notDoneLabel", {
-                          role: s.role,
-                          title: s.title,
-                        })}
-                        className="text-muted cursor-pointer text-base underline"
-                      >
-                        {t("hub.seva.notDone")}
-                      </button>
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-        {!comingSeva.length && !done.length && (
-          <Empty
-            text={t("hub.seva.empty")}
-            links={[
-              [locale === "gu" ? "/gu/seva" : "/seva", t("hub.findSeva")],
-            ]}
-          />
-        )}
-      </Section>
-
-      <Section id="past" title={t("hub.tile.past")} t={t}>
-        {past.ask.length > 0 && (
-          <div className="border-marigold/40 bg-marigold/10 flex flex-col gap-3 rounded-2xl border p-5">
-            <h3 className="font-display text-2xl">{t("hub.past.ask")}</h3>
-            <ul className="flex flex-col gap-4">
-              {past.ask.slice(0, 5).map((v) => {
-                const title = eventTitle(v.id);
-                const e = loaded?.events[v.id];
-                return (
-                  <li key={v.id} className="flex flex-col gap-2">
-                    <p>
-                      <span className="text-marigold-ink block font-semibold">
-                        {when(v.id, v.at)}
-                      </span>
-                      <span className="text-lg font-semibold">{title}</span>
-                      {e && <span className="text-muted">, {e.mandir}</span>}
-                    </p>
-                    <p className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setWent(v.id, v.at, true)}
-                        aria-label={t("hub.past.yesLabel", { title })}
-                        className={`${quietButtonClass} border-peacock px-5 py-2`}
-                      >
-                        {t("hub.past.yes")}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setWent(v.id, v.at, false)}
-                        aria-label={t("hub.past.noLabel", { title })}
-                        className={`${quietButtonClass} px-5 py-2`}
-                      >
-                        {t("hub.past.no")}
-                      </button>
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-        {past.went.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            <h3 className="font-display text-2xl">{t("hub.past.went")}</h3>
-            <ul className="divide-line flex flex-col divide-y">
-              {past.went.map((v) => {
-                const e = loaded?.events[v.id];
-                const title = eventTitle(v.id);
-                return (
-                  <li key={v.id} className="flex flex-col gap-1 py-3">
-                    <p className="text-marigold-ink font-semibold">
-                      {when(v.id, v.at)}
                     </p>
                     {e ? (
                       <Link
@@ -620,42 +414,300 @@ export function Hub() {
                         {e.title}
                       </Link>
                     ) : (
-                      <p className="text-lg font-semibold">{title}</p>
+                      <p className="text-lg font-semibold">{t("hub.event")}</p>
                     )}
-                    <p className="text-muted flex flex-wrap items-center gap-x-3">
-                      {e && <span>{`${e.mandir}, ${e.town}`}</span>}
-                      <button
-                        type="button"
-                        onClick={() => forgetVisit(v.id)}
-                        aria-label={t("hub.past.removeLabel", { title })}
-                        className="text-muted cursor-pointer text-base underline"
-                      >
-                        {t("hub.past.remove")}
-                      </button>
+                    <p className="text-muted">
+                      {e ? `${e.mandir}, ${e.town} · ` : ""}
+                      {t("hub.coming.plan")}
                     </p>
                   </li>
                 );
               })}
             </ul>
-          </div>
-        ) : (
-          !past.ask.length && <Empty text={t("hub.past.empty")} links={[]} />
-        )}
-      </Section>
+          ) : (
+            <Empty
+              text={t("hub.coming.empty")}
+              links={[
+                [
+                  locale === "gu" ? "/gu/whats-on" : "/whats-on",
+                  t("hub.findEvents"),
+                ],
+                [locale === "gu" ? "/gu/seva" : "/seva", t("hub.findSeva")],
+              ]}
+            />
+          )}
+        </Section>
+      )}
 
-      <Section id="settings" title={t("hub.tile.settings")} t={t}>
-        <Settings
-          t={t}
-          data={{
-            following,
-            plan,
-            visits: visits.slice(0, 100),
-            done: done.slice(0, 100),
-            // Finished shifts travel in the record of seva done.
-            slots: comingSeva as MySlot[],
-          }}
-        />
-      </Section>
+      {shows("mandirs") && (
+        <Section id="mandirs" title={t("hub.tile.mandirs")} t={t}>
+          {following.length ? (
+            <>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {following.map((slug) => {
+                  const m = loaded?.mandirs[slug];
+                  const name = m?.name ?? slug.replace(/-/g, " ");
+                  return (
+                    <li
+                      key={slug}
+                      className={`${cardClass} flex flex-col gap-3 p-5`}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <Link
+                          href={
+                            m?.path ??
+                            `${locale === "gu" ? "/gu" : ""}/mandirs/${slug}`
+                          }
+                          className="text-ink text-xl font-semibold"
+                        >
+                          {name}
+                        </Link>
+                        {m && <p className="text-muted">{m.town}</p>}
+                      </div>
+                      {m?.hours && <OpenNow {...m.hours} />}
+                      {m &&
+                        (m.next ? (
+                          <p>
+                            <span className="text-muted block text-base">
+                              {t("hub.mandirs.next")}
+                            </span>
+                            <span className="text-marigold-ink block font-semibold">
+                              {m.next.when}
+                            </span>
+                            <Link
+                              href={m.next.path}
+                              className="text-peacock underline"
+                            >
+                              {m.next.title}
+                            </Link>
+                          </p>
+                        ) : (
+                          <p className="text-muted">
+                            {t("hub.mandirs.nothing")}
+                          </p>
+                        ))}
+                      <p className="mt-auto flex flex-wrap gap-2">
+                        <Link
+                          href={`${locale === "gu" ? "/gu" : ""}/whats-on?mandirs=${slug}`}
+                          className={pillButtonClass}
+                        >
+                          {t("hub.mandirs.events")}
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setFollowing(slug, false)}
+                          aria-label={t("hub.mandirs.unfollowLabel", { name })}
+                          className={pillButtonClass}
+                        >
+                          {t("hub.mandirs.unfollow")}
+                        </button>
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+              <Link
+                href={`${locale === "gu" ? "/gu" : ""}/whats-on?mandirs=${following.join(",")}`}
+                className={`${actionPillClass} self-start`}
+              >
+                <Star filled />
+                {t("hub.mandirs.events")}
+              </Link>
+            </>
+          ) : (
+            <Empty
+              text={t("hub.mandirs.empty")}
+              links={[
+                [
+                  locale === "gu" ? "/gu/mandirs" : "/mandirs",
+                  t("hub.findMandirs"),
+                ],
+              ]}
+            />
+          )}
+        </Section>
+      )}
+
+      {shows("seva") && (
+        <Section id="seva" title={t("hub.tile.seva")} t={t}>
+          {comingSeva.length > 0 && (
+            <div className="border-peacock/30 bg-peacock/5 flex flex-col gap-3 rounded-2xl border p-5">
+              <h3 className="font-display text-2xl">{t("hub.seva.coming")}</h3>
+              <ul className="flex flex-col gap-4">
+                {[...comingSeva]
+                  .sort((a, b) => a.starts_at.localeCompare(b.starts_at))
+                  .map((s) => (
+                    <MySlotItem key={s.slot} slug={slotMandir(s)} slot={s}>
+                      <p>
+                        <Link
+                          href={s.path}
+                          className="text-peacock font-semibold"
+                        >
+                          {s.title}
+                        </Link>
+                        <span className="text-muted">, {s.place}</span>
+                      </p>
+                    </MySlotItem>
+                  ))}
+              </ul>
+            </div>
+          )}
+          {done.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <h3 className="font-display text-2xl">{t("hub.seva.done")}</h3>
+              <ul className="divide-line flex flex-col divide-y">
+                {done.map((s) => {
+                  const hours = shiftHours(s);
+                  return (
+                    <li key={s.slot} className="flex flex-col gap-1 py-3">
+                      <p className="text-marigold-ink font-semibold">
+                        {s.label}
+                      </p>
+                      <p className="text-lg font-semibold">
+                        {s.role} ·{" "}
+                        <Link href={s.path} className="text-ink">
+                          {s.title}
+                        </Link>
+                      </p>
+                      <p className="text-muted flex flex-wrap items-center gap-x-3">
+                        <span>{s.place}</span>
+                        {hours > 0 && (
+                          <span>
+                            {hours === 1
+                              ? t("hub.seva.hour")
+                              : t("hub.seva.hours", { count: hours })}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => forgetDone(s.slot)}
+                          aria-label={t("hub.seva.notDoneLabel", {
+                            role: s.role,
+                            title: s.title,
+                          })}
+                          className="text-muted cursor-pointer text-base underline"
+                        >
+                          {t("hub.seva.notDone")}
+                        </button>
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          {!comingSeva.length && !done.length && (
+            <Empty
+              text={t("hub.seva.empty")}
+              links={[
+                [locale === "gu" ? "/gu/seva" : "/seva", t("hub.findSeva")],
+              ]}
+            />
+          )}
+        </Section>
+      )}
+
+      {shows("past") && (
+        <Section id="past" title={t("hub.tile.past")} t={t}>
+          {past.ask.length > 0 && (
+            <div className="border-marigold/40 bg-marigold/10 flex flex-col gap-3 rounded-2xl border p-5">
+              <h3 className="font-display text-2xl">{t("hub.past.ask")}</h3>
+              <ul className="flex flex-col gap-4">
+                {past.ask.slice(0, 5).map((v) => {
+                  const title = eventTitle(v.id);
+                  const e = loaded?.events[v.id];
+                  return (
+                    <li key={v.id} className="flex flex-col gap-2">
+                      <p>
+                        <span className="text-marigold-ink block font-semibold">
+                          {when(v.id, v.at)}
+                        </span>
+                        <span className="text-lg font-semibold">{title}</span>
+                        {e && <span className="text-muted">, {e.mandir}</span>}
+                      </p>
+                      <p className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setWent(v.id, v.at, true)}
+                          aria-label={t("hub.past.yesLabel", { title })}
+                          className={`${quietButtonClass} border-peacock px-5 py-2`}
+                        >
+                          {t("hub.past.yes")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWent(v.id, v.at, false)}
+                          aria-label={t("hub.past.noLabel", { title })}
+                          className={`${quietButtonClass} px-5 py-2`}
+                        >
+                          {t("hub.past.no")}
+                        </button>
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          {past.went.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              <h3 className="font-display text-2xl">{t("hub.past.went")}</h3>
+              <ul className="divide-line flex flex-col divide-y">
+                {past.went.map((v) => {
+                  const e = loaded?.events[v.id];
+                  const title = eventTitle(v.id);
+                  return (
+                    <li key={v.id} className="flex flex-col gap-1 py-3">
+                      <p className="text-marigold-ink font-semibold">
+                        {when(v.id, v.at)}
+                      </p>
+                      {e ? (
+                        <Link
+                          href={e.path}
+                          className="text-ink text-lg font-semibold"
+                        >
+                          {e.title}
+                        </Link>
+                      ) : (
+                        <p className="text-lg font-semibold">{title}</p>
+                      )}
+                      <p className="text-muted flex flex-wrap items-center gap-x-3">
+                        {e && <span>{`${e.mandir}, ${e.town}`}</span>}
+                        <button
+                          type="button"
+                          onClick={() => forgetVisit(v.id)}
+                          aria-label={t("hub.past.removeLabel", { title })}
+                          className="text-muted cursor-pointer text-base underline"
+                        >
+                          {t("hub.past.remove")}
+                        </button>
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            !past.ask.length && <Empty text={t("hub.past.empty")} links={[]} />
+          )}
+        </Section>
+      )}
+
+      {!fresh && (
+        <Section id="settings" title={t("hub.tile.settings")} t={t}>
+          <Settings
+            t={t}
+            data={{
+              following,
+              plan,
+              visits: visits.slice(0, 100),
+              done: done.slice(0, 100),
+              // Finished shifts travel in the record of seva done.
+              slots: comingSeva as MySlot[],
+            }}
+          />
+        </Section>
+      )}
     </div>
   );
 }
@@ -690,6 +742,63 @@ function Section({
       >
         {t("hub.backToTop")}
       </a>
+    </section>
+  );
+}
+
+// A phone with nothing saved yet: three ways to start, instead of a page
+// of empty parts.
+function Welcome({ t, locale }: { t: T; locale: Locale }) {
+  const starts: [string, string, string, ReactNode][] = [
+    [
+      "/mandirs",
+      t("hub.welcome.follow"),
+      t("hub.welcome.followHint"),
+      <Star key="star" filled />,
+    ],
+    [
+      "/whats-on",
+      t("hub.welcome.plan"),
+      t("hub.welcome.planHint"),
+      <ListIcon key="list" />,
+    ],
+    [
+      "/seva",
+      t("hub.welcome.seva"),
+      t("hub.welcome.sevaHint"),
+      <HandsIcon key="hands" />,
+    ],
+  ];
+  return (
+    <section
+      aria-labelledby="welcome"
+      className={`${cardClass} flex flex-col gap-4 p-5 sm:p-7`}
+    >
+      <h2 id="welcome" className="font-display text-3xl sm:text-4xl">
+        {t("hub.welcome.title")}
+      </h2>
+      <p>{t("hub.welcome.text")}</p>
+      <ul className="flex flex-col gap-3">
+        {starts.map(([href, label, hint, icon]) => (
+          <li key={href}>
+            <Link
+              href={withLocale(href, locale)}
+              className="border-line hover:border-peacock/60 flex items-center gap-4 rounded-2xl border p-4 no-underline transition active:scale-[0.98]"
+            >
+              <span className="text-peacock shrink-0 [&_svg]:size-7">
+                {icon}
+              </span>
+              <span className="flex flex-col">
+                <span className="text-ink text-xl font-semibold">{label}</span>
+                <span className="text-muted text-base">{hint}</span>
+              </span>
+              <span aria-hidden="true" className="text-peacock ml-auto text-xl">
+                →
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

@@ -6,25 +6,26 @@ import { expect, test } from "@playwright/test";
 const SLUG = "shree-example-mandir-leicester";
 const PAST = "44444444-4444-4444-8444-444444444444";
 
-test("an empty phone gets a way in to each part", async ({ page }) => {
+test("an empty phone gets a welcome with a way in", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "My Toran" }).first().click();
   await expect(page).toHaveURL(/\/my$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("My Toran");
-  const parts = page.getByRole("navigation", { name: "Parts of My Toran" });
-  for (const name of ["Coming up", "My mandirs", "My seva", "Past events"]) {
-    await expect(
-      parts.getByRole("link", { name: new RegExp(name) }),
-    ).toBeVisible();
-  }
-  await parts.getByRole("link", { name: /My seva/ }).click();
-  await expect(page).toHaveURL(/#seva$/);
-  await expect(page.getByText(/No seva yet/)).toBeVisible();
+  // Nothing saved yet: a welcome instead of empty sections.
+  const welcome = page.getByRole("region", { name: "Start your Toran" });
   await expect(
-    page
-      .getByRole("region", { name: "My seva" })
-      .getByRole("link", { name: "Find seva →" }),
+    welcome.getByRole("link", { name: /Follow your mandir/ }),
+  ).toHaveAttribute("href", "/mandirs");
+  await expect(
+    welcome.getByRole("link", { name: /Plan a day out/ }),
+  ).toHaveAttribute("href", "/whats-on");
+  await expect(
+    welcome.getByRole("link", { name: /Help with seva/ }),
   ).toHaveAttribute("href", "/seva");
+  await expect(
+    page.getByRole("navigation", { name: "Parts of My Toran" }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "My seva" })).toHaveCount(0);
 });
 
 test("seva done and past events are kept, and move to a new phone", async ({
@@ -67,6 +68,8 @@ test("seva done and past events are kept, and move to a new phone", async ({
 
   const seva = page.getByRole("region", { name: "My seva" });
   await expect(seva.getByText("Seva you've done")).toBeVisible();
+  // Only the parts with something in them show.
+  await expect(page.getByRole("region", { name: "My mandirs" })).toHaveCount(0);
   await expect(seva.getByText("Kitchen ·")).toBeVisible();
   await expect(seva.getByText("3 hours")).toBeVisible();
 

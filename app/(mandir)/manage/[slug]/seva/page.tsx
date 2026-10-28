@@ -7,10 +7,10 @@ import { Badge } from "@/components/public-shell";
 import {
   Card,
   Loading,
-  PageShell,
   pillButtonClass,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { upcomingFilter, withNextStart } from "@/lib/events";
 import { formatEventStart, londonDate } from "@/lib/format";
 import { requireMandirAccess } from "@/lib/manage-access";

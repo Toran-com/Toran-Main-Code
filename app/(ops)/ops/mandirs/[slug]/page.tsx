@@ -10,9 +10,9 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
   quietButtonClass,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { FORM_ERRORS } from "@/lib/mandir-form";
 import { pageTitle } from "@/lib/site";

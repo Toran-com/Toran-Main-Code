@@ -8,8 +8,8 @@ import {
   inputClass,
   Loading,
   Notice,
-  PageShell,
 } from "@/components/ui";
+import { PageShell } from "@/components/page-shell";
 import { getCurrentUser } from "@/lib/auth";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
