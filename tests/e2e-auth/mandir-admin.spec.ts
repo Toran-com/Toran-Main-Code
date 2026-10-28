@@ -233,7 +233,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
 
   // The committee corrects its own details, which fold away until wanted.
   await member.goto(`/manage/${SLUG}`);
-  await member.getByText("Your mandir's details").click();
+  await member.getByText("Your mandir's details", { exact: true }).click();
   await member
     .getByLabel("Website")
     .fill("krishnatemple-leicester.example.org");

@@ -28,7 +28,7 @@ test("invite a colleague, who accepts; remove and leave", async ({
   // Invite, with capitals the database tidies.
   await first.goto(`/manage/${SLUG}`);
   // The committee part folds away until it's wanted.
-  await first.getByText("Your committee on Toran").click();
+  await first.getByText("Your committee on Toran", { exact: true }).click();
   await first
     .getByLabel("Their email address")
     .fill(colleagueEmail.toUpperCase());
