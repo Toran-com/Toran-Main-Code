@@ -745,13 +745,21 @@ export function mentionsDates(html: string): boolean {
 
 // ---- Choosing what to keep --------------------------------------------------
 
-// Upcoming events only (today to two years ahead), one per title and day.
+// Lines in a mandir's calendar that say when to end a fast, not an event
+// to go to: "Break fast 07:10 (sunrise) - 10:15", "Fasting till noon",
+// "Parana". A breakfast that is an event ("Charity breakfast") stays.
+const FAST_NOTE =
+  /^\s*(?:break\s?fast\b.*\d{1,2}[:.]\d{2}|fast(?:ing)?\s+(?:till|until)\b|parana\b)/i;
+
+// Upcoming events only (today to two years ahead), one per title and day,
+// leaving out notes about fasting.
 export function upcoming(events: FoundEvent[], now = new Date()): FoundEvent[] {
   const today = londonDate(now);
   const latest = londonDate(new Date(now.getTime() + 2 * 366 * 86_400_000));
   const seen = new Set<string>();
   return events.filter((e) => {
     const key = `${e.title.toLowerCase()}|${e.date}`;
+    if (FAST_NOTE.test(e.title)) return false;
     if (e.date < today || e.date > latest || seen.has(key)) return false;
     seen.add(key);
     return true;
