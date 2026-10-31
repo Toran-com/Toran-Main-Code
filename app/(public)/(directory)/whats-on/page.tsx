@@ -243,6 +243,12 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {!mandirs.length && <FollowedOnly href={here({})} />}
             <PlanLink />
+            <Link
+              href={localePath("/regular")}
+              className="text-peacock font-semibold underline"
+            >
+              {t("whatsOn.regular")}
+            </Link>
           </div>
         </div>
         {active.length > 0 && (
