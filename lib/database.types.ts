@@ -430,6 +430,9 @@ isOneToOne: false
             "accept_committee_invite":
 { Args: { "invite": string }; Returns: string
                            },
+"can_edit_mandir_photo":
+{ Args: { "object_name": string }; Returns: boolean
+                           },
 "committee_members":
 { Args: { "target": string }; Returns: {
               "added_at": string,"added_by_me": boolean,"email": string,"user_id": string
