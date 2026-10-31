@@ -12,7 +12,8 @@ import type { Duplicate } from "@/lib/review-queue";
 // like something already there, and the buttons. "Fix something first"
 // (`fixHref`) reloads the page with this item's details open to correct
 // (`fixing`) before publishing, or, where Toran can't publish, before the
-// committee does. Only that one form is on the page.
+// committee does. Only that one form is on the page. With `tickForm`, a
+// tick box joins the item to that form, to publish several at once.
 export function ReviewItem({
   id,
   mandirSlug,
@@ -25,6 +26,7 @@ export function ReviewItem({
   fixHref,
   cancelHref,
   fixing,
+  tickForm,
 }: {
   id: string;
   mandirSlug: string;
@@ -37,6 +39,7 @@ export function ReviewItem({
   fixHref: string;
   cancelHref: string;
   fixing: boolean;
+  tickForm?: string;
 }) {
   const fields = (
     <>
@@ -58,6 +61,18 @@ export function ReviewItem({
     >
       {header}
       <PosterDetails poster={poster} />
+      {tickForm && !fixing && (
+        <label className="flex items-center gap-3 self-start font-semibold">
+          <input
+            type="checkbox"
+            name="poster"
+            value={id}
+            form={tickForm}
+            className="accent-peacock size-6"
+          />
+          Tick to publish with the others
+        </label>
+      )}
       {duplicates.length > 0 && (
         <Likeness
           mandirSlug={mandirSlug}

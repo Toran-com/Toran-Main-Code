@@ -38,6 +38,7 @@ import {
 import {
   addPoster,
   importWebsiteEvents,
+  publishTicked,
   readPosterPicture,
   reviewPosterAsToran,
 } from "./actions";
@@ -61,6 +62,7 @@ const ERRORS: Record<string, string> = {
   claimed:
     "That mandir has a committee, so they publish it. It's waiting on their page.",
   done: "Someone has already dealt with that one.",
+  ticked: "Tick at least one event to publish.",
   ...DUPLICATE_ERRORS,
   readingOff: "Reading pictures isn't switched on yet.",
   picture: "Please choose a photo or PDF of the poster.",
@@ -114,7 +116,10 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       ])
     : [{ data: [] }, { data: [] }];
   const query = await searchParams;
-  const error = ERRORS[String(query.error ?? "")];
+  const error =
+    query.published === "0"
+      ? "None of the ticked ones could be published: someone else dealt with them, or they need a closer look."
+      : ERRORS[String(query.error ?? "")];
   const read =
     query.read === undefined
       ? null
@@ -123,7 +128,9 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
     ? "Added to the queue."
     : read
       ? readMessage(read)
-      : DONE[String(query.done ?? "")];
+      : query.published !== undefined && query.published !== "0"
+        ? tickedMessage(Number(query.published) || 0, Number(query.left) || 0)
+        : DONE[String(query.done ?? "")];
   const chosen = String(query.mandir ?? "");
   // Coming from a patrika found on a mandir's website (/ops/websites).
   const startLink = String(query.link ?? "");
@@ -170,6 +177,11 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
     group: sourceGroup(c.poster.from),
   }));
   const waiting = group ? all.filter((c) => c.group === group) : all;
+  // Toran can publish these straight away, nothing like them is listed or
+  // waiting, so several can go together.
+  const tickable = (c: (typeof waiting)[number]) =>
+    c.mandir.status !== "claimed" && c.duplicates.length === 0;
+  const canTick = waiting.filter(tickable).length > 1 && fixing === "";
   const today = londonDate();
 
   return (
@@ -230,6 +242,7 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
                 hidden={group ? { group } : {}}
                 canPublish={!hasCommittee}
                 fixing={fixing === c.id}
+                tickForm={canTick && tickable(c) ? "publish-ticked" : undefined}
                 fixHref={`${here}${group ? "&" : "?"}fix=${c.id}#item-${c.id}`}
                 cancelHref={`${here}#item-${c.id}`}
                 header={
@@ -260,6 +273,23 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
             );
           })}
         </ul>
+        {canTick && (
+          <form
+            id="publish-ticked"
+            action={publishTicked}
+            className="border-line bg-sunk flex flex-wrap items-center gap-4 rounded-2xl border p-5"
+          >
+            {group && <input type="hidden" name="group" value={group} />}
+            <p className="grow basis-64">
+              Checked a few? Tick them above and publish them together. Ones
+              that look like something already there are left to do on their
+              own.
+            </p>
+            <button type="submit" className={buttonClass}>
+              Publish the ticked ones
+            </button>
+          </form>
+        )}
       </section>
 
       <Card>
@@ -411,6 +441,14 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       </Card>
     </>
   );
+}
+
+function tickedMessage(published: number, left: number) {
+  const events = (n: number) => `${n} ${n === 1 ? "event" : "events"}`;
+  const stayed = left
+    ? ` ${events(left)} stayed in the queue: someone else dealt with ${left === 1 ? "it" : "them"}, or ${left === 1 ? "it needs" : "they need"} a closer look.`
+    : "";
+  return `Published ${events(published)}. ${published === 1 ? "It's" : "They're"} on the mandirs' pages now.${stayed}`;
 }
 
 function readMessage({ added, skipped }: { added: number; skipped: number }) {
