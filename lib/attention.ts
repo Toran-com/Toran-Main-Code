@@ -200,3 +200,12 @@ export function nightlyStatus(
   const hours = (now.getTime() - new Date(run.ran_at).getTime()) / 3_600_000;
   return { state: hours > LATE_HOURS ? "late" : "ok", ranAt: run.ran_at, text };
 }
+
+// Mandir details nobody has changed in this long are worth checking:
+// phone numbers, websites and opening times drift.
+export const STALE_DAYS = 183;
+
+// The moment before which a mandir's details count as not updated lately.
+export function staleCutoff(now: Date = new Date()): string {
+  return new Date(now.getTime() - STALE_DAYS * 86_400_000).toISOString();
+}
