@@ -153,6 +153,7 @@ export const gu: Record<MessageKey, string> = {
   "mandir.directions": "રસ્તો",
   "mandir.gettingThere": "કેવી રીતે પહોંચવું",
   "mandir.website": "વેબસાઇટ",
+  "mandir.photoAlt": "{name}નો ફોટો",
   "mandir.phone": "ફોન",
   "mandir.call": "ફોન કરો",
   "mandir.callNumber": "{name}ને {phone} પર ફોન કરો",

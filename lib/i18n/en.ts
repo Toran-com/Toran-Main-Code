@@ -150,6 +150,7 @@ export const en = {
   "mandir.directions": "Directions",
   "mandir.gettingThere": "Getting there",
   "mandir.website": "Website",
+  "mandir.photoAlt": "Photo of {name}",
   "mandir.phone": "Phone",
   "mandir.call": "Call",
   "mandir.callNumber": "Call {name} on {phone}",

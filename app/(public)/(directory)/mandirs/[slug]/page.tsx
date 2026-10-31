@@ -6,6 +6,7 @@ import { DateTile } from "@/components/date-tile";
 import { FollowButton } from "@/components/follow";
 import { CallAndDirections, directionsTo } from "@/components/call-directions";
 import { GlobeIcon } from "@/components/icons";
+import { photoUrl } from "@/lib/mandir-photo";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ReadAloud } from "@/components/read-aloud";
@@ -102,6 +103,12 @@ export default async function MandirPage({
         >
           {t("mandir.all")}
         </Link>
+        {mandir.photo_path && (
+          <MandirPhoto
+            path={mandir.photo_path}
+            alt={t("mandir.photoAlt", { name: mandir.name })}
+          />
+        )}
         <div className="rise relative flex max-w-4xl flex-col gap-4">
           <div className="flex flex-wrap items-start gap-x-4 gap-y-3 sm:gap-x-6">
             <h1 className="font-display min-w-0 flex-1 text-5xl leading-[1.02] tracking-tight sm:text-7xl">
@@ -504,4 +511,26 @@ function NoEvents({ website }: { website: string | null }) {
 function regionName(region: string): string {
   const key = regionKey(region);
   return key ? pageT()(key) : region;
+}
+
+// The committee's photo of the mandir, full width. A phone always gets
+// the small copy (tens of kilobytes); only a laptop-sized screen gets the
+// larger one.
+function MandirPhoto({ path, alt }: { path: string; alt: string }) {
+  const small = photoUrl(path, 640);
+  const large = photoUrl(path, 1200);
+  if (!small || !large) return null;
+  return (
+    <picture className="relative block">
+      <source media="(min-width: 1024px)" srcSet={large} />
+      <img
+        src={small}
+        alt={alt}
+        width={640}
+        height={360}
+        decoding="async"
+        className="bg-sunk aspect-[16/9] w-full rounded-3xl object-cover lg:aspect-[21/8] lg:max-h-[26rem]"
+      />
+    </picture>
+  );
 }
