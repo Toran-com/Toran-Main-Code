@@ -11,6 +11,7 @@ import {
 } from "@/components/ui";
 import { PageShell } from "@/components/page-shell";
 import { getCurrentUser } from "@/lib/auth";
+import { listMandirs } from "@/lib/directory";
 import { readSupabaseEnv } from "@/lib/env";
 import { pageTitle } from "@/lib/site";
 import { requestLoginLink } from "../login/actions";
@@ -19,7 +20,9 @@ import { requestLoginLink } from "../login/actions";
 // mandirs". Two choices. Committee members give their email, get a link,
 // then choose their mandir (/join/mandir) for Toran to check. Visitors
 // don't need an account (decision 0006): what they save stays on their
-// phone, in My Toran.
+// phone, in My Toran. A link for one mandir (/join?mandir=<slug>, which
+// Toran sends its committee) skips choosing: the email's link goes
+// straight to asking to look after that mandir's page.
 
 export const metadata: Metadata = {
   title: pageTitle("Create an account"),
@@ -50,6 +53,9 @@ export default function JoinPage(props: PageProps<"/join">) {
 async function Join({ searchParams }: PageProps<"/join">) {
   const query = await searchParams;
   const error = ERRORS[String(query.error ?? "")];
+  const chosen = await mandirFor(String(query.mandir ?? ""));
+  const next = chosen ? `/mandirs/${chosen.slug}/claim` : NEXT;
+  const here = chosen ? `/join?mandir=${chosen.slug}` : "/join";
 
   let configured = true;
   try {
@@ -67,10 +73,12 @@ async function Join({ searchParams }: PageProps<"/join">) {
         </Notice>
         <p className="text-muted">
           It can take a minute to arrive; check your spam folder too. The link
-          works once and expires after an hour. Then you&apos;ll choose your
-          mandir.
+          works once and expires after an hour. Then you&apos;ll{" "}
+          {chosen
+            ? `say what you do at ${chosen.name}.`
+            : "choose your mandir."}
         </p>
-        <Link href="/join" className="text-peacock font-semibold underline">
+        <Link href={here} className="text-peacock font-semibold underline">
           Use a different email
         </Link>
       </Card>
@@ -79,7 +87,18 @@ async function Join({ searchParams }: PageProps<"/join">) {
 
   return (
     <>
-      <p className="text-muted text-lg">Which describes you?</p>
+      {chosen ? (
+        <Notice>
+          This link is for <strong>{chosen.name}</strong>, {chosen.town}. Not
+          your mandir?{" "}
+          <Link href="/join" className="underline">
+            Start without it
+          </Link>
+          .
+        </Notice>
+      ) : (
+        <p className="text-muted text-lg">Which describes you?</p>
+      )}
       {error && <Notice tone="error">{error}</Notice>}
 
       <Card>
@@ -90,7 +109,11 @@ async function Join({ searchParams }: PageProps<"/join">) {
         </p>
         <ol className="text-muted flex list-decimal flex-col gap-1 pl-6">
           <li>Enter your email. We send you a link: no password needed.</li>
-          <li>Choose your mandir and say what you do there.</li>
+          <li>
+            {chosen
+              ? `Say what you do at ${chosen.name}.`
+              : "Choose your mandir and say what you do there."}
+          </li>
           <li>
             We check you&apos;re on the committee, usually with a quick phone
             call, then your mandir&apos;s page is yours to update.
@@ -107,13 +130,13 @@ async function Join({ searchParams }: PageProps<"/join">) {
               You&apos;re logged in as{" "}
               <strong className="break-all">{user.email}</strong>.
             </p>
-            <Link href={NEXT} className={`${buttonClass} self-start`}>
-              Choose your mandir
+            <Link href={next} className={`${buttonClass} self-start`}>
+              {chosen ? `Carry on for ${chosen.name}` : "Choose your mandir"}
             </Link>
           </div>
         ) : (
           <form action={requestLoginLink} className="flex flex-col gap-4">
-            <input type="hidden" name="next" value={NEXT} />
+            <input type="hidden" name="next" value={next} />
             <input type="hidden" name="from" value="join" />
             <label className="flex flex-col gap-2 font-semibold">
               Your email address
@@ -171,4 +194,13 @@ async function Join({ searchParams }: PageProps<"/join">) {
       )}
     </>
   );
+}
+
+// The mandir a join link is for, if it's one on Toran's public list.
+async function mandirFor(slug: string) {
+  if (!slug || !/^[a-z0-9-]{1,120}$/.test(slug)) return null;
+  const mandirs = await listMandirs();
+  return mandirs.state === "ok"
+    ? (mandirs.data.find((m) => m.slug === slug) ?? null)
+    : null;
 }

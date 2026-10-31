@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { latestLoginLink, sql } from "./helpers";
+import { latestLoginLink, logInAsAdmin, sql } from "./helpers";
 
 // Creating a committee account: log in, choose your mandir by searching,
 // and ask to look after its page. Uses a mandir no other test looks at.
@@ -64,4 +64,44 @@ test("a new committee member finds their mandir and asks to look after it", asyn
 
   sql(`delete from public.mandir_claims
     where user_id = (select id from auth.users where email = '${email}')`);
+});
+
+test("a join link for one mandir skips choosing it", async ({
+  page,
+  browser,
+}) => {
+  test.setTimeout(90_000);
+  // A mandir no other test looks at.
+  const slug = "chelmsford-hindu-society";
+  await logInAsAdmin(page, `join-link-${Date.now()}@example.com`);
+  await page.goto(`/ops/mandirs/${slug}`);
+  const card = page.getByRole("region", {
+    name: "Join link for its committee",
+  });
+  await expect(card.getByRole("img", { name: /^QR code for / })).toBeVisible();
+  const link = await card.locator("code").innerText();
+  expect(link).toMatch(new RegExp(`/join\\?mandir=${slug}$`));
+
+  // Someone on its committee opens the link on their own phone.
+  const phone = await browser.newPage();
+  const email = `join-link-member-${Date.now()}@example.com`;
+  await phone.goto(new URL(link).pathname + new URL(link).search);
+  await expect(
+    phone.getByText(/This link is for Chelmsford Hindu Society/),
+  ).toBeVisible();
+  await phone.getByLabel("Your email address").fill(email);
+  await phone
+    .getByRole("button", { name: "Email me a link to carry on" })
+    .click();
+  await expect(
+    phone.getByText(/say what you do at Chelmsford Hindu Society/),
+  ).toBeVisible();
+  // The email's link goes straight to asking for that mandir's page.
+  await phone.goto(await latestLoginLink(email));
+  await expect(phone).toHaveURL(new RegExp(`/mandirs/${slug}/claim$`));
+  await phone.close();
+
+  // An unknown mandir is ignored: the usual page.
+  await page.goto("/join?mandir=no-such-mandir");
+  await expect(page.getByText("Which describes you?")).toBeVisible();
 });
