@@ -50,6 +50,9 @@ export async function saveEvent(
       confirmed_at: confirmed ? new Date().toISOString() : null,
       link,
       festival_date_id: festivalDateId,
+      cost_note: event.costNote,
+      tickets_needed: event.ticketsNeeded,
+      tickets_url: event.ticketsUrl,
     })
     .select("id")
     .single();
@@ -91,6 +94,9 @@ export async function updateEvent(
       starts_at: event.startsAt.toISOString(),
       all_day: event.allDay,
       recurrence: event.rule ?? "",
+      cost_note: event.costNote ?? "",
+      tickets_needed: event.ticketsNeeded,
+      tickets_url: event.ticketsUrl ?? "",
     },
     dates: event.occurrences.map((at) => at.toISOString()),
     today: `${londonDate()}T00:00:00Z`,

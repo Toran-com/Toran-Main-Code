@@ -61,6 +61,8 @@ export type MandirEvent = Pick<
   | "all_day"
   | "location_note"
   | "cost_note"
+  | "tickets_needed"
+  | "tickets_url"
   | "link"
   | "status"
   | "confirmed_at"
@@ -116,7 +118,7 @@ export async function listMandirs(): Promise<Loaded<MandirSummary[]>> {
 const MANDIR_COLUMNS =
   "id, slug, name, town, region, postcode, tradition, calendar, website, phone, charity_number, status, latitude, longitude, getting_there, facilities, visiting_note, opening_hours, aarti_times";
 const EVENT_COLUMNS =
-  "id, title, title_gu, kind, summary, summary_gu, starts_at, ends_at, all_day, location_note, cost_note, link, status, confirmed_at, recurrence, origin, event_occurrences (starts_at, cancelled)";
+  "id, title, title_gu, kind, summary, summary_gu, starts_at, ends_at, all_day, location_note, cost_note, tickets_needed, tickets_url, link, status, confirmed_at, recurrence, origin, event_occurrences (starts_at, cancelled)";
 
 export async function getMandir(
   slug: string,

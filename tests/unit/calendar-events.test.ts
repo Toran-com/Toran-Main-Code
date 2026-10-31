@@ -17,6 +17,8 @@ const event = (over: Partial<MandirEvent>): MandirEvent => ({
   all_day: false,
   location_note: "Main hall",
   cost_note: "Free",
+  tickets_needed: false,
+  tickets_url: null,
   link: null,
   status: "published",
   confirmed_at: null,

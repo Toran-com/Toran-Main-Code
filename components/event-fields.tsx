@@ -5,15 +5,18 @@ import { londonDate } from "@/lib/format";
 
 // The details of an event: used by a committee adding or editing an event
 // and by Toran typing up a forwarded poster. Committees can also give the
-// name and description in Gujarati, and say what kind of event it is.
-// "values" fills the fields in, when editing.
+// name and description in Gujarati, say what kind of event it is, and
+// give its cost and whether to book first (`tickets`). "values" fills the
+// fields in, when editing.
 export function EventFields({
   gujarati = false,
   kinds = false,
+  tickets = false,
   values,
 }: {
   gujarati?: boolean;
   kinds?: boolean;
+  tickets?: boolean;
   values?: EventInput;
 }) {
   return (
@@ -126,6 +129,52 @@ export function EventFields({
           className={`${inputClass} mt-2`}
         />
       </details>
+      {tickets && (
+        <details
+          className="flex flex-col gap-2"
+          open={!!(values?.cost_note || values?.tickets || values?.tickets_url)}
+        >
+          <summary className="cursor-pointer font-semibold">
+            Add the cost or tickets (optional)
+          </summary>
+          <div className="mt-2 flex flex-col gap-4">
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">Cost</span>
+              <input
+                name="cost_note"
+                defaultValue={values?.cost_note}
+                maxLength={80}
+                placeholder="e.g. Free, or £10 adults, children free"
+                className={inputClass}
+              />
+            </label>
+            <label className="flex items-center gap-3 font-semibold">
+              <input
+                type="checkbox"
+                name="tickets"
+                value="needed"
+                defaultChecked={values?.tickets === "needed"}
+                className="accent-peacock size-6"
+              />
+              People need to book or get a ticket first
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">Where to book (optional)</span>
+              <input
+                name="tickets_url"
+                inputMode="url"
+                maxLength={300}
+                defaultValue={values?.tickets_url}
+                placeholder="https://"
+                className={inputClass}
+              />
+            </label>
+            <p className="text-muted text-base">
+              Leave the link empty if people book by phone or at the mandir.
+            </p>
+          </div>
+        </details>
+      )}
       {gujarati && (
         <details
           className="flex flex-col gap-2"
