@@ -42,6 +42,12 @@ $$;
 revoke all on function public.can_edit_mandir_photo(text) from public, anon;
 grant execute on function public.can_edit_mandir_photo(text) to authenticated;
 
+-- The files are public anyway; Storage reads a file's row when it's
+-- replaced or removed, so reading it is allowed too.
+create policy "mandir photos: anyone can read"
+  on storage.objects for select
+  using (bucket_id = 'mandir-photos');
+
 create policy "mandir photos: committees add"
   on storage.objects for insert to authenticated
   with check (bucket_id = 'mandir-photos' and public.can_edit_mandir_photo(name));
