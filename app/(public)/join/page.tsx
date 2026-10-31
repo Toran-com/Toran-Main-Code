@@ -53,7 +53,14 @@ export default function JoinPage(props: PageProps<"/join">) {
 async function Join({ searchParams }: PageProps<"/join">) {
   const query = await searchParams;
   const error = ERRORS[String(query.error ?? "")];
-  const chosen = await mandirFor(String(query.mandir ?? ""));
+  // From the link itself, or, after sending the email or a mistyped
+  // address, from where the email's link will lead.
+  const fromNext = /^\/mandirs\/([a-z0-9-]+)\/claim$/.exec(
+    String(query.next ?? ""),
+  );
+  const chosen = await mandirFor(
+    String(query.mandir ?? "") || (fromNext?.[1] ?? ""),
+  );
   const next = chosen ? `/mandirs/${chosen.slug}/claim` : NEXT;
   const here = chosen ? `/join?mandir=${chosen.slug}` : "/join";
 
