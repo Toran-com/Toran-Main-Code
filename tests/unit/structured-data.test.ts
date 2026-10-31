@@ -43,6 +43,28 @@ describe("eventData", () => {
     });
   });
 
+  it("puts an event held elsewhere at that place", () => {
+    const data = eventData(
+      {
+        ...event,
+        venue_name: "Reading Town Hall",
+        venue_postcode: "RG1 1QH",
+      },
+      mandir,
+      url,
+    );
+    expect(data.location).toEqual({
+      "@type": "Place",
+      name: "Reading Town Hall",
+      address: {
+        "@type": "PostalAddress",
+        postalCode: "RG1 1QH",
+        addressCountry: "GB",
+      },
+    });
+    expect(data.organizer.name).toBe("Reading Hindu Temple");
+  });
+
   it("uses London dates for all-day events", () => {
     const data = eventData(
       {

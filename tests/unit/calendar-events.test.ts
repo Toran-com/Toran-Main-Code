@@ -19,6 +19,8 @@ const event = (over: Partial<MandirEvent>): MandirEvent => ({
   cost_note: "Free",
   tickets_needed: false,
   tickets_url: null,
+  venue_name: null,
+  venue_postcode: null,
   link: null,
   status: "published",
   confirmed_at: null,
@@ -53,6 +55,19 @@ describe("mandirCalendarEvents", () => {
     });
     expect(entry.description).toContain("Fireworks at 8pm");
     expect(entry.description).toContain("Main hall · Free");
+  });
+
+  it("puts an event held elsewhere at that place", () => {
+    const [entry] = mandirCalendarEvents(
+      mandir([
+        event({
+          venue_name: "Harrow Leisure Centre",
+          venue_postcode: "HA3 5BD",
+        }),
+      ]),
+      "https://toran.example",
+    );
+    expect(entry.location).toBe("Harrow Leisure Centre, HA3 5BD");
   });
 
   it("gives all-day events their UK date, even in summer time", () => {

@@ -220,6 +220,8 @@ export const hi: Record<MessageKey, string> = {
   "event.bookTickets": "टिकट बुक करें",
   "event.bookWithMandir": "जाने से पहले मंदिर से बुक करें।",
   "event.bookFirstBadge": "पहले बुक करें",
+  "event.awayFrom": "मंदिर में नहीं: {name} द्वारा आयोजित।",
+  "event.atVenue": "{venue} में",
   "event.fromMandir": "मंदिर की ओर से",
   "shell.seva": "सेवा",
   "sevaList.title": "सेवा",

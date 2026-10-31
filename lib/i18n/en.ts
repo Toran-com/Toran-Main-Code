@@ -219,6 +219,8 @@ export const en = {
   "event.bookTickets": "Book tickets",
   "event.bookWithMandir": "Book with the mandir before you go.",
   "event.bookFirstBadge": "Book first",
+  "event.awayFrom": "Not at the mandir: run by {name}.",
+  "event.atVenue": "At {venue}",
   "event.fromMandir": "From the mandir",
   "shell.my": "My Toran",
   "shell.logIn": "Committee log in",

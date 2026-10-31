@@ -404,6 +404,11 @@ function EventRow({
             ? `${t("event.repeatNext", { rule: rule ?? "" })}${formatEventStart(event.next_starts_at, event.all_day)}`
             : formatTimeOfDay(event.next_starts_at, event.all_day)}
         </p>
+        {event.venue_name && (
+          <p className="font-semibold">
+            {t("event.atVenue", { venue: event.venue_name })}
+          </p>
+        )}
         {summary && <p className="text-muted line-clamp-2">{summary}</p>}
         {(cancelled ||
           confirmed ||

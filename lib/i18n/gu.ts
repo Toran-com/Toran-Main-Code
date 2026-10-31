@@ -222,6 +222,8 @@ export const gu: Record<MessageKey, string> = {
   "event.bookTickets": "ટિકિટ બુક કરો",
   "event.bookWithMandir": "જતાં પહેલાં મંદિર સાથે બુક કરો.",
   "event.bookFirstBadge": "પહેલાં બુક કરો",
+  "event.awayFrom": "મંદિરમાં નહીં: {name} દ્વારા આયોજિત.",
+  "event.atVenue": "{venue} ખાતે",
   "event.fromMandir": "મંદિર તરફથી",
   "shell.my": "મારું Toran",
   "shell.logIn": "સમિતિ લૉગ ઇન",

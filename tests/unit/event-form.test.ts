@@ -66,6 +66,52 @@ describe("checkEvent", () => {
     });
   });
 
+  it("keeps a room note and a place away from the mandir", () => {
+    const result = checkEvent(
+      {
+        ...base,
+        location_note: " Sports hall ",
+        venue_name: " Harrow Leisure Centre ",
+        venue_postcode: "ha35bd",
+      },
+      now,
+    );
+    expect(result.ok && result.event).toMatchObject({
+      locationNote: "Sports hall",
+      venueName: "Harrow Leisure Centre",
+      venuePostcode: "HA3 5BD",
+    });
+    const none = checkEvent(base, now);
+    expect(none.ok && none.event).toMatchObject({
+      locationNote: null,
+      venueName: null,
+      venuePostcode: null,
+    });
+  });
+
+  it("needs both the place's name and a real postcode", () => {
+    expect(
+      checkEvent({ ...base, venue_name: "Harrow Leisure Centre" }, now),
+    ).toEqual({ ok: false, error: "venue" });
+    expect(checkEvent({ ...base, venue_postcode: "HA3 5BD" }, now)).toEqual({
+      ok: false,
+      error: "venue",
+    });
+    expect(
+      checkEvent(
+        {
+          ...base,
+          venue_name: "Harrow Leisure Centre",
+          venue_postcode: "near",
+        },
+        now,
+      ),
+    ).toEqual({ ok: false, error: "venuePostcode" });
+    expect(
+      checkEvent({ ...base, location_note: "x".repeat(161) }, now),
+    ).toEqual({ ok: false, error: "locationNote" });
+  });
+
   it("refuses a long cost or an odd booking link", () => {
     expect(checkEvent({ ...base, cost_note: "x".repeat(81) }, now)).toEqual({
       ok: false,
@@ -143,6 +189,9 @@ describe("eventInputFrom", () => {
       cost_note: "",
       tickets: "",
       tickets_url: "",
+      location_note: "",
+      venue_name: "",
+      venue_postcode: "",
     });
   });
 
@@ -217,6 +266,9 @@ describe("eventInputFromEvent", () => {
       cost_note: "",
       tickets: "",
       tickets_url: "",
+      location_note: "",
+      venue_name: "",
+      venue_postcode: "",
     });
   });
 
