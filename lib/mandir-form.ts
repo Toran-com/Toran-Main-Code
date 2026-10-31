@@ -44,6 +44,8 @@ export type PracticalDetails = {
   postcode: string | null;
   website: string | null;
   phone: string | null;
+  // Where it streams its aarti and katha: shown as "Watch live".
+  live_url: string | null;
   // Parking, entrance, nearest station: shown with directions.
   getting_there: string | null;
   // Step-free access, chairs, food and so on (lib/visiting.ts), and a
@@ -88,6 +90,20 @@ export function parsePracticalDetails(
     }
   }
 
+  let live_url: string | null = text(form, "live_url") || null;
+  if (live_url && !/^https?:\/\//i.test(live_url))
+    live_url = `https://${live_url}`;
+  if (live_url) {
+    try {
+      const url = new URL(live_url);
+      if (!url.hostname.includes(".") || live_url.length > 300) {
+        return { ok: false, error: "live_url" };
+      }
+    } catch {
+      return { ok: false, error: "live_url" };
+    }
+  }
+
   const phone = text(form, "phone") || null;
   if (phone && !/^[0-9+() -]{6,40}$/.test(phone)) {
     return { ok: false, error: "phone" };
@@ -119,6 +135,7 @@ export function parsePracticalDetails(
     values: {
       postcode,
       website,
+      live_url,
       phone,
       getting_there,
       facilities,
@@ -190,6 +207,8 @@ export const FORM_ERRORS: Record<string, string> = {
   charity_number: "That doesn't look like a charity number.",
   postcode: "That doesn't look like a UK postcode.",
   website: "That doesn't look like a website address.",
+  live_url:
+    "That doesn't look like a web address for the live stream (for example a YouTube or Facebook page).",
   phone: "Please use only numbers, spaces and + ( ) in the phone number.",
   getting_there: 'Please keep "Getting there" under 400 characters.',
   getting_there_contact:

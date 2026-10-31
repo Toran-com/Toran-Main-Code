@@ -242,6 +242,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByLabel("Website")
     .fill("krishnatemple-leicester.example.org");
   await member.getByLabel("Mandir phone number").fill("0116 000 0000");
+  await member
+    .getByLabel("Live stream")
+    .fill("youtube.example.org/@krishnatemple/live");
   // What visitors need to know before they set off.
   await member.getByLabel("Step-free way in").check();
   await member.getByLabel("Jain food").check();
@@ -269,6 +272,10 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
       .first(),
   ).toBeVisible();
   await expect(member.getByText("0116 000 0000").first()).toBeVisible();
+  // Where they stream aarti, one tap away.
+  await expect(
+    member.getByRole("link", { name: "Watch live" }),
+  ).toHaveAttribute("href", "https://youtube.example.org/@krishnatemple/live");
   // A big "Call" button, with the number on it.
   await expect(
     member.getByRole("link", { name: /^Call .* on 0116 000 0000$/ }),

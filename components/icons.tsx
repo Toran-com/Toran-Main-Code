@@ -29,6 +29,15 @@ export function GlobeIcon() {
   );
 }
 
+export function PlayIcon() {
+  return (
+    <svg {...props}>
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <path d="M10.5 9.5v5l4-2.5z" />
+    </svg>
+  );
+}
+
 export function PhoneIcon() {
   return (
     <svg {...props}>

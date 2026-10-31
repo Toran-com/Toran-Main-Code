@@ -152,6 +152,7 @@ export const hi: Record<MessageKey, string> = {
   "mandir.directions": "रास्ता",
   "mandir.gettingThere": "वहाँ कैसे पहुँचें",
   "mandir.website": "वेबसाइट",
+  "mandir.watchLive": "लाइव देखें",
   "mandir.phone": "फ़ोन",
   "mandir.call": "फ़ोन करें",
   "mandir.callNumber": "{name} को {phone} पर फ़ोन करें",

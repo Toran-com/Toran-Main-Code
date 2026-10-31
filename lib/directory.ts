@@ -83,6 +83,7 @@ export type MandirDetails = Pick<
   | "tradition"
   | "calendar"
   | "website"
+  | "live_url"
   | "phone"
   | "charity_number"
   | "status"
@@ -114,7 +115,7 @@ export async function listMandirs(): Promise<Loaded<MandirSummary[]>> {
 }
 
 const MANDIR_COLUMNS =
-  "id, slug, name, town, region, postcode, tradition, calendar, website, phone, charity_number, status, latitude, longitude, getting_there, facilities, visiting_note, opening_hours, aarti_times";
+  "id, slug, name, town, region, postcode, tradition, calendar, website, live_url, phone, charity_number, status, latitude, longitude, getting_there, facilities, visiting_note, opening_hours, aarti_times";
 const EVENT_COLUMNS =
   "id, title, title_gu, kind, summary, summary_gu, starts_at, ends_at, all_day, location_note, cost_note, link, status, confirmed_at, recurrence, origin, event_occurrences (starts_at, cancelled)";
 
