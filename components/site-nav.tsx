@@ -16,7 +16,7 @@ export function SiteNav({
       aria-label="Main"
       className="order-last w-full sm:order-none sm:w-auto"
     >
-      <ul className="flex justify-between gap-0 overflow-x-auto text-base whitespace-nowrap sm:justify-start sm:gap-1.5 sm:overflow-visible sm:text-lg">
+      <ul className="flex flex-wrap justify-between gap-0 text-base whitespace-nowrap sm:justify-start sm:gap-1.5 sm:text-lg">
         {links.map(({ href, label }) => {
           const here = path === href || path.startsWith(`${href}/`);
           return (

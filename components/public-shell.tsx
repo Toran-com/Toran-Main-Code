@@ -64,7 +64,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               { href: localePath("/festivals"), label: t("shell.festivals") },
             ]}
           />
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
             <Link
               href={localePath("/search")}
               aria-label={t("shell.search")}

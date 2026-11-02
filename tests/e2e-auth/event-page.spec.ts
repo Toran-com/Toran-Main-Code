@@ -115,3 +115,31 @@ test("unknown, unpublished and mismatched events aren't found", async ({
     expect((await request.get(path)).status(), path).toBe(404);
   }
 });
+
+// Mandirs' own words are in English. On Gujarati and Hindi pages they're
+// marked as English, so screen readers don't read them in a Gujarati or
+// Hindi voice; English pages need no marking.
+test("an event's own words are marked as English on translated pages", async ({
+  page,
+}) => {
+  const title = `Govardhan puja ${Date.now()}`;
+  const id = addEvent(
+    "title, kind, summary, starts_at, status",
+    `'${title}', 'festival', 'Puja at the hill of food, then prasad for all.',
+     now() + interval '5 days', 'published'`,
+  );
+  for (const locale of ["gu", "hi"]) {
+    await page.goto(`/${locale}/mandirs/${SLUG}/events/${id}`);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveAttribute(
+      "lang",
+      "en-GB",
+    );
+    await expect(
+      page.getByText("Puja at the hill of food, then prasad for all."),
+    ).toHaveAttribute("lang", "en-GB");
+  }
+  await page.goto(`/mandirs/${SLUG}/events/${id}`);
+  await expect(page.getByRole("heading", { level: 1 })).not.toHaveAttribute(
+    "lang",
+  );
+});

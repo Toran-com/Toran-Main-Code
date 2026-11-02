@@ -35,6 +35,61 @@ for (const path of [
   });
 }
 
+// The smallest screen that has to work (320px: a small phone, or 400%
+// zoom) with the largest text, in all three languages: Gujarati and Hindi
+// words are longer, so the header and buttons must wrap, not spill.
+test.describe("on a small phone with the largest text", () => {
+  test.use({ viewport: { width: 320, height: 640 } });
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() =>
+      localStorage.setItem("toran:display", JSON.stringify({ text: "xl" })),
+    );
+  });
+
+  for (const path of [
+    "/",
+    "/whats-on",
+    "/mandirs",
+    "/my",
+    "/gu",
+    "/gu/whats-on",
+    "/gu/my",
+    "/hi",
+    "/hi/whats-on",
+    "/hi/festivals",
+  ]) {
+    test(`${path} fits the screen`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator("html")).toHaveAttribute("data-text", "xl");
+      const { width, scroll } = await page.evaluate(() => ({
+        width: document.documentElement.clientWidth,
+        scroll: document.documentElement.scrollWidth,
+      }));
+      expect(
+        scroll,
+        `${path} is ${scroll - width}px too wide`,
+      ).toBeLessThanOrEqual(width);
+    });
+  }
+});
+
+// Hindi headings don't fetch the Gujarati font just for the danda (।),
+// which both scripts share; Gujarati pages do need it.
+test("Hindi pages don't download the Gujarati font", async ({ page }) => {
+  const loaded = async () => {
+    await page.waitForLoadState("networkidle");
+    return page.evaluate(() =>
+      [...document.fonts]
+        .filter((f) => f.status === "loaded")
+        .map((f) => f.family.replace(/"/g, "")),
+    );
+  };
+  await page.goto("/hi");
+  expect(await loaded()).not.toContain("Noto Serif Gujarati");
+  await page.goto("/gu");
+  expect(await loaded()).toContain("Noto Serif Gujarati");
+});
+
 // On a laptop, the main pages use the width of the screen rather than a
 // narrow column down the middle, and fit it too.
 test.describe("on a laptop", () => {

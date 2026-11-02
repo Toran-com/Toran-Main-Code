@@ -158,8 +158,8 @@ export function PlacePicker({
 
   return (
     <>
-      <div className="border-line bg-surface shadow-card flex items-center justify-between gap-3 rounded-full border py-2 pr-2 pl-5">
-        <p className="min-w-0 truncate font-semibold">
+      <div className="border-line bg-surface shadow-card flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-[1.75rem] border py-2 pr-2 pl-5">
+        <p className="min-w-0 font-semibold break-words">
           <span aria-hidden="true">📍 </span>
           {near && placed
             ? t("place.near", { place: near.toUpperCase(), miles: within })

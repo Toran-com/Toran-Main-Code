@@ -154,6 +154,13 @@ body {
   color: var(--ink);
 }
 
+/* Hindi pages leave the Gujarati serif out of the headings: its letters
+   include the danda (।), so a Hindi heading would download all 37 KB of
+   it for that one mark. Devanagari already uses the phone's own font. */
+.font-display:lang(hi) {
+  font-family: var(--font-instrument), Georgia, serif;
+}
+
 /* The headline serif has one weight: never let the browser fake a bold
    one, whatever weight a heading asks for. */
 .font-display {

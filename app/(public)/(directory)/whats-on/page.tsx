@@ -197,7 +197,9 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(19rem,24rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
       <div className="flex flex-col gap-3 lg:sticky lg:top-28">
         {place}
-        <div className="flex items-center justify-between gap-3">
+        {/* Wraps with big text on a small phone; the filter panel then
+            opens across the whole row. */}
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
           <nav
             aria-label={t("whatsOn.showAs")}
             className="border-line-strong bg-surface flex rounded-full border p-1"
@@ -336,7 +338,7 @@ function Filters({
     }));
   const regions = REGIONS.map((r) => ({ value: r, label: t(regionKey(r)!) }));
   return (
-    <details className="group relative shrink-0">
+    <details className="group shrink-0 lg:relative">
       <summary
         className={`${pillButtonClass} list-none [&::-webkit-details-marker]:hidden`}
       >
@@ -358,7 +360,7 @@ function Filters({
           </span>
         )}
       </summary>
-      <div className="border-line bg-surface absolute top-full right-0 z-20 mt-2 flex w-[min(calc(100vw-2rem),32rem)] flex-col gap-5 rounded-3xl border p-5 shadow-[0_20px_48px_rgba(0,0,0,0.18)] lg:right-auto lg:left-0">
+      <div className="border-line bg-surface absolute top-full right-0 left-0 z-20 mt-2 flex flex-col gap-5 rounded-3xl border p-5 shadow-[0_20px_48px_rgba(0,0,0,0.18)] lg:right-auto lg:w-[32rem]">
         <Choices
           title={t("whatsOn.type")}
           all={t("whatsOn.anyType")}
@@ -402,7 +404,7 @@ function Choices({
               <Link
                 href={href(o.value)}
                 aria-current={here ? "page" : undefined}
-                className={`inline-block rounded-full border px-4 py-1.5 text-base whitespace-nowrap no-underline transition-colors ${
+                className={`inline-block rounded-full border px-4 py-1.5 text-base no-underline transition-colors ${
                   here
                     ? "border-ink bg-ink text-bg font-semibold"
                     : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"

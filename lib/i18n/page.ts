@@ -10,6 +10,14 @@ export function pageT() {
   return translator(pageLocale());
 }
 
+// Mandirs' own words (event titles and descriptions, mandir names) are
+// stored in English. On Gujarati and Hindi pages they're marked as English,
+// so a screen reader reads them in an English voice, not a Gujarati or
+// Hindi one. Nothing is needed on English pages.
+export function storedLang(): "en-GB" | undefined {
+  return pageLocale() === "en" ? undefined : "en-GB";
+}
+
 // An address on the site in the page's language: "/mandirs" on English
 // pages, "/gu/mandirs" on Gujarati ones and "/hi/mandirs" on Hindi ones,
 // for pages that have translations (lib/i18n/paths.ts).
