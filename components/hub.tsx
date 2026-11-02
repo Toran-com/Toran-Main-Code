@@ -778,7 +778,7 @@ function Welcome({ t, locale }: { t: T; locale: Locale }) {
         {t("hub.welcome.title")}
       </h2>
       <p>{t("hub.welcome.text")}</p>
-      <ul className="grid gap-3 lg:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-3 lg:grid-cols-3">
         {starts.map(([href, label, hint, icon]) => (
           <li key={href}>
             <Link
@@ -788,7 +788,7 @@ function Welcome({ t, locale }: { t: T; locale: Locale }) {
               <span className="text-peacock shrink-0 [&_svg]:size-7">
                 {icon}
               </span>
-              <span className="flex flex-col">
+              <span className="flex min-w-0 flex-col break-words">
                 <span className="text-ink text-xl font-semibold">{label}</span>
                 <span className="text-muted text-base">{hint}</span>
               </span>

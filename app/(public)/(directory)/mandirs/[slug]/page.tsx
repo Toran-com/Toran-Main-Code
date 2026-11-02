@@ -35,7 +35,13 @@ import { eventPath } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData, mandirData } from "@/lib/structured-data";
 import { regionKey } from "@/lib/i18n/client/mandirs";
-import { localePath, pageLocale, pageT, seasonText } from "@/lib/i18n/page";
+import {
+  localePath,
+  pageLocale,
+  pageT,
+  seasonText,
+  storedLang,
+} from "@/lib/i18n/page";
 import { mandirKit } from "@/lib/season-kit";
 
 // Every mandir page is fully static. A mandir added after the build is
@@ -111,7 +117,10 @@ export default async function MandirPage({
         )}
         <div className="rise relative flex max-w-4xl flex-col gap-4">
           <div className="flex flex-wrap items-start gap-x-4 gap-y-3 sm:gap-x-6">
-            <h1 className="font-display min-w-0 flex-1 text-5xl leading-[1.02] tracking-tight sm:text-7xl">
+            <h1
+              lang={storedLang()}
+              className="font-display min-w-0 flex-1 text-5xl leading-[1.02] tracking-tight sm:text-7xl"
+            >
               {mandir.name}
             </h1>
             <FollowButton slug={mandir.slug} beside />

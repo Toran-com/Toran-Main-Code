@@ -7,7 +7,7 @@ import { describeRule } from "@/lib/recurrence";
 import { eventPath } from "@/lib/share";
 import type { EventNear } from "@/lib/whats-on-view";
 import { groupByDay, longDayHeading } from "@/lib/whats-on-view";
-import { pageT, localePath } from "@/lib/i18n/page";
+import { pageT, localePath, storedLang } from "@/lib/i18n/page";
 
 // Events across mandirs, grouped by day. Each row opens the event's own
 // page, which has "Add to calendar" and sharing. Rows sit on the page with
@@ -87,7 +87,8 @@ export function EventCard({
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <h3
-          className={`text-lg leading-snug font-semibold sm:text-xl ${cancelled ? "line-through" : ""}`}
+          lang={storedLang()}
+          className={`text-lg leading-snug font-semibold break-words sm:text-xl ${cancelled ? "line-through" : ""}`}
         >
           <Link
             href={localePath(eventPath(e.mandir.slug, e.id))}
@@ -102,8 +103,10 @@ export function EventCard({
           </p>
         )}
         <p className="text-muted">
-          {e.mandir.name}
-          {` · ${e.mandir.town}`}
+          <span lang={storedLang()}>
+            {e.mandir.name}
+            {` · ${e.mandir.town}`}
+          </span>
           {e.miles !== null && ` · ${formatMiles(e.miles)}`}
         </p>
         {underDay ? (
@@ -119,7 +122,11 @@ export function EventCard({
             {kind && ` · ${kind}`}
           </p>
         )}
-        {e.summary && <p className="text-muted line-clamp-2">{e.summary}</p>}
+        {e.summary && (
+          <p lang={storedLang()} className="text-muted line-clamp-2">
+            {e.summary}
+          </p>
+        )}
         {(cancelled || source) && (
           <p className="text-muted mt-1 flex flex-wrap items-center gap-x-2 text-base">
             {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}

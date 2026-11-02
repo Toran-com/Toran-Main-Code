@@ -41,7 +41,7 @@ import { placesTaken } from "@/lib/seva";
 import { eventPath, eventShareText, sevaPath } from "@/lib/share";
 import { pageMetadata, pageTitle, siteUrl } from "@/lib/site";
 import { breadcrumbData, eventData } from "@/lib/structured-data";
-import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
+import { localePath, pageLocale, pageT, storedLang } from "@/lib/i18n/page";
 
 // Every event has its own page: the link people share, with the details,
 // directions and calendar buttons in one place. Fully static; an event
@@ -155,6 +155,7 @@ export default async function EventPage({
       <div className="flex flex-col gap-4">
         <Link
           href={mandirPath}
+          lang={storedLang()}
           className="text-peacock self-start font-semibold hover:underline"
         >
           ← {mandir.name}
@@ -200,6 +201,7 @@ export default async function EventPage({
                 </p>
               )}
               <h1
+                lang={storedLang()}
                 className={`font-display text-[2.75rem] leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl ${cancelled ? "line-through" : ""}`}
               >
                 {event.title}
@@ -211,6 +213,7 @@ export default async function EventPage({
               )}
               <Link
                 href={mandirPath}
+                lang={storedLang()}
                 className="text-night-muted hover:text-on-night w-fit text-lg underline decoration-1 underline-offset-4 sm:text-xl"
               >
                 {mandir.name}, {mandir.town}
@@ -304,7 +307,10 @@ export default async function EventPage({
                 {t("event.about")}
               </h2>
               {event.summary && (
-                <p className="text-lg leading-relaxed sm:text-xl">
+                <p
+                  lang={storedLang()}
+                  className="text-lg leading-relaxed sm:text-xl"
+                >
                   {event.summary}
                 </p>
               )}
@@ -347,6 +353,7 @@ export default async function EventPage({
                     <span className="flex min-w-0 flex-col">
                       <Link
                         href={localePath(eventPath(mandir.slug, e.id))}
+                        lang={storedLang()}
                         className="card-link group-hover:text-peacock text-lg leading-snug font-semibold no-underline sm:text-xl"
                       >
                         {e.title}
