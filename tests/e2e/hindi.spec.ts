@@ -35,6 +35,7 @@ test("a draft page links back to the same page in English", async ({
   page,
 }) => {
   await page.goto("/hi/festivals");
+  await page.locator("summary", { hasText: "मेनू" }).click();
   await page.getByRole("link", { name: "English", exact: true }).click();
   await expect(page).toHaveURL(/\/festivals$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Festivals");

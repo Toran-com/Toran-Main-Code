@@ -31,10 +31,10 @@ test("login and not-found pages have the full header, with a way to log in", asy
     ).toBeVisible();
     await expect(page.getByRole("link", { name: "Search" })).toBeVisible();
   }
+  // Committees log in from the menu.
   await page.goto("/");
+  await page.locator("summary", { hasText: "Menu" }).click();
   await page.getByRole("link", { name: "Committee log in" }).click();
   await expect(page).toHaveURL(/\/login$/);
-  await expect(
-    page.getByRole("link", { name: "Committee log in" }),
-  ).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Log in");
 });

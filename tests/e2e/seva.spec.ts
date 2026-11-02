@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 
-// Seva has its own place in the main menu, and its page works before the
-// database is connected.
-test("the Seva page is in the main menu", async ({ page }) => {
+// Seva is in the menu (and in the header on a laptop), and its page works
+// before the database is connected.
+test("the Seva page is in the menu", async ({ page }) => {
   await page.goto("/");
+  await page.locator("summary", { hasText: "Menu" }).click();
   await page
-    .getByRole("navigation", { name: "Main" })
+    .getByRole("group", { name: "Menu" })
     .getByRole("link", { name: "Seva" })
     .click();
   await expect(page).toHaveURL(/\/seva$/);

@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "@/lib/i18n";
 import { languagePath, localeOfPath } from "@/lib/i18n/paths";
+import { menuRowClass } from "@/components/site-menu";
 
 export type Language = { locale: Locale; name: string; lang: string };
 
-// A link to the same page in each of the other languages ("ગુજરાતી",
+// In the menu: a link to the same page in each of the other languages ("ગુજરાતી",
 // "हिन्दी", "English"), or that language's home page for pages that are
 // only in English.
 export function LanguageSwitch({ languages }: { languages: Language[] }) {
@@ -21,7 +22,7 @@ export function LanguageSwitch({ languages }: { languages: Language[] }) {
         href={languagePath(path, l.locale)}
         lang={l.lang}
         hrefLang={l.lang}
-        className="text-ink hover:bg-sunk shrink-0 rounded-full px-3 py-2 text-base font-medium no-underline"
+        className={menuRowClass}
       >
         {l.name}
       </Link>

@@ -54,9 +54,12 @@ export function RangoliMark({
 export function Logo({ size = "md" }: { size?: "md" | "sm" }) {
   return (
     <span className="flex items-center gap-2.5">
-      <RangoliMark className={size === "md" ? "size-9" : "size-8"} />
+      {/* A logo keeps its size whatever the text size (lib/display.ts). */}
+      <RangoliMark
+        className={size === "md" ? "size-[34px] sm:size-[40px]" : "size-[36px]"}
+      />
       <span
-        className={`font-display leading-none ${size === "md" ? "text-[2rem]" : "text-[1.75rem]"}`}
+        className={`font-display leading-none ${size === "md" ? "text-[32px] sm:text-[36px]" : "text-[32px]"}`}
       >
         Toran
       </span>

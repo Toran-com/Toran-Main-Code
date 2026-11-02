@@ -161,6 +161,25 @@ body {
   font-family: var(--font-instrument), Georgia, serif;
 }
 
+/* On a phone the main places sit in a bar fixed along the bottom of the
+   screen (components/tab-bar.tsx): leave room for it at the end of the
+   page, so the footer isn't hidden behind it. */
+@media (width < 48rem) {
+  body:has(.tab-bar) {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* While the menu is open (components/site-menu.tsx) the page behind it
+   stays still, and the bottom bar steps aside: the menu has every place
+   in it, and a "Close" button. */
+html:has(.site-menu[open]) {
+  overflow: hidden;
+}
+body:has(.site-menu[open]) .tab-bar {
+  display: none;
+}
+
 /* The headline serif has one weight: never let the browser fake a bold
    one, whatever weight a heading asks for. */
 .font-display {
