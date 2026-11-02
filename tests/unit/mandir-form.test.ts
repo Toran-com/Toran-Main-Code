@@ -34,6 +34,7 @@ describe("parseMandirDetails", () => {
         region: "London",
         postcode: "UB2 4DA",
         website: "https://shreerammandir.co.uk",
+        live_url: null,
         phone: "020 8574 1234",
         tradition: null,
         calendar: "north_indian",
@@ -69,6 +70,7 @@ describe("parsePracticalDetails", () => {
       values: {
         postcode: null,
         website: null,
+        live_url: null,
         phone: null,
         getting_there: null,
         facilities: [],
@@ -87,6 +89,25 @@ describe("parsePracticalDetails", () => {
       ok: false,
       error: "phone",
     });
+  });
+  it("tidies a live stream link", () => {
+    const parsed = parsePracticalDetails(
+      form({ live_url: " youtube.com/@shreerammandir/live " }),
+    );
+    expect(parsed.ok && parsed.values.live_url).toBe(
+      "https://youtube.com/@shreerammandir/live",
+    );
+  });
+  it("rejects an odd or overlong live stream link", () => {
+    expect(parsePracticalDetails(form({ live_url: "our youtube" }))).toEqual({
+      ok: false,
+      error: "live_url",
+    });
+    expect(
+      parsePracticalDetails(
+        form({ live_url: `https://youtube.com/${"x".repeat(300)}` }),
+      ),
+    ).toEqual({ ok: false, error: "live_url" });
   });
   it("keeps a getting-there note, trimmed", () => {
     const parsed = parsePracticalDetails(

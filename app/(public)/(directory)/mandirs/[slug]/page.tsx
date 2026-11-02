@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
 import { FollowButton } from "@/components/follow";
 import { CallAndDirections, directionsTo } from "@/components/call-directions";
-import { GlobeIcon } from "@/components/icons";
+import { GlobeIcon, PlayIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import { ReadAloud } from "@/components/read-aloud";
@@ -324,8 +324,8 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
 }
 
 // The things people most often want, in one tap: directions and a call
-// as big buttons, then one row for the mandir's own website, sharing the
-// page and hearing it read aloud.
+// as big buttons, then one row for the mandir's own website, its live
+// stream, sharing the page and hearing it read aloud.
 function QuickLinks({ mandir }: { mandir: MandirDetails }) {
   const t = pageT();
   return (
@@ -336,6 +336,12 @@ function QuickLinks({ mandir }: { mandir: MandirDetails }) {
           <a href={mandir.website} rel="noopener" className={actionPillClass}>
             <GlobeIcon />
             {t("mandir.website")}
+          </a>
+        )}
+        {mandir.live_url && (
+          <a href={mandir.live_url} rel="noopener" className={actionPillClass}>
+            <PlayIcon />
+            {t("mandir.watchLive")}
           </a>
         )}
         <ShareButtons

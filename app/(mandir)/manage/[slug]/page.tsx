@@ -142,7 +142,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     ? await supabase
         .from("mandirs")
         .select(
-          "id, slug, name, town, postcode, website, phone, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
+          "id, slug, name, town, postcode, website, live_url, phone, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
         )
         .eq("slug", slug)
         .maybeSingle()
@@ -879,6 +879,19 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               name="website"
               inputMode="url"
               defaultValue={mandir.website ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold">Live stream</span>
+            <span className="text-muted -mt-1 text-base">
+              If you stream aarti or katha, the YouTube or Facebook page (or
+              your own). Shown as &ldquo;Watch live&rdquo;.
+            </span>
+            <input
+              name="live_url"
+              inputMode="url"
+              defaultValue={mandir.live_url ?? ""}
               className={inputClass}
             />
           </label>

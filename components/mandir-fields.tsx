@@ -20,6 +20,7 @@ type Values = {
   region?: string;
   postcode?: string | null;
   website?: string | null;
+  live_url?: string | null;
   phone?: string | null;
   tradition?: string | null;
   calendar?: string | null;
@@ -113,6 +114,17 @@ export function MandirFields({ values = {} }: { values?: Values }) {
           name="website"
           inputMode="url"
           defaultValue={values.website ?? ""}
+          className={inputClass}
+        />
+      </Field>
+      <Field
+        label="Live stream"
+        hint="Where aarti or katha is streamed, e.g. a YouTube or Facebook page."
+      >
+        <input
+          name="live_url"
+          inputMode="url"
+          defaultValue={values.live_url ?? ""}
           className={inputClass}
         />
       </Field>
