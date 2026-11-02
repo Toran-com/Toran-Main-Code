@@ -79,7 +79,7 @@ export async function loadCommitteeFacts(
     db
       .from("events")
       .select(
-        "id, title, status, confirmed_at, starts_at, recurrence, festival_date_id, event_occurrences (starts_at, cancelled)",
+        "id, title, status, confirmed_at, starts_at, all_day, recurrence, festival_date_id, event_occurrences (starts_at, cancelled)",
       )
       .eq("mandir_id", mandir.id)
       .neq("status", "removed")
