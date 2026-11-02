@@ -23,6 +23,12 @@ export const enReport = {
   "report.error.cost": "Please keep the cost short (80 characters at most).",
   "report.error.ticketsUrl":
     "That doesn't look like a web address for booking. Leave it empty if people book by phone or at the mandir.",
+  "report.error.locationNote":
+    "Please keep the room or hall note under 160 characters.",
+  "report.error.venue":
+    "For an event away from the mandir, please give both the place's name and its postcode.",
+  "report.error.venuePostcode":
+    "That doesn't look like a UK postcode for the place.",
   "report.error.link":
     "Please give a web address starting with http:// or https://, or leave it empty.",
   "report.error.links": "Please include no more than two web addresses.",

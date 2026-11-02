@@ -135,6 +135,9 @@ export const IMPORT_PROBLEMS: Record<ImportProblem["problem"], string> = {
   until: "it can't repeat",
   cost: "the cost is over 80 characters",
   ticketsUrl: "the booking link isn't a web address",
+  locationNote: "the room or hall note is over 160 characters",
+  venue: "the place needs both its name and postcode",
+  venuePostcode: "the place's postcode isn't a UK postcode",
   untilDaily: "an event every day can run for a month at most",
   columns:
     "it needs at least mandir, date, time, name and link, separated by tabs",

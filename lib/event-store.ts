@@ -53,6 +53,9 @@ export async function saveEvent(
       cost_note: event.costNote,
       tickets_needed: event.ticketsNeeded,
       tickets_url: event.ticketsUrl,
+      location_note: event.locationNote,
+      venue_name: event.venueName,
+      venue_postcode: event.venuePostcode,
     })
     .select("id")
     .single();
@@ -97,6 +100,9 @@ export async function updateEvent(
       cost_note: event.costNote ?? "",
       tickets_needed: event.ticketsNeeded,
       tickets_url: event.ticketsUrl ?? "",
+      location_note: event.locationNote ?? "",
+      venue_name: event.venueName ?? "",
+      venue_postcode: event.venuePostcode ?? "",
     },
     dates: event.occurrences.map((at) => at.toISOString()),
     today: `${londonDate()}T00:00:00Z`,

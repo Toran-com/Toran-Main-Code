@@ -85,6 +85,11 @@ export const guClient: Record<ClientKey, string> = {
   "report.error.cost": "કૃપા કરીને ખર્ચ ટૂંકમાં લખો (વધુમાં વધુ 80 અક્ષર).",
   "report.error.ticketsUrl":
     "આ બુકિંગ માટેનું વેબ સરનામું લાગતું નથી. લોકો ફોનથી કે મંદિરમાં બુક કરે તો ખાલી રાખો.",
+  "report.error.locationNote":
+    "કૃપા કરીને રૂમ કે હોલની નોંધ 160 અક્ષરથી ઓછી રાખો.",
+  "report.error.venue":
+    "મંદિર સિવાયની જગ્યાએ કાર્યક્રમ હોય તો, જગ્યાનું નામ અને પોસ્ટકોડ બંને આપો.",
+  "report.error.venuePostcode": "આ જગ્યાનો UK પોસ્ટકોડ લાગતો નથી.",
   "report.error.link":
     "કૃપા કરીને http:// કે https://થી શરૂ થતું વેબ સરનામું લખો, અથવા ખાલી રાખો.",
   "report.error.links": "કૃપા કરીને બેથી વધુ વેબ સરનામાં ન લખો.",

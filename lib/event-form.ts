@@ -4,6 +4,7 @@
 
 import { type EventKind, isEventKind } from "@/lib/event-kinds";
 import { londonDate, londonTime, londonToUtc } from "@/lib/format";
+import { normalisePostcode } from "@/lib/geo";
 import {
   MAX_DAILY_DAYS,
   occurrenceDates,
@@ -33,6 +34,10 @@ export type EventInput = {
   // "needed" when people must book or buy a ticket first.
   tickets?: string;
   tickets_url?: string;
+  // Which room or hall, and the place it's held if not at the mandir.
+  location_note?: string;
+  venue_name?: string;
+  venue_postcode?: string;
 };
 
 export type EventError =
@@ -47,7 +52,10 @@ export type EventError =
   | "until"
   | "untilDaily"
   | "cost"
-  | "ticketsUrl";
+  | "ticketsUrl"
+  | "locationNote"
+  | "venue"
+  | "venuePostcode";
 
 export type CheckedEvent = {
   title: string;
@@ -65,6 +73,10 @@ export type CheckedEvent = {
   costNote: string | null;
   ticketsNeeded: boolean;
   ticketsUrl: string | null;
+  // "Main hall, enter by the side gate"; a place other than the mandir.
+  locationNote: string | null;
+  venueName: string | null;
+  venuePostcode: string | null;
 };
 
 export const EVENT_FIELDS = [
@@ -93,6 +105,9 @@ export function eventInputFrom(source: {
     cost_note: text("cost_note"),
     tickets: text("tickets"),
     tickets_url: text("tickets_url"),
+    location_note: text("location_note"),
+    venue_name: text("venue_name"),
+    venue_postcode: text("venue_postcode"),
   };
 }
 
@@ -110,6 +125,9 @@ export function eventInputFromEvent(event: {
   cost_note?: string | null;
   tickets_needed?: boolean;
   tickets_url?: string | null;
+  location_note?: string | null;
+  venue_name?: string | null;
+  venue_postcode?: string | null;
 }): EventInput {
   const at = new Date(event.next_starts_at);
   const parsed = event.recurrence ? parseRule(event.recurrence) : null;
@@ -126,6 +144,9 @@ export function eventInputFromEvent(event: {
     cost_note: event.cost_note ?? "",
     tickets: event.tickets_needed ? "needed" : "",
     tickets_url: event.tickets_url ?? "",
+    location_note: event.location_note ?? "",
+    venue_name: event.venue_name ?? "",
+    venue_postcode: event.venue_postcode ?? "",
   };
 }
 
@@ -160,6 +181,21 @@ export function checkEvent(
     ticketsUrl = `https://${ticketsUrl}`;
   }
   if (ticketsUrl && !isWebAddress(ticketsUrl)) return fail("ticketsUrl");
+  const locationNote = input.location_note?.trim() ?? "";
+  if (locationNote.length > 160) return fail("locationNote");
+  const venueName = input.venue_name?.trim() ?? "";
+  const venuePostcodeInput = input.venue_postcode?.trim() ?? "";
+  const venuePostcode = venuePostcodeInput
+    ? normalisePostcode(venuePostcodeInput)
+    : null;
+  if (venuePostcodeInput && !venuePostcode) return fail("venuePostcode");
+  // A place needs both: its name to show, its postcode for directions.
+  if (
+    (venueName !== "") !== (venuePostcode !== null) ||
+    (venueName && (venueName.length < 2 || venueName.length > 120))
+  ) {
+    return fail("venue");
+  }
   const today = londonDate(now);
   const latest = londonDate(new Date(now.getTime() + 2 * 366 * DAY_MS));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < today || date > latest) {
@@ -221,6 +257,9 @@ export function checkEvent(
       // A booking link means booking first.
       ticketsNeeded: input.tickets === "needed" || ticketsUrl !== "",
       ticketsUrl: ticketsUrl || null,
+      locationNote: locationNote || null,
+      venueName: venueName || null,
+      venuePostcode,
     },
   };
 }
@@ -263,4 +302,8 @@ export const EVENT_ERRORS: Record<EventError, string> = {
   cost: "Please keep the cost short (80 characters at most).",
   ticketsUrl:
     "That doesn't look like a web address for booking. Leave it empty if people book by phone or at the mandir.",
+  locationNote: "Please keep the room or hall note under 160 characters.",
+  venue:
+    "For an event away from the mandir, please give both the place's name and its postcode.",
+  venuePostcode: "That doesn't look like a UK postcode for the place.",
 };

@@ -17,6 +17,11 @@ export function mandirCalendarEvents(
     .filter(Boolean)
     .join(", ");
   return mandir.events.map((event) => {
+    // Held away from the mandir: the place, so the calendar's map finds it.
+    const where =
+      event.venue_name && event.venue_postcode
+        ? `${event.venue_name}, ${event.venue_postcode}`
+        : location;
     const url = `${origin}${eventPath(mandir.slug, event.id)}`;
     const description = [
       event.title_gu,
@@ -40,7 +45,7 @@ export function mandirCalendarEvents(
       uid: `event-${event.id}@toran`,
       title: event.title,
       description,
-      location,
+      location: where,
       url,
       start,
       end,

@@ -247,7 +247,7 @@ export default async function EventPage({
           <div className={`${cardClass} flex flex-col gap-6 p-6 sm:p-7`}>
             <ReadAloud text={spokenEvent(result.data)} />
             <Details page={result.data} />
-            <CallAndDirections mandir={mandir} />
+            <CallAndDirections mandir={mandir} place={venueOf(event)} />
             {confirmedOn ? (
               <Badge tone="leaf">
                 <span aria-hidden="true">✓ </span>
@@ -416,7 +416,9 @@ function spokenEvent({ mandir, event }: MandirEventPage): string {
     event.status === "cancelled" && t("event.cancelled"),
     rule,
     formatSpokenStart(event.next_starts_at, event.all_day),
-    `${mandir.name}, ${mandir.town}`,
+    event.venue_name
+      ? `${event.venue_name}, ${event.venue_postcode}`
+      : `${mandir.name}, ${mandir.town}`,
     event.location_note,
     gu && event.summary_gu ? event.summary_gu : event.summary,
     event.cost_note,
@@ -499,7 +501,23 @@ function Details({ page }: { page: MandirEventPage }) {
     {
       label: t("event.where"),
       icon: <PinIcon />,
-      value: (
+      value: event.venue_name ? (
+        <>
+          <strong>{event.venue_name}</strong>
+          <br />
+          {event.venue_postcode}
+          {event.location_note && (
+            <>
+              <br />
+              {event.location_note}
+            </>
+          )}
+          <br />
+          <span className="text-muted">
+            {t("event.awayFrom", { name: mandir.name })}
+          </span>
+        </>
+      ) : (
         <>
           <Link
             href={localePath(`/mandirs/${mandir.slug}`)}
@@ -520,7 +538,9 @@ function Details({ page }: { page: MandirEventPage }) {
       ),
     },
   ];
-  if (mandir.getting_there)
+  // Getting there and visiting are about the mandir itself.
+  const atMandir = !event.venue_name;
+  if (atMandir && mandir.getting_there)
     rows.push({
       label: t("mandir.gettingThere"),
       icon: null,
@@ -529,7 +549,7 @@ function Details({ page }: { page: MandirEventPage }) {
       ),
     });
   const visiting = visitingItems(mandir.facilities);
-  if (visiting.length || mandir.visiting_note)
+  if (atMandir && (visiting.length || mandir.visiting_note))
     rows.push({
       label: t("visit.title"),
       icon: null,
@@ -588,4 +608,11 @@ function Details({ page }: { page: MandirEventPage }) {
       ))}
     </dl>
   );
+}
+
+// Where an event away from the mandir is, for its directions button.
+function venueOf(event: MandirEventPage["event"]) {
+  return event.venue_name && event.venue_postcode
+    ? { name: event.venue_name, postcode: event.venue_postcode }
+    : undefined;
 }

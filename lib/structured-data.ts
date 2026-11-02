@@ -112,7 +112,8 @@ export function eventData(
     | "status"
     | "recurrence"
     | "next_starts_at"
-  >,
+  > &
+    Partial<Pick<MandirEvent, "venue_name" | "venue_postcode">>,
   mandir: Mandir,
   url: string,
 ) {
@@ -139,12 +140,23 @@ export function eventData(
         ? "https://schema.org/EventCancelled"
         : "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    location: {
-      "@type": "Place",
-      name: mandir.name,
-      address: address(mandir),
-      ...geo(mandir),
-    },
+    location:
+      event.venue_name && event.venue_postcode
+        ? {
+            "@type": "Place",
+            name: event.venue_name,
+            address: {
+              "@type": "PostalAddress",
+              postalCode: event.venue_postcode,
+              addressCountry: "GB",
+            },
+          }
+        : {
+            "@type": "Place",
+            name: mandir.name,
+            address: address(mandir),
+            ...geo(mandir),
+          },
     organizer: {
       "@type": "Organization",
       name: mandir.name,
