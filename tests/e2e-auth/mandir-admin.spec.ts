@@ -62,6 +62,12 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .click();
   await member.getByLabel("Name in Gujarati").fill("અન્નકૂટ દર્શન");
   await member.getByLabel("Description in Gujarati").fill("સૌનું સ્વાગત છે.");
+  // Free, but places are booked first.
+  await member.getByText("Add the cost or tickets (optional)").click();
+  await member.getByLabel("Cost").fill("Free");
+  await member
+    .getByLabel("Where to book (optional)")
+    .fill("krishnatemple-leicester.example.org/annakut");
   await member.getByRole("button", { name: "Add event" }).click();
   await expect(member.getByText("Added.")).toBeVisible();
   // …and that step is ticked off.
@@ -77,6 +83,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   );
   await expect(event).toContainText("Festival");
   await expect(event).toContainText("Confirmed by the mandir");
+  await expect(event).toContainText("Book first");
   await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
   const eventId = (await event.getAttribute("id"))!.replace(/^event-/, "");
   const eventPage = `/mandirs/${SLUG}/events/${eventId}`;
@@ -101,6 +108,18 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByText("સૌનું સ્વાગત છે.").filter({ visible: true }),
   ).toBeVisible();
+  const details = member.locator("dl").filter({ visible: true });
+  await expect(details).toContainText("Free");
+  await expect(details).toContainText("Book before you go.");
+  await expect(
+    member
+      .getByRole("link", { name: "Book tickets" })
+      .filter({ visible: true })
+      .first(),
+  ).toHaveAttribute(
+    "href",
+    "https://krishnatemple-leicester.example.org/annakut",
+  );
   const whatsApp = await member
     .getByRole("link", { name: "WhatsApp" })
     .filter({ visible: true })

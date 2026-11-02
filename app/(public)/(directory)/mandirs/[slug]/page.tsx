@@ -411,7 +411,11 @@ function EventRow({
             : formatTimeOfDay(event.next_starts_at, event.all_day)}
         </p>
         {summary && <p className="text-muted line-clamp-2">{summary}</p>}
-        {(cancelled || confirmed || kind || sourceLabel(event)) && (
+        {(cancelled ||
+          confirmed ||
+          kind ||
+          event.tickets_needed ||
+          sourceLabel(event)) && (
           <p className="mt-1 flex flex-wrap items-center gap-2">
             {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
             {confirmed ? (
@@ -427,6 +431,9 @@ function EventRow({
               )
             )}
             {kind && <Badge>{kind}</Badge>}
+            {event.tickets_needed && (
+              <Badge tone="marigold">{t("event.bookFirstBadge")}</Badge>
+            )}
           </p>
         )}
         <JsonLd

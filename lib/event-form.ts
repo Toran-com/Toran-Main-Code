@@ -28,6 +28,11 @@ export type EventInput = {
   summary_gu?: string;
   // What kind of event (lib/event-kinds.ts); posters leave it out.
   kind?: string;
+  // Cost and tickets, from a committee's forms; posters leave them out.
+  cost_note?: string;
+  // "needed" when people must book or buy a ticket first.
+  tickets?: string;
+  tickets_url?: string;
 };
 
 export type EventError =
@@ -40,7 +45,9 @@ export type EventError =
   | "time"
   | "repeat"
   | "until"
-  | "untilDaily";
+  | "untilDaily"
+  | "cost"
+  | "ticketsUrl";
 
 export type CheckedEvent = {
   title: string;
@@ -54,6 +61,10 @@ export type CheckedEvent = {
   rule: string | null;
   // Every date's start, for a repeating event (empty otherwise).
   occurrences: Date[];
+  // "Free", "£10 adults, children free"; whether to book first, and where.
+  costNote: string | null;
+  ticketsNeeded: boolean;
+  ticketsUrl: string | null;
 };
 
 export const EVENT_FIELDS = [
@@ -79,6 +90,9 @@ export function eventInputFrom(source: {
     title_gu: text("title_gu"),
     summary_gu: text("summary_gu"),
     kind: text("kind") || "other",
+    cost_note: text("cost_note"),
+    tickets: text("tickets"),
+    tickets_url: text("tickets_url"),
   };
 }
 
@@ -93,6 +107,9 @@ export function eventInputFromEvent(event: {
   recurrence: string | null;
   next_starts_at: string;
   kind?: string;
+  cost_note?: string | null;
+  tickets_needed?: boolean;
+  tickets_url?: string | null;
 }): EventInput {
   const at = new Date(event.next_starts_at);
   const parsed = event.recurrence ? parseRule(event.recurrence) : null;
@@ -106,6 +123,9 @@ export function eventInputFromEvent(event: {
     title_gu: event.title_gu ?? "",
     summary_gu: event.summary_gu ?? "",
     kind: event.kind ?? "other",
+    cost_note: event.cost_note ?? "",
+    tickets: event.tickets_needed ? "needed" : "",
+    tickets_url: event.tickets_url ?? "",
   };
 }
 
@@ -133,6 +153,13 @@ export function checkEvent(
   if (summaryGu.length > 280) return fail("summaryGu");
   const kind = input.kind || "other";
   if (!isEventKind(kind)) return fail("kind");
+  const costNote = input.cost_note?.trim() ?? "";
+  if (costNote.length > 80) return fail("cost");
+  let ticketsUrl = input.tickets_url?.trim() ?? "";
+  if (ticketsUrl && !/^https?:\/\//i.test(ticketsUrl)) {
+    ticketsUrl = `https://${ticketsUrl}`;
+  }
+  if (ticketsUrl && !isWebAddress(ticketsUrl)) return fail("ticketsUrl");
   const today = londonDate(now);
   const latest = londonDate(new Date(now.getTime() + 2 * 366 * DAY_MS));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < today || date > latest) {
@@ -190,8 +217,21 @@ export function checkEvent(
       startsAt,
       rule,
       occurrences,
+      costNote: costNote || null,
+      // A booking link means booking first.
+      ticketsNeeded: input.tickets === "needed" || ticketsUrl !== "",
+      ticketsUrl: ticketsUrl || null,
     },
   };
+}
+
+function isWebAddress(address: string): boolean {
+  if (address.length > 300 || /\s/.test(address)) return false;
+  try {
+    return new URL(address).hostname.includes(".");
+  } catch {
+    return false;
+  }
 }
 
 function repeatFromChoice(choice: string, date: string): Repeat | null {
@@ -220,4 +260,7 @@ export const EVENT_ERRORS: Record<EventError, string> = {
     "Please choose an end date after the first date, and within a year of it.",
   untilDaily:
     "For an event every day, please choose a last day within a month of the first, as for a festival like Navratri.",
+  cost: "Please keep the cost short (80 characters at most).",
+  ticketsUrl:
+    "That doesn't look like a web address for booking. Leave it empty if people book by phone or at the mandir.",
 };

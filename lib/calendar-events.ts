@@ -23,6 +23,7 @@ export function mandirCalendarEvents(
       event.summary,
       event.summary_gu,
       [event.location_note, event.cost_note].filter(Boolean).join(" · "),
+      event.tickets_url && `Book tickets: ${event.tickets_url}`,
       event.link && `More details: ${event.link}`,
       `On Toran: ${url}`,
     ]
