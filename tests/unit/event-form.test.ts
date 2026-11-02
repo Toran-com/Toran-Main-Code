@@ -33,6 +33,98 @@ describe("checkEvent", () => {
     );
   });
 
+  it("keeps the cost and whether to book first", () => {
+    const result = checkEvent(
+      {
+        ...base,
+        cost_note: " £10 adults, children free ",
+        tickets: "needed",
+      },
+      now,
+    );
+    expect(result.ok && result.event).toMatchObject({
+      costNote: "£10 adults, children free",
+      ticketsNeeded: true,
+      ticketsUrl: null,
+    });
+    const none = checkEvent(base, now);
+    expect(none.ok && none.event).toMatchObject({
+      costNote: null,
+      ticketsNeeded: false,
+      ticketsUrl: null,
+    });
+  });
+
+  it("tidies a booking link, which means booking first", () => {
+    const result = checkEvent(
+      { ...base, tickets_url: "example.org/diwali-dinner" },
+      now,
+    );
+    expect(result.ok && result.event).toMatchObject({
+      ticketsNeeded: true,
+      ticketsUrl: "https://example.org/diwali-dinner",
+    });
+  });
+
+  it("keeps a room note and a place away from the mandir", () => {
+    const result = checkEvent(
+      {
+        ...base,
+        location_note: " Sports hall ",
+        venue_name: " Harrow Leisure Centre ",
+        venue_postcode: "ha35bd",
+      },
+      now,
+    );
+    expect(result.ok && result.event).toMatchObject({
+      locationNote: "Sports hall",
+      venueName: "Harrow Leisure Centre",
+      venuePostcode: "HA3 5BD",
+    });
+    const none = checkEvent(base, now);
+    expect(none.ok && none.event).toMatchObject({
+      locationNote: null,
+      venueName: null,
+      venuePostcode: null,
+    });
+  });
+
+  it("needs both the place's name and a real postcode", () => {
+    expect(
+      checkEvent({ ...base, venue_name: "Harrow Leisure Centre" }, now),
+    ).toEqual({ ok: false, error: "venue" });
+    expect(checkEvent({ ...base, venue_postcode: "HA3 5BD" }, now)).toEqual({
+      ok: false,
+      error: "venue",
+    });
+    expect(
+      checkEvent(
+        {
+          ...base,
+          venue_name: "Harrow Leisure Centre",
+          venue_postcode: "near",
+        },
+        now,
+      ),
+    ).toEqual({ ok: false, error: "venuePostcode" });
+    expect(
+      checkEvent({ ...base, location_note: "x".repeat(161) }, now),
+    ).toEqual({ ok: false, error: "locationNote" });
+  });
+
+  it("refuses a long cost or an odd booking link", () => {
+    expect(checkEvent({ ...base, cost_note: "x".repeat(81) }, now)).toEqual({
+      ok: false,
+      error: "cost",
+    });
+    for (const tickets_url of ["ask at the desk", "javascript:alert(1)"]) {
+      expect(checkEvent({ ...base, tickets_url }, now)).toEqual({
+        ok: false,
+        error: "ticketsUrl",
+      });
+    }
+  });
+
   it("treats an empty time as all day", () => {
     const result = checkEvent({ ...base, time: "" }, now);
     expect(result.ok && result.event.allDay).toBe(true);
@@ -94,6 +186,12 @@ describe("eventInputFrom", () => {
       title_gu: "",
       summary_gu: "",
       kind: "other",
+      cost_note: "",
+      tickets: "",
+      tickets_url: "",
+      location_note: "",
+      venue_name: "",
+      venue_postcode: "",
     });
   });
 
@@ -165,6 +263,12 @@ describe("eventInputFromEvent", () => {
       title_gu: "આરતી",
       summary_gu: "",
       kind: "other",
+      cost_note: "",
+      tickets: "",
+      tickets_url: "",
+      location_note: "",
+      venue_name: "",
+      venue_postcode: "",
     });
   });
 

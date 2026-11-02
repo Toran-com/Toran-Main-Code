@@ -16,14 +16,17 @@ export function directionsTo(mandir: {
 
 // The two things people most often want before setting off, as big
 // buttons side by side: directions, and a call to the mandir (its number
-// shown, so you know who you're ringing). Either can be missing.
+// shown, so you know who you're ringing). Either can be missing. For an
+// event held elsewhere, directions go to that `place` instead.
 export function CallAndDirections({
   mandir,
+  place,
 }: {
   mandir: { name: string; postcode: string | null; phone: string | null };
+  place?: { name: string; postcode: string };
 }) {
   const t = pageT();
-  const directions = directionsTo(mandir);
+  const directions = directionsTo(place ?? mandir);
   const phone = mandir.phone;
   if (!directions && !phone) return null;
   const big =

@@ -216,3 +216,42 @@ test("a visitor tells us about an event, and Toran sees it in the queue", async 
   await report.getByRole("button", { name: "Discard" }).click();
   await expect(page.getByText("Discarded.")).toBeVisible();
 });
+
+test("Toran publishes several ticked events at once", async ({ page }) => {
+  test.setTimeout(120_000);
+  // Two mandirs no other test looks at, neither with a committee.
+  const stamp = Date.now();
+  const posters = [
+    { slug: "colchester-hindu-society", title: `Kartik purnima ${stamp}` },
+    { slug: "dharma-mandir-newport", title: `Tulsi vivah ${stamp}` },
+  ];
+  await logInAsAdmin(page, `ticked-${stamp}@example.com`);
+  for (const { slug, title } of posters) {
+    await page.goto("/ops/posters");
+    await page.getByRole("combobox", { name: /^Mandir/ }).selectOption(slug);
+    await page.getByLabel("What's happening?").fill(title);
+    await page.getByLabel("Date").fill(nextWeek());
+    await page.getByLabel("Starts").fill("19:00");
+    await page.getByRole("button", { name: "Add to the queue" }).click();
+    await expect(page.getByText("Added to the queue.")).toBeVisible();
+  }
+
+  for (const { title } of posters) {
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: title })
+      .getByLabel("Tick to publish with the others")
+      .check();
+  }
+  await page.getByRole("button", { name: "Publish the ticked ones" }).click();
+  await expect(page.getByText("Published 2 events.")).toBeVisible();
+  for (const { slug, title } of posters) {
+    await expect(
+      page.getByRole("listitem").filter({ hasText: title }),
+    ).toHaveCount(0);
+    await page.goto(`/mandirs/${slug}`);
+    await expect(
+      page.getByRole("article").filter({ hasText: title }),
+    ).toContainText("7pm");
+  }
+});

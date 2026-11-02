@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { CopyText } from "@/components/copy-text";
 import { MandirFields } from "@/components/mandir-fields";
 import { OpsNav } from "@/components/ops-nav";
 import {
@@ -15,7 +16,8 @@ import {
 import { PageShell } from "@/components/page-shell";
 import { requireToranAdmin } from "@/lib/auth";
 import { FORM_ERRORS } from "@/lib/mandir-form";
-import { pageTitle } from "@/lib/site";
+import { qrPath } from "@/lib/qr";
+import { pageTitle, siteUrl } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { removeMandirAdmin, updateMandir } from "../actions";
 
@@ -54,7 +56,7 @@ async function EditMandir({
     ? await supabase
         .from("mandirs")
         .select(
-          "id, slug, name, town, region, postcode, website, phone, tradition, calendar, charity_number, status, latitude, getting_there, facilities, visiting_note, opening_hours, aarti_times",
+          "id, slug, name, town, region, postcode, website, live_url, phone, tradition, calendar, charity_number, status, latitude, getting_there, facilities, visiting_note, opening_hours, aarti_times",
         )
         .eq("slug", slug)
         .maybeSingle()
@@ -148,6 +150,42 @@ async function EditMandir({
           </p>
         )}
       </section>
+
+      {mandir.status !== "hidden" && <JoinLink mandir={mandir} />}
     </>
+  );
+}
+
+// A link (and QR code) for this mandir's committee to create an account
+// with the mandir already chosen: for an email, WhatsApp or a visit.
+function JoinLink({ mandir }: { mandir: { slug: string; name: string } }) {
+  const url = `${siteUrl()}/join?mandir=${mandir.slug}`;
+  const qr = qrPath(url);
+  return (
+    <section aria-labelledby="join-link" className="flex flex-col gap-3">
+      <h2 id="join-link" className="text-2xl font-bold">
+        Join link for its committee
+      </h2>
+      <p className="text-muted">
+        Send this to someone on {mandir.name}&apos;s committee, or show them the
+        QR code. They create an account with this mandir already chosen, then
+        you check them as usual.
+      </p>
+      <div className="border-line bg-surface shadow-card flex flex-wrap items-center gap-5 rounded-2xl border p-4">
+        <svg
+          viewBox={`-2 -2 ${qr.size + 4} ${qr.size + 4}`}
+          role="img"
+          aria-label={`QR code for ${url}`}
+          className="size-36 shrink-0 bg-white"
+          shapeRendering="crispEdges"
+        >
+          <path d={qr.d} fill="#000" />
+        </svg>
+        <div className="flex min-w-0 flex-[1_1_16rem] flex-col gap-2">
+          <code className="break-all">{url}</code>
+          <CopyText text={url} label="Copy the link" />
+        </div>
+      </div>
+    </section>
   );
 }

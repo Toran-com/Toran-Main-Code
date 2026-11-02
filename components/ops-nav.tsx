@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/ops/festivals", label: "Festival dates" },
   { href: "/ops/stats", label: "Stats" },
   { href: "/ops/digest", label: "Digest" },
+  { href: "/ops/committee-email", label: "Committee email" },
   { href: "/ops/translations", label: "Translations" },
 ] as const;
 

@@ -12,6 +12,7 @@ export const TRANSLATED_LOCALES = ["gu", "hi"] as const;
 const TRANSLATED_PATHS = [
   /^\/$/,
   /^\/whats-on$/,
+  /^\/regular$/,
   /^\/seva$/,
   /^\/plan$/,
   /^\/my$/,

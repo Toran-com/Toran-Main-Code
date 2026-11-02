@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
 import { FollowButton } from "@/components/follow";
 import { CallAndDirections, directionsTo } from "@/components/call-directions";
-import { GlobeIcon } from "@/components/icons";
+import { GlobeIcon, PlayIcon } from "@/components/icons";
 import { photoUrl } from "@/lib/mandir-photo";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, LoadProblem } from "@/components/public-shell";
@@ -331,8 +331,8 @@ function Facts({ mandir }: { mandir: MandirDetails }) {
 }
 
 // The things people most often want, in one tap: directions and a call
-// as big buttons, then one row for the mandir's own website, sharing the
-// page and hearing it read aloud.
+// as big buttons, then one row for the mandir's own website, its live
+// stream, sharing the page and hearing it read aloud.
 function QuickLinks({ mandir }: { mandir: MandirDetails }) {
   const t = pageT();
   return (
@@ -343,6 +343,12 @@ function QuickLinks({ mandir }: { mandir: MandirDetails }) {
           <a href={mandir.website} rel="noopener" className={actionPillClass}>
             <GlobeIcon />
             {t("mandir.website")}
+          </a>
+        )}
+        {mandir.live_url && (
+          <a href={mandir.live_url} rel="noopener" className={actionPillClass}>
+            <PlayIcon />
+            {t("mandir.watchLive")}
           </a>
         )}
         <ShareButtons
@@ -411,8 +417,17 @@ function EventRow({
             ? `${t("event.repeatNext", { rule: rule ?? "" })}${formatEventStart(event.next_starts_at, event.all_day)}`
             : formatTimeOfDay(event.next_starts_at, event.all_day)}
         </p>
+        {event.venue_name && (
+          <p className="font-semibold">
+            {t("event.atVenue", { venue: event.venue_name })}
+          </p>
+        )}
         {summary && <p className="text-muted line-clamp-2">{summary}</p>}
-        {(cancelled || confirmed || kind || sourceLabel(event)) && (
+        {(cancelled ||
+          confirmed ||
+          kind ||
+          event.tickets_needed ||
+          sourceLabel(event)) && (
           <p className="mt-1 flex flex-wrap items-center gap-2">
             {cancelled && <Badge tone="kumkum">{t("event.cancelled")}</Badge>}
             {confirmed ? (
@@ -428,6 +443,9 @@ function EventRow({
               )
             )}
             {kind && <Badge>{kind}</Badge>}
+            {event.tickets_needed && (
+              <Badge tone="marigold">{t("event.bookFirstBadge")}</Badge>
+            )}
           </p>
         )}
         <JsonLd

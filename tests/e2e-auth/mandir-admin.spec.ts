@@ -62,6 +62,12 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .click();
   await member.getByLabel("Name in Gujarati").fill("અન્નકૂટ દર્શન");
   await member.getByLabel("Description in Gujarati").fill("સૌનું સ્વાગત છે.");
+  // Free, but places are booked first.
+  await member.getByText("Add the cost or tickets (optional)").click();
+  await member.getByLabel("Cost").fill("Free");
+  await member
+    .getByLabel("Where to book (optional)")
+    .fill("krishnatemple-leicester.example.org/annakut");
   await member.getByRole("button", { name: "Add event" }).click();
   await expect(member.getByText("Added.")).toBeVisible();
   // …and that step is ticked off.
@@ -77,6 +83,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   );
   await expect(event).toContainText("Festival");
   await expect(event).toContainText("Confirmed by the mandir");
+  await expect(event).toContainText("Book first");
   await expect(member.getByText("Run by the mandir's committee")).toBeVisible();
   const eventId = (await event.getAttribute("id"))!.replace(/^event-/, "");
   const eventPage = `/mandirs/${SLUG}/events/${eventId}`;
@@ -101,6 +108,18 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByText("સૌનું સ્વાગત છે.").filter({ visible: true }),
   ).toBeVisible();
+  const details = member.locator("dl").filter({ visible: true });
+  await expect(details).toContainText("Free");
+  await expect(details).toContainText("Book before you go.");
+  await expect(
+    member
+      .getByRole("link", { name: "Book tickets" })
+      .filter({ visible: true })
+      .first(),
+  ).toHaveAttribute(
+    "href",
+    "https://krishnatemple-leicester.example.org/annakut",
+  );
   const whatsApp = await member
     .getByRole("link", { name: "WhatsApp" })
     .filter({ visible: true })
@@ -184,6 +203,22 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .filter({ hasText: "Weekly aarti" });
   await expect(weekly).toHaveCount(1);
   await expect(weekly).toContainText(/Every \w+day · next .*7pm/);
+  // It's with the classes and regular groups, under its day.
+  await member.goto("/whats-on");
+  await member
+    .getByRole("link", { name: "Classes and regular groups" })
+    .click();
+  await expect(member).toHaveURL(/\/regular$/);
+  const weekday = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    timeZone: "Europe/London",
+  }).format(new Date(`${nextWeek()}T12:00:00Z`));
+  await expect(
+    member
+      .getByRole("region", { name: weekday })
+      .getByRole("article")
+      .filter({ hasText: "Weekly aarti" }),
+  ).toHaveCount(1);
 
   // The committee edits it: the form starts with its details filled in.
   await member.goto(`/manage/${SLUG}`);
@@ -207,6 +242,12 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   );
   await form.getByLabel("What's happening?").fill("Weekly sandhya aarti");
   await form.getByLabel("Starts").fill("19:30");
+  // It moves to a hired hall while the mandir is being repaired.
+  await form
+    .getByText("Add a room, or a place away from the mandir (optional)")
+    .click();
+  await form.getByLabel("Name of the place").fill("Leicester Town Hall");
+  await form.getByLabel("Its postcode").fill("le1 9bg");
   await form.getByRole("button", { name: "Save changes" }).click();
   await expect(member.getByText("Saved. Your public page shows")).toBeVisible();
   await member.goto(`/mandirs/${SLUG}`);
@@ -214,8 +255,16 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByRole("article")
     .filter({ hasText: "Weekly sandhya aarti" });
   await expect(edited).toHaveCount(1);
+  await expect(edited).toContainText("At Leicester Town Hall");
   await expect(edited).toContainText(/Every \w+day · next .*7:30pm/);
   await expect(edited).toContainText("Confirmed by the mandir");
+  // Its page sends people to the hall, not the mandir.
+  const weeklyId = (await edited.getAttribute("id"))!.replace(/^event-/, "");
+  await member.goto(`/mandirs/${SLUG}/events/${weeklyId}`);
+  await expect(member.getByText(/^Not at the mandir/)).toBeVisible();
+  await expect(
+    member.getByRole("link", { name: "Directions" }),
+  ).toHaveAttribute("href", /Leicester%20Town%20Hall%20LE1%209BG/);
 
   // Cancelling shows on the public page too.
   await member.goto(`/manage/${SLUG}`);
@@ -242,6 +291,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByLabel("Website")
     .fill("krishnatemple-leicester.example.org");
   await member.getByLabel("Mandir phone number").fill("0116 000 0000");
+  await member
+    .getByLabel("Live stream")
+    .fill("youtube.example.org/@krishnatemple/live");
   // What visitors need to know before they set off.
   await member.getByLabel("Step-free way in").check();
   await member.getByLabel("Jain food").check();
@@ -269,6 +321,10 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
       .first(),
   ).toBeVisible();
   await expect(member.getByText("0116 000 0000").first()).toBeVisible();
+  // Where they stream aarti, one tap away.
+  await expect(
+    member.getByRole("link", { name: "Watch live" }),
+  ).toHaveAttribute("href", "https://youtube.example.org/@krishnatemple/live");
   // A big "Call" button, with the number on it.
   await expect(
     member.getByRole("link", { name: /^Call .* on 0116 000 0000$/ }),

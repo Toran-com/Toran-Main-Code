@@ -21,6 +21,20 @@ test("what's on explains it isn't connected yet", async ({ page }) => {
   await expect(page.getByText("isn't connected yet")).toBeVisible();
 });
 
+test("classes and regular groups explain they aren't connected yet", async ({
+  page,
+}) => {
+  await page.goto("/regular");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Classes and regular groups",
+  );
+  await expect(page.getByText("isn't connected yet")).toBeVisible();
+  await page.goto("/gu/regular");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "વર્ગો અને નિયમિત મંડળો",
+  );
+});
+
 test("an unknown festival is not found", async ({ page }) => {
   const response = await page.goto("/festivals/no-such-festival");
   expect(response?.status()).toBe(404);

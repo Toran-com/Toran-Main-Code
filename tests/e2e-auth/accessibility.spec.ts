@@ -122,6 +122,8 @@ test("the admin area is accessible", async ({ page }) => {
     "/ops/mandirs/import",
     "/ops/festivals",
     "/ops/digest",
+    "/ops/committee-email",
+    "/ops/committee-email?mandir=geeta-bhavan-leicester",
     "/ops/translations",
     "/ops/translations/print",
   ]) {

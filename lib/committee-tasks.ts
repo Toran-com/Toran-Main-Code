@@ -19,6 +19,7 @@ export type CommitteeFacts = {
     status: string;
     confirmed_at: string | null;
     next_starts_at: string;
+    all_day?: boolean;
   }[];
   // Posters and messages waiting for the committee to check.
   posters: number;

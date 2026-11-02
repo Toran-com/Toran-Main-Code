@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { attentionCount, daysSince, readAttention } from "@/lib/attention";
+import {
+  attentionCount,
+  daysSince,
+  readAttention,
+  staleCutoff,
+} from "@/lib/attention";
 
 const MANDIR = { slug: "busy-mandir", name: "Busy Mandir", town: "Harrow" };
 
@@ -121,5 +126,13 @@ describe("daysSince", () => {
     expect(daysSince("2026-10-15T13:00:00Z", now)).toBe(3);
     expect(daysSince("2026-10-19T11:00:00Z", now)).toBe(0);
     expect(daysSince("2026-10-25T00:00:00Z", now)).toBe(0);
+  });
+});
+
+describe("staleCutoff", () => {
+  it("is six months before now", () => {
+    expect(staleCutoff(new Date("2026-10-31T12:00:00Z"))).toBe(
+      "2026-05-01T12:00:00.000Z",
+    );
   });
 });
