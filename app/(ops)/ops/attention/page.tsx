@@ -16,6 +16,7 @@ import { requireToranAdmin } from "@/lib/auth";
 import { CORRECTION_KINDS } from "@/lib/corrections";
 import { calendarLabel, formatEventStart } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
+import { sentryOptions } from "@/lib/observability";
 import { createSessionClient } from "@/lib/supabase/session";
 import { markRequestDone } from "./actions";
 
@@ -106,6 +107,13 @@ async function NeedsAttention() {
           Nightly job last ran {formatEventStart(nightly.ranAt, false)}:{" "}
           {nightly.text}.
         </p>
+      )}
+      {!sentryOptions().enabled && (
+        <Notice tone="error">
+          Error reports aren&apos;t switched on, so Toran won&apos;t hear when a
+          page breaks. Set NEXT_PUBLIC_SENTRY_DSN in Vercel (see
+          docs/app-setup.md).
+        </Notice>
       )}
       {total === 0 && (
         <Notice tone="success">Nothing needs attention. All clear.</Notice>

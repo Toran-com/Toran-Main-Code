@@ -2,6 +2,12 @@
 # GitHub issue (labelled "site down"), which emails the repo's watchers;
 # closes it when the site recovers. Before the database is connected the
 # check only notes "not configured" and doesn't alert.
+#
+# While the site is up it also looks at Toran's own checks: whether the
+# nightly job (and, once switched on, the weekly email) is still running,
+# and whether errors reach Sentry. Anything wrong opens one issue
+# (labelled "checks need a look"), commented on only when what's wrong
+# changes, and closed when all is well again.
 name: Uptime
 
 on:
@@ -35,6 +41,7 @@ jobs:
             "$SITE_URL/api/health") || true
           code=${code:-000}
           database=$(jq -r '.database // "no answer"' body.json 2>/dev/null || echo "no answer")
+          cp body.json health.json 2>/dev/null || true
           echo "HTTP $code, database: $database"
           if [ "$code" = "200" ]; then state=up
           elif [ "$code" = "503" ] && [ "$database" = "not configured" ]; then
@@ -46,6 +53,64 @@ jobs:
             echo "code=$code"
             echo "database=$database"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Look at Toran's own checks
+        id: checks
+        if: steps.health.outputs.state == 'up' && steps.health.outputs.database == 'ok'
+        run: |
+          nightly=$(jq -r 'if .jobs == null then "unreadable" else .jobs.nightly end' health.json)
+          weekly=$(jq -r 'if .jobs == null then "unreadable" else .jobs.weekly end' health.json)
+          errors=$(jq -r '.errorReports // "off"' health.json)
+          echo "nightly: $nightly, weekly: $weekly, error reports: $errors"
+          problems=""
+          add() { problems="$problems- $1"$'\n'; }
+          case "$nightly" in
+            ok) ;;
+            never) add "The nightly job has never run. It needs CRON_SECRET and SUPABASE_SECRET_KEY in Vercel (docs/app-setup.md, \"Nightly job\"), then Vercel → Settings → Cron Jobs → Run." ;;
+            late) add "The nightly job hasn't run for over 36 hours. Look at Vercel → Settings → Cron Jobs, and the nightly job's logs." ;;
+            "cleanup failed") add "The nightly job ran, but deleting old data (run_retention) failed. Look at the nightly job's logs and Sentry." ;;
+            *) add "The job times couldn't be read ($nightly). Check the latest database migrations were applied." ;;
+          esac
+          case "$weekly" in
+            late) add "The weekly email hasn't gone out for over 8 days. Look at Vercel → Settings → Cron Jobs." ;;
+            "some failed") add "Some weekly emails couldn't be sent last time. Look at Resend → Logs." ;;
+          esac
+          if [ "$errors" != "on" ]; then
+            add "Error reports aren't reaching Sentry: NEXT_PUBLIC_SENTRY_DSN isn't set in Vercel for Production."
+          fi
+          {
+            echo "problems<<EOF_PROBLEMS"
+            printf '%s' "$problems"
+            echo "EOF_PROBLEMS"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open, update or close the "checks need a look" issue
+        if: steps.checks.outcome == 'success'
+        env:
+          PROBLEMS: ${{ steps.checks.outputs.problems }}
+        run: |
+          label="checks need a look"
+          gh label create "$label" --color FBCA04 --description "Opened by the Uptime workflow" 2>/dev/null || true
+          now=$(date -u '+%d %b %Y %H:%M UTC')
+          open=$(gh issue list --label "$label" --state open --json number --jq '.[0].number')
+          if [ -z "$PROBLEMS" ]; then
+            if [ -n "$open" ]; then
+              gh issue close "$open" --comment "All fine again at $now."
+            fi
+            exit 0
+          fi
+          echo "$PROBLEMS"
+          # A fingerprint of what's wrong, so the issue changes only when that does.
+          mark="<!-- checks: $(printf '%s' "$PROBLEMS" | sha256sum | cut -c1-16) -->"
+          body=$(printf '%s\n%s\n\n%s\n\n%s' "Toran's own checks need a look:" "$PROBLEMS" \
+            "Checked $SITE_URL/api/health. This issue is updated when what's wrong changes, and closes itself when all is well." \
+            "$mark")
+          if [ -z "$open" ]; then
+            gh issue create --label "$label" --title "Toran's own checks need a look" --body "$body"
+          elif ! gh issue view "$open" --json body --jq .body | grep -qF "$mark"; then
+            gh issue edit "$open" --body "$body"
+            gh issue comment "$open" --body "What's wrong changed at $now:"$'\n\n'"$PROBLEMS"
+          fi
 
       - name: Open or update the "site down" issue
         if: steps.health.outputs.state == 'down'

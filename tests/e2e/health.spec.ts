@@ -9,6 +9,7 @@ test("health check reports an unconnected database", async ({ request }) => {
   expect(await response.json()).toMatchObject({
     status: "degraded",
     database: "not configured",
+    errorReports: "off",
   });
 });
 

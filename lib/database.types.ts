@@ -480,6 +480,9 @@ isOneToOne: false
 "is_toran_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"job_health":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "london_day":
 { Args: { "at": string }; Returns: string
                            },
