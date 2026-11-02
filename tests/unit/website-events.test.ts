@@ -247,6 +247,25 @@ describe("upcoming", () => {
       ).map((x) => x.title),
     ).toEqual(["Today"]);
   });
+
+  it("leaves out notes about when to end a fast", () => {
+    expect(
+      upcoming(
+        [
+          e(
+            "Break fast 07:10 (sunrise) - 10:15 (1/3 of daylight) LT",
+            "2026-10-15",
+          ),
+          e("Breakfast 7.05 - 10.20", "2026-10-15"),
+          e("Fasting till noon", "2026-10-15"),
+          e("Parana", "2026-10-15"),
+          e("Charity breakfast", "2026-10-15"),
+          e("Ekadashi", "2026-10-15"),
+        ],
+        now,
+      ).map((x) => x.title),
+    ).toEqual(["Charity breakfast", "Ekadashi"]);
+  });
 });
 
 describe("robotsAllows", () => {
