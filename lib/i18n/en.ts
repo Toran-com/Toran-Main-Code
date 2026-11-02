@@ -65,6 +65,17 @@ export const en = {
   "search.allEvents": "See everything that's on",
   "whatsOn.title": "What's on",
   "whatsOn.intro": "Events at UK mandirs in the next eight weeks.",
+  "regular.title": "Classes and regular groups",
+  "regular.description":
+    "Classes, bhajan groups and other regular gatherings at UK mandirs, by the day of the week.",
+  "regular.intro":
+    "Bal vihar, bhajan mandal, yoga, language classes and more: everything that happens every week or month, by the day it's on.",
+  "regular.what": "classes and regular groups",
+  "regular.areas": "Area",
+  "regular.everywhere": "Everywhere",
+  "regular.none": "No regular classes or groups are listed here yet.",
+  "regular.seeAll": "See everything that's on",
+  "whatsOn.regular": "Classes and regular groups",
   "whatsOn.filter": "Filter",
   "whatsOn.showAs": "Show as",
   "whatsOn.list": "List",

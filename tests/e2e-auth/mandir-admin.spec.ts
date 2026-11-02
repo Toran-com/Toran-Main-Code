@@ -203,6 +203,22 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .filter({ hasText: "Weekly aarti" });
   await expect(weekly).toHaveCount(1);
   await expect(weekly).toContainText(/Every \w+day · next .*7pm/);
+  // It's with the classes and regular groups, under its day.
+  await member.goto("/whats-on");
+  await member
+    .getByRole("link", { name: "Classes and regular groups" })
+    .click();
+  await expect(member).toHaveURL(/\/regular$/);
+  const weekday = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    timeZone: "Europe/London",
+  }).format(new Date(`${nextWeek()}T12:00:00Z`));
+  await expect(
+    member
+      .getByRole("region", { name: weekday })
+      .getByRole("article")
+      .filter({ hasText: "Weekly aarti" }),
+  ).toHaveCount(1);
 
   // The committee edits it: the form starts with its details filled in.
   await member.goto(`/manage/${SLUG}`);

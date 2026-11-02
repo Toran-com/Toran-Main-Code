@@ -66,6 +66,17 @@ export const gu: Record<MessageKey, string> = {
   "search.allEvents": "બધા કાર્યક્રમો જુઓ",
   "whatsOn.title": "કાર્યક્રમો",
   "whatsOn.intro": "આગામી આઠ અઠવાડિયામાં યુકેનાં મંદિરોના કાર્યક્રમો.",
+  "regular.title": "વર્ગો અને નિયમિત મંડળો",
+  "regular.description":
+    "UK ના મંદિરોમાં વર્ગો, ભજન મંડળો અને અન્ય નિયમિત કાર્યક્રમો, અઠવાડિયાના દિવસ પ્રમાણે.",
+  "regular.intro":
+    "બાલ વિહાર, ભજન મંડળ, યોગ, ભાષાના વર્ગો અને વધુ: દર અઠવાડિયે કે દર મહિને થતું બધું, જે દિવસે થાય તે પ્રમાણે.",
+  "regular.what": "વર્ગો અને નિયમિત મંડળો",
+  "regular.areas": "વિસ્તાર",
+  "regular.everywhere": "બધે",
+  "regular.none": "અહીં હજી કોઈ નિયમિત વર્ગ કે મંડળ નથી.",
+  "regular.seeAll": "જે ચાલે છે તે બધું જુઓ",
+  "whatsOn.regular": "વર્ગો અને નિયમિત મંડળો",
   "whatsOn.filter": "ફિલ્ટર",
   "whatsOn.showAs": "આ રીતે બતાવો",
   "whatsOn.list": "યાદી",

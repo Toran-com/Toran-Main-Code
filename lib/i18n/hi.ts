@@ -67,6 +67,17 @@ export const hi: Record<MessageKey, string> = {
   "search.allEvents": "सभी कार्यक्रम देखें",
   "whatsOn.title": "कार्यक्रम",
   "whatsOn.intro": "अगले आठ हफ़्तों में UK के मंदिरों में कार्यक्रम।",
+  "regular.title": "कक्षाएँ और नियमित मंडल",
+  "regular.description":
+    "UK के मंदिरों में कक्षाएँ, भजन मंडल और अन्य नियमित कार्यक्रम, हफ़्ते के दिन के अनुसार।",
+  "regular.intro":
+    "बाल विहार, भजन मंडल, योग, भाषा की कक्षाएँ और भी बहुत कुछ: हर हफ़्ते या हर महीने होने वाला सब कुछ, जिस दिन होता है उसके अनुसार।",
+  "regular.what": "कक्षाएँ और नियमित मंडल",
+  "regular.areas": "क्षेत्र",
+  "regular.everywhere": "हर जगह",
+  "regular.none": "यहाँ अभी कोई नियमित कक्षा या मंडल नहीं है।",
+  "regular.seeAll": "जो चल रहा है वह सब देखें",
+  "whatsOn.regular": "कक्षाएँ और नियमित मंडल",
   "whatsOn.filter": "छाँटें",
   "whatsOn.showAs": "ऐसे दिखाएँ",
   "whatsOn.list": "सूची",
