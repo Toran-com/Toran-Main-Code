@@ -162,6 +162,7 @@ export const en = {
   "mandir.gettingThere": "Getting there",
   "mandir.website": "Website",
   "mandir.watchLive": "Watch live",
+  "mandir.photoAlt": "Photo of {name}",
   "mandir.phone": "Phone",
   "mandir.call": "Call",
   "mandir.callNumber": "Call {name} on {phone}",

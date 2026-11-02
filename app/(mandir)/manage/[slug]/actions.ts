@@ -16,6 +16,13 @@ import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
 import { londonDate } from "@/lib/london";
+import {
+  isJpeg,
+  MAX_PHOTO_BYTES,
+  newPhotoName,
+  PHOTO_BUCKET,
+  PHOTO_WIDTHS,
+} from "@/lib/mandir-photo";
 import { parsePracticalDetails } from "@/lib/mandir-form";
 import { queueRead } from "@/lib/poster-queue";
 import {
@@ -456,4 +463,92 @@ export async function removeMember(formData: FormData) {
   // Leaving: this page is no longer theirs.
   if (member === auth.user?.id) redirect("/account?done=left");
   back("done=removed");
+}
+
+// The committee adds (or changes) a photo of the mandir. The browser has
+// already made the two sizes (components/photo-picker.tsx); they're
+// checked again here, and the bucket only lets the mandir's own committee
+// put files in its folder.
+export async function savePhoto(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#photo`);
+  if (formData.get("agree") !== "yes") back("error=photo-agree");
+  const files: Uint8Array[] = [];
+  for (const width of PHOTO_WIDTHS) {
+    const file = formData.get(`photo_${width}`);
+    if (!(file instanceof File) || file.size === 0) back("error=photo-none");
+    if (file.size > MAX_PHOTO_BYTES) back("error=photo-size");
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    if (!isJpeg(bytes)) back("error=photo-none");
+    files.push(bytes);
+  }
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, photo_path")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+
+  const bucket = supabase.storage.from(PHOTO_BUCKET);
+  const path = `${mandir.id}/${newPhotoName()}`;
+  const names = PHOTO_WIDTHS.map((w) => `${path}-${w}.jpg`);
+  for (const [i, name] of names.entries()) {
+    const { error } = await bucket.upload(name, files[i], {
+      contentType: "image/jpeg",
+      cacheControl: "31536000",
+    });
+    if (error) {
+      await bucket.remove(names);
+      back("error=photo-failed");
+    }
+  }
+  const { data, error } = await supabase
+    .from("mandirs")
+    .update({ photo_path: path })
+    .eq("id", mandir.id)
+    .select("id");
+  if (error || !data?.length) {
+    await bucket.remove(names);
+    back("error=photo-failed");
+  }
+  if (mandir.photo_path) {
+    await bucket.remove(
+      PHOTO_WIDTHS.map((w) => `${mandir.photo_path}-${w}.jpg`),
+    );
+  }
+  updateTag(`mandir:${slug}`);
+  updateTag("mandirs");
+  back("done=photo");
+}
+
+export async function removePhoto(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#photo`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, photo_path")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  if (mandir.photo_path) {
+    const { data, error } = await supabase
+      .from("mandirs")
+      .update({ photo_path: null })
+      .eq("id", mandir.id)
+      .select("id");
+    if (error || !data?.length) back("error=photo-failed");
+    await supabase.storage
+      .from(PHOTO_BUCKET)
+      .remove(PHOTO_WIDTHS.map((w) => `${mandir.photo_path}-${w}.jpg`));
+  }
+  updateTag(`mandir:${slug}`);
+  updateTag("mandirs");
+  back("done=photo-removed");
 }

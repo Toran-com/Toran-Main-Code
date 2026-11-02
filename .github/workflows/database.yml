@@ -79,8 +79,8 @@ jobs:
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
 
-      - name: Start Supabase (database, login, API, test mailbox)
-        run: supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Start Supabase (database, login, API, file storage, test mailbox)
+        run: supabase start -x realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 
       - name: Read local Supabase settings
         run: |

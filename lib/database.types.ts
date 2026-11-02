@@ -287,14 +287,14 @@ isOneToOne: false
                   ]
                 },"mandirs": {
                   Row: {
-                    "aarti_times": Json | null,"calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"facilities": (string)[],"getting_there": string | null,"id": string,"latitude": number | null,"live_url": string | null,"longitude": number | null,"name": string,"opening_hours": Json | null,"phone": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"visiting_note": string | null,"website": string | null
+                    "aarti_times": Json | null,"calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"facilities": (string)[],"getting_there": string | null,"id": string,"latitude": number | null,"live_url": string | null,"longitude": number | null,"name": string,"opening_hours": Json | null,"phone": string | null,"photo_path": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"visiting_note": string | null,"website": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "aarti_times"?: Json | null,"calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"live_url"?: string | null,"longitude"?: number | null,"name": string,"opening_hours"?: Json | null,"phone"?: string | null,"postcode"?: string | null,"region": string,"slug": string,"status"?: string,"town": string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
+                    "aarti_times"?: Json | null,"calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"live_url"?: string | null,"longitude"?: number | null,"name": string,"opening_hours"?: Json | null,"phone"?: string | null,"photo_path"?: string | null,"postcode"?: string | null,"region": string,"slug": string,"status"?: string,"town": string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
                   }
                   Update: {
-                    "aarti_times"?: Json | null,"calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"live_url"?: string | null,"longitude"?: number | null,"name"?: string,"opening_hours"?: Json | null,"phone"?: string | null,"postcode"?: string | null,"region"?: string,"slug"?: string,"status"?: string,"town"?: string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
+                    "aarti_times"?: Json | null,"calendar"?: Database["public"]['Enums']["calendar_tradition"] | null,"charity_number"?: string | null,"created_at"?: string,"facilities"?: (string)[],"getting_there"?: string | null,"id"?: string,"latitude"?: number | null,"live_url"?: string | null,"longitude"?: number | null,"name"?: string,"opening_hours"?: Json | null,"phone"?: string | null,"photo_path"?: string | null,"postcode"?: string | null,"region"?: string,"slug"?: string,"status"?: string,"town"?: string,"tradition"?: string | null,"updated_at"?: string,"visiting_note"?: string | null,"website"?: string | null
                   }
                   Relationships: [
                     
@@ -429,6 +429,9 @@ isOneToOne: false
           Functions: {
             "accept_committee_invite":
 { Args: { "invite": string }; Returns: string
+                           },
+"can_edit_mandir_photo":
+{ Args: { "object_name": string }; Returns: boolean
                            },
 "committee_members":
 { Args: { "target": string }; Returns: {

@@ -64,10 +64,13 @@ export async function shareCard({
   title,
   detail,
   date,
+  photo,
 }: {
   kicker: string;
   title: string;
   detail?: string;
+  // A photo (a mandir's own) behind the words, darkened so they read.
+  photo?: string;
   // A day (YYYY-MM-DD) or a moment, shown as a date tile.
   date?: string;
 }): Promise<ImageResponse> {
@@ -87,6 +90,36 @@ export async function shareCard({
         fontFamily: "Figtree",
       }}
     >
+      {photo && (
+        // eslint-disable-next-line @next/next/no-img-element -- drawn into a picture, not a page
+        <img
+          src={photo}
+          width={1200}
+          height={630}
+          alt=""
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            width: 1200,
+            height: 630,
+            objectFit: "cover",
+          }}
+        />
+      )}
+      {photo && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            width: 1200,
+            height: 630,
+            background:
+              "linear-gradient(90deg, rgba(10,59,58,0.92) 0%, rgba(10,59,58,0.7) 55%, rgba(10,59,58,0.25) 100%)",
+          }}
+        />
+      )}
       {/* eslint-disable-next-line @next/next/no-img-element -- drawn into a picture, not a page */}
       <img
         src={rangoli}

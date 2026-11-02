@@ -22,6 +22,8 @@ import { weekEvents, weekMessage } from "@/lib/committee-week";
 import { posterReadingOn } from "@/lib/poster-reader";
 import { CommitteeTodo } from "@/components/committee-todo";
 import { Fold } from "@/components/fold";
+import { PhotoPicker } from "@/components/photo-picker";
+import { photoUrl } from "@/lib/mandir-photo";
 import { OpenFromHash } from "@/components/open-from-hash";
 import { VisitingFields } from "@/components/visiting-fields";
 import { HoursFields } from "@/components/hours-fields";
@@ -60,8 +62,10 @@ import {
   removeCalendar,
   removeMember,
   readPosterAsCommittee,
+  removePhoto,
   reviewPosterAsCommittee,
   saveCalendar,
+  savePhoto,
   updatePracticalDetails,
 } from "./actions";
 
@@ -96,6 +100,11 @@ const ERRORS: Record<string, string> = {
   pictureFailed:
     "The poster couldn't be read just now. Please try again, or add the event below.",
   slow: "You've sent a few posters just now. Please wait ten minutes, or add the event below.",
+  "photo-agree":
+    "Please tick to say it's a photo of the building, with no people in it.",
+  "photo-none": "Please choose a photo first.",
+  "photo-size": "That photo is too big. Please try a smaller one.",
+  "photo-failed": "The photo couldn't be saved just now. Please try again.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -110,6 +119,8 @@ const DONE: Record<string, string> = {
   restore: "Back on. Visitors will see it as happening.",
   remove: "Removed from your page.",
   details: "Saved. Your public page shows the new details.",
+  photo: "Saved. Your photo is at the top of your public page.",
+  "photo-removed": "Photo removed from your page.",
   published: "Published. It's on your public page now.",
   discarded: "Thanks. That poster won't be published.",
   invited:
@@ -142,7 +153,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     ? await supabase
         .from("mandirs")
         .select(
-          "id, slug, name, town, postcode, website, live_url, phone, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
+          "id, slug, name, town, postcode, website, live_url, phone, photo_path, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
         )
         .eq("slug", slug)
         .maybeSingle()
@@ -847,6 +858,63 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             Invite
           </button>
         </form>
+      </Fold>
+
+      <Fold
+        id="photo"
+        title="Photo of your mandir"
+        hint={
+          mandir.photo_path
+            ? "Shown at the top of your page"
+            : "Add one for the top of your page"
+        }
+        open={
+          ["photo", "photo-removed"].includes(String(query.done ?? "")) ||
+          String(query.error ?? "").startsWith("photo-")
+        }
+      >
+        <div className="flex flex-col gap-5 px-5 pb-6 sm:px-7">
+          {mandir.photo_path && photoUrl(mandir.photo_path, 640) && (
+            <div className="flex flex-col gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element -- already the right size */}
+              <img
+                src={photoUrl(mandir.photo_path, 640)!}
+                alt={`${mandir.name} now`}
+                className="aspect-[16/9] w-full max-w-md rounded-2xl object-cover"
+              />
+              <form action={removePhoto}>
+                <input type="hidden" name="slug" value={mandir.slug} />
+                <button type="submit" className={quietButtonClass}>
+                  Remove the photo
+                </button>
+              </form>
+            </div>
+          )}
+          <form action={savePhoto} className="flex flex-col gap-4">
+            <input type="hidden" name="slug" value={mandir.slug} />
+            <p className="text-muted">
+              A photo of the mandir building, outside or inside. Families see it
+              at the top of your page and when your page is shared.
+            </p>
+            <PhotoPicker />
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                name="agree"
+                value="yes"
+                required
+                className="accent-peacock mt-1 size-6 shrink-0"
+              />
+              <span>
+                It&apos;s a photo of the building with no people in it, and
+                we&apos;re happy for Toran to show it.
+              </span>
+            </label>
+            <button type="submit" className={`${buttonClass} self-start`}>
+              {mandir.photo_path ? "Use this photo instead" : "Add the photo"}
+            </button>
+          </form>
+        </div>
       </Fold>
 
       <Fold
