@@ -65,9 +65,9 @@ insert into public.event_claims (mandir_id, proposed, created_at) values
   ('30000000-0000-0000-0000-000000000003', '{"title":"Older poster"}', now() - interval '9 days'),
   ('10000000-0000-0000-0000-000000000001', '{"title":"New poster"}', now() - interval '1 hour');
 
-insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, created_at) values
+insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, created_at, consented_at) values
   ('30000000-0000-0000-0000-000000000003', 'cccccccc-0000-0000-0000-000000000003', 'Trustee',
-   now() - interval '4 days');
+   now() - interval '4 days', now());
 
 -- Someone signed in who isn't a Toran admin ------------------------------------------------
 set local role authenticated;

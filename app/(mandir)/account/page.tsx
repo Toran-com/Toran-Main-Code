@@ -28,6 +28,10 @@ const NOTICES: Record<string, { tone: "error" | "success"; text: string }> = {
     tone: "error",
     text: "That invite has been cancelled or is more than 14 days old. Ask for a new one.",
   },
+  "error=consent": {
+    tone: "error",
+    text: "To accept, please tick the box to agree that Toran can record that you help run this mandir.",
+  },
   "error=failed": {
     tone: "error",
     text: "Something went wrong. Please try again.",
@@ -108,22 +112,39 @@ async function Account({ searchParams }: PageProps<"/account">) {
             committee: Toran will then keep that you help run this page, until
             you leave.
           </p>
-          <form className="flex flex-wrap gap-2">
+          <form className="flex flex-col gap-4">
             <input type="hidden" name="invite" value={invite.id} />
-            <button
-              type="submit"
-              formAction={acceptInvite}
-              className={buttonClass}
-            >
-              Accept
-            </button>
-            <button
-              type="submit"
-              formAction={declineInvite}
-              className={quietButtonClass}
-            >
-              No thanks
-            </button>
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                name="consent"
+                value="yes"
+                required
+                className="mt-1.5 size-5 shrink-0"
+              />
+              <span>
+                I agree that Toran can record that I help run this mandir. This
+                may show my religion. I can withdraw this at any time by leaving
+                the committee on Toran.
+              </span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="submit"
+                formAction={acceptInvite}
+                className={buttonClass}
+              >
+                Accept
+              </button>
+              <button
+                type="submit"
+                formAction={declineInvite}
+                formNoValidate
+                className={quietButtonClass}
+              >
+                No thanks
+              </button>
+            </div>
           </form>
         </Card>
       ))}

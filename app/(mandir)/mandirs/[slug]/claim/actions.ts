@@ -15,6 +15,9 @@ export async function submitClaim(formData: FormData) {
   if (role.length < 2 || role.length > 80) back("error=role");
   if (message.length > 500) back("error=message");
   if (formData.get("confirm") !== "yes") back("error=confirm");
+  // Explicit consent, separate from the confirmation (DPIA section 5):
+  // being on a committee can show someone's religion.
+  if (formData.get("consent") !== "yes") back("error=consent");
 
   const supabase = await createSessionClient();
   if (!supabase) back("error=failed");
@@ -29,6 +32,8 @@ export async function submitClaim(formData: FormData) {
     mandir_id: mandir!.id,
     role_at_mandir: role,
     message: message || null,
+    // The database stamps its own time.
+    consented_at: new Date().toISOString(),
   });
   if (error) back(error.code === "23505" ? "error=duplicate" : "error=failed");
   back("sent=1");

@@ -39,6 +39,7 @@ test("a new committee member finds their mandir and asks to look after it", asyn
 
   await page.getByLabel("Your role at the mandir").fill("Secretary");
   await page.getByLabel(/I'm on this mandir's committee/).check();
+  await page.getByLabel(/I agree that Toran can record/).check();
   await page.getByRole("button", { name: "Send request" }).click();
   await expect(
     page.getByText(/We've got your request for Hindu Temple Society, Coventry/),

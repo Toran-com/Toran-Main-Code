@@ -25,13 +25,13 @@ insert into public.mandir_invites (mandir_id, email, expires_at) values
   ('10000000-0000-0000-0000-000000000001', 'old@example.com', now() - interval '1 day'),
   ('10000000-0000-0000-0000-000000000001', 'new@example.com', now() + interval '5 days');
 
-insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, status, decided_at) values
-  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Old yes', 'approved', now() - interval '25 months'),
-  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Recent yes', 'approved', now() - interval '20 months'),
-  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Old no', 'rejected', now() - interval '7 months'),
-  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Recent no', 'rejected', now() - interval '5 months');
-insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, created_at) values
-  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Waiting', now() - interval '3 years');
+insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, status, decided_at, consented_at) values
+  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Old yes', 'approved', now() - interval '25 months', now()),
+  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Recent yes', 'approved', now() - interval '20 months', now()),
+  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Old no', 'rejected', now() - interval '7 months', now()),
+  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Recent no', 'rejected', now() - interval '5 months', now());
+insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, created_at, consented_at) values
+  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Waiting', now() - interval '3 years', now());
 
 insert into public.daily_counts (day, metric, path, count) values
   (current_date - interval '4 years', 'view', '/', 5),

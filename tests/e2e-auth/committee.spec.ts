@@ -27,6 +27,11 @@ test("invite a colleague, who accepts; remove and leave", async ({
 
   // Invite, with capitals the database tidies.
   await first.goto(`/manage/${SLUG}`);
+  // Added before consent was asked, so they're asked for it once.
+  await first.getByLabel(/I agree that Toran can record/).check();
+  await first.getByRole("button", { name: "Agree", exact: true }).click();
+  await expect(first.getByText("Thanks. That's recorded.")).toBeVisible();
+  await expect(first.getByText("One thing to agree to")).toHaveCount(0);
   // The committee part folds away until it's wanted.
   await first.getByText("Your committee on Toran", { exact: true }).click();
   await first
@@ -51,10 +56,15 @@ test("invite a colleague, who accepts; remove and leave", async ({
   await expect(
     colleague.getByRole("heading", { name: `Help run ${NAME}, Chelmsford?` }),
   ).toBeVisible();
+  // Accepting needs the separate consent box; "No thanks" doesn't.
+  await colleague.getByRole("button", { name: "Accept" }).click();
+  await expect(colleague).toHaveURL(/\/account$/);
+  await colleague.getByLabel(/I agree that Toran can record/).check();
   await colleague.getByRole("button", { name: "Accept" }).click();
   await expect(colleague).toHaveURL(
     new RegExp(`/manage/${SLUG}\\?done=joined`),
   );
+  await expect(colleague.getByText("One thing to agree to")).toHaveCount(0);
   await expect(colleague.getByText(/^Welcome\./)).toBeVisible();
   // They can't take off the person who invited them.
   const firstRow = colleague

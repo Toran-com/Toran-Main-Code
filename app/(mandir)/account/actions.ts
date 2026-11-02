@@ -8,11 +8,14 @@ import { createSessionClient } from "@/lib/supabase/session";
 // database checks the invite was sent to their own email address.
 
 export async function acceptInvite(formData: FormData) {
+  if (formData.get("consent") !== "yes") redirect("/account?error=consent");
   const supabase = await createSessionClient();
   if (!supabase) redirect("/account?error=failed");
   const { data: slug, error } = await supabase.rpc("accept_committee_invite", {
     invite: String(formData.get("invite") ?? ""),
+    consent: formData.get("consent") === "yes",
   });
+  if (error?.message === "consent_required") redirect("/account?error=consent");
   if (error || !slug) redirect("/account?error=invite");
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");

@@ -52,20 +52,20 @@ select is((select count(*)::int from public.mandir_contacts), 0, 'a member sees 
 
 -- Claims, made by the member
 select lives_ok(
-  $$insert into public.mandir_claims (mandir_id, role_at_mandir, message)
-    values ('10000000-0000-0000-0000-000000000001', 'Secretary', 'Please call the office to check')$$,
+  $$insert into public.mandir_claims (mandir_id, role_at_mandir, message, consented_at)
+    values ('10000000-0000-0000-0000-000000000001', 'Secretary', 'Please call the office to check', now())$$,
   'a member can claim a mandir for themselves');
 select throws_ok(
-  $$insert into public.mandir_claims (mandir_id, user_id, role_at_mandir)
-    values ('20000000-0000-0000-0000-000000000002', 'aaaaaaaa-0000-0000-0000-000000000001', 'Trustee')$$,
+  $$insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, consented_at)
+    values ('20000000-0000-0000-0000-000000000002', 'aaaaaaaa-0000-0000-0000-000000000001', 'Trustee', now())$$,
   '42501', null, 'a member cannot claim on someone else''s behalf');
 select throws_ok(
-  $$insert into public.mandir_claims (mandir_id, role_at_mandir, status)
-    values ('20000000-0000-0000-0000-000000000002', 'Trustee', 'approved')$$,
+  $$insert into public.mandir_claims (mandir_id, role_at_mandir, status, consented_at)
+    values ('20000000-0000-0000-0000-000000000002', 'Trustee', 'approved', now())$$,
   '42501', null, 'a member cannot create an already-approved claim');
 select throws_ok(
-  $$insert into public.mandir_claims (mandir_id, role_at_mandir)
-    values ('10000000-0000-0000-0000-000000000001', 'Secretary')$$,
+  $$insert into public.mandir_claims (mandir_id, role_at_mandir, consented_at)
+    values ('10000000-0000-0000-0000-000000000001', 'Secretary', now())$$,
   '23505', null, 'only one open claim per person per mandir');
 select throws_ok(
   $$select public.decide_mandir_claim(
@@ -78,8 +78,8 @@ select is((select count(*)::int from public.mandir_claims), 1, 'a member sees th
 select set_config('request.jwt.claims',
   '{"sub":"eeeeeeee-0000-0000-0000-000000000005","role":"authenticated","aal":"aal1"}', true);
 select throws_ok(
-  $$insert into public.mandir_claims (mandir_id, role_at_mandir)
-    values ('20000000-0000-0000-0000-000000000002', 'Trustee')$$,
+  $$insert into public.mandir_claims (mandir_id, role_at_mandir, consented_at)
+    values ('20000000-0000-0000-0000-000000000002', 'Trustee', now())$$,
   '42501', null, 'an unproved address cannot claim a mandir');
 select set_config('request.jwt.claims',
   '{"sub":"cccccccc-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', true);

@@ -465,6 +465,28 @@ export async function removeMember(formData: FormData) {
   back("done=removed");
 }
 
+// A committee member from before consent was asked gives it (DPIA
+// section 5). The database only changes their own place, and only once.
+export async function giveConsent(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
+  if (formData.get("consent") !== "yes") back("error=consent");
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  const { error } = await supabase.rpc("give_committee_consent", {
+    target: mandir.id,
+  });
+  if (error) back("error=failed");
+  back("done=consent");
+}
+
 // The committee adds (or changes) a photo of the mandir. The browser has
 // already made the two sizes (components/photo-picker.tsx); they're
 // checked again here, and the bucket only lets the mandir's own committee
