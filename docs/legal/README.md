@@ -53,13 +53,13 @@ providers' own terms (2 November 2026). These are the blanks left:
 1. **Company details.** Once the company is registered (decision 0007),
    fill in its name, number and registered office everywhere below.
 2. **ICO registration** in the company's name: ico.org.uk → "Pay the data
-   protection fee". About £50 a year for a small company [check the
-   current tier]. Put the registration number in the privacy notice.
+   protection fee". £52 a year for a small company (£47 by direct
+   debit). Put the registration number in the privacy notice.
 3. **A privacy contact address**, e.g. `privacy@<domain>`, that both
    founders can read. Requests must be answered within a month.
-4. **Read the DPIA together** and agree the open actions at its end. The
-   most important: how we meet the special category condition for
-   committee members (section 5).
+4. **Read the DPIA together** and agree the open actions at its end.
+   Committee members' explicit consent (section 5) is built: a separate
+   box when they ask to look after a page or accept an invite.
 5. **Get a review.** The ICO has a free helpline and a small business hub
    (ico.org.uk/for-organisations/advice-for-small-organisations). A
    solicitor's fixed-fee review of the privacy notice and terms is worth
