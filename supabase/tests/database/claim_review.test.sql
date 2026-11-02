@@ -9,8 +9,8 @@ insert into auth.users (id, email) values
 insert into public.toran_admins (user_id) values ('dddddddd-0000-0000-0000-000000000004');
 insert into public.mandirs (id, slug, name, town, region) values
   ('10000000-0000-0000-0000-000000000001', 'mandir-one', 'Mandir One', 'Harrow', 'London');
-insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, message) values
-  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Secretary', 'Call the office');
+insert into public.mandir_claims (mandir_id, user_id, role_at_mandir, message, consented_at) values
+  ('10000000-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Secretary', 'Call the office', now());
 
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);

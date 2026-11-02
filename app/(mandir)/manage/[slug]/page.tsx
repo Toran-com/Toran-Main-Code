@@ -58,6 +58,7 @@ import {
   addPickedEvents,
   cancelInvite,
   changeEvent,
+  giveConsent,
   inviteMember,
   removeCalendar,
   removeMember,
@@ -105,6 +106,7 @@ const ERRORS: Record<string, string> = {
   "photo-none": "Please choose a photo first.",
   "photo-size": "That photo is too big. Please try a smaller one.",
   "photo-failed": "The photo couldn't be saved just now. Please try again.",
+  consent: "Please tick the box first.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -131,6 +133,7 @@ const DONE: Record<string, string> = {
   calendar:
     "Saved. Toran reads your calendar tonight, and new events will wait here for you to check.",
   "calendar-removed": "Toran won't read your calendar any more.",
+  consent: "Thanks. That's recorded.",
 };
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
@@ -162,7 +165,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
 
   const { data: admin } = await supabase!
     .from("mandir_admins")
-    .select("mandir_id")
+    .select("mandir_id, consented_at")
     .eq("mandir_id", mandir.id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -399,6 +402,46 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       <OpenFromHash />
       {error && <Notice tone="error">{error}</Notice>}
       {done && <Notice tone="success">{done}</Notice>}
+
+      {admin && !admin.consented_at && (
+        <Card>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            One thing to agree to
+          </h2>
+          <p>
+            Toran now asks everyone who helps run a mandir&apos;s page to agree
+            to this, because being on a mandir&apos;s committee can show your
+            religion.
+          </p>
+          <form action={giveConsent} className="flex flex-col gap-4">
+            <input type="hidden" name="slug" value={mandir.slug} />
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                name="consent"
+                value="yes"
+                required
+                className="mt-1.5 size-5 shrink-0"
+              />
+              <span>
+                I agree that Toran can record that I help run this mandir. This
+                may show my religion. I can withdraw this at any time by leaving
+                the committee on Toran.
+              </span>
+            </label>
+            <button type="submit" className={buttonClass}>
+              Agree
+            </button>
+          </form>
+          <p className="text-muted text-base">
+            If you&apos;d rather not, press &ldquo;Leave&rdquo; under{" "}
+            <a href="#committee" className="text-peacock underline">
+              Committee
+            </a>{" "}
+            and Toran will no longer keep that you help run this page.
+          </p>
+        </Card>
+      )}
 
       <CommitteeTodo facts={facts} />
 

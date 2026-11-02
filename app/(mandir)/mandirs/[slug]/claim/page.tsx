@@ -24,6 +24,8 @@ const ERRORS: Record<string, string> = {
   role: "Please say what you do at the mandir (for example Secretary or Trustee).",
   message: "Please keep the note under 500 characters.",
   confirm: "Please tick the box to confirm you're on the committee.",
+  consent:
+    "Please tick the box to agree that Toran can record that you help run this mandir.",
   duplicate: "You've already asked to look after this mandir's page.",
   failed: "Something went wrong. Please try again.",
 };
@@ -160,6 +162,20 @@ async function Claim({
           <span>
             I&apos;m on this mandir&apos;s committee and allowed to manage its
             listing.
+          </span>
+        </label>
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name="consent"
+            value="yes"
+            required
+            className="mt-1.5 size-5 shrink-0"
+          />
+          <span>
+            I agree that Toran can record that I help run this mandir. This may
+            show my religion. I can withdraw this at any time by leaving the
+            committee on Toran.
           </span>
         </label>
         <p className="text-muted text-base">

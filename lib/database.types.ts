@@ -187,14 +187,14 @@ isOneToOne: false
                   ]
                 },"mandir_admins": {
                   Row: {
-                    "added_at": string,"added_by": string | null,"mandir_id": string,"user_id": string
+                    "added_at": string,"added_by": string | null,"consented_at": string | null,"mandir_id": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "added_at"?: string,"added_by"?: string | null,"mandir_id": string,"user_id": string
+                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id": string,"user_id": string
                   }
                   Update: {
-                    "added_at"?: string,"added_by"?: string | null,"mandir_id"?: string,"user_id"?: string
+                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -227,14 +227,14 @@ isOneToOne: true
                   ]
                 },"mandir_claims": {
                   Row: {
-                    "created_at": string,"decided_at": string | null,"decided_by": string | null,"id": string,"mandir_id": string,"message": string | null,"role_at_mandir": string,"status": string,"user_id": string
+                    "consented_at": string | null,"created_at": string,"decided_at": string | null,"decided_by": string | null,"id": string,"mandir_id": string,"message": string | null,"role_at_mandir": string,"status": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"id"?: string,"mandir_id": string,"message"?: string | null,"role_at_mandir": string,"status"?: string,"user_id"?: string
+                    "consented_at"?: string | null,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"id"?: string,"mandir_id": string,"message"?: string | null,"role_at_mandir": string,"status"?: string,"user_id"?: string
                   }
                   Update: {
-                    "created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"id"?: string,"mandir_id"?: string,"message"?: string | null,"role_at_mandir"?: string,"status"?: string,"user_id"?: string
+                    "consented_at"?: string | null,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"id"?: string,"mandir_id"?: string,"message"?: string | null,"role_at_mandir"?: string,"status"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -428,7 +428,7 @@ isOneToOne: false
           }
           Functions: {
             "accept_committee_invite":
-{ Args: { "invite": string }; Returns: string
+{ Args: { "consent"?: boolean,"invite": string }; Returns: string
                            },
 "can_edit_mandir_photo":
 { Args: { "object_name": string }; Returns: boolean
@@ -464,6 +464,9 @@ isOneToOne: false
                            },
 "give_back_seva_slot":
 { Args: { "slot": string }; Returns: boolean
+                           },
+"give_committee_consent":
+{ Args: { "target": string }; Returns: boolean
                            },
 "health":
 { Args: Record<PropertyKey, never>; Returns: string

@@ -50,7 +50,7 @@ select throws_ok($$insert into public.mandir_invites (mandir_id, email)
 select set_config('request.jwt.claims',
   '{"sub":"cccccccc-0000-0000-0000-000000000003","role":"authenticated","email":"c@example.com"}', true);
 select is((select count(*)::int from public.mandir_invites), 0, 'others don''t see the invite');
-select throws_ok($$select public.accept_committee_invite((select id from invites))$$,
+select throws_ok($$select public.accept_committee_invite((select id from invites), true)$$,
   'P0002', 'not_found', 'nor can they accept it');
 select is(public.drop_committee_invite((select id from invites)), false,
   'nor cancel it');
@@ -59,7 +59,7 @@ select is(public.drop_committee_invite((select id from invites)), false,
 select set_config('request.jwt.claims',
   '{"sub":"bbbbbbbb-0000-0000-0000-000000000002","role":"authenticated","email":"b@example.com"}', true);
 select is((select count(*)::int from public.mandir_invites), 1, 'the colleague sees their invite');
-select is(public.accept_committee_invite((select id from invites)), 'mandir-one',
+select is(public.accept_committee_invite((select id from invites), true), 'mandir-one',
   'and accepts it');
 select ok(public.is_mandir_admin('10000000-0000-0000-0000-000000000001'),
   'they now help run the mandir');
@@ -85,11 +85,11 @@ select set_config('request.jwt.claims',
   '{"sub":"eeeeeeee-0000-0000-0000-000000000005","role":"authenticated","email":"u@example.com"}', true);
 select is((select count(*)::int from public.mandir_invites), 0,
   'someone who never opened their login link doesn''t see an invite to that address');
-select throws_ok($$select public.accept_committee_invite(i.id) from unproved i$$,
+select throws_ok($$select public.accept_committee_invite(i.id, true) from unproved i$$,
   'P0002', 'not_found', 'nor can they accept it');
 select set_config('request.jwt.claims',
   '{"sub":"ffffffff-0000-0000-0000-000000000006","role":"authenticated","email":"p@example.com","amr":[{"method":"password","timestamp":1}]}', true);
-select throws_ok($$select public.accept_committee_invite(i.id) from unproved i$$,
+select throws_ok($$select public.accept_committee_invite(i.id, true) from unproved i$$,
   'P0002', 'not_found', 'nor can someone who logged in with a password');
 select set_config('request.jwt.claims',
   '{"sub":"aaaaaaaa-0000-0000-0000-000000000001","role":"authenticated","email":"a@example.com"}', true);
@@ -122,7 +122,7 @@ insert into public.mandir_invites (id, mandir_id, email, expires_at) values
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"cccccccc-0000-0000-0000-000000000003","role":"authenticated","email":"c@example.com"}', true);
-select throws_ok($$select public.accept_committee_invite('99999999-0000-0000-0000-000000000009')$$,
+select throws_ok($$select public.accept_committee_invite('99999999-0000-0000-0000-000000000009', true)$$,
   'P0002', 'not_found', 'an invite older than 14 days can''t be accepted');
 
 select * from finish();

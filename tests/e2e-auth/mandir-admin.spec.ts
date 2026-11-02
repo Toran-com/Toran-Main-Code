@@ -31,6 +31,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(member).toHaveURL(new RegExp(`/mandirs/${SLUG}/claim$`));
   await member.getByLabel("Your role at the mandir").fill("Secretary");
   await member.getByLabel(/I'm on this mandir's committee/).check();
+  await member.getByLabel(/I agree that Toran can record/).check();
   await member.getByRole("button", { name: "Send request" }).click();
   await expect(member.getByText("We've got your request")).toBeVisible();
 
