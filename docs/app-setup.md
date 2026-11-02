@@ -233,6 +233,14 @@ the real domain exists, set it in GitHub → Settings → Secrets and variables
 → Actions → **Variables** → `SITE_URL`. Make sure you **Watch** the repo
 (top right on GitHub) so issue emails reach you.
 
+The same hourly check also watches Toran's own jobs, once the database is
+connected: if the nightly job hasn't run for 36 hours (or its clean-up
+failed), if the weekly email is switched on but hasn't gone out for 8
+days, or if error reports aren't reaching Sentry, it opens one issue,
+labelled "checks need a look", saying what's wrong and where to look. It
+comments only when what's wrong changes, and closes itself when all is
+well. `/api/health` shows the same under `jobs` and `errorReports`.
+
 **Sentry, your part (about 10 minutes, any time):**
 
 1. Sign up at sentry.io (free plan), create a project, platform **Next.js**,
@@ -244,6 +252,9 @@ the real domain exists, set it in GitHub → Settings → Secrets and variables
    Addresses**; keep **Data Scrubber** on.
 5. Test: open `/api/debug/error` on a preview link; the error should appear
    in Sentry within a minute.
+6. Sentry → Alerts: keep the alert Sentry made with the project, which
+   emails you about each new kind of error, and check it goes to an
+   address you read.
 
 ### Pull request 6 — the data model
 

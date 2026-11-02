@@ -1,3 +1,5 @@
+import { NIGHTLY_LATE_HOURS } from "@/lib/health";
+
 // What needs a Toran admin's attention (/ops/attention), as the database
 // works it out (needs_attention). Pure, so reading the answer is tested on
 // its own; anything malformed is left out rather than breaking the page.
@@ -165,7 +167,7 @@ export type NightlyStatus =
   { state: "never" } | { state: "late" | "ok"; ranAt: string; text: string };
 
 // A run more than this long ago means the job has stopped.
-const LATE_HOURS = 36;
+const LATE_HOURS = NIGHTLY_LATE_HOURS;
 
 export function nightlyStatus(
   run: { ran_at: string; summary: unknown } | null,
