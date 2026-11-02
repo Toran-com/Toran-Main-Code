@@ -9,6 +9,7 @@ import {
   daysSince,
   nightlyStatus,
   readAttention,
+  staleCutoff,
   type List,
 } from "@/lib/attention";
 import { requireToranAdmin } from "@/lib/auth";
@@ -42,7 +43,10 @@ const WEBSITE_OUTCOMES: Record<string, string> = {
 async function NeedsAttention() {
   await requireToranAdmin("/ops/attention");
   const supabase = await createSessionClient();
-  const [answer, lastRun] = supabase
+  // Details nobody has changed in six months: phone numbers, websites
+  // and opening times drift, so worth a check with the mandir.
+  const cutoff = staleCutoff();
+  const [answer, lastRun, staleAnswer] = supabase
     ? await Promise.all([
         supabase.rpc("needs_attention"),
         supabase
@@ -52,13 +56,30 @@ async function NeedsAttention() {
           .order("ran_at", { ascending: false })
           .limit(1)
           .maybeSingle(),
+        supabase
+          .from("mandirs")
+          .select("slug, name, town, updated_at", { count: "exact" })
+          .neq("status", "hidden")
+          .lt("updated_at", cutoff)
+          .order("updated_at")
+          .limit(50),
       ])
-    : [null, null];
+    : [null, null, null];
   if (!answer || answer.error) {
     return <Notice tone="error">Couldn&apos;t load the list.</Notice>;
   }
   const a = readAttention(answer.data);
-  const total = attentionCount(a);
+  const stale: List<{
+    slug: string;
+    name: string;
+    town: string;
+    updated_at: string;
+  }> = {
+    total: staleAnswer?.count ?? 0,
+    items: staleAnswer?.data ?? [],
+  };
+  const totals = { ...a, stale };
+  const total = attentionCount(a) + stale.total;
   const now = new Date();
   const nightly = nightlyStatus(lastRun?.data ?? null, now);
 
@@ -97,7 +118,7 @@ async function NeedsAttention() {
             href={`#${id}`}
             className="border-line hover:bg-sunk rounded-full border px-4 py-1.5 text-base font-semibold"
           >
-            {title} ({a[id].total})
+            {title} ({totals[id].total})
           </a>
         ))}
       </nav>
@@ -136,6 +157,21 @@ async function NeedsAttention() {
               {m.last_added
                 ? `Last added an event ${daysSince(m.last_added, now)} days ago`
                 : "Hasn't added an event yet"}
+            </span>
+          </>
+        )}
+      />
+
+      <Section
+        id="stale"
+        list={stale}
+        intro="Mandirs whose phone number, website and opening times nobody has changed in six months. Check them against the mandir's website, or ask the committee to look over their details."
+        empty="Every mandir's details have been updated in the last six months."
+        render={(m) => (
+          <>
+            <Mandir {...m} href={`/ops/mandirs/${m.slug}`} />
+            <span className="text-muted text-base">
+              Last updated {daysSince(m.updated_at, now)} days ago
             </span>
           </>
         )}
@@ -263,6 +299,7 @@ async function NeedsAttention() {
 const SECTIONS = [
   { id: "unconfirmed", title: "Not confirmed lately" },
   { id: "quiet", title: "Nothing coming up" },
+  { id: "stale", title: "Details not updated in 6 months" },
   { id: "websites", title: "Websites not read" },
   { id: "invites", title: "Invites running out" },
   { id: "festival_dates", title: "Festival dates to check" },

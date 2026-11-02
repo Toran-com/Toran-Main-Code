@@ -24,6 +24,16 @@ test("admins see what needs attention", async ({ page }) => {
          where s.mandir_id = m.id and s.kind = 'crawler')`,
   );
 
+  // Nobody has changed its details for a year. (The trigger that keeps
+  // updated_at current is paused for this one change.)
+  sql(
+    `begin;
+     alter table public.mandirs disable trigger mandirs_updated_at;
+     update public.mandirs set updated_at = now() - interval '1 year' where slug = '${SLUG}';
+     alter table public.mandirs enable trigger mandirs_updated_at;
+     commit;`,
+  );
+
   await logInAsAdmin(page, `attention-${Date.now()}@example.com`);
   await page
     .getByRole("navigation", { name: "Admin" })
@@ -58,4 +68,11 @@ test("admins see what needs attention", async ({ page }) => {
     .getByRole("link", { name: /^Posters waiting long \(\d+\)$/ })
     .click();
   await expect(page).toHaveURL(/#posters$/);
+
+  const stale = page.getByRole("region", {
+    name: /Details not updated in 6 months/,
+  });
+  await expect(
+    stale.getByRole("listitem").filter({ hasText: "Aberdeen Hindu Temple" }),
+  ).toContainText(/Last updated 36\d days ago/);
 });
