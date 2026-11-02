@@ -15,9 +15,38 @@ done. This folder is the paperwork for that.
 | [terms.md](terms.md)                   | Rules for using the site and for committees adding information  | `/terms`, shown from this file             |
 | [dpia.md](dpia.md)                     | Data protection impact assessment: risks and how we reduce them | Internal; shown to the ICO if asked        |
 | [retention.md](retention.md)           | How long each kind of data is kept, and how it is deleted       | Internal; summarised in the privacy notice |
+| [breach-plan.md](breach-plan.md)       | What to do, step by step, if personal data leaks                | Internal                                   |
 
 Text in **[square brackets]** needs filling in or checking. Search for `[`
 before publishing anything.
+
+## Questions only the founders can answer
+
+Everything else in these drafts has been checked against the site and the
+providers' own terms (2 November 2026). These are the blanks left:
+
+1. **The company:** its registered name, number and registered office
+   (decision 0007). Used in the privacy notice and terms.
+2. **The domain** (toran.org.uk was still free on 31 October) and two
+   addresses on it: one for privacy requests (e.g. `privacy@`) and one
+   for everything else (e.g. `hello@`). Both founders should be able to
+   read them.
+3. **The ICO registration number**, once the fee is paid.
+4. **Regions**, each a quick look in its settings:
+   - Supabase → the live project → Settings → General: "Region" (we want
+     London, `eu-west-2`);
+   - Sentry: the error reporting address (`NEXT_PUBLIC_SENTRY_DSN` in
+     Vercel) contains `ingest.de.sentry.io` for the EU; anything else
+     (`ingest.us.sentry.io` or `ingest.sentry.io`) is the USA;
+   - Resend → Domains: the region shown for the sending domain.
+5. **Data processing agreements:** accept Anthropic's, Resend's,
+   Supabase's, Vercel's and Sentry's for the company's accounts (each is
+   in the provider's legal or settings pages).
+6. **Names and dates** to sign off the DPIA, and who leads in the breach
+   plan.
+7. **A solicitor's review** of the privacy notice and terms (two
+   bracketed notes in the terms), and the ICO helpline call before the
+   weekly email is switched on.
 
 ## What to do, in order
 

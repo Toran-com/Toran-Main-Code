@@ -1,7 +1,9 @@
 # Privacy notice (DRAFT)
 
-> Draft for review, [date]. Not yet published. Text in [brackets] needs
-> filling in or checking.
+> Draft of 2 November 2026, brought up to date with the site as built.
+> Not yet published as final. Text in [brackets] is for the founders to
+> fill in; everything else has been checked against the site and the
+> providers' own terms.
 
 Toran is run by **[Company name] Ltd**, a company registered in England and
 Wales (number [number]), registered office [address]. We are the
@@ -15,6 +17,8 @@ within one month.
 
 - You can browse Toran without an account. We don't use tracking cookies
   or advertising, and we don't sell or share data for marketing.
+- What you save (mandirs you follow, your plan, seva you've taken, your
+  text size) stays on your phone, not with us.
 - Mandir committee members who look after a mandir's page log in with
   their email address. That's most of what we hold.
 - Knowing which mandir someone is involved with can reveal their religion.
@@ -24,25 +28,33 @@ within one month.
 
 - **No account and no tracking cookies.** We don't record who you are or
   which mandirs you look at.
-- **Server logs.** Our hosting provider (Vercel) briefly keeps technical
-  logs, including IP addresses, to run the site and protect it from abuse.
-  [Check Vercel's log retention for our plan.]
+- **Server logs.** Our hosting provider, Vercel, briefly keeps technical
+  logs, including IP addresses, to run the site and protect it from abuse:
+  one hour on its free plan, one day on its Pro plan. The site's servers
+  are in London.
 - **Error reports.** If a page breaks, an error report goes to Sentry so
   we can fix it. We set it up not to store IP addresses, cookies, browser
-  headers or email addresses.
+  headers or email addresses. Reports are deleted after 30 days (90 days
+  on Sentry's Team plan).
 - **The mandirs map.** The map pictures come from OpenStreetMap. Your
   browser fetches them directly, so OpenStreetMap sees your IP address, as
   any website you visit does. If you press "Near me", your browser asks
   first; your location only moves the map on your screen and is never sent
   to us or kept.
-- **"Near me" on What's on and the festival pages.** If you press it, your browser asks first,
-  then sends your position (rounded to about a kilometre) to postcodes.io
-  to find your postcode district, such as "RG1". Only the district reaches
-  Toran, just as if you'd typed it; your position isn't sent to us or
-  kept. postcodes.io is a free public service run by Ideal Postcodes.
-  Your phone remembers the postcode or district you chose (or that you
-  chose all of the UK), so What's on starts there next time. It stays on
-  your phone; clearing the site's data in your browser forgets it.
+- **"Near me" on What's on and the festival pages.** If you press it, your
+  browser asks first, then sends your position (rounded to about a
+  kilometre) to postcodes.io to find your postcode district, such as
+  "RG1". Only the district reaches Toran, just as if you'd typed it; your
+  position isn't sent to us or kept. postcodes.io is a free public service
+  run by Ideal Postcodes. Your phone remembers the postcode or district you
+  chose (or that you chose all of the UK), so What's on starts there next
+  time. It stays on your phone; clearing the site's data in your browser
+  forgets it.
+- **Directions, live streams, tickets and mandirs' websites.** Buttons like
+  "Directions", "Watch live", "Book tickets" and "Website" take you to
+  another site (Google Maps, YouTube, a mandir's booking page and so on).
+  Toran doesn't send them anything about you, but once you're there their
+  own privacy notice applies.
 - **Calendars.** If you add a mandir's events or the festival dates to
   your calendar, your calendar app checks Toran for changes every few
   hours. Like any visit, that shows up briefly in the server logs; we
@@ -51,6 +63,11 @@ within one month.
   opened (What's on, mandir and festival pages), so they still open
   without signal. They stay on your phone; clearing the site's data in
   your browser removes them. Nothing personal is kept.
+- **Text size and contrast.** If you change these, your phone remembers
+  your choice. Nothing is sent to us.
+- **Read aloud.** Your phone or browser reads the page aloud with its own
+  voices. Toran sends nothing anywhere; some browsers use their maker's
+  online voices, under that maker's privacy terms.
 - **Seva slots.** If a mandir lets you take a seva slot on Toran, we
   keep only that one more slot is taken, with the time. We don't ask for
   or keep your name, contact details or anything about your phone. Your
@@ -97,6 +114,20 @@ within one month.
   running total. If your browser asks sites not to track you ("Do Not
   Track" or "Global Privacy Control"), you aren't counted at all.
 
+## If you sign up for the weekly email
+
+The weekly "What's on" email is switched off until our ICO registration
+and impact assessment are done. When it's on:
+
+- We keep **your email address and, if you choose one, an area** (such as
+  "London"). No name, postcode or anything else.
+- You confirm by pressing the link we send. If you don't within 7 days,
+  your address is deleted.
+- Every email has a one-click link to stop them. Pressing it deletes your
+  address straight away.
+- The email is sent through Resend, our email provider. Lawful basis: your
+  consent, which you can withdraw at any time by leaving.
+
 ## If you look after a mandir's page
 
 | What we hold                                                      | Why                                                                       | Lawful basis                                             |
@@ -109,57 +140,74 @@ within one month.
 | For Toran's own staff only: an authenticator app link             | To protect the admin area                                                 | Legitimate interests: security                           |
 
 Being on a mandir's committee can reveal your religious beliefs, which the
-law treats as **special category data**. [We rely on your explicit
-consent, which you give when you ask to look after a page or accept a
-colleague's invite, and which you can withdraw at any time by pressing
-"Leave" on your mandir's page or asking us to remove you. Confirm with the
-DPIA, section 5.]
+law treats as **special category data**. We rely on your **explicit
+consent**, which you give by ticking a separate box when you ask to look
+after a page or accept a colleague's invite. You can withdraw it at any
+time by leaving your mandir's committee on Toran or asking us to remove
+you.
 
 We don't show your name or email on the public site. Others on the same
 mandir's committee can see your login email on the committee page, so
 they know who else helps run it. Event listings say
 "Confirmed by the mandir", not who confirmed them.
 
+**Photos of the mandir.** A committee can add a photo of the mandir
+building to its page. It must show the building only, with no people in
+it; the committee ticks a box to confirm that and that Toran may show it.
+The photo is public. It is removed when the committee removes it, or
+straight away if anyone asks us to because it shows a person.
+
+**Reading a poster.** A committee, or Toran, can send a photo or PDF of a
+poster so its events are typed up automatically. The picture is sent to
+Anthropic (the Claude API) to be read, together with an instruction to
+leave out anyone's name or number. Toran doesn't keep the picture, only
+the event details it finds, which are checked before anything is
+published. Anthropic doesn't use what we send to train its models and
+deletes it within 30 days.
+
+**A monthly email to committees** (switched off until our ICO
+registration is done): a summary of how your page did and anything worth
+doing. You'll be able to stop it at any time.
+
 ## Mandirs' own details
 
-Mandir names, towns, postcodes, websites and public phone numbers come
-from the mandirs' own websites and public registers. They describe
+Mandir names, towns, postcodes, websites, public phone numbers, live
+stream pages and public event calendars come from the mandirs' own
+websites and public registers, or from their committees. They describe
 organisations, not people. If a mandir's published contact is a personal
 email or phone number, we keep it private and use it only to contact the
-committee.
+committee. Every night Toran reads the public event calendars mandirs
+have given it, and the event details their websites publish, to keep
+listings up to date; these are the mandirs' public information.
 
 ## Coming later (this section will be updated before each launches)
 
-- **Weekly digest:** your email address and postcode, nothing else. You
-  can unsubscribe in one click; we delete your details 30 days later.
-- **Seva rota sign-ups:** your name and one way to contact you, shared
-  only with that mandir's committee. Deleted 90 days after the event.
-  Under-16s need a parent's or guardian's details and the mandir's
-  sign-off.
+- **Seva sign-ups with names:** today seva on Toran keeps no names at all.
+  If a mandir ever needs names, they'll be shared only with that mandir's
+  committee, deleted 90 days after the event, and under-16s will need a
+  parent's or guardian's details and the mandir's sign-off.
 - **Forwarding posters by WhatsApp or email:** the message, any image,
-  and the sender's number or address. We use them to create the listing,
-  then delete the message [within 90 days]. If we have a poster read by
-  machine, only the picture goes to Anthropic, never who sent it; it's
-  told to leave out anyone's name or number, and Toran doesn't keep the
-  picture.
+  and the sender's number or address, used to create the listing and then
+  deleted within 90 days.
 
 ## Who we share data with
 
 Only these service providers ("processors"), who act on our instructions
 under contract:
 
-| Provider                                  | What for                                   | Where                                       |
-| ----------------------------------------- | ------------------------------------------ | ------------------------------------------- |
-| Supabase                                  | Database and login                         | London (UK) [check project region]          |
-| Vercel                                    | Hosting the website                        | Servers in London; global network for speed |
-| Sentry                                    | Error reports (with personal data removed) | [EU / US: check the region chosen]          |
-| [Email provider, e.g. Postmark or Resend] | Sending login links (and later the digest) | [check]                                     |
-| Anthropic (Claude API)                    | Reading poster photos and PDFs into events | USA [check]                                 |
-| [Meta (WhatsApp)], later                  | Receiving forwarded posters                | [check]                                     |
+| Provider               | What for                                              | Where                                                      |
+| ---------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| Supabase               | Database, login and the mandirs' photos               | [London (UK): check the live project's region]             |
+| Vercel                 | Hosting the website                                   | Servers in London; a global network delivers pages quickly |
+| Sentry                 | Error reports (with personal data removed)            | [EU or USA: check the region chosen]                       |
+| Resend                 | Sending login links (and later the weekly email)      | [USA or EU: check the region the account uses]             |
+| Anthropic (Claude API) | Reading poster photos and PDFs into events            | USA                                                        |
+| postcodes.io           | Finding your postcode district when you press Near me | UK (a rounded position only, never linked to you)          |
 
 Some of these companies are based in the USA. Where data leaves the UK,
-we rely on [the UK–US data bridge or the ICO's international data transfer
-agreement / addendum: check each provider's terms].
+we rely on the UK Extension to the EU–US Data Privacy Framework where the
+company is certified, and otherwise on the ICO's international data
+transfer addendum in the company's data processing agreement.
 
 We never sell data. We'd only share it with others if the law requires
 it.
@@ -169,8 +217,11 @@ it.
 In short:
 logins until you ask us to delete them, or 24 months after your last login
 (we email first); an address typed on the login page whose link is never
-opened, 7 days; decided page requests for 2 years; error reports for
-about 30 days.
+opened, 7 days; weekly email sign-ups until you leave (never confirmed: 7
+days); decided page requests for 2 years; correction requests 90 days
+after they're dealt with; error reports 30 to 90 days; server logs one
+hour to one day; database backups 7 days. Our full retention schedule is
+available on request.
 
 ## Your rights
 
@@ -198,4 +249,4 @@ don't show a cookie banner. If that ever changes, we'll ask first.
 ## Changes
 
 We'll update this notice when we start collecting something new, and show
-the date at the top. Last updated: [date].
+the date at the top. Last updated: 2 November 2026.
