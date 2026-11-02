@@ -112,6 +112,45 @@ export async function reviewPosterAsToran(formData: FormData) {
   );
 }
 
+// The ticked items, published in one go. Only ones Toran may publish with
+// no look-alikes get a tick box; each still goes through the same checks
+// as publishing it alone, so a copy is never listed twice and anything
+// that needs a closer look stays in the queue.
+export async function publishTicked(formData: FormData) {
+  await requireToranAdmin("/ops/posters");
+  const group = String(formData.get("group") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(
+      `/ops/posters?${group ? `from=${encodeURIComponent(group)}&` : ""}${query}`,
+    );
+  const ids = [
+    ...new Set(
+      formData
+        .getAll("poster")
+        .map(String)
+        .filter((id) => /^[0-9a-f-]{36}$/.test(id)),
+    ),
+  ].slice(0, MAX_TICKED);
+  if (ids.length === 0) back("error=ticked");
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+
+  let published = 0;
+  const slugs = new Set<string>();
+  for (const id of ids) {
+    const result = await reviewPoster(supabase, id, "publish", "toran");
+    if (result.ok) {
+      published += 1;
+      slugs.add(result.slug);
+    }
+  }
+  for (const slug of slugs) updateTag(`mandir:${slug}`);
+  if (published) updateTag("events");
+  back(`published=${published}&left=${ids.length - published}`);
+}
+
+const MAX_TICKED = 100;
+
 // Several events read from mandirs' own websites, pasted as spreadsheet
 // rows (lib/website-import.ts). Each joins the queue "From the mandir's
 // website"; anything the mandir already has, or that's already waiting,
