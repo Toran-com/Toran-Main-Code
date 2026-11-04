@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { EventCard } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
-import { Loading } from "@/components/ui";
+import { EventListSkeleton } from "@/components/skeletons";
 import { dateLocale } from "@/lib/format";
 import { regionKey } from "@/lib/i18n/client/mandirs";
 import { localePath, pageT } from "@/lib/i18n/page";
@@ -30,7 +30,7 @@ export default function RegularPage(props: PageProps<"/regular">) {
   return (
     <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <PageHeading title={t("regular.title")} intro={t("regular.intro")} />
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<EventListSkeleton />}>
         <Regular {...props} />
       </Suspense>
     </div>

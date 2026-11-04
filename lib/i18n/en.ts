@@ -6,6 +6,7 @@ import { enClient } from "@/lib/i18n/client-messages";
 export const en = {
   ...enClient,
   ...enShared,
+  "shell.loading": "Loading…",
   "shell.home": "Toran home",
   "shell.whatsOn": "What's on",
   "shell.mandirs": "Mandirs",
@@ -117,6 +118,9 @@ export const en = {
     'We couldn\'t find "{place}". Try a full postcode like LE4 6AR, or just the first part like LE4.',
   "whatsOn.noneThere": "No events listed there in the next eight weeks.",
   "whatsOn.noneYet": "No events listed yet.",
+  "whatsOn.wider": "Look within {miles} miles",
+  "whatsOn.everything": "Show every kind of event, any day",
+  "whatsOn.allUk": "Show all of the UK",
   "whatsOn.emptyBefore":
     "Mandirs are adding their events as they join Toran. In the meantime, find your nearest mandir on the ",
   "whatsOn.emptyLink": "mandir list",
@@ -264,6 +268,7 @@ export const en = {
   "sevaList.count.other": "{count} events need help",
   "sevaList.free.one": "{count} place free",
   "sevaList.free.other": "{count} places free",
+  "sevaList.seeWhatsOn": "See what's on instead",
   "sevaList.none": "No mandir is asking for seva just now. Look again soon.",
   "sevaList.places.one": "place still needed",
   "sevaList.places.other": "places still needed",

@@ -4,8 +4,9 @@ import { Suspense } from "react";
 import { DateTile } from "@/components/date-tile";
 import { Toran } from "@/components/ornaments";
 import { Badge, LoadProblem, PageHeading } from "@/components/public-shell";
+import { FestivalsSkeleton } from "@/components/skeletons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
-import { Loading, Notice } from "@/components/ui";
+import { Notice } from "@/components/ui";
 import { listFestivalDates, type FestivalDate } from "@/lib/directory";
 import { calendarLabel, formatDateRange, monthOf } from "@/lib/format";
 import { pageMetadata } from "@/lib/site";
@@ -27,7 +28,7 @@ export default function FestivalsPage() {
   return (
     <div className="page-wide flex flex-col gap-10 sm:gap-14">
       <PageHeading title={t("shell.festivals")} intro={t("festivals.intro")} />
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<FestivalsSkeleton />}>
         <Festivals />
       </Suspense>
     </div>

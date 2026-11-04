@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { Empty } from "@/components/empty";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { EventsMapView } from "@/components/events-map-view";
 import { FollowedOnly } from "@/components/follow";
 import { PlanLink } from "@/components/plan";
 import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
-import { Loading, Notice, pillButtonClass } from "@/components/ui";
+import { WhatsOnSkeleton } from "@/components/skeletons";
+import { Notice, pillButtonClass } from "@/components/ui";
 import { EVENT_KINDS, isEventKind, kindLabel } from "@/lib/event-kinds";
 import { londonDate } from "@/lib/format";
 import { cleanSlugs } from "@/lib/follow";
@@ -49,7 +51,7 @@ export default function WhatsOnPage(props: PageProps<"/whats-on">) {
   return (
     <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <PageHeading title={t("whatsOn.title")} intro={t("whatsOn.intro")} />
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<WhatsOnSkeleton />}>
         <WhatsOn {...props} />
       </Suspense>
     </div>
@@ -89,10 +91,14 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     when?: When;
     view?: string;
     mandirs?: string;
+    near?: string;
+    within?: number;
   }) => {
     const params = new URLSearchParams();
-    if (near) params.set("near", near);
-    if (within !== 15) params.set("within", String(within));
+    const n = change.near ?? near;
+    const w2 = change.within ?? within;
+    if (n) params.set("near", n);
+    if (n && w2 !== 15) params.set("within", String(w2));
     const r = change.region ?? region;
     const k = change.type ?? kind;
     // Choosing a day forgets "today" or "this weekend", and the other way.
@@ -292,23 +298,54 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             }
           />
         ) : (
-          <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
-            <p className="font-semibold">
-              {position || region || kind || day || when || mandirs.length
+          <Empty
+            title={
+              position || region || kind || day || when || mandirs.length
                 ? t("whatsOn.noneThere")
-                : t("whatsOn.noneYet")}
-            </p>
-            <p className="text-muted">
-              {t("whatsOn.emptyBefore")}
-              <Link
-                href={localePath("/mandirs")}
-                className="text-peacock underline"
-              >
-                {t("whatsOn.emptyLink")}
-              </Link>
-              {t("whatsOn.emptyAfter")}
-            </p>
-          </div>
+                : t("whatsOn.noneYet")
+            }
+            steps={[
+              // Look further afield first: the next distance up.
+              ...(position && within < RADII[RADII.length - 1]
+                ? [
+                    {
+                      href: here({
+                        within: RADII.find((r) => r > within) ?? within,
+                      }),
+                      label: t("whatsOn.wider", {
+                        miles: RADII.find((r) => r > within) ?? within,
+                      }),
+                    },
+                  ]
+                : []),
+              ...(region || kind || day || when || mandirs.length
+                ? [
+                    {
+                      href: here({
+                        region: "",
+                        type: "",
+                        day: "",
+                        when: "",
+                        mandirs: "",
+                      }),
+                      label: t("whatsOn.everything"),
+                    },
+                  ]
+                : []),
+              ...(near
+                ? [{ href: here({ near: "" }), label: t("whatsOn.allUk") }]
+                : []),
+            ]}
+          >
+            {t("whatsOn.emptyBefore")}
+            <Link
+              href={localePath("/mandirs")}
+              className="text-peacock underline"
+            >
+              {t("whatsOn.emptyLink")}
+            </Link>
+            {t("whatsOn.emptyAfter")}
+          </Empty>
         )}
         {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
       </div>

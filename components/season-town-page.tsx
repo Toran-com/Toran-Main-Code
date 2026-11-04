@@ -8,7 +8,7 @@ import { Toran } from "@/components/ornaments";
 import { LoadProblem } from "@/components/public-shell";
 import { SeasonDays } from "@/components/season-page";
 import { ShareButtons } from "@/components/share-buttons";
-import { Loading } from "@/components/ui";
+import { EventListSkeleton } from "@/components/skeletons";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
 import { seasonDays, seasonEvents, seasonWindow } from "@/lib/festival-season";
 import { localePath, pageT, seasonText } from "@/lib/i18n/page";
@@ -121,7 +121,7 @@ export async function SeasonTownPage({
           </Suspense>
         </div>
       </header>
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<EventListSkeleton />}>
         <TownBody season={season} slug={slug} town={town} />
       </Suspense>
     </>

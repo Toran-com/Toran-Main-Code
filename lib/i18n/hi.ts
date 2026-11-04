@@ -8,6 +8,7 @@ import type { MessageKey } from "@/lib/i18n/en";
 export const hi: Record<MessageKey, string> = {
   ...hiClient,
   ...hiShared,
+  "shell.loading": "लोड हो रहा है…",
   "shell.home": "Toran मुख्य पेज",
   "shell.whatsOn": "कार्यक्रम",
   "shell.mandirs": "मंदिर",
@@ -119,6 +120,9 @@ export const hi: Record<MessageKey, string> = {
     "हमें “{place}” नहीं मिला। LE4 6AR जैसा पूरा पोस्टकोड आज़माएँ, या सिर्फ़ पहला हिस्सा, जैसे LE4।",
   "whatsOn.noneThere": "अगले आठ हफ़्तों में वहाँ कोई कार्यक्रम नहीं है।",
   "whatsOn.noneYet": "अभी कोई कार्यक्रम नहीं है।",
+  "whatsOn.wider": "{miles} मील तक देखें",
+  "whatsOn.everything": "हर तरह के कार्यक्रम, किसी भी दिन दिखाएँ",
+  "whatsOn.allUk": "पूरा UK दिखाएँ",
   "whatsOn.emptyBefore":
     "मंदिर Toran से जुड़ते हुए अपने कार्यक्रम डाल रहे हैं। तब तक, अपना सबसे पास का मंदिर यहाँ खोजें: ",
   "whatsOn.emptyLink": "मंदिरों की सूची",
@@ -256,6 +260,7 @@ export const hi: Record<MessageKey, string> = {
   "sevaList.count.other": "{count} कार्यक्रमों को मदद चाहिए",
   "sevaList.free.one": "{count} जगह खाली",
   "sevaList.free.other": "{count} जगहें खाली",
+  "sevaList.seeWhatsOn": "इसके बजाय कार्यक्रम देखें",
   "sevaList.none": "अभी कोई मंदिर सेवा के लिए नहीं कह रहा। जल्द फिर देखें।",
   "sevaList.places.one": "जगह की अभी ज़रूरत है",
   "sevaList.places.other": "जगहों की अभी ज़रूरत है",
