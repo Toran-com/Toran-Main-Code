@@ -50,16 +50,56 @@ export function RangoliMark({
   );
 }
 
-// The rangoli and the name: the top of every page and the footer.
-export function Logo({ size = "md" }: { size?: "md" | "sm" }) {
+// Toran's mark: a T made of a toran, the garland hung over a mandir's
+// door, with drops hanging from it (DESIGN.md). On light pages it sits in
+// a midnight tile; on midnight ("night") it's gold line work on its own.
+export function ToranMark({
+  className = "size-10",
+  night = false,
+}: {
+  className?: string;
+  night?: boolean;
+}) {
   return (
-    <span className="flex items-center gap-2.5">
+    <svg viewBox="0 0 48 48" aria-hidden="true" className={className}>
+      {!night && <rect width="48" height="48" rx="11" fill="#14213d" />}
+      <path
+        d="M9 13H39M24 13V37"
+        stroke="#d9a441"
+        strokeWidth="3.6"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {[
+        [13.2, 19.2],
+        [18.2, 21.4],
+        [29.8, 21.4],
+        [34.8, 19.2],
+      ].map(([cx, cy]) => (
+        <circle key={cx} cx={cx} cy={cy} r="2.25" fill="#d9a441" />
+      ))}
+    </svg>
+  );
+}
+
+// The mark and the name, spaced like letters carved over a doorway: the
+// top of every page and the footer.
+export function Logo({
+  size = "md",
+  night = false,
+}: {
+  size?: "md" | "sm";
+  night?: boolean;
+}) {
+  return (
+    <span className="flex items-center gap-3">
       {/* A logo keeps its size whatever the text size (lib/display.ts). */}
-      <RangoliMark
-        className={size === "md" ? "size-[34px] sm:size-[40px]" : "size-[36px]"}
+      <ToranMark
+        night={night}
+        className={size === "md" ? "size-[34px] sm:size-[38px]" : "size-[34px]"}
       />
       <span
-        className={`font-display leading-none ${size === "md" ? "text-[32px] sm:text-[36px]" : "text-[32px]"}`}
+        className={`font-display leading-none tracking-[0.16em] uppercase ${size === "md" ? "text-[24px] sm:text-[27px]" : "text-[24px]"}`}
       >
         Toran
       </span>

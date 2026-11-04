@@ -33,6 +33,7 @@ import { googleCalendarLink } from "@/lib/ical";
 import { enSeva } from "@/lib/i18n/client/seva";
 import { enSlots } from "@/lib/i18n/client/slots";
 import { savePlace } from "@/lib/place-memory";
+import { LineIcon, type LineIconName } from "@/components/line-icons";
 import { londonDate } from "@/lib/london";
 import {
   type Choice,
@@ -42,7 +43,6 @@ import {
   type Found,
   nearEnough,
   PARTS_OF_DAY,
-  type PartOfDay,
   placesBy,
   ROLE_KINDS,
   type RoleKind,
@@ -59,22 +59,18 @@ export type FinderDay = { day: string; label: string; heading: string };
 
 export type FinderOrigin = Position & { place: string };
 
-export const KIND_ICONS: Record<RoleKind, string> = {
-  kitchen: "🍲",
-  parking: "🚗",
-  shoes: "👟",
-  decorations: "🪔",
-  prasad: "🍬",
-  children: "🧸",
-  cleaning: "🧹",
-  welcome: "🙏",
-  other: "✨",
-};
-
-const PART_ICONS: Record<PartOfDay, string> = {
-  morning: "🌅",
-  afternoon: "☀️",
-  evening: "🌙",
+// Line icons (components/line-icons.tsx), not emoji: the kind of seva and
+// the time of day each have a small picture beside their name.
+const KIND_ICONS: Record<RoleKind, LineIconName> = {
+  kitchen: "kitchen",
+  parking: "parking",
+  shoes: "shoes",
+  decorations: "decorations",
+  prasad: "prasad",
+  children: "children",
+  cleaning: "cleaning",
+  welcome: "welcome",
+  other: "other",
 };
 
 const RADII = [5, 15, 30, 60] as const;
@@ -210,7 +206,7 @@ export function SevaExplorer({
               <Tile
                 pressed={!choice.kind}
                 onClick={() => choose({ kind: "" })}
-                icon="💛"
+                icon={<LineIcon name="heart" className="text-peacock size-8" />}
                 label={t("sevaFind.anything")}
                 count={places(t, sum(byKind))}
               />
@@ -219,7 +215,12 @@ export function SevaExplorer({
                   key={k}
                   pressed={choice.kind === k}
                   onClick={() => choose({ kind: choice.kind === k ? "" : k })}
-                  icon={KIND_ICONS[k]}
+                  icon={
+                    <LineIcon
+                      name={KIND_ICONS[k]}
+                      className="text-peacock size-8"
+                    />
+                  }
                   label={t(`sevaKind.${k}`)}
                   count={places(t, byKind.get(k) ?? 0)}
                   quiet={!byKind.get(k)}
@@ -267,7 +268,7 @@ export function SevaExplorer({
                   onClick={() => choose({ part: choice.part === p ? "" : p })}
                   quiet={!byPart.get(p)}
                 >
-                  <span aria-hidden="true">{PART_ICONS[p]}</span>{" "}
+                  <LineIcon name={p} className="inline size-5 align-[-0.2em]" />{" "}
                   {t(`sevaFind.${p}`)}
                 </Chip>
               ))}
@@ -453,7 +454,10 @@ function NearMeButton({
     return (
       <div className="flex flex-col gap-3">
         <p className="text-lg font-bold">
-          <span aria-hidden="true">📍 </span>
+          <LineIcon
+            name="pin"
+            className="text-peacock inline size-6 align-[-0.25em]"
+          />{" "}
           {"place" in origin
             ? t("sevaFind.nearPlace", { place: origin.place })
             : t("sevaFind.nearYou")}
@@ -526,7 +530,7 @@ function Tile({
 }: {
   pressed: boolean;
   onClick: () => void;
-  icon: string;
+  icon: ReactNode;
   label: string;
   count: string;
   quiet?: boolean;
@@ -538,9 +542,7 @@ function Tile({
       onClick={onClick}
       className={`border-line hover:border-peacock/60 flex cursor-pointer items-center gap-3 rounded-2xl border p-3 text-left transition active:scale-[0.97] sm:p-4 ${pressedRing} ${quiet && !pressed ? QUIET : "bg-surface"}`}
     >
-      <span aria-hidden="true" className="text-3xl leading-none sm:text-4xl">
-        {icon}
-      </span>
+      {icon}
       <span className="flex min-w-0 flex-col">
         <span className="leading-snug font-bold">{label}</span>
         <span className="text-muted text-base leading-snug">{count}</span>
@@ -718,7 +720,10 @@ function NeedCard({
         {roles.map((r) => (
           <li key={r.role}>
             <Pill tone={r.needsDbs ? "quiet" : "leaf"}>
-              <span aria-hidden="true">{KIND_ICONS[r.kind]} </span>
+              <LineIcon
+                name={KIND_ICONS[r.kind]}
+                className="inline size-5 align-[-0.2em]"
+              />{" "}
               {r.role} {r.free}
             </Pill>
           </li>
@@ -796,7 +801,10 @@ function ShiftRow({
     <li className="border-line flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3">
       <div className="flex min-w-48 flex-1 flex-col gap-1">
         <p className="font-semibold">
-          <span aria-hidden="true">{KIND_ICONS[shift.kind]} </span>
+          <LineIcon
+            name={KIND_ICONS[shift.kind]}
+            className="text-peacock inline size-5 align-[-0.2em]"
+          />{" "}
           {shift.role} <span className="text-muted font-normal">· {when}</span>
         </p>
         <Filled done={done} needed={shift.needed} />
@@ -958,8 +966,8 @@ function Celebration({
             />
           ))}
         </div>
-        <p aria-hidden="true" className="diya text-7xl leading-none">
-          🪔
+        <p aria-hidden="true" className="diya text-marigold leading-none">
+          <LineIcon name="decorations" className="size-20" />
         </p>
         <h2 id="thanks" className="font-display text-4xl leading-tight">
           {t("sevaFind.thanks")}

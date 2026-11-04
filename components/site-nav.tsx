@@ -22,7 +22,7 @@ export function SiteNav({
               <Link
                 href={href}
                 aria-current={here ? "page" : undefined}
-                className={`text-ink hover:bg-sunk block rounded-full px-4 py-2 text-center no-underline transition-colors ${here ? "bg-sunk font-semibold" : "font-medium"}`}
+                className={`text-on-night hover:bg-on-night/10 block rounded-full px-4 py-2 text-center no-underline transition-colors ${here ? "bg-on-night/15 font-semibold" : "font-medium"}`}
               >
                 {label}
               </Link>

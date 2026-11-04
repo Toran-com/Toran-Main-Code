@@ -62,16 +62,16 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
   );
   return (
     <>
-      <header className="bg-bg z-30 md:sticky md:top-0">
+      <header className="bg-night text-on-night z-30 md:sticky md:top-0">
         <div
           className={`${wideClass} flex items-center justify-between gap-x-3 py-2.5 sm:gap-x-6 sm:py-3`}
         >
           <Link
             href={localePath("/")}
             aria-label={t("shell.home")}
-            className="text-ink shrink-0 no-underline"
+            className="text-on-night shrink-0 no-underline"
           >
-            <Logo />
+            <Logo night />
           </Link>
           <SiteNav links={places} />
           {/* The header's buttons keep their size whatever the text size
@@ -82,7 +82,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               href={localePath("/search")}
               aria-label={t("shell.search")}
               title={t("shell.search")}
-              className="text-ink hover:bg-sunk inline-flex size-[44px] items-center justify-center rounded-full no-underline transition-colors max-[359px]:hidden"
+              className="text-on-night hover:bg-on-night/10 inline-flex size-[44px] items-center justify-center rounded-full no-underline transition-colors max-[359px]:hidden"
             >
               <svg
                 aria-hidden="true"

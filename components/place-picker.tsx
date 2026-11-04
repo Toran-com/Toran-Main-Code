@@ -1,5 +1,6 @@
 "use client";
 
+import { LineIcon } from "@/components/line-icons";
 import { useRouter } from "next/navigation";
 import {
   type FormEvent,
@@ -160,7 +161,10 @@ export function PlacePicker({
     <>
       <div className="border-line bg-surface shadow-card flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-[1.75rem] border py-2 pr-2 pl-5">
         <p className="min-w-0 font-semibold break-words">
-          <span aria-hidden="true">📍 </span>
+          <LineIcon
+            name="pin"
+            className="text-peacock inline size-6 align-[-0.25em]"
+          />{" "}
           {near && placed
             ? t("place.near", { place: near.toUpperCase(), miles: within })
             : t("place.everywhere")}

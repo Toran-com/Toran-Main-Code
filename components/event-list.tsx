@@ -75,7 +75,7 @@ export function EventCard({
   const source = sourceLabel(e);
   const kind = kindLabel(e.kind);
   return (
-    <article className="has-card-link group flex gap-4 py-5 sm:gap-6 sm:py-6">
+    <article className="reveal has-card-link group flex gap-4 py-5 sm:gap-6 sm:py-6">
       {underDay ? (
         <TimeTile at={e.next_starts_at} allDay={e.all_day} />
       ) : (

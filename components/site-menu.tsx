@@ -45,7 +45,7 @@ export function SiteMenu({
 
   return (
     <details ref={menu} className="site-menu">
-      <summary className="text-ink hover:bg-sunk inline-flex h-[44px] cursor-pointer list-none items-center gap-[8px] rounded-full px-[12px] text-[18px] font-semibold whitespace-nowrap transition-colors [&::-webkit-details-marker]:hidden">
+      <summary className="text-on-night hover:bg-on-night/10 inline-flex h-[44px] cursor-pointer list-none items-center gap-[8px] rounded-full px-[12px] text-[18px] font-semibold whitespace-nowrap transition-colors [&::-webkit-details-marker]:hidden">
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"

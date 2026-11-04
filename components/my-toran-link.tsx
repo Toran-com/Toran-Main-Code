@@ -11,7 +11,7 @@ export function MyToranLink({ label, href }: { label: string; href: string }) {
     <Link
       href={href}
       aria-current={here ? "page" : undefined}
-      className={`text-ink hover:bg-sunk hidden h-11 items-center justify-center gap-2 rounded-full px-4 no-underline transition-colors md:inline-flex ${here ? "bg-sunk" : ""}`}
+      className={`text-on-night hover:bg-on-night/10 hidden h-11 items-center justify-center gap-2 rounded-full px-4 no-underline transition-colors md:inline-flex ${here ? "bg-on-night/15" : ""}`}
     >
       <svg
         aria-hidden="true"

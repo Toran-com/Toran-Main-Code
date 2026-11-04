@@ -8,7 +8,7 @@ export const dayHeadingClass =
   "font-display text-ink pb-1 text-3xl leading-tight";
 
 export const cardClass =
-  "border-line bg-surface shadow-card rounded-3xl border";
+  "reveal border-line bg-surface shadow-card rounded-3xl border";
 
 export function Card({ children }: { children: ReactNode }) {
   return (
@@ -65,7 +65,7 @@ export const actionPillClass =
   "border-line-strong bg-surface text-ink hover:border-peacock/60 inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-base font-semibold no-underline transition duration-200 active:scale-95 [&_svg]:text-peacock";
 
 // Everything else you press: an outlined pill.
-export const quietButtonClass = `${press} border-line-strong bg-surface text-ink hover:border-peacock/60 rounded-full border px-6 py-3 text-lg font-semibold`;
+export const quietButtonClass = `${press} border-peacock bg-surface text-peacock hover:bg-peacock/8 rounded-full border-2 px-6 py-[0.625rem] text-lg font-semibold`;
 
 export function Loading() {
   return (
