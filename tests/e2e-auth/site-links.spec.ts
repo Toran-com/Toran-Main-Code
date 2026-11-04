@@ -20,6 +20,7 @@ const PAGES = [
   "/about",
   "/privacy",
   "/accessibility",
+  "/how-its-built",
 ];
 
 // Links on these pages that aren't pages to visit.
