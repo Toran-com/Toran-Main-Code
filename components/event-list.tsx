@@ -1,3 +1,4 @@
+import { dayHeadingClass } from "@/components/ui";
 import Link from "next/link";
 import { DateTile, TimeTile } from "@/components/date-tile";
 import { Badge } from "@/components/public-shell";
@@ -31,9 +32,7 @@ export function EventList({
         const shown = more ? all.slice(0, more.perDay) : all;
         return (
           <section key={day} className="flex flex-col">
-            <h2 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
-              {heading}
-            </h2>
+            <h2 className={dayHeadingClass}>{heading}</h2>
             <ul className="divide-line flex flex-col divide-y">
               {shown.map((e) => (
                 <li key={e.id}>

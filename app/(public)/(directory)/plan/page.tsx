@@ -5,7 +5,7 @@ import { EventCard } from "@/components/event-list";
 import { WhatsAppIcon } from "@/components/icons";
 import { PlanButtons, PlanEntry, PlanFromPhone } from "@/components/plan";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
-import { Loading } from "@/components/ui";
+import { dayHeadingClass, Loading } from "@/components/ui";
 import { formatEventStart } from "@/lib/format";
 import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
 import { cleanEventIds, planHref } from "@/lib/plan";
@@ -94,9 +94,7 @@ async function Plan({ searchParams }: PageProps<"/plan">) {
             // Hidden once its last event is taken out.
             className="flex flex-col [&:not(:has(li))]:hidden"
           >
-            <h2 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
-              {heading}
-            </h2>
+            <h2 className={dayHeadingClass}>{heading}</h2>
             <ul className="divide-line flex flex-col divide-y">
               {all.map((e) => (
                 <PlanEntry key={e.id} id={e.id} shown={shown}>

@@ -2,6 +2,11 @@ import type { ReactNode } from "react";
 
 // The white (or, in dark mode, deep blue) panel for things you tap and
 // for forms. Lists sit on the page with fine lines instead.
+// A day in a list of events or seva ("Today", "Friday 6 November"), in
+// the headline serif: calm, and easy to find when scrolling.
+export const dayHeadingClass =
+  "font-display text-ink pb-1 text-3xl leading-tight";
+
 export const cardClass =
   "border-line bg-surface shadow-card rounded-3xl border";
 

@@ -1,13 +1,15 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Notice } from "@/components/ui";
-import { AccountLink, CommitteeLink } from "@/components/account-link";
+import { AccountLink } from "@/components/account-link";
 import { InstallApp } from "@/components/install-app";
-import { DisplaySettings } from "@/components/display-settings";
+import { DisplayControls } from "@/components/display-settings";
 import { LanguageSwitch } from "@/components/language-switch";
 import { MyToranLink } from "@/components/my-toran-link";
 import { Logo, Toran } from "@/components/ornaments";
+import { MenuSection, menuRowClass, SiteMenu } from "@/components/site-menu";
 import { SiteNav } from "@/components/site-nav";
+import { TabBar } from "@/components/tab-bar";
 import { LOCALES } from "@/lib/i18n";
 import { localePath, pageLocale, pageT } from "@/lib/i18n/page";
 import { TRANSLATED_LOCALES } from "@/lib/i18n/paths";
@@ -31,10 +33,14 @@ export function PublicShell({ children }: { children: ReactNode }) {
 // The page width for headers, footers and wide pages.
 export const wideClass = "mx-auto w-full max-w-[88rem] px-4 sm:px-8 lg:px-12";
 
-// The name, the main menu and the other language. On a phone the menu
-// takes its own row, so every page stays one tap away. From tablet size
-// up the header stays at the top as you scroll. The toran hangs below it,
-// except where the page hangs its own over a bold moment.
+// One calm row: the name, the four main places (from tablet size up),
+// Search, My Toran and "Menu", which holds everything else: text size,
+// language, the way in for committees. On a phone the four places and My
+// Toran sit in a bar along the bottom of the screen instead
+// (components/tab-bar.tsx). From tablet size up the header stays at the
+// top as you scroll. It has a solid background, not a blurred one, so the
+// menu can cover the whole screen. The toran hangs below it, except where
+// the page hangs its own over a bold moment.
 export function SiteHeader({ toran = true }: { toran?: boolean }) {
   const t = pageT();
   // English, the translations that have been checked, and the page's own
@@ -43,11 +49,22 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
   const languages = (["en", ...TRANSLATED_LOCALES] as const)
     .filter((l) => l === "en" || LOCALES[l].ready || l === locale)
     .map((l) => ({ locale: l, name: LOCALES[l].name, lang: LOCALES[l].lang }));
+  const places = [
+    { href: localePath("/whats-on"), label: t("shell.whatsOn") },
+    { href: localePath("/seva"), label: t("shell.seva") },
+    { href: localePath("/mandirs"), label: t("shell.mandirs") },
+    { href: localePath("/festivals"), label: t("shell.festivals") },
+  ];
+  const arrow = (
+    <span aria-hidden="true" className="text-peacock">
+      →
+    </span>
+  );
   return (
     <>
-      <header className="bg-bg/90 z-30 backdrop-blur-md sm:sticky sm:top-0">
+      <header className="bg-bg z-30 md:sticky md:top-0">
         <div
-          className={`${wideClass} flex flex-wrap items-center justify-between gap-x-6 gap-y-1 py-2.5 sm:py-3`}
+          className={`${wideClass} flex items-center justify-between gap-x-3 py-2.5 sm:gap-x-6 sm:py-3`}
         >
           <Link
             href={localePath("/")}
@@ -56,25 +73,21 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
           >
             <Logo />
           </Link>
-          <SiteNav
-            links={[
-              { href: localePath("/whats-on"), label: t("shell.whatsOn") },
-              { href: localePath("/seva"), label: t("shell.seva") },
-              { href: localePath("/mandirs"), label: t("shell.mandirs") },
-              { href: localePath("/festivals"), label: t("shell.festivals") },
-            ]}
-          />
-          <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <SiteNav links={places} />
+          {/* The header's buttons keep their size whatever the text size
+              (at least 18px), so the row always fits a phone; the page
+              below grows. Below 360px wide, Search is in the menu only. */}
+          <div className="ml-auto flex items-center gap-[4px] sm:gap-[8px]">
             <Link
               href={localePath("/search")}
               aria-label={t("shell.search")}
               title={t("shell.search")}
-              className="text-ink hover:bg-sunk inline-flex size-11 items-center justify-center rounded-full no-underline transition-colors"
+              className="text-ink hover:bg-sunk inline-flex size-[44px] items-center justify-center rounded-full no-underline transition-colors max-[359px]:hidden"
             >
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
-                className="size-6"
+                className="size-[24px]"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -85,20 +98,54 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               </svg>
             </Link>
             <MyToranLink label={t("shell.my")} href={localePath("/my")} />
-            <AccountLink
-              logIn={t("shell.logIn")}
-              account={t("shell.account")}
-            />
-            <DisplaySettings />
-            {languages.length > 1 && <LanguageSwitch languages={languages} />}
-            <CommitteeLink
-              forMandirs={t("shell.forMandirs")}
-              account={t("shell.account")}
-            />
+            <SiteMenu label={t("shell.menu")} close={t("shell.closeMenu")}>
+              <MenuSection heading={t("shell.find")}>
+                {[
+                  ...places,
+                  { href: localePath("/my"), label: t("shell.my") },
+                  { href: localePath("/search"), label: t("shell.search") },
+                ].map(({ href, label }) => (
+                  <Link key={href} href={href} className={menuRowClass}>
+                    {label}
+                    {arrow}
+                  </Link>
+                ))}
+              </MenuSection>
+              <DisplayControls />
+              {languages.length > 1 && (
+                <MenuSection heading={t("shell.language")}>
+                  <LanguageSwitch languages={languages} />
+                </MenuSection>
+              )}
+              <MenuSection heading={t("shell.toran")}>
+                <Link href="/for-mandirs" className={menuRowClass}>
+                  {t("shell.forMandirs")}
+                  {arrow}
+                </Link>
+                <AccountLink
+                  logIn={t("shell.logIn")}
+                  account={t("shell.account")}
+                />
+                {FOOTER_LINKS.about.map(({ href, key }) => (
+                  <Link key={href} href={href} className={menuRowClass}>
+                    {t(key)}
+                    {arrow}
+                  </Link>
+                ))}
+              </MenuSection>
+            </SiteMenu>
           </div>
         </div>
       </header>
       {toran && <Toran className="site-toran" />}
+      <TabBar
+        tabs={[
+          { href: places[0].href, label: places[0].label, icon: "events" },
+          { href: places[2].href, label: places[2].label, icon: "mandirs" },
+          { href: places[3].href, label: places[3].label, icon: "festivals" },
+          { href: localePath("/my"), label: t("shell.my"), icon: "my" },
+        ]}
+      />
     </>
   );
 }

@@ -21,7 +21,11 @@ import {
   takeAndKeep,
   useMySlots,
 } from "@/components/seva-slots";
-import { buttonClass, quietButtonClass } from "@/components/ui";
+import {
+  buttonClass,
+  dayHeadingClass,
+  quietButtonClass,
+} from "@/components/ui";
 import { useOrigin } from "@/components/use-origin";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
@@ -331,7 +335,7 @@ export function SevaExplorer({
             <div className="flex flex-col gap-8">
               {groups.map(({ day, items }) => (
                 <section key={day} className="flex flex-col gap-3">
-                  <h3 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
+                  <h3 className={dayHeadingClass}>
                     {headings.get(day) ?? day}
                   </h3>
                   <ul className="flex flex-col gap-4">

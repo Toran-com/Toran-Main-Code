@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// The main menu. The page you're on is marked (for screen readers too)
-// with a soft pill. On a phone it fills its own row, spread across it.
+// The four main places in the header, from tablet size up (on a phone
+// they're in the bar along the bottom, components/tab-bar.tsx). The page
+// you're on is marked (for screen readers too) with a soft pill.
 export function SiteNav({
   links,
 }: {
@@ -12,11 +13,8 @@ export function SiteNav({
 }) {
   const path = usePathname();
   return (
-    <nav
-      aria-label="Main"
-      className="order-last w-full sm:order-none sm:w-auto"
-    >
-      <ul className="flex flex-wrap justify-between gap-0 text-base whitespace-nowrap sm:justify-start sm:gap-1.5 sm:text-lg">
+    <nav aria-label="Main" className="hidden md:block">
+      <ul className="flex flex-wrap gap-1 text-lg whitespace-nowrap">
         {links.map(({ href, label }) => {
           const here = path === href || path.startsWith(`${href}/`);
           return (
@@ -24,7 +22,7 @@ export function SiteNav({
               <Link
                 href={href}
                 aria-current={here ? "page" : undefined}
-                className={`text-ink hover:bg-sunk block rounded-full px-1.5 py-2 text-center no-underline transition-colors sm:px-4 ${here ? "bg-sunk font-semibold" : "font-medium"}`}
+                className={`text-ink hover:bg-sunk block rounded-full px-4 py-2 text-center no-underline transition-colors ${here ? "bg-sunk font-semibold" : "font-medium"}`}
               >
                 {label}
               </Link>

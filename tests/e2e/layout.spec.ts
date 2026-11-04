@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectAccessible } from "../a11y";
 
 // On a phone, no page should be wider than the screen: a page that slides
 // sideways when you scroll feels broken.
@@ -34,6 +35,48 @@ for (const path of [
     ).toBeLessThanOrEqual(width);
   });
 }
+
+// On a phone, the main places are in a bar along the bottom, each with a
+// picture and its name, and the header is one row: the name, Search and
+// Menu. The bar never hides the end of the page.
+test("on a phone, the main places are along the bottom", async ({ page }) => {
+  await page.goto("/");
+  // (Next.js keeps the page before hidden, so only the one showing.)
+  const bar = page.locator(".tab-bar:visible");
+  await expect(bar).toBeVisible();
+  for (const name of ["What's on", "Mandirs", "Festivals", "My Toran"]) {
+    await expect(bar.getByRole("link", { name })).toBeVisible();
+  }
+  await bar.getByRole("link", { name: "Festivals" }).click();
+  await expect(page).toHaveURL(/\/festivals$/);
+  await expect(bar.getByRole("link", { name: "Festivals" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  // The footer's last link can be seen above the bar.
+  await page.keyboard.press("End");
+  const footerEnd = await page
+    .locator("footer a")
+    .last()
+    .evaluate((a) => a.getBoundingClientRect().bottom);
+  const barTop = await bar.evaluate((b) => b.getBoundingClientRect().top);
+  expect(footerEnd).toBeLessThanOrEqual(barTop);
+
+  // The menu covers the screen, with the bar out of the way, and closes.
+  await page.locator("summary:visible", { hasText: "Menu" }).click();
+  const menu = page.getByRole("group", { name: "Menu" });
+  await expect(menu.getByRole("link", { name: "Seva" })).toBeVisible();
+  await expect(bar).toBeHidden();
+  await expectAccessible(page);
+  await menu.getByRole("button", { name: "Close" }).click();
+  await expect(menu).toBeHidden();
+  await expect(bar).toBeVisible();
+  // And closes by itself on going to another page.
+  await page.locator("summary:visible", { hasText: "Menu" }).click();
+  await menu.getByRole("link", { name: "Mandirs" }).click();
+  await expect(page).toHaveURL(/\/mandirs$/);
+  await expect(menu).toBeHidden();
+});
 
 // The smallest screen that has to work (320px: a small phone, or 400%
 // zoom) with the largest text, in all three languages: Gujarati and Hindi
@@ -116,14 +159,29 @@ test.describe("on a laptop", () => {
     });
   }
 
-  test("the header has one button for committees", async ({ page }) => {
+  test("the header is one row, with the rest in the menu", async ({ page }) => {
     await page.goto("/");
+    const header = page.locator("header");
+    const main = header.getByRole("navigation", { name: "Main" });
+    for (const name of ["What's on", "Seva", "Mandirs", "Festivals"]) {
+      await expect(main.getByRole("link", { name })).toBeVisible();
+    }
+    await expect(header.getByRole("link", { name: "My Toran" })).toBeVisible();
+    // No bar along the bottom on a laptop.
+    await expect(page.locator(".tab-bar")).toBeHidden();
+    // Committees, text size and the rest are in the menu.
     await expect(
-      page.getByRole("link", { name: "For mandir committees" }).first(),
-    ).toBeVisible();
-    // The phone's log-in icon gives way to it.
-    await expect(
-      page.getByRole("link", { name: "Committee log in" }),
+      header.getByRole("link", { name: "Committee log in" }),
     ).toBeHidden();
+    await page.locator("summary:visible", { hasText: "Menu" }).click();
+    const menu = page.getByRole("group", { name: "Menu" });
+    await expect(
+      menu.getByRole("link", { name: "For mandir committees" }),
+    ).toBeVisible();
+    await expect(
+      menu.getByRole("link", { name: "Committee log in" }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
   });
 });
