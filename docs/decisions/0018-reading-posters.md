@@ -38,3 +38,15 @@ Typing a patrika up becomes checking it. Machine reading can be wrong
 checking, and why the queue marks these. Anthropic is a new processor in
 the privacy notice; its region and data terms need checking before
 launch, along with the other "[check]" items there.
+
+## Later: a public demo on sample posters (November 2026)
+
+/demo/poster lets anyone watch Claude read one of three posters Toran
+made for the made-up sample mandir, and check the drafts as a committee
+would (nothing is saved). The public still can't send pictures: only
+those three files are ever read, so no one's personal data is sent. Each
+poster is read at most once a day (the reading is cached), with at most
+a dozen readings an hour from one server as a safety net, so it costs
+pennies a day. One poster has a made-up volunteer's name and number
+(07700 900xxx, kept for drama) to show they're left out; the page checks
+the drafts and says honestly if one wasn't.
