@@ -126,7 +126,17 @@ const PRINCIPLES: { title: string; body: ReactNode }[] = [
   },
   {
     title: "Responsible AI",
-    body: "AI reads a poster into a draft event; it never publishes on its own, and a person always checks first. Only the picture is sent, never who sent it, and it isn't kept.",
+    body: (
+      <>
+        AI reads a poster into a draft event; it never publishes on its own, and
+        a person always checks first. Only the picture is sent, never who sent
+        it, and it isn&apos;t kept.{" "}
+        <Link href="/demo/poster" className="text-peacock underline">
+          Watch it read a poster
+        </Link>
+        .
+      </>
+    ),
   },
   {
     title: "Reliable",

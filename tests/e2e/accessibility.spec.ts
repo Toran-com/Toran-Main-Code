@@ -20,6 +20,7 @@ for (const path of [
   "/for-mandirs",
   "/about",
   "/how-its-built",
+  "/demo/poster",
   "/privacy",
   "/corrections",
   "/gu",

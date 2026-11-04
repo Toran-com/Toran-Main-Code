@@ -8,6 +8,8 @@ for (const path of [
   "/whats-on",
   "/my",
   "/login",
+  "/how-its-built",
+  "/demo/poster",
 ]) {
   test(`${path} stays within the speed budget`, async ({ page }) => {
     await ownDownloadsOnly(page);
