@@ -1,6 +1,7 @@
 import { dayHeadingClass } from "@/components/ui";
 import Link from "next/link";
 import { DateTile, TimeTile } from "@/components/date-tile";
+import { Morph, morphName } from "@/components/morph";
 import { Badge } from "@/components/public-shell";
 import { kindLabel, sourceLabel } from "@/lib/event-kinds";
 import { formatEventStart, formatMiles, formatTimeOfDay } from "@/lib/format";
@@ -76,26 +77,30 @@ export function EventCard({
   const kind = kindLabel(e.kind);
   return (
     <article className="reveal has-card-link group flex gap-4 py-5 sm:gap-6 sm:py-6">
-      {underDay ? (
-        <TimeTile at={e.next_starts_at} allDay={e.all_day} />
-      ) : (
-        <DateTile
-          date={e.next_starts_at}
-          label={formatEventStart(e.next_starts_at, true)}
-        />
-      )}
+      <Morph name={morphName.eventDate(e.id)}>
+        {underDay ? (
+          <TimeTile at={e.next_starts_at} allDay={e.all_day} />
+        ) : (
+          <DateTile
+            date={e.next_starts_at}
+            label={formatEventStart(e.next_starts_at, true)}
+          />
+        )}
+      </Morph>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3
-          lang={storedLang()}
-          className={`text-lg leading-snug font-semibold break-words sm:text-xl ${cancelled ? "line-through" : ""}`}
-        >
-          <Link
-            href={localePath(eventPath(e.mandir.slug, e.id))}
-            className="card-link group-hover:text-peacock no-underline"
+        <Morph name={morphName.eventTitle(e.id)}>
+          <h3
+            lang={storedLang()}
+            className={`text-lg leading-snug font-semibold break-words sm:text-xl ${cancelled ? "line-through" : ""}`}
           >
-            {e.title}
-          </Link>
-        </h3>
+            <Link
+              href={localePath(eventPath(e.mandir.slug, e.id))}
+              className="card-link group-hover:text-peacock no-underline"
+            >
+              {e.title}
+            </Link>
+          </h3>
+        </Morph>
         {e.title_gu && (
           <p lang="gu" className="font-semibold">
             {e.title_gu}

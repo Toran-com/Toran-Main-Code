@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Morph, morphName } from "@/components/morph";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
@@ -117,12 +118,14 @@ export default async function MandirPage({
         )}
         <div className="rise relative flex max-w-4xl flex-col gap-4">
           <div className="flex flex-wrap items-start gap-x-4 gap-y-3 sm:gap-x-6">
-            <h1
-              lang={storedLang()}
-              className="font-display min-w-0 flex-1 text-5xl leading-[1.02] tracking-tight sm:text-7xl"
-            >
-              {mandir.name}
-            </h1>
+            <Morph name={morphName.mandir(mandir.slug)}>
+              <h1
+                lang={storedLang()}
+                className="font-display min-w-0 flex-1 text-5xl leading-[1.02] tracking-tight sm:text-7xl"
+              >
+                {mandir.name}
+              </h1>
+            </Morph>
             <FollowButton slug={mandir.slug} beside />
           </div>
           <p className="text-muted flex flex-wrap items-center gap-x-4 gap-y-2 text-lg sm:text-xl">
@@ -401,21 +404,25 @@ function EventRow({
       id={`event-${event.id}`}
       className="has-card-link group flex scroll-mt-28 gap-4 py-5 sm:gap-6 sm:py-6"
     >
-      <DateTile
-        date={event.next_starts_at}
-        label={formatEventStart(event.next_starts_at, true)}
-      />
+      <Morph name={morphName.eventDate(event.id)}>
+        <DateTile
+          date={event.next_starts_at}
+          label={formatEventStart(event.next_starts_at, true)}
+        />
+      </Morph>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3
-          className={`text-xl leading-snug font-semibold ${cancelled ? "line-through" : ""}`}
-        >
-          <Link
-            href={localePath(eventPath(mandir.slug, event.id))}
-            className="card-link group-hover:text-peacock no-underline"
+        <Morph name={morphName.eventTitle(event.id)}>
+          <h3
+            className={`text-xl leading-snug font-semibold ${cancelled ? "line-through" : ""}`}
           >
-            {event.title}
-          </Link>
-        </h3>
+            <Link
+              href={localePath(eventPath(mandir.slug, event.id))}
+              className="card-link group-hover:text-peacock no-underline"
+            >
+              {event.title}
+            </Link>
+          </h3>
+        </Morph>
         {event.title_gu && (
           <p lang="gu" className="font-semibold">
             {event.title_gu}

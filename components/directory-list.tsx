@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { Morph, morphName } from "@/components/morph";
 import { useId, useMemo, useState } from "react";
 import type { MandirSummary } from "@/lib/directory";
 import { useLocale, useT } from "@/components/use-t";
@@ -193,9 +194,11 @@ function MandirGroups({
                         className="group hover:bg-sunk flex items-center gap-3 px-4 py-3 no-underline transition-colors first:rounded-t-2xl last:rounded-b-2xl"
                       >
                         <span className="flex flex-1 flex-col">
-                          <span className="text-peacock font-semibold">
-                            {m.name}
-                          </span>
+                          <Morph name={morphName.mandir(m.slug)}>
+                            <span className="text-peacock font-semibold">
+                              {m.name}
+                            </span>
+                          </Morph>
                           {m.tradition && (
                             <span className="text-muted text-base">
                               {m.tradition}

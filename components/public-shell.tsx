@@ -62,7 +62,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
   );
   return (
     <>
-      <header className="bg-night text-on-night z-30 md:sticky md:top-0">
+      <header className="site-header bg-night text-on-night z-30 md:sticky md:top-0">
         <div
           className={`${wideClass} flex items-center justify-between gap-x-3 py-2.5 sm:gap-x-6 sm:py-3`}
         >
