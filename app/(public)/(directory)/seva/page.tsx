@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LineIcon } from "@/components/line-icons";
 import Link from "next/link";
 import { connection } from "next/server";
 import { type CSSProperties, Suspense } from "react";
@@ -226,7 +227,10 @@ function NeedBand({
         </p>
         {totals.taken > 0 && (
           <p className="text-on-night/80 mt-2 text-lg">
-            <span aria-hidden="true">🙏 </span>
+            <LineIcon
+              name="heart"
+              className="text-night-accent inline size-5 align-[-0.2em]"
+            />{" "}
             {t.count("sevaList.taken", totals.taken)}
           </p>
         )}

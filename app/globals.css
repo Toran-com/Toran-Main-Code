@@ -1,77 +1,81 @@
 @import "tailwindcss";
 
-/* Colours carried over from the prototype. Light mode is the default; dark
+/* Colours: "Midnight & Gold" (DESIGN.md). Light mode is the default; dark
    mode follows the device setting on screen, and printouts are always light.
    Use the Tailwind names (bg-surface, text-peacock, …) in components rather
-   than raw hex values. */
+   than raw hex values. Some names are older than the colours they now hold:
+   "peacock" is the colour of everything you can press (lapis blue),
+   "marigold" is gold and "night" is midnight. */
 :root {
-  --bg: #faf8f4;
+  --bg: #f6f4ef;
   --surface: #ffffff;
-  --sunk: #f1eee7;
-  --ink: #1b1a2c;
-  --muted: #5d5a6e;
-  --line: rgba(27, 26, 44, 0.12);
-  --peacock: #0b6b68;
+  --sunk: #eeebe4;
+  --ink: #1a1a22;
+  --muted: #55566a;
+  --line: rgba(20, 33, 61, 0.12);
+  /* Buttons and links: one blue, so "blue means you can press it". */
+  --peacock: #1f3a8a;
   --on-peacock: #ffffff;
-  --marigold: #f0a00a;
-  --marigold-ink: #8a5a00;
-  --kumkum: #c21e3a;
-  --leaf: #3f7d3a;
-  --peacock-deep: #08504e;
+  --peacock-deep: #14213d;
+  /* Gold: highlights and the logo, never small text on a light page. */
+  --marigold: #d9a441;
+  --marigold-ink: #7a5a12;
+  /* Cancelled and errors only. */
+  --kumkum: #b3261e;
+  --leaf: #2f6a2b;
   --card-shadow:
-    0 1px 2px rgba(27, 26, 44, 0.04), 0 12px 32px -14px rgba(27, 26, 44, 0.14);
+    0 1px 2px rgba(20, 33, 61, 0.05), 0 12px 32px -14px rgba(20, 33, 61, 0.16);
   --lift-shadow:
-    0 2px 4px rgba(27, 26, 44, 0.05), 0 20px 44px -18px rgba(27, 26, 44, 0.24);
-  /* Each page's one bold moment: a deep peacock band with cream text and
-     gold line art (the home page welcome, an event's heading). */
-  --night: #0a3b3a;
-  --on-night: #faf3e6;
-  --night-muted: #cfe3df;
-  --night-accent: #ffc95c;
-  /* Date tiles: a page from a panchang, the month in kumkum. */
-  --tile: #fff6e3;
-  --tile-line: rgba(240, 160, 10, 0.35);
-  --date: #c21e3a;
-  --line-strong: rgba(27, 26, 44, 0.18);
+    0 2px 4px rgba(20, 33, 61, 0.06), 0 24px 48px -18px rgba(20, 33, 61, 0.28);
+  /* Midnight: the header and each page's bold moment, with gold on it. */
+  --night: #14213d;
+  --on-night: #f6f4ef;
+  --night-muted: #c9ccda;
+  --night-accent: #d9a441;
+  /* Date tiles: a cool page, the month in lapis. */
+  --tile: #eef0f7;
+  --tile-line: rgba(31, 58, 138, 0.16);
+  --date: #1f3a8a;
+  --line-strong: rgba(20, 33, 61, 0.2);
   /* "Confirmed by the mandir". */
-  --leaf-tint: #eaf3e8;
+  --leaf-tint: #e9f2e7;
   --leaf-ink: #2f6a2b;
 }
 
 @media screen and (prefers-color-scheme: dark) {
   :root {
-    --bg: #0d1120;
-    --surface: #151a2d;
-    --sunk: #10152a;
-    --ink: #edeaf5;
-    --muted: #a6a3bc;
-    --line: rgba(237, 234, 245, 0.12);
-    --peacock: #3cc6bf;
-    /* Bright teal needs dark text to be readable (WCAG AA). */
-    --on-peacock: #0d1120;
-    --marigold: #ffb627;
-    --marigold-ink: #ffc95c;
-    --kumkum: #ff5c77;
-    --leaf: #7dc46f;
-    --peacock-deep: #2aa39d;
+    --bg: #0b1222;
+    --surface: #131c33;
+    --sunk: #0e1629;
+    --ink: #eef0f7;
+    --muted: #a9aec4;
+    --line: rgba(238, 240, 247, 0.12);
+    /* A light blue needs dark text to be readable (WCAG AA). */
+    --peacock: #9db8ff;
+    --on-peacock: #0b1222;
+    --peacock-deep: #c3d3ff;
+    --marigold: #e2b65a;
+    --marigold-ink: #e8c477;
+    --kumkum: #ff7a70;
+    --leaf: #8fd18a;
     --card-shadow:
       0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 30px -18px rgba(0, 0, 0, 0.7);
     --lift-shadow:
       0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -18px rgba(0, 0, 0, 0.8);
-    --night: #0b2f31;
-    --on-night: #faf3e6;
-    --night-muted: #c3d9d5;
-    --night-accent: #ffc95c;
-    --tile: rgba(255, 182, 39, 0.12);
-    --tile-line: rgba(255, 182, 39, 0.3);
-    --date: #ff8a9e;
-    --line-strong: rgba(237, 234, 245, 0.22);
-    --leaf-tint: rgba(125, 196, 111, 0.14);
-    --leaf-ink: #9fd892;
+    --night: #16244a;
+    --on-night: #f6f4ef;
+    --night-muted: #c9ccda;
+    --night-accent: #e2b65a;
+    --tile: rgba(157, 184, 255, 0.1);
+    --tile-line: rgba(157, 184, 255, 0.25);
+    --date: #9db8ff;
+    --line-strong: rgba(238, 240, 247, 0.22);
+    --leaf-tint: rgba(143, 209, 138, 0.12);
+    --leaf-ink: #a6dca1;
   }
 }
 
-/* Higher contrast, chosen with "Aa": darker grey text and lines on a
+/* Higher contrast, chosen in the menu: darker grey text and lines on a
    white page, or brighter ones on black in dark mode. */
 html[data-contrast="high"] {
   --bg: #ffffff;
@@ -80,8 +84,8 @@ html[data-contrast="high"] {
   --muted: #2f2d3d;
   --line: rgba(11, 10, 20, 0.35);
   --line-strong: rgba(11, 10, 20, 0.6);
-  --peacock: #054846;
-  --peacock-deep: #033331;
+  --peacock: #142a6b;
+  --peacock-deep: #0b1840;
   --marigold-ink: #5a3b00;
   --leaf-ink: #1d4a1a;
 }
@@ -95,8 +99,8 @@ html[data-contrast="high"] {
     --muted: #dedcea;
     --line: rgba(255, 255, 255, 0.4);
     --line-strong: rgba(255, 255, 255, 0.65);
-    --peacock: #6ee6df;
-    --peacock-deep: #4fd3cb;
+    --peacock: #c3d3ff;
+    --peacock-deep: #dfe8ff;
     --marigold-ink: #ffd27a;
     --leaf-ink: #b6eaa9;
   }
@@ -129,8 +133,8 @@ html[data-contrast="high"] {
   --shadow-card: var(--card-shadow);
   --shadow-lift: var(--lift-shadow);
   --font-display:
-    var(--font-instrument), var(--font-gujarati-serif), Georgia, serif;
-  --font-sans: var(--font-figtree), "Segoe UI", system-ui, sans-serif;
+    var(--font-marcellus), var(--font-gujarati-serif), Georgia, serif;
+  --font-sans: var(--font-mulish), "Segoe UI", system-ui, sans-serif;
 }
 
 /* 18px body text minimum (docs/architecture.md, section 8). */
@@ -158,7 +162,7 @@ body {
    include the danda (।), so a Hindi heading would download all 37 KB of
    it for that one mark. Devanagari already uses the phone's own font. */
 .font-display:lang(hi) {
-  font-family: var(--font-instrument), Georgia, serif;
+  font-family: var(--font-marcellus), Georgia, serif;
 }
 
 /* On a phone the main places sit in a bar fixed along the bottom of the
@@ -202,6 +206,10 @@ a:hover {
 :focus-visible {
   outline: 3px solid var(--peacock);
   outline-offset: 3px;
+}
+/* On midnight (the header, bold bands) the focus ring is gold. */
+.bg-night :focus-visible {
+  outline-color: var(--night-accent);
 }
 
 ::selection {
@@ -342,6 +350,34 @@ a:hover {
   }
 }
 
+/* Scrolling: sections and cards (.reveal) rise gently into place as they
+   come into view, tied to the scroll rather than a timer, as on Apple's
+   and other product sites. Only for people who haven't asked their device
+   for less motion, and only in browsers that can tie animation to
+   scrolling; everywhere else they're simply there. It ends on "none", so
+   nothing is left moved or layered once it's in place. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 32px;
+    scale: 0.985;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+    scale: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
 /* A card anywhere inside can be opened by its main link (.card-link): the
    link stretches over the whole card. */
 .has-card-link {
@@ -357,16 +393,16 @@ a:hover {
 /* The toran: mango leaves and marigolds on a string, drawn in fine line
    (public/art), hung under the header and over each page's bold moment. */
 .toran {
-  height: 48px;
-  background: url("/art/toran.svg") repeat-x 0 0 / 48px 48px;
+  height: 24px;
+  background: url("/art/toran.svg") repeat-x 0 0 / 48px 24px;
 }
 .toran-night {
   background-image: url("/art/toran-night.svg");
 }
 @media (min-width: 40rem) {
   .toran {
-    height: 64px;
-    background-size: 64px 64px;
+    height: 32px;
+    background-size: 64px 32px;
   }
 }
 

@@ -1,23 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Figtree,
-  Instrument_Serif,
-  Noto_Serif_Gujarati,
-} from "next/font/google";
+import { Marcellus, Mulish, Noto_Serif_Gujarati } from "next/font/google";
 import { Suspense } from "react";
 import { CountVisits } from "@/components/count-visits";
 import { DISPLAY_SCRIPT } from "@/lib/display";
 import { pageMetadata, site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
-// Headlines: a graceful serif, with a matching one for Gujarati. The
-// Gujarati one isn't fetched ahead: browsers download it only on pages
-// with Gujarati headings (its unicode range), so English pages stay light.
-const instrument = Instrument_Serif({
-  variable: "--font-instrument",
+// Headlines: Marcellus, a classical face like letters carved in stone
+// (DESIGN.md), with a matching serif for Gujarati. The Gujarati one isn't
+// fetched ahead: browsers download it only on pages with Gujarati
+// headings (its unicode range), so English pages stay light.
+const marcellus = Marcellus({
+  variable: "--font-marcellus",
   subsets: ["latin"],
   weight: "400",
-  style: ["normal", "italic"],
 });
 
 const gujaratiSerif = Noto_Serif_Gujarati({
@@ -27,8 +23,9 @@ const gujaratiSerif = Noto_Serif_Gujarati({
   preload: false,
 });
 
-const figtree = Figtree({
-  variable: "--font-figtree",
+// Reading: Mulish, open and clear at 18px for every age.
+const mulish = Mulish({
+  variable: "--font-mulish",
   subsets: ["latin"],
 });
 
@@ -37,7 +34,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   ...pageMetadata(),
   robots: site.launched ? undefined : { index: false, follow: false },
-  // The toran doorway icon, in the browser tab and on the home screen.
+  // The toran monogram, in the browser tab and on the home screen.
   icons: {
     icon: [
       { url: "/icons/icon.svg", type: "image/svg+xml" },
@@ -51,8 +48,8 @@ export const metadata: Metadata = {
 // The phone's status bar matches the page, in light and dark mode.
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf8f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d1120" },
+    { media: "(prefers-color-scheme: light)", color: "#14213d" },
+    { media: "(prefers-color-scheme: dark)", color: "#14213d" },
   ],
 };
 
@@ -60,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-GB"
-      className={`${instrument.variable} ${gujaratiSerif.variable} ${figtree.variable} h-full antialiased`}
+      className={`${marcellus.variable} ${gujaratiSerif.variable} ${mulish.variable} h-full antialiased`}
       // The visitor's text size and contrast are set on <html> before the
       // page is drawn (lib/display.ts), so it differs from the server's.
       suppressHydrationWarning
