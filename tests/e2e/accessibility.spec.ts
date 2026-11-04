@@ -19,6 +19,7 @@ for (const path of [
   "/demo",
   "/for-mandirs",
   "/about",
+  "/how-its-built",
   "/privacy",
   "/corrections",
   "/gu",
