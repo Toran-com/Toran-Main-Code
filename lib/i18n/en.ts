@@ -37,6 +37,16 @@ export const en = {
   "home.festivalsSoon": "Festivals coming up",
   "home.allFestivals": "All festival dates",
   "home.committeesCta": "Run a mandir? Put your events on Toran",
+  "home.whyTitle": "Made with the mandirs, for families",
+  "home.why1Title": "From the mandirs themselves",
+  "home.why1Body":
+    "Events come from each mandir's own website, calendar or committee, and many are confirmed by the mandir.",
+  "home.why2Title": "Near you, in your calendar",
+  "home.why2Body":
+    "Find what's on near your postcode, then add an event, or a mandir's whole calendar, to your phone in one tap.",
+  "home.why3Title": "No account. No tracking.",
+  "home.why3Body":
+    "Follow mandirs and plan your day without signing up. It all stays on your phone.",
   "home.comingSoon": "Coming soon",
   "home.committeesTitle": "How it works for committees",
   "home.committeesHeading": "Your events, where families already look.",

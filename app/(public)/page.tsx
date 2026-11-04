@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Countdown } from "@/components/countdown";
-import { DateTile } from "@/components/date-tile";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
 import { JsonLd } from "@/components/json-ld";
+import { LineIcon, type LineIconName } from "@/components/line-icons";
 import { Toran } from "@/components/ornaments";
 import { RememberPlace } from "@/components/remember-place";
 import { YourMandirs, type MandirBrief } from "@/components/your-mandirs";
@@ -41,10 +41,22 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 // The kinds of event offered as quick links under the search.
 const QUICK_KINDS = ["festival", "aarti", "bhajan", "class"] as const;
 
-// The home page until launch. Its bold moment is the welcome: a deep
-// peacock band under a toran, with the search and the festivals coming
-// up. Then the next few events, the mandirs by region, and a word for
-// committees.
+// What Toran does differently, one statement at a time as you scroll.
+const WHY = [
+  { icon: "decorations", title: "home.why1Title", body: "home.why1Body" },
+  { icon: "pin", title: "home.why2Title", body: "home.why2Body" },
+  { icon: "heart", title: "home.why3Title", body: "home.why3Body" },
+] as const satisfies readonly {
+  icon: LineIconName;
+  title: string;
+  body: string;
+}[];
+
+// The home page (DESIGN.md): one midnight welcome, its headline in the
+// middle, the main button in gold and a lit diya that glows brighter as
+// you scroll; then the festivals coming up as cards to swipe, what Toran
+// does in three lines that rise in one by one, the next events, the
+// mandirs by region, and a midnight band for committees.
 export default function Home({ searchParams }: PageProps<"/">) {
   const t = pageT();
   return (
@@ -56,69 +68,96 @@ export default function Home({ searchParams }: PageProps<"/">) {
           <Toran night />
           <div
             aria-hidden="true"
-            className="rangoli-art rangoli-art-night pointer-events-none absolute top-24 -right-40 size-[26rem] opacity-15 sm:top-12 sm:-right-32 sm:size-[44rem] sm:opacity-30"
+            className="rangoli-art rangoli-art-night pointer-events-none absolute top-1/2 left-1/2 size-[44rem] -translate-x-1/2 -translate-y-1/3 opacity-[0.07] sm:size-[64rem]"
           />
           <div
-            className={`${wideClass} relative flex flex-wrap items-center gap-x-14 gap-y-12 pt-5 pb-16 sm:pt-10 sm:pb-24`}
+            className={`${wideClass} relative flex flex-col items-center gap-6 pt-8 pb-4 text-center sm:gap-8 sm:pt-16`}
           >
-            <div className="rise flex min-w-0 flex-[1_1_32rem] flex-col gap-6 sm:gap-7">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="bg-on-night/10 inline-flex w-fit items-center gap-2 rounded-full px-4 py-1 text-base font-semibold">
-                  <span
-                    aria-hidden="true"
-                    className="bg-night-accent size-2 animate-pulse rounded-full"
-                  />
-                  {t("home.comingSoon")}
-                </p>
-                <Suspense fallback={null}>
-                  <SeasonLink />
-                </Suspense>
-              </div>
-              <h1 className="font-display text-[3.25rem] leading-[0.98] tracking-tight sm:text-7xl lg:text-[5.5rem]">
-                {t("home.tagline")}
-              </h1>
-              <p className="text-night-muted max-w-xl text-lg leading-relaxed sm:text-xl">
-                {t("home.intro")}
+            <div className="rise flex flex-wrap items-center justify-center gap-2">
+              <p className="bg-on-night/10 inline-flex w-fit items-center gap-2 rounded-full px-4 py-1 text-base font-semibold">
+                <span
+                  aria-hidden="true"
+                  className="bg-night-accent size-2 animate-pulse rounded-full"
+                />
+                {t("home.comingSoon")}
               </p>
-
-              <Link
-                href={localePath("/whats-on")}
-                className="bg-marigold inline-flex w-fit items-center justify-center gap-2 rounded-full px-8 py-4 text-xl font-bold text-[#1b1a2c] no-underline shadow-[0_20px_48px_rgba(0,0,0,0.28)] transition hover:brightness-105 active:scale-[0.98]"
-              >
-                <span aria-hidden="true">📍</span>
-                {t("home.findNear")}
-              </Link>
-
-              <nav aria-label={t("whatsOn.type")}>
-                <ul className="flex flex-wrap gap-2">
-                  {QUICK_KINDS.map((kind) => (
-                    <li key={kind}>
-                      <Link
-                        href={`${localePath("/whats-on")}?type=${kind}`}
-                        className="border-on-night/30 text-on-night hover:bg-on-night/10 inline-flex rounded-full border px-4 py-2 text-base font-medium no-underline transition-colors"
-                      >
-                        {kindLabel(kind) ?? EVENT_KINDS[kind]}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </div>
-
-            <div className="flex min-w-0 flex-[1_1_22rem] lg:justify-end">
               <Suspense fallback={null}>
-                <FestivalsSoon />
+                <SeasonLink />
               </Suspense>
             </div>
+            <h1 className="rise font-display max-w-5xl text-[3.25rem] leading-[1.02] tracking-tight sm:text-7xl lg:text-[6rem]">
+              {t("home.tagline")}
+            </h1>
+            <p className="rise text-night-muted max-w-2xl text-xl leading-relaxed sm:text-2xl">
+              {t("home.intro")}
+            </p>
+            <div className="rise flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+              <Link
+                href={localePath("/whats-on")}
+                className="bg-night-accent text-night inline-flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-xl font-bold no-underline shadow-[0_18px_44px_rgba(0,0,0,0.3)] transition hover:brightness-105 active:scale-[0.98] sm:w-auto"
+              >
+                <LineIcon name="pin" />
+                {t("home.findNear")}
+              </Link>
+              <Link
+                href={localePath("/festivals")}
+                className="border-on-night/70 text-on-night hover:bg-on-night/10 inline-flex w-full items-center justify-center rounded-full border-2 px-8 py-[0.875rem] text-xl font-bold no-underline transition sm:w-auto"
+              >
+                {t("home.allFestivals")}
+              </Link>
+            </div>
+            <nav aria-label={t("whatsOn.type")} className="rise">
+              <ul className="flex flex-wrap justify-center gap-2">
+                {QUICK_KINDS.map((kind) => (
+                  <li key={kind}>
+                    <Link
+                      href={`${localePath("/whats-on")}?type=${kind}`}
+                      className="border-on-night/30 text-on-night hover:bg-on-night/10 inline-flex rounded-full border px-4 py-2 text-base font-medium no-underline transition-colors"
+                    >
+                      {kindLabel(kind) ?? EVENT_KINDS[kind]}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <HeroDiya />
           </div>
         </section>
 
         <div
-          className={`${wideClass} flex flex-col gap-20 pt-16 sm:gap-28 sm:pt-24`}
+          className={`${wideClass} flex flex-col gap-24 pt-16 sm:gap-32 sm:pt-24`}
         >
+          <Suspense fallback={null}>
+            <FestivalsSoon />
+          </Suspense>
+
           <Suspense fallback={null}>
             <Followed />
           </Suspense>
+
+          <section aria-labelledby="why" className="flex flex-col gap-10">
+            <h2
+              id="why"
+              className="reveal font-display max-w-3xl text-5xl leading-[1.05] tracking-tight sm:text-7xl"
+            >
+              {t("home.whyTitle")}
+            </h2>
+            <ol className="grid gap-x-10 gap-y-12 md:grid-cols-3">
+              {WHY.map(({ icon, title, body }) => (
+                <li key={title} className="reveal flex flex-col gap-4">
+                  <span className="bg-night text-night-accent grid size-14 place-items-center rounded-2xl">
+                    <LineIcon name={icon} className="size-7" />
+                  </span>
+                  <h3 className="font-display text-3xl leading-tight sm:text-4xl">
+                    {t(title)}
+                  </h3>
+                  <p className="text-muted max-w-md text-lg leading-relaxed">
+                    {t(body)}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </section>
 
           <div className="flex flex-wrap gap-x-16 gap-y-16">
             <Suspense fallback={null}>
@@ -135,10 +174,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
 
           <section
             aria-labelledby="committees"
-            className="bg-sunk flex flex-wrap items-start gap-x-14 gap-y-10 rounded-[2rem] p-6 sm:p-12 lg:p-16"
+            className="reveal bg-night text-on-night relative flex flex-wrap items-start gap-x-14 gap-y-10 overflow-hidden rounded-[2rem] p-6 sm:p-12 lg:p-16"
           >
             <div className="flex min-w-0 flex-[1_1_24rem] flex-col gap-5">
-              <p className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
+              <p className="text-night-accent text-base font-semibold tracking-[0.12em] uppercase">
                 {t("shell.forMandirs")}
               </p>
               <h2
@@ -147,15 +186,18 @@ export default function Home({ searchParams }: PageProps<"/">) {
               >
                 {t("home.committeesHeading")}
               </h2>
-              <p className="text-muted max-w-lg text-lg">
+              <p className="text-night-muted max-w-lg text-lg">
                 {t("home.committeesBody")}
               </p>
-              <Link href="/for-mandirs" className={`${buttonClass} sm:w-fit`}>
+              <Link
+                href="/for-mandirs"
+                className="bg-night-accent text-night inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-bold no-underline transition hover:brightness-105 active:scale-[0.98] sm:w-fit"
+              >
                 {t("home.committeesTitle")}
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
-            <ol className="divide-line flex min-w-0 flex-[1_1_24rem] flex-col divide-y">
+            <ol className="divide-on-night/15 flex min-w-0 flex-[1_1_24rem] flex-col divide-y">
               {(
                 [
                   "home.step1Title",
@@ -169,7 +211,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
                 >
                   <span
                     aria-hidden="true"
-                    className="font-display text-marigold-ink w-8 shrink-0 text-5xl leading-none"
+                    className="font-display text-night-accent w-8 shrink-0 text-5xl leading-none"
                   >
                     {i + 1}
                   </span>
@@ -185,6 +227,51 @@ export default function Home({ searchParams }: PageProps<"/">) {
   );
 }
 
+// A lit diya in gold line, under the welcome. Its flame moves gently, and
+// it grows and glows as you scroll past (app/globals.css, .hero-diya).
+// Decoration only.
+function HeroDiya() {
+  return (
+    <div aria-hidden="true" className="hero-diya relative mt-4 w-56 sm:w-72">
+      <div className="hero-diya-glow absolute inset-x-0 top-0 mx-auto aspect-square w-full rounded-full" />
+      <svg viewBox="0 0 200 200" className="relative w-full" fill="none">
+        <g className="hero-diya-flame">
+          <path
+            d="M100 28c15 19 21 33 21 45a21 21 0 0 1-42 0c0-12 6-26 21-45z"
+            fill="#d9a441"
+          />
+          <path
+            d="M100 56c6 8 8 13.5 8 18a8 8 0 0 1-16 0c0-4.5 2-10 8-18z"
+            fill="#f6e7b8"
+          />
+        </g>
+        <path
+          d="M100 94v12"
+          stroke="#d9a441"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+        <path
+          d="M26 116h148c-6 34-36 56-74 56s-68-22-74-56z"
+          stroke="#d9a441"
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M48 134c14 9 32 14 52 14s38-5 52-14"
+          stroke="#d9a441"
+          strokeOpacity="0.55"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        {[44, 72, 100, 128, 156].map((x) => (
+          <circle key={x} cx={x} cy="116" r="3.5" fill="#d9a441" />
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 // In the weeks before a festival season, a way straight to its page.
 async function SeasonLink() {
   const season = await getSeasonBanner();
@@ -194,15 +281,16 @@ async function SeasonLink() {
   return (
     <Link
       href={localePath(`/${season.slug}`)}
-      className="bg-night-accent/15 text-night-accent hover:bg-night-accent/25 inline-flex w-fit rounded-full px-4 py-1 text-base font-semibold no-underline transition-colors"
+      className="bg-night-accent/15 text-night-accent hover:bg-night-accent/25 inline-flex w-fit gap-1.5 rounded-full px-4 py-1 text-base font-semibold no-underline transition-colors"
     >
       {t("festival.atMandirs", { name })}
-      <span aria-hidden="true">{" →"}</span>
+      <span aria-hidden="true">→</span>
     </Link>
   );
 }
 
-// The next three festivals, each once, on a card in the welcome.
+// The next festivals, each once, as large cards in a row to swipe
+// through (they snap into place), with the date big and the days to go.
 async function FestivalsSoon() {
   const t = pageT();
   const result = await listFestivalDates();
@@ -214,32 +302,43 @@ async function FestivalsSoon() {
       seen.add(d.festival.slug);
       return true;
     })
-    .slice(0, 3);
+    .slice(0, 6);
   if (!next.length) return null;
   return (
-    <section
-      aria-labelledby="festivals-soon"
-      className="bg-surface text-ink w-full max-w-md rounded-3xl p-6 shadow-[0_30px_80px_rgba(0,0,0,0.35)] sm:p-7"
-    >
-      <h2
-        id="festivals-soon"
-        className="font-display text-[2rem] leading-tight"
-      >
-        {t("home.festivalsSoon")}
-      </h2>
-      <ul className="divide-line mt-2 flex flex-col divide-y">
+    <section aria-labelledby="festivals-soon" className="flex flex-col gap-6">
+      <div className="reveal flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <h2
+          id="festivals-soon"
+          className="font-display text-5xl leading-tight tracking-tight sm:text-6xl"
+        >
+          {t("home.festivalsSoon")}
+        </h2>
+        <Link
+          href={localePath("/festivals")}
+          className="text-peacock text-lg font-semibold"
+        >
+          {t("home.allFestivals")} →
+        </Link>
+      </div>
+      <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-4 sm:-mx-8 sm:scroll-px-8 sm:px-8 lg:-mx-12 lg:scroll-px-12 lg:px-12">
         {next.map((d) => {
           const when = formatDateRange(d.starts_on, d.ends_on);
+          const day = new Date(`${d.starts_on}T12:00:00Z`);
           return (
             <li
               key={d.id}
-              className="has-card-link group flex items-center gap-4 py-4"
+              className="reveal lift has-card-link group border-line bg-surface shadow-card flex w-[17rem] shrink-0 snap-start flex-col gap-6 rounded-3xl border p-6 sm:w-[19rem]"
             >
-              <DateTile date={d.starts_on} label={when} size="sm" />
-              <span className="flex min-w-0 flex-col items-start gap-1">
+              <span className="flex items-baseline gap-3">
+                <span className="font-display text-peacock text-6xl leading-none">
+                  {day.getUTCDate()}
+                </span>
+                <span className="text-muted text-lg font-semibold">{when}</span>
+              </span>
+              <span className="mt-auto flex flex-col items-start gap-2">
                 <Link
                   href={localePath(`/festivals/${d.festival!.slug}`)}
-                  className="card-link group-hover:text-peacock text-lg leading-snug font-semibold no-underline"
+                  className="card-link font-display group-hover:text-peacock text-3xl leading-tight no-underline"
                 >
                   {festivalText(d.festival!.slug, d.festival!).name}
                 </Link>
@@ -249,12 +348,6 @@ async function FestivalsSoon() {
           );
         })}
       </ul>
-      <Link
-        href={localePath("/festivals")}
-        className="text-peacock mt-2 inline-block font-semibold"
-      >
-        {t("home.allFestivals")} →
-      </Link>
     </section>
   );
 }
@@ -268,7 +361,7 @@ async function SevaSoon() {
   return (
     <section
       aria-labelledby="seva-soon"
-      className="border-line bg-surface shadow-card flex flex-wrap items-center gap-x-10 gap-y-5 rounded-[2rem] border p-6 sm:p-10"
+      className="reveal border-line bg-surface shadow-card flex flex-wrap items-center gap-x-10 gap-y-5 rounded-[2rem] border p-6 sm:p-10"
     >
       <div className="flex min-w-0 flex-[1_1_24rem] flex-col gap-3">
         <h2
@@ -338,7 +431,7 @@ async function ComingUp({
                 : "unknown"
         }
       />
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+      <div className="reveal flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <h2
           id="coming-up"
           className="font-display text-5xl leading-tight tracking-tight sm:text-6xl"
@@ -430,7 +523,7 @@ async function Mandirs() {
   return (
     <section
       aria-labelledby="mandirs"
-      className="flex min-w-0 flex-[1_1_20rem] flex-col gap-4"
+      className="reveal flex min-w-0 flex-[1_1_20rem] flex-col gap-4"
     >
       <h2
         id="mandirs"
