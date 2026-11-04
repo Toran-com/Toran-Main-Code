@@ -1,6 +1,28 @@
 # Toran
 
+[![Checks](https://github.com/Toran-com/Toran-Main-Code/actions/workflows/checks.yml/badge.svg)](https://github.com/Toran-com/Toran-Main-Code/actions/workflows/checks.yml)
+[![Database](https://github.com/Toran-com/Toran-Main-Code/actions/workflows/database.yml/badge.svg)](https://github.com/Toran-com/Toran-Main-Code/actions/workflows/database.yml)
+[![Uptime](https://github.com/Toran-com/Toran-Main-Code/actions/workflows/uptime.yml/badge.svg)](https://github.com/Toran-com/Toran-Main-Code/actions/workflows/uptime.yml)
+![Lighthouse accessibility 100](https://img.shields.io/badge/Lighthouse_accessibility-100-1f3a8a)
+![Lighthouse performance 92+ on a slow phone, 100 on desktop](https://img.shields.io/badge/Lighthouse_performance-92%2B_mobile_·_100_desktop-1f3a8a)
+![WCAG 2.2 AA](https://img.shields.io/badge/WCAG-2.2_AA-1f3a8a)
+
 What's on at mandirs near you, and a simple seva rota for mandir committees.
+
+**Built to a high bar, and measured** (see `/how-its-built` on the site,
+and `lib/built-facts.ts` for the numbers and when they were measured):
+
+- **Accessible:** WCAG 2.2 AA, 18px minimum text, larger text and higher
+  contrast, three languages (English, Gujarati, Hindi), axe scans on every
+  kind of page in light and dark.
+- **Fast on a slow phone:** a download budget per page (350 KB, 250 KB of
+  JavaScript) enforced by the tests; no layout jumps; works offline.
+- **Private by design:** no tracking cookies, no accounts for visitors,
+  row-level security on every table with tests for every role.
+- **Tested on every change:** about 2,200 automated tests (unit, browser and
+  with a real database), type checks and linting in CI.
+- **Documented decisions:** `docs/decisions/` and the design system in
+  `DESIGN.md`.
 
 ## Run it on your computer
 

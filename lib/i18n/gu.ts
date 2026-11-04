@@ -24,6 +24,7 @@ export const gu: Record<MessageKey, string> = {
   "shell.corrections": "સુધારો કે દૂર કરાવો",
   "shell.privacy": "ગોપનીયતા",
   "shell.terms": "શરતો",
+  "shell.built": "તે કેવી રીતે બન્યું છે",
   "shell.accessibility": "સુલભતા",
   "page.somethingWrong": "અહીં કંઈ ખોટું છે? અમને જણાવો",
   "page.privacyNotice": "ગોપનીયતા નોંધ",

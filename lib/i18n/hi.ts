@@ -24,6 +24,7 @@ export const hi: Record<MessageKey, string> = {
   "shell.corrections": "कुछ सुधारें या हटवाएँ",
   "shell.privacy": "निजता",
   "shell.terms": "शर्तें",
+  "shell.built": "यह कैसे बना है",
   "shell.accessibility": "सुलभता",
   "page.somethingWrong": "यहाँ कुछ ग़लत है? हमें बताएँ",
   "page.privacyNotice": "निजता सूचना",

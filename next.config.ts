@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // The sample posters are read from disk by "Watch AI read a poster".
+  outputFileTracingIncludes: {
+    "/demo/poster": ["./public/demo-posters/*.jpg"],
+  },
   experimental: {
     // Room for a poster photo or PDF sent to be read (lib/poster-reader.ts,
     // at most 4 MB); forms are otherwise far smaller.
