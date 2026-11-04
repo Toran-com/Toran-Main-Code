@@ -71,6 +71,10 @@ export const gu: Record<MessageKey, string> = {
   "search.count.other": "{count} પરિણામો",
   "search.none":
     "“{q}” માટે કંઈ મળ્યું નહીં. કોઈ શહેર, મંદિરનું નામ કે તહેવાર અજમાવો.",
+  "search.close":
+    "“{q}” જેમ લખ્યું તેમ કંઈ મળ્યું નથી, તેથી મળતા શબ્દો બતાવ્યા છે.",
+  "search.keys": "પરિણામોમાં જવા ↓ દબાવો, પાછા આવવા Esc.",
+  "search.searching": "શોધી રહ્યા છીએ…",
   "search.events": "કાર્યક્રમો",
   "search.allMandirs": "બધાં મંદિરો જુઓ",
   "search.allEvents": "બધા કાર્યક્રમો જુઓ",

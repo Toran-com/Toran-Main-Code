@@ -72,6 +72,10 @@ export const hi: Record<MessageKey, string> = {
   "search.count.other": "{count} परिणाम",
   "search.none":
     "“{q}” के लिए कुछ नहीं मिला। कोई शहर, मंदिर का नाम या त्योहार आज़माएँ।",
+  "search.close":
+    "“{q}” जैसा लिखा वैसा कुछ नहीं मिला, इसलिए मिलती-जुलती वर्तनी दिखाई है।",
+  "search.keys": "परिणामों में जाने के लिए ↓ दबाएँ, वापस आने के लिए Esc।",
+  "search.searching": "खोज रहे हैं…",
   "search.events": "कार्यक्रम",
   "search.allMandirs": "सभी मंदिर देखें",
   "search.allEvents": "सभी कार्यक्रम देखें",

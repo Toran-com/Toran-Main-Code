@@ -70,6 +70,9 @@ export const en = {
   "search.count.other": "{count} results",
   "search.none":
     "Nothing found for “{q}”. Try a town, a mandir's name or a festival.",
+  "search.close": "Nothing for “{q}” as typed, so these are close spellings.",
+  "search.keys": "Press ↓ to move through the results, Esc to go back.",
+  "search.searching": "Searching…",
   "search.events": "Events",
   "search.allMandirs": "See every mandir",
   "search.allEvents": "See everything that's on",

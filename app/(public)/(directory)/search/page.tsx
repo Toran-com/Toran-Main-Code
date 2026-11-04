@@ -4,7 +4,8 @@ import { connection } from "next/server";
 import { type ReactNode, Suspense } from "react";
 import { EventList } from "@/components/event-list";
 import { PageHeading } from "@/components/public-shell";
-import { buttonClass, inputClass, Loading } from "@/components/ui";
+import { InstantSearch } from "@/components/instant-search";
+import { Loading } from "@/components/ui";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
 import { EVENT_KINDS, kindLabel } from "@/lib/event-kinds";
 import { formatDateRange } from "@/lib/format";
@@ -15,7 +16,8 @@ import { listUpcomingEvents } from "@/lib/whats-on";
 import { nearTo } from "@/lib/whats-on-view";
 
 // One box to find anything on Toran: events coming up, mandirs and
-// towns, and festivals (lib/search.ts). Works without JavaScript.
+// towns, and festivals (lib/search.ts). Results change as you type
+// (components/instant-search.tsx); without JavaScript it's a form.
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = pageT();
@@ -49,35 +51,22 @@ async function Results({ searchParams }: PageProps<"/search">) {
   await connection();
   const query = parseQuery(text);
 
-  const box = (
-    <form
-      role="search"
-      action={localePath("/search")}
-      className="flex flex-col gap-2"
+  const box = (results?: ReactNode) => (
+    <InstantSearch
+      path={localePath("/search")}
+      initial={text}
+      labels={{
+        label: t("search.label"),
+        example: t("search.example"),
+        button: t("search.button"),
+        keys: t("search.keys"),
+        searching: t("search.searching"),
+      }}
     >
-      <label htmlFor="q" className="font-semibold">
-        {t("search.label")}
-      </label>
-      <div className="flex flex-wrap gap-2">
-        <input
-          id="q"
-          name="q"
-          type="search"
-          defaultValue={text}
-          placeholder={t("search.example")}
-          enterKeyHint="search"
-          className={`${inputClass} min-w-0 flex-[3_1_14rem]`}
-        />
-        <button
-          type="submit"
-          className={`${buttonClass} flex-[1_1_8rem] sm:w-auto`}
-        >
-          {t("search.button")}
-        </button>
-      </div>
-    </form>
+      {results}
+    </InstantSearch>
   );
-  if (!query) return box;
+  if (!query) return box();
 
   const [events, mandirs, dates] = await Promise.all([
     listUpcomingEvents(),
@@ -111,10 +100,10 @@ async function Results({ searchParams }: PageProps<"/search">) {
       kindLabel(kind) ?? EVENT_KINDS[kind as keyof typeof EVENT_KINDS] ?? "",
   );
 
-  return (
+  return box(
     <>
-      {box}
       <p className="text-muted" aria-live="polite">
+        {found.close && `${t("search.close", { q: text.trim() })} `}
         {found.total
           ? t.count("search.count", found.total)
           : t("search.none", { q: text })}
@@ -198,7 +187,7 @@ async function Results({ searchParams }: PageProps<"/search">) {
           )}
         </Section>
       )}
-    </>
+    </>,
   );
 }
 
