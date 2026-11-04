@@ -21,6 +21,7 @@ export const en = {
   "shell.corrections": "Correct or remove something",
   "shell.privacy": "Privacy",
   "shell.terms": "Terms",
+  "shell.built": "How it's built",
   "shell.accessibility": "Accessibility",
   "page.somethingWrong": "Something wrong here? Tell us",
   "page.privacyNotice": "Privacy notice",
