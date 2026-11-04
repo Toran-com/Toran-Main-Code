@@ -22,7 +22,9 @@ export function PublicShell({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 pt-4 pb-10 has-[>.page-wide]:max-w-[88rem] sm:gap-8 sm:px-6 sm:pt-6 sm:has-[>.page-wide]:px-8 lg:has-[>.page-wide]:px-12">
+      {/* At least a screen tall, so the footer starts below the fold and
+          nothing on screen moves as the page streams in. */}
+      <main className="mx-auto flex min-h-[100svh] w-full max-w-3xl flex-1 flex-col gap-6 px-4 pt-4 pb-10 has-[>.page-wide]:max-w-[88rem] sm:gap-8 sm:px-6 sm:pt-6 sm:has-[>.page-wide]:px-8 lg:has-[>.page-wide]:px-12">
         {children}
       </main>
       <SiteFooter />
@@ -156,6 +158,7 @@ const FOOTER_LINKS = {
     { href: "/about", key: "shell.about" },
     { href: "/contact", key: "shell.contact" },
     { href: "/accessibility", key: "shell.accessibility" },
+    { href: "/how-its-built", key: "shell.built" },
   ],
   data: [
     { href: "/privacy", key: "shell.privacy" },

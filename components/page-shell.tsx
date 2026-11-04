@@ -23,7 +23,7 @@ export function PageShell({
         <SiteHeader />
       </Suspense>
       <main
-        className={`rise mx-auto flex w-full flex-1 flex-col gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-10 ${wide ? "max-w-3xl" : "max-w-lg"}`}
+        className={`rise mx-auto flex min-h-[100svh] w-full flex-1 flex-col gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-10 ${wide ? "max-w-3xl" : "max-w-lg"}`}
       >
         <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
           {title}

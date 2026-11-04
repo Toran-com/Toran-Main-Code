@@ -63,13 +63,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
     <>
       <JsonLd data={siteData(siteUrl())} />
       <SiteHeader toran={false} />
-      <main className="flex w-full flex-1 flex-col">
+      <main className="flex min-h-[100svh] w-full flex-1 flex-col">
         <section className="bg-night text-on-night relative overflow-hidden">
           <Toran night />
-          <div
-            aria-hidden="true"
-            className="rangoli-art rangoli-art-night pointer-events-none absolute top-1/2 left-1/2 size-[44rem] -translate-x-1/2 -translate-y-1/3 opacity-[0.07] sm:size-[64rem]"
-          />
           <div
             className={`${wideClass} relative flex flex-col items-center gap-6 pt-8 pb-4 text-center sm:gap-8 sm:pt-16`}
           >

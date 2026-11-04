@@ -102,8 +102,9 @@ as decoration.
 
 Calm and purposeful, never decoration for its own sake.
 
-- **Scroll:** sections and cards (`.reveal`) rise 32px and fade in as
-  they enter the screen. The animation is tied to scrolling (CSS
+- **Scroll:** sections and cards (`.reveal`) rise 48px into place as
+  they enter the screen. They move but never fade, so text is at full
+  contrast even halfway through. The animation is tied to scrolling (CSS
   `animation-timeline: view()`), not to a timer, and needs no
   JavaScript. Browsers without it just show the content.
 - **Pages:** content rises 10px as a page opens (`.rise`, `.rise-list`).

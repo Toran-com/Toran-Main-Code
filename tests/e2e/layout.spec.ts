@@ -78,6 +78,21 @@ test("on a phone, the main places are along the bottom", async ({ page }) => {
   await expect(menu).toBeHidden();
 });
 
+// The scroll animation moves things but never fades them: text caught
+// halfway in at the edge of the screen must still be at full contrast.
+test("scrolling never leaves text faded", async ({ page }) => {
+  for (const path of ["/", "/festivals", "/whats-on"]) {
+    await page.goto(path);
+    await page.mouse.wheel(0, 300);
+    const faded = await page.evaluate(() =>
+      [...document.querySelectorAll(".reveal")]
+        .map((el) => getComputedStyle(el).opacity)
+        .filter((o) => o !== "1"),
+    );
+    expect(faded, `${path} has faded .reveal elements`).toEqual([]);
+  }
+});
+
 // The smallest screen that has to work (320px: a small phone, or 400%
 // zoom) with the largest text, in all three languages: Gujarati and Hindi
 // words are longer, so the header and buttons must wrap, not spill.

@@ -141,6 +141,9 @@ export default function DemoPage() {
         </ol>
         <p className="font-semibold">It&apos;s free for mandirs.</p>
         <div className="flex flex-wrap gap-3">
+          <Link href="/demo/poster" className={quietButtonClass}>
+            Watch AI read a poster
+          </Link>
           <Link href="/mandirs" className={quietButtonClass}>
             Find your mandir
           </Link>
