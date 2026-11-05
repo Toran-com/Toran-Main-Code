@@ -40,9 +40,10 @@ test("shared links get a preview picture", async ({ page, request }) => {
   expect(response.headers()["content-type"]).toBe("image/png");
 });
 
-test("“See how Toran works” changes the phone's screen as you scroll", async ({
+test("“See how Toran works” changes the laptop's phone as you scroll", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
   const story = page.locator(".story");
   await expect(
@@ -52,21 +53,38 @@ test("“See how Toran works” changes the phone's screen as you scroll", async
   const steps = page.locator("[data-story-step]");
   await expect(steps).toHaveCount(6);
   await expect(
-    steps.nth(3).getByRole("heading", { name: "Follow your mandirs" }),
-  ).toBeAttached();
-  await expect(
     steps.nth(3).getByRole("link", { name: "Find your mandir" }),
   ).toHaveAttribute("href", "/mandirs");
 
-  // Bring the fourth step into view: the phone shows a mandir to follow.
+  // Bring the fourth step into view: the phone shows a mandir to follow,
+  // and only that screen.
+  const stage = page.locator(".story-stage");
   await steps.nth(3).locator("h3").scrollIntoViewIfNeeded();
-  await page.evaluate(() => window.scrollBy(0, -innerHeight * 0.2));
   await expect(story).toHaveAttribute("data-active", "3");
-  await expect(page.locator('[data-screen="3"]')).toBeVisible();
-  await expect(page.locator('[data-screen="0"]')).toBeHidden();
+  await expect(stage.locator('[data-screen="3"]')).toBeVisible();
+  for (const other of [0, 1, 2, 4, 5]) {
+    await expect(stage.locator(`[data-screen="${other}"]`)).toBeHidden();
+  }
   // The phone is a picture: screen readers get the steps' words instead.
-  await expect(page.locator(".story-stage")).toHaveAttribute(
-    "aria-hidden",
-    "true",
-  );
+  await expect(stage).toHaveAttribute("aria-hidden", "true");
+});
+
+test("on a phone, each step of “See how Toran works” has its own phone", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto("/");
+  await expect(page.locator(".story-stage")).toBeHidden();
+  const steps = page.locator("[data-story-step]");
+  for (let i = 0; i < 6; i++) {
+    const step = steps.nth(i);
+    await step.scrollIntoViewIfNeeded();
+    // Its own screen, and no other.
+    await expect(step.locator(`[data-screen="${i}"]`)).toBeVisible();
+    await expect(step.locator("[data-screen]")).toHaveCount(1);
+    // The phone never covers the step's words.
+    const phone = await step.locator(".story-phone").boundingBox();
+    const title = await step.locator("h3").boundingBox();
+    expect(phone!.y + phone!.height).toBeLessThanOrEqual(title!.y);
+  }
 });

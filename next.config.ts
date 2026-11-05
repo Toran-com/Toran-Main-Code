@@ -36,6 +36,11 @@ const nextConfig: NextConfig = {
     "/demo/poster": ["./public/demo-posters/*.jpg"],
   },
   experimental: {
+    // Build from scratch every time. Next keeps a cache of its build work
+    // in .next/cache, which Vercel restores between deployments; the
+    // home page's styles once went out without that day's changes, and
+    // a clean build each time rules that out.
+    turbopackFileSystemCacheForBuild: false,
     // Room for a poster photo or PDF sent to be read (lib/poster-reader.ts,
     // at most 4 MB); forms are otherwise far smaller.
     serverActions: { bodySizeLimit: "5mb" },

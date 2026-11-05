@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { OpsIcon } from "@/components/ops-icon";
+import "./ops-nav.css";
 import { currentTool, OPS_GROUPS, type OpsCounts } from "@/lib/ops-tools";
 
 // The admin area's menu (components/ops-chrome.tsx puts it in the side
