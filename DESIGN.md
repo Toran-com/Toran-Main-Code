@@ -113,6 +113,11 @@ Calm and purposeful, never decoration for its own sake.
   tile and name grow from its card into the event page; a mandir's name
   moves from the list into its heading. The rest crossfades in 180ms;
   the header and the bar along the bottom stay still.
+- **Scroll story:** on the home page a phone stays on screen while six
+  steps scroll past; its screen changes to the step in view and the
+  button that step is about is outlined in gold, with a gentle tap
+  (`components/home-story.tsx`). The phone is a picture; each step says
+  in words what its button does and links to try it.
 - **Pointer:** cards lift 3px (`.lift`); buttons press in slightly.
 - **Durations:** 200–450ms, easing `cubic-bezier(0.2, 0.7, 0.2, 1)`.
 - **Reduced motion:** everything above is off when the device asks for

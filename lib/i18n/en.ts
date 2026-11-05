@@ -39,16 +39,47 @@ export const en = {
   "home.festivalsSoon": "Festivals coming up",
   "home.allFestivals": "All festival dates",
   "home.committeesCta": "Run a mandir? Put your events on Toran",
-  "home.whyTitle": "Made with the mandirs, for families",
-  "home.why1Title": "From the mandirs themselves",
-  "home.why1Body":
-    "Events come from each mandir's own website, calendar or committee, and many are confirmed by the mandir.",
-  "home.why2Title": "Near you, in your calendar",
-  "home.why2Body":
-    "Find what's on near your postcode, then add an event, or a mandir's whole calendar, to your phone in one tap.",
-  "home.why3Title": "No account. No tracking.",
-  "home.why3Body":
-    "Follow mandirs and plan your day without signing up. It all stays on your phone.",
+  "story.eyebrow": "In six steps",
+  "story.title": "See how Toran works",
+  "story.intro":
+    "Scroll through what you can do. The buttons outlined in gold are the ones you'll tap.",
+  "story.step": "Step {n} of {total}",
+  "story.findTitle": "Find what's on near you",
+  "story.findBody":
+    "Press Find near me, or type a postcode. Events at the mandirs nearest you come first, straight from the mandirs themselves.",
+  "story.findTry": "Try What's on",
+  "story.calendarTitle": "Put it in your calendar",
+  "story.calendarBody":
+    "Add to calendar puts the event in your phone's calendar, with the time and the mandir's address, so nobody forgets.",
+  "story.shareTitle": "Send it to the family",
+  "story.shareBody":
+    "WhatsApp sends the event to your family group in one tap, with a link that opens on any phone.",
+  "story.shareTry": "See what's on",
+  "story.followTitle": "Follow your mandirs",
+  "story.followBody":
+    "Follow keeps your mandirs at the top of the home page. It's saved on your phone: no account, no sign-up, no tracking.",
+  "story.followTry": "Find your mandir",
+  "story.planTitle": "Plan the festival together",
+  "story.planBody":
+    "Add to our plan collects the events you want to go to, then sends the whole plan to the family in one message.",
+  "story.planTry": "See the festivals",
+  "story.sevaTitle": "Give seva",
+  "story.sevaBody":
+    "Mandirs ask for help in the kitchen, with parking or with cleaning. Take this slot puts you down for a shift, and the committee sees it.",
+  "story.sevaTry": "See where help is needed",
+  "story.mockNear": "Near LE4",
+  "story.mockFind": "Find near me",
+  "story.mockMiles": "{miles} miles",
+  "story.mockCalendar": "Add to calendar",
+  "story.mockSent": "Sent to Family 🙏",
+  "story.mockFollow": "Follow",
+  "story.mockYours": "Your mandirs",
+  "story.mockPlanAdd": "Add to our plan",
+  "story.mockInPlan": "In our plan",
+  "story.mockPlan": "Our plan · {count}",
+  "story.mockTaken": "{taken} of {places} taken",
+  "story.mockTake": "Take this slot",
+  "story.mockKitchen": "Kitchen seva",
   "home.comingSoon": "Coming soon",
   "home.committeesTitle": "How it works for committees",
   "home.committeesHeading": "Your events, where families already look.",

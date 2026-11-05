@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Countdown } from "@/components/countdown";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
+import { HomeStory } from "@/components/home-story";
 import { JsonLd } from "@/components/json-ld";
-import { LineIcon, type LineIconName } from "@/components/line-icons";
+import { LineIcon } from "@/components/line-icons";
 import { Toran } from "@/components/ornaments";
 import { RememberPlace } from "@/components/remember-place";
 import { YourMandirs, type MandirBrief } from "@/components/your-mandirs";
@@ -41,22 +42,11 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 // The kinds of event offered as quick links under the search.
 const QUICK_KINDS = ["festival", "aarti", "bhajan", "class"] as const;
 
-// What Toran does differently, one statement at a time as you scroll.
-const WHY = [
-  { icon: "decorations", title: "home.why1Title", body: "home.why1Body" },
-  { icon: "pin", title: "home.why2Title", body: "home.why2Body" },
-  { icon: "heart", title: "home.why3Title", body: "home.why3Body" },
-] as const satisfies readonly {
-  icon: LineIconName;
-  title: string;
-  body: string;
-}[];
-
 // The home page (DESIGN.md): one midnight welcome, its headline in the
 // middle, the main button in gold and a lit diya that glows brighter as
-// you scroll; then the festivals coming up as cards to swipe, what Toran
-// does in three lines that rise in one by one, the next events, the
-// mandirs by region, and a midnight band for committees.
+// you scroll; then the festivals coming up as cards to swipe, "See how
+// Toran works" (a phone that shows each step as you scroll past it), the
+// next events, the mandirs by region, and a midnight band for committees.
 export default function Home({ searchParams }: PageProps<"/">) {
   const t = pageT();
   return (
@@ -131,29 +121,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
             <Followed />
           </Suspense>
 
-          <section aria-labelledby="why" className="flex flex-col gap-10">
-            <h2
-              id="why"
-              className="reveal font-display max-w-3xl text-5xl leading-[1.05] tracking-tight sm:text-7xl"
-            >
-              {t("home.whyTitle")}
-            </h2>
-            <ol className="grid gap-x-10 gap-y-12 md:grid-cols-3">
-              {WHY.map(({ icon, title, body }) => (
-                <li key={title} className="reveal flex flex-col gap-4">
-                  <span className="bg-night text-night-accent grid size-14 place-items-center rounded-2xl">
-                    <LineIcon name={icon} className="size-7" />
-                  </span>
-                  <h3 className="font-display text-3xl leading-tight sm:text-4xl">
-                    {t(title)}
-                  </h3>
-                  <p className="text-muted max-w-md text-lg leading-relaxed">
-                    {t(body)}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </section>
+          <HomeStory />
 
           <div className="flex flex-wrap gap-x-16 gap-y-16">
             <Suspense fallback={null}>

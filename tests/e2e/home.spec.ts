@@ -39,3 +39,34 @@ test("shared links get a preview picture", async ({ page, request }) => {
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toBe("image/png");
 });
+
+test("“See how Toran works” changes the phone's screen as you scroll", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const story = page.locator(".story");
+  await expect(
+    page.getByRole("heading", { level: 2, name: "See how Toran works" }),
+  ).toBeVisible();
+  // Every step says in words what its button does, with a way to try it.
+  const steps = page.locator("[data-story-step]");
+  await expect(steps).toHaveCount(6);
+  await expect(
+    steps.nth(3).getByRole("heading", { name: "Follow your mandirs" }),
+  ).toBeAttached();
+  await expect(
+    steps.nth(3).getByRole("link", { name: "Find your mandir" }),
+  ).toHaveAttribute("href", "/mandirs");
+
+  // Bring the fourth step into view: the phone shows a mandir to follow.
+  await steps.nth(3).locator("h3").scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollBy(0, -innerHeight * 0.2));
+  await expect(story).toHaveAttribute("data-active", "3");
+  await expect(page.locator('[data-screen="3"]')).toBeVisible();
+  await expect(page.locator('[data-screen="0"]')).toBeHidden();
+  // The phone is a picture: screen readers get the steps' words instead.
+  await expect(page.locator(".story-stage")).toHaveAttribute(
+    "aria-hidden",
+    "true",
+  );
+});
