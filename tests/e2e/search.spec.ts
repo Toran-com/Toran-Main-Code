@@ -25,3 +25,19 @@ test("search results aren't for search engines", async ({ page }) => {
     /noindex/,
   );
 });
+
+test("results come as you type, without pressing Search", async ({ page }) => {
+  await page.goto("/search");
+  const box = page.getByLabel("Events, mandirs, towns or festivals");
+  await box.pressSequentially("Holi Harrow", { delay: 40 });
+  await expect(page).toHaveURL(/\/search\?q=Holi\+Harrow$/);
+  await expect(page.getByText(/Nothing found for “Holi Harrow”/)).toBeVisible();
+  // The box keeps what was typed while the results change under it.
+  await expect(box).toHaveValue("Holi Harrow");
+  await expect(box).toBeFocused();
+
+  // Esc clears it and goes back to an empty search.
+  await box.press("Escape");
+  await expect(box).toHaveValue("");
+  await expect(page).toHaveURL(/\/search$/);
+});

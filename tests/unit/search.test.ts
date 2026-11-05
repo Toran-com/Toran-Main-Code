@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { matches, parseQuery, search } from "@/lib/search";
+import {
+  closeTo,
+  editDistance,
+  matches,
+  parseQuery,
+  search,
+} from "@/lib/search";
 
 const q = (text: string) => parseQuery(text)!;
 
@@ -62,5 +68,65 @@ describe("search", () => {
   });
   it("matches the kind of event too", () => {
     expect(search(data, q("kirtan"), label).events.shown).toHaveLength(1);
+  });
+});
+
+describe("close spellings", () => {
+  it("counts a wrong, missing, extra or swapped letter as one", () => {
+    expect(editDistance("leicester", "leicester")).toBe(0);
+    expect(editDistance("leicster", "leicester")).toBe(1);
+    expect(editDistance("navarti", "navratri")).toBe(2);
+    expect(editDistance("hlio", "holi")).toBe(2);
+    expect(editDistance("hloi", "holi")).toBe(1);
+  });
+
+  it("allows one slip in a word of four or more letters, two from eight", () => {
+    expect(closeTo("leicster", "leicester")).toBe(true);
+    expect(closeTo("navrati", "navratri")).toBe(true);
+    expect(closeTo("janmastami", "janmashtami")).toBe(true);
+    expect(closeTo("bhajn", "bhajan")).toBe(true);
+    // Short words must be right: "ram" isn't "rama" or "jam".
+    expect(closeTo("jam", "ram")).toBe(false);
+    expect(closeTo("wembly", "wembley")).toBe(true);
+    expect(closeTo("london", "leicester")).toBe(false);
+  });
+
+  it("matches the start of a word with a slip, while it's typed", () => {
+    expect(closeTo("leics", "leicester")).toBe(true);
+    expect(closeTo("navrt", "navratri")).toBe(true);
+  });
+});
+
+describe("search with a typo", () => {
+  const mandir = {
+    name: "Shree Ram Mandir",
+    town: "Leicester",
+    region: "East Midlands",
+  };
+  const data = {
+    events: [
+      { title: "Navratri garba", title_gu: null, kind: "festival", mandir },
+    ],
+    mandirs: [{ ...mandir, tradition: null }],
+    festivals: [{ slug: "navratri", name: "Navratri" }],
+  };
+  const label = (kind: string) => kind;
+
+  it("finds close spellings when nothing matches as typed", () => {
+    const found = search(data, q("navrati leicster"), label);
+    expect(found.close).toBe(true);
+    expect(found.events.count).toBe(1);
+  });
+
+  it("keeps to what was typed when that finds something", () => {
+    const found = search(data, q("navratri"), label);
+    expect(found.close).toBe(false);
+    expect(found.events.count).toBe(1);
+    expect(found.festivals.count).toBe(1);
+  });
+
+  it("says nothing was found when nothing is close either", () => {
+    const found = search(data, q("birmingham"), label);
+    expect(found).toMatchObject({ total: 0, close: false });
   });
 });
