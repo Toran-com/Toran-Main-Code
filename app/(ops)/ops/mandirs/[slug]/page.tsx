@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CopyText } from "@/components/copy-text";
 import { MandirFields } from "@/components/mandir-fields";
-import { OpsNav } from "@/components/ops-nav";
 import {
   buttonClass,
   Card,
@@ -13,7 +12,7 @@ import {
   Notice,
   quietButtonClass,
 } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { FORM_ERRORS } from "@/lib/mandir-form";
 import { qrPath } from "@/lib/qr";
@@ -36,12 +35,11 @@ export default function EditMandirPage(
   props: PageProps<"/ops/mandirs/[slug]">,
 ) {
   return (
-    <PageShell title="Edit mandir" wide>
-      <OpsNav current="/ops/mandirs" />
+    <OpsPage title="Edit mandir">
       <Suspense fallback={<Loading />}>
         <EditMandir {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

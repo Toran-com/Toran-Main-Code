@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CopyText } from "@/components/copy-text";
-import { OpsNav } from "@/components/ops-nav";
 import { TranslationLine } from "@/components/translation-line";
 import {
   Card,
@@ -11,7 +10,7 @@ import {
   pillButtonClass,
   pillPrimaryClass,
 } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { LOCALES } from "@/lib/i18n";
 import { pageTitle } from "@/lib/site";
@@ -34,12 +33,14 @@ export default function OpsTranslationsPage(
   props: PageProps<"/ops/translations">,
 ) {
   return (
-    <PageShell title="Translations" wide>
-      <OpsNav current="/ops/translations" />
+    <OpsPage
+      title="Translations"
+      intro="Gujarati and Hindi waiting for a reviewer."
+    >
       <Suspense fallback={<Loading />}>
         <Translations {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Card, Loading, Notice, quietButtonClass } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
-import { OpsNav } from "@/components/ops-nav";
+import { OpsIcon } from "@/components/ops-icon";
+import { OpsPage } from "@/components/ops-page";
+import { attentionCount, readAttention } from "@/lib/attention";
 import { getCurrentUser } from "@/lib/auth";
+import { londonDate } from "@/lib/london";
+import { OPS_GROUPS } from "@/lib/ops-tools";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
+import { listUpcomingEvents } from "@/lib/whats-on";
 import { decideClaim, fillMapPositions } from "./actions";
 import { EnrolSecondFactor, VerifySecondFactor } from "./second-factor";
 
@@ -15,13 +20,13 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default function OpsPage(props: PageProps<"/ops">) {
+export default function AdminDashboardPage(props: PageProps<"/ops">) {
   return (
-    <PageShell title="Toran admin" wide>
+    <OpsPage title="Toran admin">
       <Suspense fallback={<Loading />}>
         <Ops searchParams={props.searchParams} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 
@@ -44,18 +49,117 @@ async function Ops({ searchParams }: Pick<PageProps<"/ops">, "searchParams">) {
   const { data: claims, error } = supabase
     ? await supabase.rpc("pending_mandir_claims")
     : { data: null, error: true };
-  const { count: unmapped } = supabase
-    ? await supabase
-        .from("mandirs")
-        .select("id", { count: "exact", head: true })
-        .not("postcode", "is", null)
-        .is("latitude", null)
-    : { count: null };
+  const [{ count: unmapped }, review, attention, upcoming] = await Promise.all([
+    supabase
+      ? supabase
+          .from("mandirs")
+          .select("id", { count: "exact", head: true })
+          .not("postcode", "is", null)
+          .is("latitude", null)
+      : { count: null },
+    supabase
+      ? supabase
+          .from("event_claims")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending")
+      : { count: null },
+    supabase ? supabase.rpc("needs_attention") : null,
+    listUpcomingEvents(),
+  ]);
+  const figures: Figure[] = [
+    {
+      label: "Waiting for review",
+      value: review.count,
+      href: "/ops/posters",
+      urgent: true,
+    },
+    {
+      label: "Mandir claims to check",
+      value: error ? null : (claims?.length ?? 0),
+      href: "#claims",
+      urgent: true,
+    },
+    {
+      label: "Need attention",
+      value:
+        attention && !attention.error
+          ? attentionCount(readAttention(attention.data))
+          : null,
+      href: "/ops/attention",
+      urgent: true,
+    },
+    {
+      label: "Events coming up",
+      value:
+        upcoming.state === "ok"
+          ? upcoming.data.filter((e) => e.status === "published").length
+          : null,
+      href: "/whats-on",
+    },
+  ];
 
   return (
     <>
-      <OpsNav current="/ops" />
-      <p className="text-xl font-semibold">Unlocked.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="font-display text-3xl">{greeting()}</p>
+        <p className="bg-leaf/10 text-leaf-ink inline-flex items-center gap-2 rounded-full px-4 py-1 text-base font-semibold">
+          <span aria-hidden="true">●</span> Unlocked.
+        </p>
+      </div>
+
+      <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        {figures.map((f) => (
+          <li key={f.label}>
+            <Link
+              href={f.href}
+              className="border-line bg-surface shadow-card lift flex h-full flex-col gap-2 rounded-3xl border p-5 no-underline"
+            >
+              <span
+                className={`font-display text-5xl leading-none ${
+                  f.urgent && f.value ? "text-marigold-ink" : "text-ink"
+                }`}
+              >
+                {f.value ?? "–"}
+              </span>
+              <span className="text-muted font-semibold">{f.label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      <section aria-labelledby="tools" className="flex flex-col gap-4">
+        <h2 id="tools" className="text-2xl font-bold">
+          Tools
+        </h2>
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {OPS_GROUPS.flatMap((g) => g.tools)
+            .filter((tool) => tool.href !== "/ops")
+            .map((tool) => (
+              <li key={tool.href}>
+                <Link
+                  href={tool.href}
+                  className="group border-line bg-surface hover:border-peacock/40 flex h-full items-start gap-4 rounded-3xl border p-5 no-underline transition-colors"
+                >
+                  <span className="bg-night text-night-accent grid size-12 shrink-0 place-items-center rounded-2xl">
+                    <OpsIcon name={tool.icon} />
+                  </span>
+                  <span className="flex min-w-0 flex-col gap-1">
+                    <span className="text-ink group-hover:text-peacock flex items-center gap-2 text-lg font-bold">
+                      {tool.label}
+                      <span
+                        aria-hidden="true"
+                        className="transition-transform group-hover:translate-x-1"
+                      >
+                        →
+                      </span>
+                    </span>
+                    <span className="text-muted text-base">{tool.about}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+        </ul>
+      </section>
       {query.error === "claim" && (
         <Notice tone="error">
           That claim couldn&apos;t be decided. It may already have been.
@@ -154,4 +258,32 @@ async function Ops({ searchParams }: Pick<PageProps<"/ops">, "searchParams">) {
       </section>
     </>
   );
+}
+
+type Figure = {
+  label: string;
+  value: number | null | undefined;
+  href: string;
+  // Gold when there's something waiting.
+  urgent?: boolean;
+};
+
+// "Good morning · Thursday 5 November", in UK time.
+function greeting(): string {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-GB", {
+      hour: "numeric",
+      hourCycle: "h23",
+      timeZone: "Europe/London",
+    }).format(new Date()),
+  );
+  const part =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const day = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date(`${londonDate()}T12:00:00Z`));
+  return `${part} · ${day.replace(",", "")}`;
 }

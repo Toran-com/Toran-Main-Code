@@ -5,9 +5,8 @@ import {
   FigureTable as Table,
   FigureTile as Tile,
 } from "@/components/ops-figures";
-import { OpsNav } from "@/components/ops-nav";
 import { Loading, Notice } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { londonDate } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
@@ -23,12 +22,11 @@ const PERIODS = [7, 30, 90] as const;
 
 export default function OpsStatsPage(props: PageProps<"/ops/stats">) {
   return (
-    <PageShell title="Stats" wide>
-      <OpsNav current="/ops/stats" />
+    <OpsPage title="Stats" intro="Visits by page and by week, without cookies.">
       <Suspense fallback={<Loading />}>
         <Stats {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

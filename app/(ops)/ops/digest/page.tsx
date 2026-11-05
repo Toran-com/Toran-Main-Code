@@ -4,7 +4,6 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { CopyEmail } from "@/components/copy-email";
 import { CopyText } from "@/components/copy-text";
-import { OpsNav } from "@/components/ops-nav";
 import { Badge, LoadProblem } from "@/components/public-shell";
 import {
   Card,
@@ -13,7 +12,7 @@ import {
   Notice,
   quietButtonClass,
 } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import {
   buildDigest,
@@ -36,12 +35,14 @@ export const metadata: Metadata = {
 
 export default function OpsDigestPage(props: PageProps<"/ops/digest">) {
   return (
-    <PageShell title="Weekly digest" wide>
-      <OpsNav current="/ops/digest" />
+    <OpsPage
+      title="Weekly digest"
+      intro="The weekly email to families, as it would go out."
+    >
       <Suspense fallback={<Loading />}>
         <DigestPreview {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

@@ -1,5 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
-import { logInAsAdmin, showMandirList, stubMapTiles } from "./helpers";
+import {
+  logInAsAdmin,
+  openAdminTool,
+  showMandirList,
+  stubMapTiles,
+} from "./helpers";
 
 async function setVisibility(
   page: Page,
@@ -23,10 +28,7 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
   await logInAsAdmin(page, `ops-${Date.now()}@example.com`);
 
   // Find and edit a mandir.
-  await page
-    .getByRole("navigation", { name: "Admin" })
-    .getByRole("link", { name: "Mandirs", exact: true })
-    .click();
+  await openAdminTool(page, "Mandirs");
   await page.getByLabel("Search mandirs").fill("Reading");
   await page.getByRole("button", { name: "Search" }).click();
   await page.getByRole("link", { name: /Reading Hindu Temple/ }).click();
@@ -77,7 +79,7 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
   await setVisibility(page, new URL(page.url()).pathname, "hidden");
 
   // Festival dates: checking needs a source; then put it back.
-  await page.getByRole("link", { name: "Festival dates" }).click();
+  await openAdminTool(page, "Festival dates");
   const first = page
     .getByRole("listitem")
     .filter({ hasText: "Not yet checked" })
@@ -95,7 +97,7 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
 
 test("an admin sees which mandir websites can be checked", async ({ page }) => {
   await logInAsAdmin(page, `websites-${Date.now()}@example.com`);
-  await page.getByRole("link", { name: "Websites", exact: true }).click();
+  await openAdminTool(page, "Websites");
   await expect(page).toHaveURL(/\/ops\/websites$/);
   // Lists mandirs with a website, each with its own check. (Checking
   // itself reads real websites, so it's tested with a fake site instead:

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { OpsNav } from "@/components/ops-nav";
 import { Badge } from "@/components/public-shell";
 import { inputClass, Loading, quietButtonClass } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { matchesSearch } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
@@ -17,12 +16,14 @@ export const metadata: Metadata = {
 
 export default function OpsMandirsPage(props: PageProps<"/ops/mandirs">) {
   return (
-    <PageShell title="Mandirs" wide>
-      <OpsNav current="/ops/mandirs" />
+    <OpsPage
+      title="Mandirs"
+      intro="Add, edit and hide mandirs, or import a list."
+    >
       <Suspense fallback={<Loading />}>
         <MandirList {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

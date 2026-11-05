@@ -79,6 +79,18 @@ export async function logInAsAdmin(page: Page, email: string) {
   await expect(page.getByText("Unlocked.")).toBeVisible();
 }
 
+// Goes to one of the admin tools from the admin menu: in the side bar on a
+// laptop, behind "Admin menu" on a phone. A count beside a tool ("Needs
+// attention, 3 waiting") is allowed for.
+export async function openAdminTool(page: Page, name: string) {
+  const menu = page.locator("summary", { hasText: "Admin menu" });
+  if (await menu.isVisible()) await menu.click();
+  await page
+    .getByRole("navigation", { name: "Admin" })
+    .getByRole("link", { name: new RegExp(`^${name}(\\s*,|$)`) })
+    .click();
+}
+
 // The mandirs map's pictures come from OpenStreetMap. Tests get a blank
 // picture instead, so they never call OpenStreetMap or wait on it.
 const BLANK_PNG = Buffer.from(

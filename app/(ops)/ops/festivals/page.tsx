@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { OpsNav } from "@/components/ops-nav";
 import { Badge } from "@/components/public-shell";
 import { inputClass, Loading, Notice, quietButtonClass } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { calendarLabel, formatDateRange } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
@@ -17,12 +16,14 @@ export const metadata: Metadata = {
 
 export default function OpsFestivalsPage(props: PageProps<"/ops/festivals">) {
   return (
-    <PageShell title="Festival dates" wide>
-      <OpsNav current="/ops/festivals" />
+    <OpsPage
+      title="Festival dates"
+      intro="The festival calendar every page uses."
+    >
       <Suspense fallback={<Loading />}>
         <FestivalDates {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 
