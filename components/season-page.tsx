@@ -11,8 +11,9 @@ import { Toran } from "@/components/ornaments";
 import { PlacePicker } from "@/components/place-picker";
 import { LoadProblem } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
+import { EventListSkeleton } from "@/components/skeletons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
-import { Loading, Notice } from "@/components/ui";
+import { Notice } from "@/components/ui";
 import { listFestivalDates } from "@/lib/directory";
 import { seasonDays, seasonEvents, seasonWindow } from "@/lib/festival-season";
 import { formatDateRange, formatEventStart } from "@/lib/format";
@@ -85,7 +86,7 @@ export function SeasonPage({
           </Suspense>
         </div>
       </header>
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<EventListSkeleton />}>
         <SeasonBody season={season} searchParams={searchParams} />
       </Suspense>
     </div>

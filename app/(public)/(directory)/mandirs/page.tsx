@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { DirectoryList } from "@/components/directory-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
-import { Loading, Notice } from "@/components/ui";
+import { MandirsSkeleton } from "@/components/skeletons";
+import { Notice } from "@/components/ui";
 import { listMandirs } from "@/lib/directory";
 import { localePath, pageT } from "@/lib/i18n/page";
 import { pageMetadata } from "@/lib/site";
@@ -21,7 +22,7 @@ export default function MandirsPage() {
   return (
     <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <PageHeading title={t("shell.mandirs")} intro={t("mandirs.intro")} />
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<MandirsSkeleton />}>
         <Directory />
       </Suspense>
     </div>

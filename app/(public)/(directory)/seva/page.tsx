@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Empty } from "@/components/empty";
 import { LineIcon } from "@/components/line-icons";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -7,7 +8,8 @@ import { POSTCODE_CREDIT } from "@/components/event-list";
 import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { RememberPlace } from "@/components/remember-place";
 import { SevaExplorer } from "@/components/seva-explorer";
-import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
+import { CardsSkeleton } from "@/components/skeletons";
+import { buttonClass, inputClass, Notice } from "@/components/ui";
 import { dateTileParts, formatEventStart } from "@/lib/format";
 import { localePath, pageT } from "@/lib/i18n/page";
 import { londonDate } from "@/lib/london";
@@ -59,7 +61,7 @@ export default function SevaPage(props: PageProps<"/seva">) {
   return (
     <div className="page-wide flex flex-col gap-6 sm:gap-8">
       <PageHeading title={t("sevaList.title")} intro={t("sevaList.intro")} />
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<CardsSkeleton />}>
         <SevaNeeds {...props} />
       </Suspense>
     </div>
@@ -168,9 +170,13 @@ async function SevaNeeds({ searchParams }: PageProps<"/seva">) {
           postcode={<PostcodeForm near={near} within={within} />}
         />
       ) : (
-        <div className="bg-sunk flex flex-col gap-2 rounded-3xl p-6">
-          <p className="font-semibold">{t("sevaList.none")}</p>
-        </div>
+        <Empty
+          title={t("sevaList.none")}
+          icon="heart"
+          steps={[
+            { href: localePath("/whats-on"), label: t("sevaList.seeWhatsOn") },
+          ]}
+        />
       )}
       {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
 

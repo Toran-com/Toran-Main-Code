@@ -8,6 +8,7 @@ import type { MessageKey } from "@/lib/i18n/en";
 export const gu: Record<MessageKey, string> = {
   ...guClient,
   ...guShared,
+  "shell.loading": "લોડ થઈ રહ્યું છે…",
   "shell.home": "Toran મુખ્ય પાનું",
   "shell.whatsOn": "કાર્યક્રમો",
   "shell.mandirs": "મંદિરો",
@@ -123,6 +124,9 @@ export const gu: Record<MessageKey, string> = {
     '"{place}" મળ્યું નથી. LE4 6AR જેવો પૂરો પોસ્ટકોડ, અથવા LE4 જેવો ફક્ત પહેલો ભાગ લખી જુઓ.',
   "whatsOn.noneThere": "આગામી આઠ અઠવાડિયામાં ત્યાં કોઈ કાર્યક્રમ નોંધાયેલ નથી.",
   "whatsOn.noneYet": "હજી સુધી કોઈ કાર્યક્રમ નોંધાયેલ નથી.",
+  "whatsOn.wider": "{miles} માઇલ સુધી જુઓ",
+  "whatsOn.everything": "દરેક પ્રકારના કાર્યક્રમો, કોઈ પણ દિવસ બતાવો",
+  "whatsOn.allUk": "આખું યુકે બતાવો",
   "whatsOn.emptyBefore":
     "મંદિરો Toranમાં જોડાય તેમ પોતાના કાર્યક્રમો ઉમેરી રહ્યા છે. ત્યાં સુધી, ",
   "whatsOn.emptyLink": "મંદિરોની યાદી",
@@ -272,6 +276,7 @@ export const gu: Record<MessageKey, string> = {
   "sevaList.count.other": "{count} કાર્યક્રમોમાં મદદ જોઈએ છે",
   "sevaList.free.one": "{count} જગ્યા ખાલી",
   "sevaList.free.other": "{count} જગ્યા ખાલી",
+  "sevaList.seeWhatsOn": "તેના બદલે કાર્યક્રમો જુઓ",
   "sevaList.none":
     "અત્યારે કોઈ મંદિર સેવા માટે પૂછી રહ્યું નથી. થોડા સમયમાં ફરી જુઓ.",
   "sevaList.places.one": "જગ્યા માટે હજી સ્વયંસેવક જોઈએ છે",

@@ -2,6 +2,7 @@ import { seasonOf } from "@/lib/seasons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Empty } from "@/components/empty";
 import { DateTile } from "@/components/date-tile";
 import { EventList } from "@/components/event-list";
 import { Toran } from "@/components/ornaments";
@@ -186,28 +187,23 @@ export default async function FestivalPage({
           {during.length ? (
             <EventList events={nearTo(during, null, 0)} />
           ) : (
-            <div className="bg-sunk rounded-3xl p-6">
-              <p className="font-semibold">
-                {t("festival.noEvents", { name: festival.name })}
-              </p>
-              <p className="text-muted">
-                {t("festival.appearBefore")}{" "}
-                <Link
-                  href={localePath("/whats-on")}
-                  className="text-peacock underline"
-                >
-                  {t("festival.whatsOnLink")}
-                </Link>{" "}
-                {t("festival.orFind")}{" "}
-                <Link
-                  href={localePath("/mandirs")}
-                  className="text-peacock underline"
-                >
-                  {t("festival.nearestMandir")}
-                </Link>
-                {t("festival.appearAfter")}
-              </p>
-            </div>
+            <Empty title={t("festival.noEvents", { name: festival.name })}>
+              {t("festival.appearBefore")}{" "}
+              <Link
+                href={localePath("/whats-on")}
+                className="text-peacock underline"
+              >
+                {t("festival.whatsOnLink")}
+              </Link>{" "}
+              {t("festival.orFind")}{" "}
+              <Link
+                href={localePath("/mandirs")}
+                className="text-peacock underline"
+              >
+                {t("festival.nearestMandir")}
+              </Link>
+              {t("festival.appearAfter")}
+            </Empty>
           )}
         </section>
       </div>
