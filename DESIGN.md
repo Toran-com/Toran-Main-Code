@@ -108,6 +108,11 @@ Calm and purposeful, never decoration for its own sake.
   `animation-timeline: view()`), not to a timer, and needs no
   JavaScript. Browsers without it just show the content.
 - **Pages:** content rises 10px as a page opens (`.rise`, `.rise-list`).
+- **Between pages:** what's on both pages moves from one to the other
+  (`components/morph.tsx`, React's `<ViewTransition>`): an event's date
+  tile and name grow from its card into the event page; a mandir's name
+  moves from the list into its heading. The rest crossfades in 180ms;
+  the header and the bar along the bottom stay still.
 - **Pointer:** cards lift 3px (`.lift`); buttons press in slightly.
 - **Durations:** 200–450ms, easing `cubic-bezier(0.2, 0.7, 0.2, 1)`.
 - **Reduced motion:** everything above is off when the device asks for

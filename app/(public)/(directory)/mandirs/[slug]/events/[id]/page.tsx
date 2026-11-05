@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { CallAndDirections } from "@/components/call-directions";
 import { DateTile } from "@/components/date-tile";
+import { Morph, morphName } from "@/components/morph";
 import { IWent } from "@/components/i-went";
 import { CalendarIcon, ClockIcon, PinIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
@@ -169,12 +170,14 @@ export default async function EventPage({
             className="rangoli-art rangoli-art-night pointer-events-none absolute -top-16 -right-24 size-[22rem] opacity-20 sm:-right-16 sm:size-[32rem] sm:opacity-30"
           />
           <div className="relative flex flex-wrap items-end gap-x-8 gap-y-5 px-5 pt-2 pb-8 sm:px-12 sm:pt-4 sm:pb-12">
-            <DateTile
-              date={event.next_starts_at}
-              label={formatEventStart(event.next_starts_at, true)}
-              size="lg"
-              night
-            />
+            <Morph name={morphName.eventDate(event.id)}>
+              <DateTile
+                date={event.next_starts_at}
+                label={formatEventStart(event.next_starts_at, true)}
+                size="lg"
+                night
+              />
+            </Morph>
             <div className="flex min-w-0 flex-[1_1_26rem] flex-col gap-3">
               {(cancelled || !upcoming || rule || kindLabel(event.kind)) && (
                 <p className="flex flex-wrap gap-2">
@@ -200,12 +203,14 @@ export default async function EventPage({
                   )}
                 </p>
               )}
-              <h1
-                lang={storedLang()}
-                className={`font-display text-[2.75rem] leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl ${cancelled ? "line-through" : ""}`}
-              >
-                {event.title}
-              </h1>
+              <Morph name={morphName.eventTitle(event.id)}>
+                <h1
+                  lang={storedLang()}
+                  className={`font-display text-[2.75rem] leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl ${cancelled ? "line-through" : ""}`}
+                >
+                  {event.title}
+                </h1>
+              </Morph>
               {event.title_gu && (
                 <p lang="gu" className="text-xl font-semibold sm:text-2xl">
                   {event.title_gu}
@@ -345,19 +350,23 @@ export default async function EventPage({
                     key={e.id}
                     className="has-card-link group flex items-center gap-4 py-4 sm:gap-5"
                   >
-                    <DateTile
-                      date={e.next_starts_at}
-                      label={formatEventStart(e.next_starts_at, true)}
-                      size="sm"
-                    />
+                    <Morph name={morphName.eventDate(e.id)}>
+                      <DateTile
+                        date={e.next_starts_at}
+                        label={formatEventStart(e.next_starts_at, true)}
+                        size="sm"
+                      />
+                    </Morph>
                     <span className="flex min-w-0 flex-col">
-                      <Link
-                        href={localePath(eventPath(mandir.slug, e.id))}
-                        lang={storedLang()}
-                        className="card-link group-hover:text-peacock text-lg leading-snug font-semibold no-underline sm:text-xl"
-                      >
-                        {e.title}
-                      </Link>
+                      <Morph name={morphName.eventTitle(e.id)}>
+                        <Link
+                          href={localePath(eventPath(mandir.slug, e.id))}
+                          lang={storedLang()}
+                          className="card-link group-hover:text-peacock text-lg leading-snug font-semibold no-underline sm:text-xl"
+                        >
+                          {e.title}
+                        </Link>
+                      </Morph>
                       <span className="text-muted">
                         {formatEventStart(e.next_starts_at, e.all_day)}
                       </span>

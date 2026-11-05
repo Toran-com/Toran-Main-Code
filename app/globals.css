@@ -435,6 +435,57 @@ a:hover {
   }
 }
 
+/* Going from page to page (components/morph.tsx): an event's date and
+   name, or a mandir's name, move from the list into the new page while
+   the rest of the page changes quickly behind them. The header and the
+   bar along the bottom stay still, and taps aren't lost while it moves.
+   None of it when the phone asks for less motion. */
+.site-header {
+  view-transition-name: site-header;
+}
+.tab-bar {
+  view-transition-name: tab-bar;
+}
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(site-header),
+::view-transition-group(tab-bar) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header),
+::view-transition-old(tab-bar) {
+  display: none;
+}
+::view-transition-new(site-header),
+::view-transition-new(tab-bar) {
+  animation: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}
+::view-transition-group(.morph) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+@keyframes via-blur {
+  30% {
+    filter: blur(2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* A card anywhere inside can be opened by its main link (.card-link): the
    link stretches over the whole card. */
 .has-card-link {
