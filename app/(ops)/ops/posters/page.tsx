@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { EventFields } from "@/components/event-fields";
-import { OpsNav } from "@/components/ops-nav";
 import { PosterPicture } from "@/components/poster-picture";
 import { Badge } from "@/components/public-shell";
 import { ReviewItem } from "@/components/review-item";
@@ -13,7 +12,7 @@ import {
   Loading,
   Notice,
 } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { londonDate } from "@/lib/london";
 import { daysBetween } from "@/lib/quick-events";
@@ -87,12 +86,14 @@ const GROUPS = Object.keys(SOURCE_GROUPS) as SourceGroup[];
 
 export default function OpsPostersPage(props: PageProps<"/ops/posters">) {
   return (
-    <PageShell title="Review queue" wide>
-      <OpsNav current="/ops/posters" />
+    <OpsPage
+      title="Review queue"
+      intro="Posters and found events to check before they go live."
+    >
       <Suspense fallback={<Loading />}>
         <Queue {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

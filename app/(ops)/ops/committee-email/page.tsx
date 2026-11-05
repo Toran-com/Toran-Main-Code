@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CopyText } from "@/components/copy-text";
-import { OpsNav } from "@/components/ops-nav";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import {
   Card,
   inputClass,
@@ -33,12 +32,14 @@ export default function CommitteeEmailPage(
   props: PageProps<"/ops/committee-email">,
 ) {
   return (
-    <PageShell title="Monthly committee email" wide>
-      <OpsNav current="/ops/committee-email" />
+    <OpsPage
+      title="Monthly committee email"
+      intro="The monthly email to each mandir's committee."
+    >
       <Suspense fallback={<Loading />}>
         <Preview {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

@@ -1,45 +1,50 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { OpsIcon } from "@/components/ops-icon";
+import { currentTool, OPS_GROUPS, type OpsCounts } from "@/lib/ops-tools";
 
-const LINKS = [
-  { href: "/ops", label: "Overview" },
-  { href: "/ops/today", label: "Today" },
-  { href: "/ops/attention", label: "Needs attention" },
-  { href: "/ops/mandirs", label: "Mandirs" },
-  { href: "/ops/posters", label: "Review" },
-  { href: "/ops/duplicates", label: "Duplicates" },
-  { href: "/ops/websites", label: "Websites" },
-  { href: "/ops/festivals", label: "Festival dates" },
-  { href: "/ops/stats", label: "Stats" },
-  { href: "/ops/digest", label: "Digest" },
-  { href: "/ops/committee-email", label: "Committee email" },
-  { href: "/ops/translations", label: "Translations" },
-] as const;
+// The admin area's menu (components/ops-chrome.tsx puts it in the side
+// bar on a laptop and behind "Admin menu" on a phone): the tools in their
+// groups, each with a picture, and a count where something is waiting.
 
-// The admin area's own menu.
-export function OpsNav({
-  current,
-}: {
-  current: (typeof LINKS)[number]["href"];
-}) {
+export function OpsNav({ counts }: { counts: OpsCounts }) {
+  const here = currentTool(usePathname());
   return (
-    <nav aria-label="Admin">
-      <ul className="flex flex-wrap gap-2">
-        {LINKS.map(({ href, label }) => (
-          <li key={href}>
-            <Link
-              href={href}
-              aria-current={href === current ? "page" : undefined}
-              className={`inline-block rounded-full border px-4 py-1.5 text-base font-semibold ${
-                href === current
-                  ? "border-peacock bg-peacock text-on-peacock"
-                  : "border-line hover:bg-sunk"
-              }`}
-            >
-              {label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <nav aria-label="Admin" className="flex flex-col gap-5">
+      {OPS_GROUPS.map((group) => (
+        <section key={group.label} className="flex flex-col gap-1">
+          <h2 className="ops-nav-heading px-3 pb-1 text-sm font-bold tracking-[0.12em] uppercase">
+            {group.label}
+          </h2>
+          <ul className="flex flex-col gap-0.5">
+            {group.tools.map((tool) => {
+              const current = tool.href === here;
+              const count = tool.count ? (counts[tool.count] ?? 0) : 0;
+              return (
+                <li key={tool.href}>
+                  <Link
+                    href={tool.href}
+                    aria-current={current ? "page" : undefined}
+                    className="ops-nav-link flex items-center gap-3 rounded-xl px-3 py-2 text-lg font-semibold no-underline transition-colors"
+                  >
+                    <OpsIcon name={tool.icon} />
+                    <span className="flex-1">{tool.label}</span>
+                    {count > 0 && (
+                      <span className="bg-marigold text-night min-w-7 rounded-full px-2 text-center text-base font-bold">
+                        <span className="sr-only">, </span>
+                        {count}
+                        <span className="sr-only"> waiting</span>
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
     </nav>
   );
 }

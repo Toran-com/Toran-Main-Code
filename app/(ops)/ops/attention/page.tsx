@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
-import { OpsNav } from "@/components/ops-nav";
 import { cardClass, Loading, Notice, pillButtonClass } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import {
   attentionCount,
   daysSince,
@@ -27,12 +26,14 @@ export const metadata: Metadata = {
 
 export default function OpsAttentionPage() {
   return (
-    <PageShell title="Needs attention" wide>
-      <OpsNav current="/ops/attention" />
+    <OpsPage
+      title="Needs attention"
+      intro="Reports, stale details and checks to follow up."
+    >
       <Suspense fallback={<Loading />}>
         <NeedsAttention />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

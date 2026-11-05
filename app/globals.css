@@ -598,6 +598,37 @@ a:hover {
   }
 }
 
+/* The admin area's menu (components/ops-nav.tsx): light on midnight in
+   the side bar, with a gold edge on the page you're on; dark on cream in
+   the phone's "Admin menu". */
+.ops-nav-heading {
+  color: var(--color-muted);
+}
+.ops-nav-link {
+  color: var(--color-ink);
+}
+.ops-nav-link:hover {
+  background-color: var(--color-sunk);
+}
+.ops-nav-link[aria-current="page"] {
+  background-color: color-mix(in srgb, var(--color-peacock) 10%, transparent);
+  color: var(--color-peacock);
+}
+.ops-sidebar .ops-nav-heading {
+  color: var(--color-night-muted);
+}
+.ops-sidebar .ops-nav-link {
+  color: var(--color-on-night);
+}
+.ops-sidebar .ops-nav-link:hover {
+  background-color: color-mix(in srgb, var(--color-on-night) 10%, transparent);
+}
+.ops-sidebar .ops-nav-link[aria-current="page"] {
+  background-color: color-mix(in srgb, var(--color-on-night) 12%, transparent);
+  color: var(--color-night-accent);
+  box-shadow: inset 3px 0 0 var(--color-night-accent);
+}
+
 /* A card anywhere inside can be opened by its main link (.card-link): the
    link stretches over the whole card. */
 .has-card-link {

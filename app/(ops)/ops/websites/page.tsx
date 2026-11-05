@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { OpsNav } from "@/components/ops-nav";
 import { Badge } from "@/components/public-shell";
 import {
   buttonClass,
@@ -10,7 +9,7 @@ import {
   Notice,
   quietButtonClass,
 } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { formatEventStart, websiteLabel } from "@/lib/format";
 import { pageTitle } from "@/lib/site";
@@ -38,12 +37,14 @@ type Outcome = keyof typeof OUTCOMES;
 
 export default function OpsWebsitesPage(props: PageProps<"/ops/websites">) {
   return (
-    <PageShell title="Websites" wide>
-      <OpsNav current="/ops/websites" />
+    <OpsPage
+      title="Websites"
+      intro="What the nightly job found on mandirs' websites."
+    >
       <Suspense fallback={<Loading />}>
         <Websites {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

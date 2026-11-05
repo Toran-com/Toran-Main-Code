@@ -98,6 +98,23 @@ as decoration.
 - **Garland** (`.toran`): a fine gold line with small drops, under the
   header.
 
+## Admin area
+
+The admin pages (`/ops`) are a tool, so they look like one, in the same
+colours and type:
+
+- **Frame:** a midnight side bar on a laptop that stays put between pages
+  (`components/ops-chrome.tsx`): the tools in three groups (Overview,
+  Content, Messages), each with a line icon (`components/ops-icon.tsx`),
+  and a gold count where something is waiting. The page you're on has a
+  gold edge. On a phone, the same menu opens from "Admin menu".
+- **Pages** (`components/ops-page.tsx`): the tool's name large, one line
+  on what it's for, then the work.
+- **Dashboard:** what's waiting as four numbers you can tap (gold when
+  there's something to do), then every tool as a card with what it does.
+- The side bar only appears for an admin signed in with their second
+  factor; anyone else sees the site's own header.
+
 ## Motion
 
 Calm and purposeful, never decoration for its own sake.

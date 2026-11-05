@@ -4,9 +4,8 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { FigureTable, FigureTile } from "@/components/ops-figures";
-import { OpsNav } from "@/components/ops-nav";
 import { Loading, Notice } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { nightlyStatus } from "@/lib/attention";
 import { requireToranAdmin } from "@/lib/auth";
 import { londonToUtc } from "@/lib/format";
@@ -27,12 +26,14 @@ export const metadata: Metadata = {
 
 export default function OpsTodayPage() {
   return (
-    <PageShell title="Today" wide>
-      <OpsNav current="/ops/today" />
+    <OpsPage
+      title="Today"
+      intro="Visits, new events and the nightly job, today."
+    >
       <Suspense fallback={<Loading />}>
         <Today />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

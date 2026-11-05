@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { logInAsAdmin, sql } from "./helpers";
+import { logInAsAdmin, openAdminTool, sql } from "./helpers";
 
 // Toran previews the monthly email to a mandir's committee. Nothing sends
 // it. Uses a mandir no other test looks at.
@@ -18,10 +18,7 @@ test("admins preview the monthly committee email, which isn't sent", async ({
        where m.slug = '${SLUG}' and u.email = '${email}'`,
   );
 
-  await page
-    .getByRole("navigation", { name: "Admin" })
-    .getByRole("link", { name: "Committee email" })
-    .click();
+  await openAdminTool(page, "Committee email");
   await expect(page).toHaveURL(/\/ops\/committee-email$/);
   await expect(page.getByText(/^Not sent\./)).toBeVisible();
   await page

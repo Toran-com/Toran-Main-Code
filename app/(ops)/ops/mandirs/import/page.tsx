@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { MandirImport } from "@/components/mandir-import";
-import { OpsNav } from "@/components/ops-nav";
 import { Card, Loading } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { pageTitle } from "@/lib/site";
 import { importMandirs } from "../actions";
@@ -16,12 +15,11 @@ export const metadata: Metadata = {
 
 export default function ImportMandirsPage() {
   return (
-    <PageShell title="Add many mandirs" wide>
-      <OpsNav current="/ops/mandirs" />
+    <OpsPage title="Add many mandirs">
       <Suspense fallback={<Loading />}>
         <ImportMandirs />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { OpsNav } from "@/components/ops-nav";
 import { Badge } from "@/components/public-shell";
 import { cardClass, Loading, Notice, quietButtonClass } from "@/components/ui";
-import { PageShell } from "@/components/page-shell";
+import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { keptApart, listedEvents } from "@/lib/duplicate-check";
 import {
@@ -41,12 +40,11 @@ const DONE: Record<string, string> = {
 
 export default function OpsDuplicatesPage(props: PageProps<"/ops/duplicates">) {
   return (
-    <PageShell title="Duplicates" wide>
-      <OpsNav current="/ops/duplicates" />
+    <OpsPage title="Duplicates" intro="The same event listed twice, to merge.">
       <Suspense fallback={<Loading />}>
         <Duplicates {...props} />
       </Suspense>
-    </PageShell>
+    </OpsPage>
   );
 }
 

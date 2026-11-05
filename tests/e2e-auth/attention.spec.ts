@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { logInAsAdmin, sql } from "./helpers";
+import { logInAsAdmin, openAdminTool, sql } from "./helpers";
 
 // Toran admins see what needs following up on /ops/attention. Uses a mandir
 // no other test looks at.
@@ -35,10 +35,7 @@ test("admins see what needs attention", async ({ page }) => {
   );
 
   await logInAsAdmin(page, `attention-${Date.now()}@example.com`);
-  await page
-    .getByRole("navigation", { name: "Admin" })
-    .getByRole("link", { name: "Needs attention" })
-    .click();
+  await openAdminTool(page, "Needs attention");
   await expect(page).toHaveURL(/\/ops\/attention$/);
   await expect(
     page.getByRole("heading", { level: 1, name: "Needs attention" }),
