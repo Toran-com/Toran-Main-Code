@@ -1,18 +1,18 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
 import type { LeafletKeyboardEvent, Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
+import { diya, keepLitWhileOpen, makeUkMap } from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
 import { enEventsMap } from "@/lib/i18n/client/events-map";
 import { clusterApart } from "@/lib/map-clusters";
 
-// What's on as a map: a marigold circle at each mandir with events in the
-// list, bigger where there are more, with the number inside. Tapping one
-// lists its next events, each a link to its page. Mandirs too close to
-// show apart share one circle, until zoomed in. Loaded only when the map
-// is chosen, like the mandirs and seva maps (decision 0011).
+// What's on as a map of the UK (uk-map.ts): a diya at each mandir with
+// events in the list, bigger where there are more, with the number on it.
+// Tapping one lists its next events, each a link to its page. Mandirs too
+// close to show apart share one diya, until zoomed in. Loaded only when
+// the map is chosen, like the mandirs and seva maps (decision 0011).
 
 export type EventPin = {
   slug: string;
@@ -26,13 +26,10 @@ export type EventPin = {
   more: string;
 };
 
-const UK: [number, number] = [54.4, -2.6];
-// The biggest circle, and how far apart circles' centres stay.
-const BIGGEST = 52;
-const APART = BIGGEST + 6;
-
-const sizeFor = (count: number) =>
-  Math.round(34 + Math.min(BIGGEST - 34, Math.sqrt(count) * 6));
+// How far apart diyas' centres stay (the biggest is about 50px wide), and
+// how big a diya is for its number of events.
+const APART = 56;
+const sizeFor = (count: number) => 1 + Math.min(0.4, Math.sqrt(count) * 0.07);
 
 type Translate = ReturnType<typeof useT<keyof typeof enEventsMap>>;
 
@@ -94,15 +91,7 @@ export function EventsMap({
     let made: LeafletMap | null = null;
     void import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
-      made = L.map(box.current, { center: UK, zoom: 5, minZoom: 4 });
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(made);
-      made.attributionControl.setPrefix(
-        '<a href="https://leafletjs.com">Leaflet</a>',
-      );
+      made = makeUkMap(L, box.current);
       live.current = { L, map: made, layer: L.layerGroup().addTo(made) };
       setReady(true);
     });
@@ -123,6 +112,8 @@ export function EventsMap({
     // After zooming in from the keyboard, the circle to keep focus on.
     let refocus: string | null = null;
 
+    // The diyas light up the first time they're drawn, not at every zoom.
+    let firstDraw = true;
     const draw = () => {
       layer.clearLayers();
       const groups = clusterApart(
@@ -130,7 +121,7 @@ export function EventsMap({
         (p) => map.latLngToLayerPoint([p.latitude, p.longitude]),
         APART,
       );
-      for (const { items } of groups) {
+      groups.forEach(({ items }, order) => {
         const [first] = items;
         const count = items.reduce((sum, p) => sum + p.count, 0);
         const label =
@@ -142,10 +133,12 @@ export function EventsMap({
               })
             : t("eventsMap.group", { count, mandirs: items.length });
         const marker = L.marker([first.latitude, first.longitude], {
-          icon: L.divIcon({
-            className: "toran-need",
-            html: `<span>${count}</span>`,
-            iconSize: [sizeFor(count), sizeFor(count)],
+          icon: diya(L, {
+            kind: "toran-need",
+            count,
+            size: sizeFor(count),
+            light: firstDraw,
+            order,
           }),
           title: label,
           keyboard: true,
@@ -174,6 +167,7 @@ export function EventsMap({
             // Clear of the zoom buttons.
             autoPanPaddingTopLeft: [16, 96],
           });
+          keepLitWhileOpen(marker);
         } else {
           // Zoom in on them, by at least a step so the group splits.
           const zoomIn = () => {
@@ -196,7 +190,8 @@ export function EventsMap({
           );
         }
         layer.addLayer(marker);
-      }
+      });
+      firstDraw = false;
       if (origin) {
         layer.addLayer(
           L.circleMarker([origin.latitude, origin.longitude], {

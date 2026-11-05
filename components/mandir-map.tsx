@@ -1,6 +1,5 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
 import type {
   CircleMarker,
   LayerGroup,
@@ -8,6 +7,7 @@ import type {
   Map as LeafletMap,
 } from "leaflet";
 import { useEffect, useRef, useState } from "react";
+import { diya, keepLitWhileOpen, makeUkMap } from "@/components/uk-map";
 import { useLocale, useT, type Locale } from "@/components/use-t";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { withLocale } from "@/lib/i18n/paths";
@@ -16,9 +16,10 @@ type Translate = ReturnType<typeof useT<keyof typeof enMandirs>>;
 import { clusterApart, onTheMap } from "@/lib/map-clusters";
 
 // The mandirs on a map of the UK, from the map positions worked out from
-// their postcodes. Each mandir is a dot; dots close together merge into a
-// numbered circle that splits apart as you zoom in. The background map is
-// OpenStreetMap. Loaded only in the browser (see directory-list.tsx).
+// their postcodes. Each mandir is a diya; diyas close together merge into
+// one with a number that splits apart as you zoom in. The map itself is
+// shared with the other maps (uk-map.ts). Loaded only in the browser (see
+// directory-list.tsx).
 
 export type MapMandir = {
   slug: string;
@@ -30,8 +31,6 @@ export type MapMandir = {
 };
 
 type Placed = MapMandir & { latitude: number; longitude: number };
-
-const UK: [number, number] = [54.4, -2.6];
 
 type Leaflet = typeof import("leaflet");
 type Live = {
@@ -82,15 +81,7 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
     let made: LeafletMap | null = null;
     void import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
-      made = L.map(box.current, { center: UK, zoom: 5, minZoom: 4 });
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(made);
-      made.attributionControl.setPrefix(
-        '<a href="https://leafletjs.com">Leaflet</a>',
-      );
+      made = makeUkMap(L, box.current);
       live.current = {
         L,
         map: made,
@@ -121,23 +112,27 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
       }
     };
 
+    // The diyas light up the first time they're drawn, not at every zoom.
+    let first = true;
     const draw = () => {
       dots.clearLayers();
-      // Far enough apart that no two circles touch (the biggest is 44px).
+      // Far enough apart that no two diyas touch (the biggest is 50px wide).
       const clusters = clusterApart(
         points,
         (m) => map.latLngToLayerPoint([m.latitude, m.longitude]),
-        48,
+        52,
       );
-      for (const { items, x, y } of clusters) {
+      clusters.forEach(({ items, x, y }, order) => {
+        const light = first;
         if (items.length === 1) {
           const [m] = items;
           const dot = L.marker([m.latitude, m.longitude], {
-            icon: L.divIcon({ className: "toran-dot", iconSize: [20, 20] }),
+            icon: diya(L, { kind: "toran-dot", light, order }),
             title: m.name,
             keyboard: true,
             riseOnHover: true,
           }).bindPopup(() => card([m], t, locale));
+          keepLitWhileOpen(dot);
           dot.on("add", () => {
             const el = dot.getElement();
             el?.setAttribute("role", "button");
@@ -145,15 +140,17 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
             keepFocus(el, [m.slug]);
           });
           dots.addLayer(dot);
-          continue;
+          return;
         }
-        const size = items.length < 10 ? 32 : items.length < 50 ? 38 : 44;
+        const size = items.length < 10 ? 1.15 : items.length < 50 ? 1.28 : 1.4;
         const label = t("map.cluster", { count: items.length });
         const group = L.marker(map.layerPointToLatLng([x, y]), {
-          icon: L.divIcon({
-            className: "toran-cluster",
-            html: `<span>${items.length}</span>`,
-            iconSize: [size, size],
+          icon: diya(L, {
+            kind: "toran-cluster",
+            count: items.length,
+            size,
+            light,
+            order,
           }),
           title: t("map.clusterTitle", { label }),
           keyboard: true,
@@ -198,7 +195,8 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
           open();
         });
         dots.addLayer(group);
-      }
+      });
+      first = false;
     };
 
     // Frame the mandirs shown: all of them, or the ones a search found.
