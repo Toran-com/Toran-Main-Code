@@ -1,0 +1,117 @@
+/* "See how Toran works" on the home page (components/home-story.tsx).
+   Kept beside the component rather than in app/globals.css, so it always
+   ships with it.
+
+   On a laptop one phone stays beside the steps and shows the screen for
+   the step in view (data-active, set by components/story-scroll.tsx).
+   Screens not in view are hidden outright, never left faint. On a phone,
+   each step has its own phone above its words instead, so nothing ever
+   covers the words on a small screen.
+
+   The button each step is about is outlined in gold, with a gentle tap.
+   With less motion asked for, nothing moves. */
+.story-stage .story-screen {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(3%) scale(0.98);
+  transition:
+    opacity 380ms cubic-bezier(0.2, 0, 0, 1),
+    transform 520ms cubic-bezier(0.2, 0, 0, 1),
+    visibility 0s linear 380ms;
+}
+.story[data-active="0"] .story-stage [data-screen="0"],
+.story[data-active="1"] .story-stage [data-screen="1"],
+.story[data-active="2"] .story-stage [data-screen="2"],
+.story[data-active="3"] .story-stage [data-screen="3"],
+.story[data-active="4"] .story-stage [data-screen="4"],
+.story[data-active="5"] .story-stage [data-screen="5"] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+.story-dot {
+  transition:
+    width 300ms ease,
+    background-color 300ms ease;
+}
+.story[data-active="0"] [data-dot="0"],
+.story[data-active="1"] [data-dot="1"],
+.story[data-active="2"] [data-dot="2"],
+.story[data-active="3"] [data-dot="3"],
+.story[data-active="4"] [data-dot="4"],
+.story[data-active="5"] [data-dot="5"] {
+  width: 1.5rem;
+  background-color: var(--color-marigold);
+}
+.story-number {
+  border: 2px solid var(--color-line-strong);
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    border-color 300ms ease;
+}
+.story[data-active="0"] [data-story-step="0"] .story-number,
+.story[data-active="1"] [data-story-step="1"] .story-number,
+.story[data-active="2"] [data-story-step="2"] .story-number,
+.story[data-active="3"] [data-story-step="3"] .story-number,
+.story[data-active="4"] [data-story-step="4"] .story-number,
+.story[data-active="5"] [data-story-step="5"] .story-number {
+  border-color: var(--color-night);
+  background-color: var(--color-night);
+  color: var(--color-night-accent);
+}
+.story-target {
+  box-shadow:
+    0 0 0 0.9cqw var(--color-marigold),
+    0 0 0 2.6cqw rgb(217 164 65 / 0.28);
+}
+.story-target::after {
+  content: "";
+  position: absolute;
+  inset: -0.9cqw;
+  border: 0.9cqw solid var(--color-marigold);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+}
+@keyframes story-tap {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  70%,
+  100% {
+    transform: scale(1.18, 1.45);
+    opacity: 0;
+  }
+}
+@keyframes story-bubble {
+  from {
+    transform: translateY(30%) scale(0.92);
+    opacity: 0;
+  }
+}
+@keyframes story-fill {
+  from {
+    width: 25%;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .story-target::after {
+    animation: story-tap 1.8s cubic-bezier(0.2, 0, 0, 1) 600ms infinite;
+  }
+  .story[data-active="2"] .story-stage .story-bubble {
+    animation: story-bubble 500ms cubic-bezier(0.2, 0, 0, 1) 700ms both;
+  }
+  .story[data-active="5"] .story-stage .story-fill {
+    animation: story-fill 900ms cubic-bezier(0.2, 0, 0, 1) 500ms both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-screen,
+  .story-dot,
+  .story-number {
+    transition: none;
+  }
+}
