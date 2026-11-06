@@ -2,13 +2,18 @@
 
 import type { Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
-import { diya, keepLitWhileOpen, makeUkMap } from "@/components/uk-map";
+import {
+  cityLabels,
+  keepLitWhileOpen,
+  lamp,
+  makeUkMap,
+} from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
 import { enSeva } from "@/lib/i18n/client/seva";
 import type { Found } from "@/lib/seva-finder";
 
-// The Seva page's map of the UK (uk-map.ts): a diya at each mandir that
+// The Seva page's map of the UK (uk-map.ts): a lamp at each mandir that
 // needs people, bigger where more are needed, with the number on it.
 // Tapping one lists its events and the way to their rotas. Loaded only
 // when the map is chosen (seva-explorer.tsx), like the mandirs map
@@ -94,6 +99,7 @@ export function SevaMap({
     L: typeof import("leaflet");
     map: LeafletMap;
     layer: import("leaflet").LayerGroup;
+    places: ReturnType<typeof cityLabels>;
   } | null>(null);
   const [ready, setReady] = useState(false);
   const shown = pins(found);
@@ -104,7 +110,12 @@ export function SevaMap({
     void import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
       made = makeUkMap(L, box.current);
-      live.current = { L, map: made, layer: L.layerGroup().addTo(made) };
+      live.current = {
+        L,
+        map: made,
+        layer: L.layerGroup().addTo(made),
+        places: cityLabels(L, made),
+      };
       setReady(true);
     });
     return () => {
@@ -117,18 +128,18 @@ export function SevaMap({
   useEffect(() => {
     const now = live.current;
     if (!ready || !now) return;
-    const { L, map, layer } = now;
+    const { L, map, layer, places: cityNames } = now;
     const placed = pins(found);
     layer.clearLayers();
     placed.forEach((pin, order) => {
-      const size = 1 + Math.min(0.4, Math.sqrt(pin.free) * 0.06);
+      const size = 1 + Math.min(0.25, Math.sqrt(pin.free) * 0.05);
       const label = t("sevaFind.pin", {
         name: pin.name,
         town: pin.town,
         places: places(t, pin.free),
       });
       const marker = L.marker([pin.latitude, pin.longitude], {
-        icon: diya(L, {
+        icon: lamp(L, {
           kind: "toran-need",
           count: pin.free,
           size,
@@ -147,6 +158,8 @@ export function SevaMap({
       });
       layer.addLayer(marker);
     });
+    // City names make way for the lights.
+    cityNames.avoid(placed.map((p) => [p.latitude, p.longitude]));
     if (origin) {
       layer.addLayer(
         L.circleMarker([origin.latitude, origin.longitude], {

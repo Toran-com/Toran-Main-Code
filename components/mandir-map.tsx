@@ -7,7 +7,12 @@ import type {
   Map as LeafletMap,
 } from "leaflet";
 import { useEffect, useRef, useState } from "react";
-import { diya, keepLitWhileOpen, makeUkMap } from "@/components/uk-map";
+import {
+  cityLabels,
+  keepLitWhileOpen,
+  lamp,
+  makeUkMap,
+} from "@/components/uk-map";
 import { useLocale, useT, type Locale } from "@/components/use-t";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
 import { withLocale } from "@/lib/i18n/paths";
@@ -16,8 +21,8 @@ type Translate = ReturnType<typeof useT<keyof typeof enMandirs>>;
 import { clusterApart, onTheMap } from "@/lib/map-clusters";
 
 // The mandirs on a map of the UK, from the map positions worked out from
-// their postcodes. Each mandir is a diya; diyas close together merge into
-// one with a number that splits apart as you zoom in. The map itself is
+// their postcodes. Each mandir is a small flame; flames close together
+// merge into a lamp with a number that splits apart as you zoom in. The map itself is
 // shared with the other maps (uk-map.ts). Loaded only in the browser (see
 // directory-list.tsx).
 
@@ -37,6 +42,7 @@ type Live = {
   L: Leaflet;
   map: LeafletMap;
   dots: LayerGroup;
+  places: ReturnType<typeof cityLabels>;
   you: CircleMarker | null;
 };
 
@@ -86,6 +92,7 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
         L,
         map: made,
         dots: L.layerGroup().addTo(made),
+        places: cityLabels(L, made),
         you: null,
       };
       setReady(true);
@@ -101,7 +108,7 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
   useEffect(() => {
     const now = live.current;
     if (!ready || !now) return;
-    const { L, map, dots } = now;
+    const { L, map, dots, places } = now;
     const points = onTheMap(mandirs);
     // After zooming in from the keyboard, the dot or group to keep focus on.
     let refocus: string | null = null;
@@ -112,11 +119,12 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
       }
     };
 
-    // The diyas light up the first time they're drawn, not at every zoom.
+    // The lights come on the first time they're drawn, not at every zoom.
     let first = true;
     const draw = () => {
       dots.clearLayers();
-      // Far enough apart that no two diyas touch (the biggest is 50px wide).
+      const lights: [number, number][] = [];
+      // Far enough apart that no two lights touch (the biggest is 53px wide).
       const clusters = clusterApart(
         points,
         (m) => map.latLngToLayerPoint([m.latitude, m.longitude]),
@@ -126,8 +134,9 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
         const light = first;
         if (items.length === 1) {
           const [m] = items;
+          lights.push([m.latitude, m.longitude]);
           const dot = L.marker([m.latitude, m.longitude], {
-            icon: diya(L, { kind: "toran-dot", light, order }),
+            icon: lamp(L, { kind: "toran-dot", light, order }),
             title: m.name,
             keyboard: true,
             riseOnHover: true,
@@ -142,10 +151,12 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
           dots.addLayer(dot);
           return;
         }
-        const size = items.length < 10 ? 1.15 : items.length < 50 ? 1.28 : 1.4;
+        const size = items.length < 10 ? 1 : items.length < 50 ? 1.12 : 1.25;
         const label = t("map.cluster", { count: items.length });
-        const group = L.marker(map.layerPointToLatLng([x, y]), {
-          icon: diya(L, {
+        const at = map.layerPointToLatLng([x, y]);
+        lights.push([at.lat, at.lng]);
+        const group = L.marker(at, {
+          icon: lamp(L, {
             kind: "toran-cluster",
             count: items.length,
             size,
@@ -197,6 +208,8 @@ export function MandirMap({ mandirs }: { mandirs: MapMandir[] }) {
         dots.addLayer(group);
       });
       first = false;
+      // City names make way for the lights.
+      places.avoid(lights);
     };
 
     // Frame the mandirs shown: all of them, or the ones a search found.

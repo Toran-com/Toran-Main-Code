@@ -1,19 +1,68 @@
 /* The maps (components/uk-map.ts and the mandirs, What's on and Seva
    maps). Leaflet's own styles load just before these, so rules are scoped
-   to .toran-map to take precedence. */
+   to .toran-map to take precedence. Colours follow the page: a cream map
+   on a light page, a night-time one on a dark page. */
 
-.toran-map.leaflet-container {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  /* Where there are no map pictures (outside the UK): the page. */
-  background: var(--bg);
+.toran-map {
+  --map-sea: radial-gradient(
+    120% 90% at 50% 35%,
+    color-mix(in srgb, var(--surface) 70%, var(--bg)),
+    var(--bg)
+  );
+  --map-land: #fffdf8;
+  --map-dots: rgb(20 33 61 / 0.16);
+  --map-coast: #c9963a;
+  --map-place: #4a4b5e;
+  --map-place-halo: #fffdf8;
+  --lamp-edge: #8a6418;
+}
+@media screen and (prefers-color-scheme: dark) {
+  .toran-map {
+    --map-sea: radial-gradient(120% 90% at 50% 35%, #14213d, #0b1222 75%);
+    --map-land: #172748;
+    --map-dots: rgb(226 182 90 / 0.2);
+    --map-coast: rgb(226 182 90 / 0.75);
+    --map-place: #c9ccda;
+    --map-place-halo: #0b1222;
+    --lamp-edge: transparent;
+  }
 }
 
-/* The map pictures, recoloured: quiet and warm on a light page… */
+.toran-map.leaflet-container {
+  font-family: var(--font-mulish), system-ui, sans-serif;
+  font-size: 1rem;
+  background: var(--map-sea);
+}
+
+/* The UK, drawn by Toran: a soft fill, fine dots, a gold coastline. It
+   fades away when the streets come in. */
+.toran-map .toran-land {
+  fill: var(--map-land);
+  fill-opacity: 1;
+  stroke: var(--map-coast);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  transition:
+    fill-opacity 0.4s,
+    stroke-opacity 0.4s;
+}
+.toran-map .toran-land-dots {
+  fill-opacity: 1;
+  transition: fill-opacity 0.4s;
+}
+.toran-map .toran-dot-mark {
+  fill: var(--map-dots);
+}
+.toran-map[data-depth="street"] .toran-land,
+.toran-map[data-depth="street"] .toran-land-dots {
+  fill-opacity: 0;
+  stroke-opacity: 0;
+}
+
+/* The streets, recoloured: quiet and warm on a light page… */
 .toran-map .toran-tiles {
   filter: grayscale(1) sepia(0.2) brightness(1.04) contrast(0.88);
 }
-
 /* …midnight blue on a dark one. */
 @media screen and (prefers-color-scheme: dark) {
   .toran-map .toran-tiles {
@@ -22,34 +71,28 @@
   }
 }
 
-/* Everything but the UK fades into the page, with a thin gold coastline,
-   until you zoom in to a town. */
-.toran-map .toran-fade {
-  fill: var(--bg);
-  stroke: var(--marigold);
-  stroke-width: 1.5;
-  transition:
-    fill-opacity 0.4s,
-    stroke-opacity 0.4s;
-}
-.toran-map[data-fade="far"] .toran-fade {
-  fill-opacity: 1;
-  stroke-opacity: 0.9;
-}
-.toran-map[data-fade="mid"] .toran-fade {
-  fill-opacity: 0.85;
-  stroke-opacity: 0.7;
-}
-.toran-map[data-fade="near"] .toran-fade {
-  fill-opacity: 0.45;
-  stroke-opacity: 0.35;
-}
-.toran-map[data-fade="off"] .toran-fade {
-  fill-opacity: 0;
-  stroke-opacity: 0;
+/* City names: few, quiet, in the heading font. */
+.toran-map .toran-place {
+  display: flex;
+  justify-content: center;
+  background: none;
+  border: 0;
+  font-family: var(--font-marcellus), Georgia, serif;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--map-place);
+  text-shadow:
+    0 0 3px var(--map-place-halo),
+    0 0 8px var(--map-place-halo);
+  white-space: nowrap;
 }
 
 /* Zoom buttons and the credit, in the page's colours. */
+.toran-map .leaflet-bar {
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+}
 .toran-map .leaflet-bar a {
   background: var(--surface);
   color: var(--ink);
@@ -67,104 +110,123 @@
   color: var(--peacock);
 }
 
-/* A diya for each place: a midnight bowl with a gold rim (clear on light
-   and dark maps), a flame that flickers, and a glow. */
-.toran-map .toran-diya {
+/* The lights. One mandir: a flame with a soft glow. Several: a midnight
+   lamp with a gold rim and the number, its flame on top. */
+.toran-map .toran-lamp {
   background: none;
   border: 0;
   cursor: pointer;
 }
-.toran-map .toran-diya-inner {
+.toran-map .toran-lamp-inner {
   position: relative;
   display: block;
   width: 100%;
   height: 100%;
 }
-.toran-map .toran-diya svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
-}
-.toran-map .toran-diya-bowl {
-  fill: #14213d;
-  stroke: #d9a441;
-  stroke-width: 2.2;
-  stroke-linejoin: round;
-}
-.toran-map .toran-diya-flame {
-  transform-box: view-box;
-  transform-origin: 18px 26px;
-  animation: toran-flicker var(--f, 2.4s) ease-in-out var(--d, 0ms) infinite;
-  transition: scale 0.25s;
-}
-.toran-map .toran-diya-glow {
+.toran-map .toran-lamp-glow {
   position: absolute;
   left: 50%;
-  top: 36%;
-  width: 190%;
+  top: 12px;
+  width: 56px;
   aspect-ratio: 1;
-  translate: -50% -50%;
+  translate: -50% -30%;
   border-radius: 50%;
   background: radial-gradient(
     closest-side,
-    rgba(217, 164, 65, 0.6),
-    rgba(217, 164, 65, 0)
+    rgb(246 231 184 / 0.75),
+    rgb(217 164 65 / 0.35) 40%,
+    transparent
   );
-  opacity: 0.55;
+  opacity: 0.7;
   pointer-events: none;
   transition:
     opacity 0.25s,
     scale 0.25s;
 }
-
-/* Pointed at, focused, or its card open: the diya burns brighter. */
-.toran-map .toran-diya:hover .toran-diya-glow,
-.toran-map .toran-diya:focus-visible .toran-diya-glow,
-.toran-map .toran-diya.toran-lit .toran-diya-glow {
-  opacity: 1;
-  scale: 1.3;
-}
-.toran-map .toran-diya:hover .toran-diya-flame,
-.toran-map .toran-diya:focus-visible .toran-diya-flame,
-.toran-map .toran-diya.toran-lit .toran-diya-flame {
-  scale: 1.2;
-}
-.toran-map .toran-diya:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 3px;
-  border-radius: 10px;
-}
-
-/* As the map opens, the diyas light one after another. */
-.toran-map .toran-light-up .toran-diya-flame {
-  animation:
-    toran-ignite 0.7s cubic-bezier(0.2, 0.8, 0.2, 1.25) var(--d, 0ms) backwards,
-    toran-flicker var(--f, 2.4s) ease-in-out var(--d, 0ms) infinite;
-}
-.toran-map .toran-light-up .toran-diya-glow {
-  animation: toran-glow-in 0.9s ease-out var(--d, 0ms) backwards;
-}
-
-/* How many events, places or mandirs. */
-.toran-map .toran-diya-count {
+.toran-map .toran-lamp-flame {
   position: absolute;
-  left: 62%;
-  bottom: -4px;
-  min-width: 1.75rem;
-  height: 1.75rem;
-  padding: 0 0.4rem;
-  border-radius: 999px;
-  background: #14213d;
+  left: 50%;
+  top: 0;
+  width: 20px;
+  height: 27px;
+  translate: -50% 0;
+  overflow: visible;
+  transform-origin: 50% 85%;
+  animation: toran-flicker var(--f, 2s) ease-in-out var(--d, 0ms) infinite;
+  transition: scale 0.25s;
+}
+.toran-map .toran-lamp-outer {
+  fill: #d9a441;
+  stroke: var(--lamp-edge);
+  stroke-width: 1.2;
+}
+.toran-map .toran-lamp-core {
+  fill: #fff4d6;
+}
+.toran-map .toran-lamp-many .toran-lamp-glow {
+  top: calc(18px + var(--disc) / 2);
+  width: calc(var(--disc) * 1.9);
+  translate: -50% -50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(217 164 65 / 0.45),
+    rgb(217 164 65 / 0.15) 55%,
+    transparent
+  );
+}
+.toran-map .toran-lamp-many .toran-lamp-flame {
+  width: 15px;
+  height: 20px;
+}
+.toran-map .toran-lamp-disc {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: var(--disc);
+  height: var(--disc);
+  translate: -50% 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #1d2f5c, #14213d 70%);
   border: 2px solid #d9a441;
+  box-shadow:
+    0 0 0 3px rgb(217 164 65 / 0.18),
+    0 6px 14px -6px rgb(0 0 0 / 0.6);
   color: #f6e7b8;
   font-size: 1.125rem;
   font-weight: 800;
-  line-height: calc(1.75rem - 4px);
-  text-align: center;
   font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Pointed at, focused, or its card open: brighter. */
+.toran-map .toran-lamp:hover .toran-lamp-glow,
+.toran-map .toran-lamp:focus-visible .toran-lamp-glow,
+.toran-map .toran-lamp.toran-lit .toran-lamp-glow {
+  opacity: 1;
+  scale: 1.35;
+}
+.toran-map .toran-lamp:hover .toran-lamp-flame,
+.toran-map .toran-lamp:focus-visible .toran-lamp-flame,
+.toran-map .toran-lamp.toran-lit .toran-lamp-flame {
+  scale: 1.25;
+}
+.toran-map .toran-lamp:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+/* As the map opens, the lights come on one after another. */
+.toran-map .toran-light-up .toran-lamp-flame {
+  animation:
+    toran-ignite 0.7s cubic-bezier(0.2, 0.8, 0.2, 1.25) var(--d, 0ms) backwards,
+    toran-flicker var(--f, 2s) ease-in-out var(--d, 0ms) infinite;
+}
+.toran-map .toran-light-up .toran-lamp-glow,
+.toran-map .toran-light-up .toran-lamp-disc {
+  animation: toran-glow-in 0.8s ease-out var(--d, 0ms) backwards;
 }
 
 @keyframes toran-ignite {
@@ -184,7 +246,7 @@
 @keyframes toran-glow-in {
   from {
     opacity: 0;
-    scale: 0.4;
+    scale: 0.5;
   }
 }
 
@@ -193,14 +255,17 @@
   100% {
     transform: none;
   }
-  25% {
-    transform: scale(0.96, 1.05) translateX(-0.3px);
+  20% {
+    transform: scale(0.95, 1.06) skewX(-3deg);
   }
-  50% {
-    transform: scale(1.03, 0.97);
+  45% {
+    transform: scale(1.04, 0.95) skewX(2deg);
   }
-  75% {
-    transform: scale(0.98, 1.04) translateX(0.3px);
+  70% {
+    transform: scale(0.97, 1.05) skewX(-1.5deg);
+  }
+  85% {
+    transform: scale(1.02, 0.98) skewX(1deg);
   }
 }
 
@@ -212,7 +277,7 @@
   stroke-width: 3;
 }
 
-/* The card that opens on a diya follows the page colours. */
+/* The card that opens on a light follows the page colours. */
 .toran-map .leaflet-popup-content {
   font-size: 1rem;
   line-height: 1.4;

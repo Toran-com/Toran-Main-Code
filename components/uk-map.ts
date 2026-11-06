@@ -1,20 +1,23 @@
 import "leaflet/dist/leaflet.css";
 import "./uk-map.css";
-import type { DivIcon, Map as LeafletMap } from "leaflet";
+import type { DivIcon, Map as LeafletMap, Marker } from "leaflet";
 import { UK_OUTLINE } from "@/lib/uk-outline";
 
-// What the three maps share (the mandirs, What's on and Seva maps): a map
-// of the UK only, in Toran's colours, with a small diya for each place.
+// What the three maps share (the mandirs, What's on and Seva maps): a
+// night-time map of the UK drawn by Toran itself, with each mandir a
+// small light.
 //
-// - The map can't be moved or zoomed out past the UK, and its pictures
-//   are only fetched for the UK.
-// - Zoomed out, everything but the UK fades into the page, with a thin
-//   gold coastline; zoomed in to a town, the fade lifts so nothing near
-//   the coast is hidden.
-// - The pictures are OpenStreetMap's (decision 0011), recoloured in the
-//   browser (uk-map.css): warm and quiet in light mode, midnight in dark.
-// - Each place is a diya that lights up as the map opens, glows when
-//   pointed at or focused, and stays lit while its card is open.
+// - Zoomed out, there are no map pictures at all: just the UK, filled with
+//   fine dots inside a gold coastline, and a few city names to find your
+//   way. A city's name steps aside when a light is in its place, so the
+//   map never fills up with text.
+// - Zoomed in to a town, OpenStreetMap's pictures fade in (decision 0011),
+//   recoloured to match, so you can see the streets around a mandir.
+// - The map can't be moved or zoomed out past the UK, and pictures are
+//   only fetched for the UK, and only close up.
+// - One mandir is a flame; several together are a lit lamp with how many
+//   on it. They light one after another as the map opens, glow brighter
+//   when pointed at or focused, and stay lit while their card is open.
 
 type Leaflet = typeof import("leaflet");
 
@@ -28,18 +31,12 @@ const UK_LIMIT: [[number, number], [number, number]] = [
   [48.8, -11.5],
   [61.6, 4],
 ];
-
-// The fade: solid when the whole UK is in view, gone by town level.
-function fadeFor(zoom: number): "far" | "mid" | "near" | "off" {
-  if (zoom < 7) return "far";
-  if (zoom < 8.5) return "mid";
-  if (zoom < 10) return "near";
-  return "off";
-}
+// From this zoom the streets show (a town fills the map).
+export const STREET_ZOOM = 11;
 
 export function makeUkMap(L: Leaflet, box: HTMLElement): LeafletMap {
-  // Half zoom steps, so the whole UK fills a phone's map.
   const map = L.map(box, {
+    // Half steps, so the whole UK fills a phone's map.
     zoomSnap: 0.5,
     maxBounds: UK_LIMIT,
     maxBoundsViscosity: 1,
@@ -47,42 +44,206 @@ export function makeUkMap(L: Leaflet, box: HTMLElement): LeafletMap {
   map.fitBounds(UK_VIEW, { animate: false });
   // Never further out than the whole UK.
   map.setMinZoom(map.getZoom());
+  map.attributionControl.setPrefix(
+    '<a href="https://leafletjs.com">Leaflet</a>',
+  );
+
+  // Streets, only close up.
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    minZoom: STREET_ZOOM,
     maxZoom: 19,
     bounds: UK_LIMIT,
     className: "toran-tiles",
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
-  map.attributionControl.setPrefix(
-    '<a href="https://leafletjs.com">Leaflet</a>',
-  );
 
-  // The world with a UK-shaped hole in it, filled with the page colour.
-  L.polygon(
-    [
-      [
-        [85, -180],
-        [85, 180],
-        [-85, 180],
-        [-85, -180],
-      ],
-      ...UK_OUTLINE,
-    ],
-    { className: "toran-fade", interactive: false, smoothFactor: 0.5 },
-  ).addTo(map);
-  const fade = () => {
-    box.dataset.fade = fadeFor(map.getZoom());
+  // The UK: a soft fill, fine dots over it, and a gold coastline.
+  const land = L.polygon(UK_OUTLINE, {
+    className: "toran-land",
+    interactive: false,
+    smoothFactor: 0.6,
+  }).addTo(map);
+  const dots = L.polygon(UK_OUTLINE, {
+    className: "toran-land-dots",
+    interactive: false,
+    smoothFactor: 0.6,
+    stroke: false,
+  }).addTo(map);
+  const svg = (land.getElement() as SVGElement | undefined)?.ownerSVGElement;
+  if (svg) {
+    const id = `toran-dots-${Math.random().toString(36).slice(2)}`;
+    const ns = "http://www.w3.org/2000/svg";
+    const defs = document.createElementNS(ns, "defs");
+    const pattern = document.createElementNS(ns, "pattern");
+    pattern.setAttribute("id", id);
+    pattern.setAttribute("patternUnits", "userSpaceOnUse");
+    pattern.setAttribute("width", "7");
+    pattern.setAttribute("height", "7");
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("class", "toran-dot-mark");
+    dot.setAttribute("cx", "3.5");
+    dot.setAttribute("cy", "3.5");
+    dot.setAttribute("r", "1.05");
+    pattern.append(dot);
+    defs.append(pattern);
+    svg.prepend(defs);
+    dots.getElement()?.setAttribute("fill", `url(#${id})`);
+  }
+
+  const depth = () => {
+    box.dataset.depth = map.getZoom() >= STREET_ZOOM ? "street" : "country";
   };
-  fade();
-  map.on("zoomend", fade);
+  depth();
+  map.on("zoomend", depth);
   return map;
 }
 
-// A diya. "count" puts a number on it (events, places or mandirs);
-// "light" makes it light up as it appears, "order" a moment after the
-// one before, so the map fills with lights.
-export function diya(
+// A few cities to find your way by: the biggest always, more as you zoom
+// in. Tier 1 shows from the whole-UK view, tier 2 a step and a half in,
+// tier 3 three steps in. Centres to about 1 km.
+const CITIES: { name: string; at: [number, number]; tier: 1 | 2 | 3 }[] = [
+  { name: "London", at: [51.507, -0.128], tier: 1 },
+  { name: "Birmingham", at: [52.486, -1.89], tier: 1 },
+  { name: "Manchester", at: [53.48, -2.242], tier: 1 },
+  { name: "Leeds", at: [53.8, -1.549], tier: 1 },
+  { name: "Glasgow", at: [55.864, -4.252], tier: 1 },
+  { name: "Edinburgh", at: [55.953, -3.188], tier: 1 },
+  { name: "Cardiff", at: [51.481, -3.179], tier: 1 },
+  { name: "Belfast", at: [54.597, -5.93], tier: 1 },
+  { name: "Leicester", at: [52.636, -1.133], tier: 2 },
+  { name: "Bristol", at: [51.454, -2.588], tier: 2 },
+  { name: "Newcastle", at: [54.978, -1.617], tier: 2 },
+  { name: "Liverpool", at: [53.408, -2.991], tier: 2 },
+  { name: "Sheffield", at: [53.381, -1.47], tier: 2 },
+  { name: "Nottingham", at: [52.954, -1.158], tier: 2 },
+  { name: "Southampton", at: [50.909, -1.404], tier: 2 },
+  { name: "Aberdeen", at: [57.149, -2.094], tier: 2 },
+  { name: "Norwich", at: [52.63, 1.297], tier: 2 },
+  { name: "Plymouth", at: [50.376, -4.143], tier: 2 },
+  { name: "Inverness", at: [57.478, -4.225], tier: 2 },
+  { name: "Brighton", at: [50.822, -0.137], tier: 2 },
+  { name: "Coventry", at: [52.406, -1.512], tier: 2 },
+  { name: "Bradford", at: [53.795, -1.759], tier: 3 },
+  { name: "Wolverhampton", at: [52.586, -2.128], tier: 3 },
+  { name: "Luton", at: [51.879, -0.417], tier: 3 },
+  { name: "Milton Keynes", at: [52.04, -0.759], tier: 3 },
+  { name: "Reading", at: [51.454, -0.978], tier: 3 },
+  { name: "Oxford", at: [51.752, -1.258], tier: 3 },
+  { name: "Cambridge", at: [52.205, 0.119], tier: 3 },
+  { name: "Peterborough", at: [52.573, -0.24], tier: 3 },
+  { name: "Derby", at: [52.922, -1.477], tier: 3 },
+  { name: "Preston", at: [53.763, -2.703], tier: 3 },
+  { name: "Stoke-on-Trent", at: [53.003, -2.18], tier: 3 },
+  { name: "Swansea", at: [51.621, -3.944], tier: 3 },
+  { name: "Dundee", at: [56.462, -2.971], tier: 3 },
+  { name: "Exeter", at: [50.718, -3.534], tier: 3 },
+  { name: "Ipswich", at: [52.057, 1.148], tier: 3 },
+  { name: "Hull", at: [53.745, -0.336], tier: 3 },
+  { name: "Bolton", at: [53.578, -2.43], tier: 3 },
+  { name: "Northampton", at: [52.24, -0.903], tier: 3 },
+  { name: "Gloucester", at: [51.864, -2.244], tier: 3 },
+  { name: "Bedford", at: [52.136, -0.466], tier: 3 },
+  { name: "Middlesbrough", at: [54.574, -1.235], tier: 3 },
+  { name: "Crawley", at: [51.109, -0.187], tier: 3 },
+  { name: "Harrow", at: [51.58, -0.334], tier: 3 },
+  { name: "Croydon", at: [51.376, -0.098], tier: 3 },
+];
+
+type Box = [number, number, number, number];
+const overlaps = (a: Box, b: Box) =>
+  a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+
+// The city names. Each map tells them where its lights are ("avoid"); a
+// name that would sit under a light, or on another name, isn't shown.
+// They're for finding your way only, so screen readers skip them (the
+// lights have their own names).
+export function cityLabels(L: Leaflet, map: LeafletMap) {
+  const pane = map.createPane("toran-places");
+  pane.style.zIndex = "450";
+  pane.style.pointerEvents = "none";
+  const layer = L.layerGroup().addTo(map);
+  let lights: [number, number][] = [];
+
+  const draw = () => {
+    layer.clearLayers();
+    const zoom = map.getZoom();
+    if (zoom >= STREET_ZOOM) return;
+    const from = map.getMinZoom();
+    const taken: Box[] = lights.map(([lat, lng]) => {
+      const p = map.latLngToLayerPoint([lat, lng]);
+      return [p.x - 28, p.y - 40, p.x + 28, p.y + 26];
+    });
+    for (const city of CITIES) {
+      if (zoom < from + [0, 1.5, 3][city.tier - 1]) continue;
+      const p = map.latLngToLayerPoint(city.at);
+      // About the width of the name in the label's font.
+      const w = Math.round(city.name.length * 9.6 + 10);
+      // Under the city if there's room; else beside the light that's on
+      // it (right, left, below, above); else not at all.
+      const spots: [Box, [number, number]][] = [
+        [
+          [p.x - w / 2, p.y + 1, p.x + w / 2, p.y + 27],
+          [w / 2, -1],
+        ],
+        [
+          [p.x + 30, p.y - 13, p.x + 30 + w, p.y + 13],
+          [-30, 13],
+        ],
+        [
+          [p.x - 30 - w, p.y - 13, p.x - 30, p.y + 13],
+          [w + 30, 13],
+        ],
+        [
+          [p.x - w / 2, p.y + 28, p.x + w / 2, p.y + 54],
+          [w / 2, -28],
+        ],
+        [
+          [p.x - w / 2, p.y - 68, p.x + w / 2, p.y - 42],
+          [w / 2, 68],
+        ],
+      ];
+      const spot = spots.find(([box]) => !taken.some((t) => overlaps(t, box)));
+      if (!spot) continue;
+      const [box, anchor] = spot;
+      taken.push(box);
+      const label = document.createElement("span");
+      label.textContent = city.name;
+      layer.addLayer(
+        L.marker(city.at, {
+          pane: "toran-places",
+          interactive: false,
+          keyboard: false,
+          icon: L.divIcon({
+            className: "toran-place",
+            html: label,
+            iconSize: [w, 26],
+            iconAnchor: anchor,
+          }),
+        }),
+      );
+    }
+  };
+  map.on("zoomend", draw);
+  return {
+    avoid(points: [number, number][]) {
+      lights = points;
+      draw();
+    },
+  };
+}
+
+// The flame, drawn once and used at two sizes.
+const FLAME =
+  `<svg class="toran-lamp-flame" viewBox="0 0 24 32" aria-hidden="true" focusable="false">` +
+  `<path class="toran-lamp-outer" d="M12 1.5c5.2 6.5 7.6 11.2 7.6 16a7.6 7.6 0 0 1-15.2 0c0-4.8 2.4-9.5 7.6-16z"/>` +
+  `<path class="toran-lamp-core" d="M12 11c2.4 3.1 3.3 5.1 3.3 6.9a3.3 3.3 0 0 1-6.6 0c0-1.8.9-3.8 3.3-6.9z"/>` +
+  `</svg>`;
+
+// A light on the map: a flame for one mandir, a lamp with a number for
+// several (or for one mandir's count of events or places). "light"
+// makes it light up as it appears, "order" a moment after the one before.
+export function lamp(
   L: Leaflet,
   {
     kind,
@@ -98,36 +259,36 @@ export function diya(
     order?: number;
   },
 ): DivIcon {
-  const w = Math.round(36 * size);
-  const h = Math.round(44 * size);
   // Each flame a little out of step with its neighbours.
   const delay = light ? Math.min(order, 30) * 45 : 0;
-  const flicker = 2.1 + (order % 5) * 0.17;
+  const flicker = (1.7 + (order % 5) * 0.19).toFixed(2);
+  const style = `--d:${delay}ms;--f:${flicker}s`;
+  const lit = light ? " toran-light-up" : "";
+  if (count === undefined) {
+    return L.divIcon({
+      className: `toran-lamp toran-lamp-one ${kind}${lit}`,
+      html: `<span class="toran-lamp-inner" style="${style}"><span class="toran-lamp-glow"></span>${FLAME}</span>`,
+      iconSize: [30, 40],
+      iconAnchor: [15, 34],
+      popupAnchor: [0, -30],
+    });
+  }
+  const disc = Math.round(36 * size);
   return L.divIcon({
-    className: `toran-diya ${kind}${light ? " toran-light-up" : ""}`,
+    className: `toran-lamp toran-lamp-many ${kind}${lit}`,
     // Built from numbers only, never names, so no text can break it.
     html:
-      `<span class="toran-diya-inner" style="--d:${delay}ms;--f:${flicker.toFixed(2)}s">` +
-      `<span class="toran-diya-glow"></span>` +
-      `<svg viewBox="0 0 36 44" aria-hidden="true" focusable="false">` +
-      `<g class="toran-diya-flame">` +
-      `<path d="M18 3c5.5 7 7.5 11.5 7.5 15.5a7.5 7.5 0 0 1-15 0C10.5 14.5 12.5 10 18 3z" fill="#d9a441"/>` +
-      `<path d="M18 11.5c2.2 3 3 5 3 6.6a3 3 0 0 1-6 0c0-1.6.8-3.6 3-6.6z" fill="#fff4d6"/>` +
-      `</g>` +
-      `<path class="toran-diya-bowl" d="M3.5 28h29c-1.5 7.5-7.2 12-14.5 12S5 35.5 3.5 28z"/>` +
-      `</svg>` +
-      (count === undefined
-        ? ""
-        : `<span class="toran-diya-count">${Math.round(count)}</span>`) +
-      `</span>`,
-    iconSize: [w, h],
-    iconAnchor: [w / 2, h - 3],
-    popupAnchor: [0, -h + 6],
+      `<span class="toran-lamp-inner" style="${style};--disc:${disc}px">` +
+      `<span class="toran-lamp-glow"></span>${FLAME}` +
+      `<span class="toran-lamp-disc">${Math.round(count)}</span></span>`,
+    iconSize: [disc + 8, disc + 22],
+    iconAnchor: [(disc + 8) / 2, 18 + disc / 2],
+    popupAnchor: [0, -disc / 2 - 14],
   });
 }
 
-// A diya stays lit while its card is open.
-export function keepLitWhileOpen(marker: import("leaflet").Marker) {
+// A light stays lit while its card is open.
+export function keepLitWhileOpen(marker: Marker) {
   marker.on("popupopen", () => marker.getElement()?.classList.add("toran-lit"));
   marker.on("popupclose", () =>
     marker.getElement()?.classList.remove("toran-lit"),

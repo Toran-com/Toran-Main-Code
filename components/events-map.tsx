@@ -2,16 +2,21 @@
 
 import type { LeafletKeyboardEvent, Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
-import { diya, keepLitWhileOpen, makeUkMap } from "@/components/uk-map";
+import {
+  cityLabels,
+  keepLitWhileOpen,
+  lamp,
+  makeUkMap,
+} from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
 import { enEventsMap } from "@/lib/i18n/client/events-map";
 import { clusterApart } from "@/lib/map-clusters";
 
-// What's on as a map of the UK (uk-map.ts): a diya at each mandir with
+// What's on as a map of the UK (uk-map.ts): a lamp at each mandir with
 // events in the list, bigger where there are more, with the number on it.
 // Tapping one lists its next events, each a link to its page. Mandirs too
-// close to show apart share one diya, until zoomed in. Loaded only when
+// close to show apart share one lamp, until zoomed in. Loaded only when
 // the map is chosen, like the mandirs and seva maps (decision 0011).
 
 export type EventPin = {
@@ -26,10 +31,10 @@ export type EventPin = {
   more: string;
 };
 
-// How far apart diyas' centres stay (the biggest is about 50px wide), and
-// how big a diya is for its number of events.
-const APART = 56;
-const sizeFor = (count: number) => 1 + Math.min(0.4, Math.sqrt(count) * 0.07);
+// How far apart lamps' centres stay (the biggest is about 53px wide), and
+// how big a lamp is for its number of events.
+const APART = 58;
+const sizeFor = (count: number) => 1 + Math.min(0.25, Math.sqrt(count) * 0.05);
 
 type Translate = ReturnType<typeof useT<keyof typeof enEventsMap>>;
 
@@ -83,6 +88,7 @@ export function EventsMap({
     L: typeof import("leaflet");
     map: LeafletMap;
     layer: import("leaflet").LayerGroup;
+    places: ReturnType<typeof cityLabels>;
   } | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -92,7 +98,12 @@ export function EventsMap({
     void import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
       made = makeUkMap(L, box.current);
-      live.current = { L, map: made, layer: L.layerGroup().addTo(made) };
+      live.current = {
+        L,
+        map: made,
+        layer: L.layerGroup().addTo(made),
+        places: cityLabels(L, made),
+      };
       setReady(true);
     });
     return () => {
@@ -106,16 +117,17 @@ export function EventsMap({
   useEffect(() => {
     const now = live.current;
     if (!ready || !now) return;
-    const { L, map, layer } = now;
+    const { L, map, layer, places } = now;
     // The busiest first, so they keep their place when grouped.
     const ordered = [...pins].sort((a, b) => b.count - a.count);
     // After zooming in from the keyboard, the circle to keep focus on.
     let refocus: string | null = null;
 
-    // The diyas light up the first time they're drawn, not at every zoom.
+    // The lights come on the first time they're drawn, not at every zoom.
     let firstDraw = true;
     const draw = () => {
       layer.clearLayers();
+      const lights: [number, number][] = [];
       const groups = clusterApart(
         ordered,
         (p) => map.latLngToLayerPoint([p.latitude, p.longitude]),
@@ -123,6 +135,7 @@ export function EventsMap({
       );
       groups.forEach(({ items }, order) => {
         const [first] = items;
+        lights.push([first.latitude, first.longitude]);
         const count = items.reduce((sum, p) => sum + p.count, 0);
         const label =
           items.length === 1
@@ -133,7 +146,7 @@ export function EventsMap({
               })
             : t("eventsMap.group", { count, mandirs: items.length });
         const marker = L.marker([first.latitude, first.longitude], {
-          icon: diya(L, {
+          icon: lamp(L, {
             kind: "toran-need",
             count,
             size: sizeFor(count),
@@ -192,6 +205,8 @@ export function EventsMap({
         layer.addLayer(marker);
       });
       firstDraw = false;
+      // City names make way for the lights.
+      places.avoid(lights);
       if (origin) {
         layer.addLayer(
           L.circleMarker([origin.latitude, origin.longitude], {
