@@ -1,17 +1,18 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
 import type { Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
+import { diya, keepLitWhileOpen, makeUkMap } from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
 import { enSeva } from "@/lib/i18n/client/seva";
 import type { Found } from "@/lib/seva-finder";
 
-// The Seva page's map: a marigold circle at each mandir that needs people,
-// bigger where more are needed, with the number inside. Tapping one lists
-// its events and the way to their rotas. Loaded only when the map is
-// chosen (seva-explorer.tsx), like the mandirs map (decision 0011).
+// The Seva page's map of the UK (uk-map.ts): a diya at each mandir that
+// needs people, bigger where more are needed, with the number on it.
+// Tapping one lists its events and the way to their rotas. Loaded only
+// when the map is chosen (seva-explorer.tsx), like the mandirs map
+// (decision 0011).
 
 type Translate = ReturnType<typeof useT<keyof typeof enSeva>>;
 
@@ -24,8 +25,6 @@ type Pin = {
   free: number;
   items: Found[];
 };
-
-const UK: [number, number] = [54.4, -2.6];
 
 function pins(found: readonly Found[]): Pin[] {
   const bySlug = new Map<string, Pin>();
@@ -104,15 +103,7 @@ export function SevaMap({
     let made: LeafletMap | null = null;
     void import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
-      made = L.map(box.current, { center: UK, zoom: 5, minZoom: 4 });
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(made);
-      made.attributionControl.setPrefix(
-        '<a href="https://leafletjs.com">Leaflet</a>',
-      );
+      made = makeUkMap(L, box.current);
       live.current = { L, map: made, layer: L.layerGroup().addTo(made) };
       setReady(true);
     });
@@ -129,30 +120,33 @@ export function SevaMap({
     const { L, map, layer } = now;
     const placed = pins(found);
     layer.clearLayers();
-    for (const pin of placed) {
-      const size = Math.round(34 + Math.min(30, Math.sqrt(pin.free) * 5));
+    placed.forEach((pin, order) => {
+      const size = 1 + Math.min(0.4, Math.sqrt(pin.free) * 0.06);
       const label = t("sevaFind.pin", {
         name: pin.name,
         town: pin.town,
         places: places(t, pin.free),
       });
       const marker = L.marker([pin.latitude, pin.longitude], {
-        icon: L.divIcon({
-          className: "toran-need",
-          html: `<span>${pin.free}</span>`,
-          iconSize: [size, size],
+        icon: diya(L, {
+          kind: "toran-need",
+          count: pin.free,
+          size,
+          light: true,
+          order,
         }),
         title: label,
         keyboard: true,
         riseOnHover: true,
       }).bindPopup(() => card(pin, t));
+      keepLitWhileOpen(marker);
       marker.on("add", () => {
         const el = marker.getElement();
         el?.setAttribute("role", "button");
         el?.setAttribute("aria-label", label);
       });
       layer.addLayer(marker);
-    }
+    });
     if (origin) {
       layer.addLayer(
         L.circleMarker([origin.latitude, origin.longitude], {

@@ -97,6 +97,15 @@ as decoration.
   App icons are in `public/icons`.
 - **Garland** (`.toran`): a fine gold line with small drops, under the
   header.
+- **Maps** (`components/uk-map.ts`, shared by the mandirs, What's on and
+  Seva maps): the UK only. Outside the UK fades into the page behind a
+  thin gold coastline, and the fade lifts as you zoom in to a town. The
+  map pictures are recoloured to match: warm grey on light, midnight
+  blue on dark. Each place is a small diya (a midnight bowl with a gold
+  rim, so it shows on both); a number beside it counts events, places or
+  mandirs. The diyas light one after another as the map opens, glow
+  brighter when pointed at or focused, and stay lit while their card is
+  open.
 
 ## Admin area
 
