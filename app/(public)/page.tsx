@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Countdown } from "@/components/countdown";
 import { EventList, POSTCODE_CREDIT } from "@/components/event-list";
+import { HeroDiya, HeroLight } from "@/components/hero-diya";
 import { HomeStory } from "@/components/home-story";
 import { JsonLd } from "@/components/json-ld";
 import { LineIcon } from "@/components/line-icons";
@@ -42,11 +43,12 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 // The kinds of event offered as quick links under the search.
 const QUICK_KINDS = ["festival", "aarti", "bhajan", "class"] as const;
 
-// The home page (DESIGN.md): one midnight welcome, its headline in the
-// middle, the main button in gold and a lit diya that glows brighter as
-// you scroll; then the festivals coming up as cards to swipe, "See how
-// Toran works" (a phone that shows each step as you scroll past it), the
-// next events, the mandirs by region, and a midnight band for committees.
+// The home page (DESIGN.md): one midnight welcome that fills the first
+// screen, its headline in the middle, the main button in gold and a lit
+// diya whose candlelight moves with the mouse and the scroll; then "See
+// how Toran works" (a phone that shows each step as you scroll past it),
+// the festivals coming up as cards to swipe, the next events, the mandirs
+// by region, and a midnight band for committees.
 export default function Home({ searchParams }: PageProps<"/">) {
   const t = pageT();
   return (
@@ -54,10 +56,16 @@ export default function Home({ searchParams }: PageProps<"/">) {
       <JsonLd data={siteData(siteUrl())} />
       <SiteHeader toran={false} />
       <main className="flex min-h-[100svh] w-full flex-1 flex-col">
-        <section className="bg-night text-on-night relative overflow-hidden">
+        <section
+          data-hero
+          className="bg-night text-on-night relative overflow-hidden"
+        >
+          <HeroLight />
           <Toran night />
+          {/* On a laptop the welcome fills the screen under the header, with
+              the diya at the bottom; on a phone the diya comes first. */}
           <div
-            className={`${wideClass} relative flex flex-col items-center gap-6 pt-8 pb-4 text-center sm:gap-8 sm:pt-16`}
+            className={`${wideClass} relative flex flex-col items-center justify-center gap-5 pt-6 pb-6 text-center sm:min-h-[calc(100svh-5.75rem)] sm:gap-6 sm:pt-8 sm:pb-8`}
           >
             <div className="rise flex flex-wrap items-center justify-center gap-2">
               <p className="bg-on-night/10 inline-flex w-fit items-center gap-2 rounded-full px-4 py-1 text-base font-semibold">
@@ -71,7 +79,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
                 <SeasonLink />
               </Suspense>
             </div>
-            <h1 className="rise font-display max-w-5xl text-[3.25rem] leading-[1.02] tracking-tight sm:text-7xl lg:text-[6rem]">
+            <div className="order-first sm:order-last">
+              <HeroDiya />
+            </div>
+            <h1 className="rise font-display max-w-5xl text-[3.25rem] leading-[1.02] tracking-tight sm:text-7xl lg:text-[clamp(4.5rem,10svh,6rem)]">
               {t("home.tagline")}
             </h1>
             <p className="rise text-night-muted max-w-2xl text-xl leading-relaxed sm:text-2xl">
@@ -106,7 +117,6 @@ export default function Home({ searchParams }: PageProps<"/">) {
                 ))}
               </ul>
             </nav>
-            <HeroDiya />
           </div>
         </section>
 
@@ -114,14 +124,14 @@ export default function Home({ searchParams }: PageProps<"/">) {
           className={`${wideClass} flex flex-col gap-24 pt-16 sm:gap-32 sm:pt-24`}
         >
           <Suspense fallback={null}>
-            <FestivalsSoon />
-          </Suspense>
-
-          <Suspense fallback={null}>
             <Followed />
           </Suspense>
 
           <HomeStory />
+
+          <Suspense fallback={null}>
+            <FestivalsSoon />
+          </Suspense>
 
           <div className="flex flex-wrap gap-x-16 gap-y-16">
             <Suspense fallback={null}>
@@ -194,48 +204,6 @@ export default function Home({ searchParams }: PageProps<"/">) {
 // A lit diya in gold line, under the welcome. Its flame moves gently, and
 // it grows and glows as you scroll past (app/globals.css, .hero-diya).
 // Decoration only.
-function HeroDiya() {
-  return (
-    <div aria-hidden="true" className="hero-diya relative mt-4 w-56 sm:w-72">
-      <div className="hero-diya-glow absolute inset-x-0 top-0 mx-auto aspect-square w-full rounded-full" />
-      <svg viewBox="0 0 200 200" className="relative w-full" fill="none">
-        <g className="hero-diya-flame">
-          <path
-            d="M100 28c15 19 21 33 21 45a21 21 0 0 1-42 0c0-12 6-26 21-45z"
-            fill="#d9a441"
-          />
-          <path
-            d="M100 56c6 8 8 13.5 8 18a8 8 0 0 1-16 0c0-4.5 2-10 8-18z"
-            fill="#f6e7b8"
-          />
-        </g>
-        <path
-          d="M100 94v12"
-          stroke="#d9a441"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <path
-          d="M26 116h148c-6 34-36 56-74 56s-68-22-74-56z"
-          stroke="#d9a441"
-          strokeWidth="3"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M48 134c14 9 32 14 52 14s38-5 52-14"
-          stroke="#d9a441"
-          strokeOpacity="0.55"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        {[44, 72, 100, 128, 156].map((x) => (
-          <circle key={x} cx={x} cy="116" r="3.5" fill="#d9a441" />
-        ))}
-      </svg>
-    </div>
-  );
-}
-
 // In the weeks before a festival season, a way straight to its page.
 async function SeasonLink() {
   const season = await getSeasonBanner();
@@ -284,7 +252,7 @@ async function FestivalsSoon() {
           {t("home.allFestivals")} →
         </Link>
       </div>
-      <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-4 sm:-mx-8 sm:scroll-px-8 sm:px-8 lg:-mx-12 lg:scroll-px-12 lg:px-12">
+      <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 [scrollbar-width:thin] [scrollbar-color:var(--line-strong)_transparent] gap-4 overflow-x-auto px-4 pb-4 sm:-mx-8 sm:scroll-px-8 sm:px-8 lg:-mx-12 lg:scroll-px-12 lg:px-12">
         {next.map((d) => {
           const when = formatDateRange(d.starts_on, d.ends_on);
           const day = new Date(`${d.starts_on}T12:00:00Z`);

@@ -98,14 +98,15 @@ as decoration.
 - **Garland** (`.toran`): a fine gold line with small drops, under the
   header.
 - **Maps** (`components/uk-map.ts`, shared by the mandirs, What's on and
-  Seva maps): the UK only. Outside the UK fades into the page behind a
-  thin gold coastline, and the fade lifts as you zoom in to a town. The
-  map pictures are recoloured to match: warm grey on light, midnight
-  blue on dark. Each place is a small diya (a midnight bowl with a gold
-  rim, so it shows on both); a number beside it counts events, places or
-  mandirs. The diyas light one after another as the map opens, glow
-  brighter when pointed at or focused, and stay lit while their card is
-  open.
+  Seva maps): a night-time map of the UK that Toran draws itself, with no
+  roads. The land is a soft fill of fine dots inside a thin gold coastline
+  (cream on light, midnight on dark), with only a few city names, which
+  move beside a light or step aside rather than sit under one. Streets
+  (OpenStreetMap, recoloured) fade in only when you zoom in to a town.
+  One mandir is a small flame; several together are a midnight lamp with a
+  gold rim and the number. Lights come on one after another as the map
+  opens, glow brighter when pointed at or focused, and stay lit while
+  their card is open.
 
 ## Admin area
 
@@ -144,6 +145,11 @@ Calm and purposeful, never decoration for its own sake.
   button that step is about is outlined in gold, with a gentle tap
   (`components/home-story.tsx`). The phone is a picture; each step says
   in words what its button does and links to try it.
+- **The welcome:** the lit diya (`components/hero-diya.tsx`) always fits
+  on the first screen. Its flame flickers, leans towards the mouse and
+  sways when the page is scrolled, with sparks rising from it; the warm
+  light it throws across the welcome breathes, drifts after the mouse and
+  grows as you scroll down.
 - **Pointer:** cards lift 3px (`.lift`); buttons press in slightly.
 - **Durations:** 200–450ms, easing `cubic-bezier(0.2, 0.7, 0.2, 1)`.
 - **Reduced motion:** everything above is off when the device asks for
