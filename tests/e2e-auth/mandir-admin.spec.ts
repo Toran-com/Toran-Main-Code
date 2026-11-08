@@ -54,6 +54,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByRole("link", { name: "Add your first event" }),
   ).toBeVisible();
+  // The first screen shows the ways to add an event.
+  await expect(
+    member.getByRole("heading", { name: "Add events" }),
+  ).toBeVisible();
+  await expect(
+    member.getByRole("link", { name: /Type it in/ }),
+  ).toHaveAttribute("href", "#add-event");
   await member.getByLabel("What's happening?").fill("Annakut darshan");
   await member.getByLabel("What kind of event?").selectOption("festival");
   await member.getByLabel("Date").fill(nextWeek());
@@ -73,6 +80,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(member.getByText("Added.")).toBeVisible();
   // …and that step is ticked off.
   await expect(member.getByText("Add your first event (done)")).toBeVisible();
+
+  // A message shared to Toran (from WhatsApp, on Android) comes to this
+  // mandir's page, ready to read.
+  await member.goto(
+    `/share?text=${encodeURIComponent("Bhajan sandhya Sat 7pm")}`,
+  );
+  await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}\\?paste=Bhajan`));
 
   // It's on the public page at once, with the committee badge and the
   // Gujarati under the English.

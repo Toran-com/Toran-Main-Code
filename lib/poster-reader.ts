@@ -2,8 +2,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { EventInput } from "@/lib/event-form";
 import { EVENT_KINDS, guessKind, isEventKind } from "@/lib/event-kinds";
 
-// Reads the events off a poster or patrika (a photo or a PDF) with Claude,
-// so Toran doesn't have to type them up. What it reads only ever goes into
+// Reads the events off a poster or patrika (a photo or a PDF), or out of a
+// message a committee pastes (say, one forwarded on WhatsApp), with
+// Claude, so nobody has to type them up. What it reads only ever goes into
 // the review queue: a person checks every event before it's published.
 // The picture is sent to Anthropic to be read and isn't kept by Toran;
 // Claude is told to leave out people's names and phone numbers (decision
@@ -27,6 +28,9 @@ const MODEL = "claude-opus-5-5";
 export function posterReadingOn(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY);
 }
+
+// The longest message a committee can paste in to be read.
+export const MAX_MESSAGE_CHARS = 6000;
 
 export function isPosterType(type: string): type is PosterType {
   return (POSTER_TYPES as readonly string[]).includes(type);
@@ -70,7 +74,7 @@ const SCHEMA = {
 };
 
 function instructions(mandir: string, today: string): string {
-  return `You read posters and patrikas (programmes) from Hindu mandirs in the UK and list the events on them for Toran, a site where families find what's on at mandirs. This one is from ${mandir}. Today is ${today}.
+  return `You read posters, patrikas (programmes) and messages (often forwarded on WhatsApp) from Hindu mandirs in the UK and list the events in them for Toran, a site where families find what's on at mandirs. This one is from ${mandir}. Today is ${today}.
 
 List every event on it that has a date, one entry per event and day. For each:
 - title: a short English name for the event, as families would say it (at most 80 characters). If the poster is only in Gujarati or Hindi, translate the name.
@@ -135,6 +139,36 @@ export async function readPoster(
           type: "image",
           source: { type: "base64", media_type: file.type, data },
         };
+  return read(
+    [picture, { type: "text", text: "List the events on this poster." }],
+    context,
+    client,
+  );
+}
+
+// A message pasted in by a committee: the same reading, from its text.
+export async function readMessage(
+  text: string,
+  context: { mandir: string; today: string },
+  client: Pick<Anthropic, "beta"> = new Anthropic(),
+): Promise<ReadResult> {
+  return read(
+    [
+      {
+        type: "text",
+        text: `List the events in this message:\n\n${text.slice(0, MAX_MESSAGE_CHARS)}`,
+      },
+    ],
+    context,
+    client,
+  );
+}
+
+async function read(
+  content: Anthropic.Beta.BetaContentBlockParam[],
+  context: { mandir: string; today: string },
+  client: Pick<Anthropic, "beta">,
+): Promise<ReadResult> {
   let response: Anthropic.Beta.BetaMessage;
   try {
     response = await client.beta.messages.create({
@@ -149,18 +183,10 @@ export async function readPoster(
         format: { type: "json_schema", schema: SCHEMA },
       },
       system: instructions(context.mandir, context.today),
-      messages: [
-        {
-          role: "user",
-          content: [
-            picture,
-            { type: "text", text: "List the events on this poster." },
-          ],
-        },
-      ],
+      messages: [{ role: "user", content }],
     });
   } catch (error) {
-    console.error("Reading a poster failed", error);
+    console.error("Reading a poster or message failed", error);
     return { ok: false, error: "failed" };
   }
   if (response.stop_reason === "refusal")

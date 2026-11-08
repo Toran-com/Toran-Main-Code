@@ -7,11 +7,14 @@ import { SiteHeader } from "@/components/public-shell";
 export function PageShell({
   title,
   wide = false,
+  full = false,
   children,
 }: {
   title: string;
   // Wider pages for admin lists and forms.
   wide?: boolean;
+  // The full width of the screen, for the committee's own page.
+  full?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -23,9 +26,11 @@ export function PageShell({
         <SiteHeader />
       </Suspense>
       <main
-        className={`rise mx-auto flex min-h-[100svh] w-full flex-1 flex-col gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-10 ${wide ? "max-w-3xl" : "max-w-lg"}`}
+        className={`rise mx-auto flex min-h-[100svh] w-full flex-1 flex-col gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-10 ${full ? "max-w-6xl" : wide ? "max-w-3xl" : "max-w-lg"}`}
       >
-        <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
+        <h1
+          className={`font-display leading-[1.05] tracking-tight ${full ? "sr-only" : "text-5xl sm:text-6xl"}`}
+        >
           {title}
         </h1>
         {children}

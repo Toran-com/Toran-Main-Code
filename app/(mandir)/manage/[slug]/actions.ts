@@ -27,8 +27,10 @@ import { parsePracticalDetails } from "@/lib/mandir-form";
 import { queueRead } from "@/lib/poster-queue";
 import {
   isPosterType,
+  MAX_MESSAGE_CHARS,
   MAX_POSTER_BYTES,
   posterReadingOn,
+  readMessage,
   readPoster,
 } from "@/lib/poster-reader";
 import { likenessFrom, reviewPoster } from "@/lib/poster-review";
@@ -396,6 +398,62 @@ export async function readPosterAsCommittee(formData: FormData) {
     "",
   );
   back(`read=${added}&skipped=${skipped}#posters`);
+}
+
+// A message the committee pastes in (say, one forwarded on WhatsApp): the
+// same as a poster, read from its text. The events wait under "Posters
+// waiting for you" to be checked; the message itself isn't kept.
+export async function readMessageAsCommittee(formData: FormData) {
+  const slug = String(formData.get("mandir") ?? "");
+  const text = String(formData.get("message") ?? "").trim();
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}`);
+
+  if (!posterReadingOn()) back("error=readingOff#read-message");
+  if (text.length < 10) back("error=message#read-message");
+  if (text.length > MAX_MESSAGE_CHARS) back("error=messageLong#read-message");
+
+  const user = await getCurrentUser();
+  const supabase = await createSessionClient();
+  if (!user || !supabase) back("error=failed#read-message");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, name, town")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed#read-message");
+  const { data: admin } = await supabase
+    .from("mandir_admins")
+    .select("mandir_id")
+    .eq("mandir_id", mandir.id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!admin && !(user.isToranAdmin && user.aal === "aal2")) {
+    back("error=failed#read-message");
+  }
+  if (
+    !sendLimiter.allow(`poster:${mandir.id}`, senderAddress(await headers()))
+  ) {
+    back("error=slow#read-message");
+  }
+
+  const read = await readMessage(text, {
+    mandir: `${mandir.name}, ${mandir.town}`,
+    today: londonDate(new Date()),
+  });
+  if (!read.ok) {
+    back(
+      `error=${read.error === "refused" ? "messageRefused" : "pictureFailed"}#read-message`,
+    );
+  }
+  const { added, skipped } = await queueRead(
+    supabase,
+    mandir.id,
+    "whatsapp",
+    read.events,
+    "",
+  );
+  back(`read=${added}&skipped=${skipped}&from=message#posters`);
 }
 
 // The committee on Toran: invite a colleague by email, cancel an invite,

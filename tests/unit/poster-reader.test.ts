@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { readPoster, toEventInputs } from "@/lib/poster-reader";
+import {
+  MAX_MESSAGE_CHARS,
+  readMessage,
+  readPoster,
+  toEventInputs,
+} from "@/lib/poster-reader";
 import { posterFrom } from "@/lib/posters";
 
 const TODAY = "2026-10-25";
@@ -162,6 +167,34 @@ describe("readPoster", () => {
       ok: false,
       error: "failed",
     });
+  });
+});
+
+describe("readMessage", () => {
+  it("sends the pasted message as text and reads the events", async () => {
+    const { create, client } = fakeClient({
+      stop_reason: "end_turn",
+      content: [{ type: "text", text: JSON.stringify(answer) }],
+    });
+    const message = "Jai Shri Krishna 🙏 Diwali Lakshmi puja Sun 8 Nov 6.30pm";
+    const read = await readMessage(message, context, client);
+    expect(read.ok && read.events).toHaveLength(2);
+    const request = create.mock.calls[0][0];
+    expect(request.messages[0].content).toHaveLength(1);
+    expect(request.messages[0].content[0].type).toBe("text");
+    expect(request.messages[0].content[0].text).toContain(message);
+    expect(request.system).toContain("WhatsApp");
+    expect(request.system).toContain("phone number");
+  });
+
+  it("sends at most the longest message allowed", async () => {
+    const { create, client } = fakeClient({
+      stop_reason: "end_turn",
+      content: [{ type: "text", text: '{"events":[]}' }],
+    });
+    await readMessage("x".repeat(MAX_MESSAGE_CHARS + 500), context, client);
+    const text: string = create.mock.calls[0][0].messages[0].content[0].text;
+    expect(text.length).toBeLessThan(MAX_MESSAGE_CHARS + 100);
   });
 });
 
