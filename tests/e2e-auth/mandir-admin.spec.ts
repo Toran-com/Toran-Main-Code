@@ -210,7 +210,10 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByRole("button", { name: "Add event" }).click();
   await expect(member.getByText("Added.")).toBeVisible();
   await expect(
-    member.getByRole("listitem").filter({ hasText: "Weekly aarti" }),
+    member
+      .getByRole("region", { name: "Coming up" })
+      .getByRole("listitem")
+      .filter({ hasText: "Weekly aarti" }),
   ).toContainText(/Every \w+day · next/);
   await member.goto(`/mandirs/${SLUG}`);
   const weekly = member
@@ -238,6 +241,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   // The committee edits it: the form starts with its details filled in.
   await member.goto(`/manage/${SLUG}`);
   await member
+    .getByRole("region", { name: "Coming up" })
     .getByRole("listitem")
     .filter({ hasText: "Weekly aarti" })
     .getByRole("link", { name: "Edit" })

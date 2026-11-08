@@ -54,7 +54,9 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await page.getByLabel("Time for Test Utsav").fill("18:00");
   await page.getByRole("button", { name: "Add the ticked festivals" }).click();
   await expect(page.getByText("Added.")).toBeVisible();
+  // In the full list (the first screen's "Next up" shows it too).
   const added = page
+    .getByRole("region", { name: "Coming up" })
     .getByRole("listitem")
     .filter({ hasText: "Test Utsav" })
     .filter({ has: page.getByRole("link", { name: "Edit" }) });
@@ -78,6 +80,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await page.getByRole("button", { name: "Add the ticked events" }).click();
   await expect(page.getByText("Added.")).toBeVisible();
   const bhajans = page
+    .getByRole("region", { name: "Coming up" })
     .getByRole("listitem")
     .filter({ hasText: "Utsav eve bhajans" })
     .filter({ has: page.getByRole("link", { name: "Edit" }) });
