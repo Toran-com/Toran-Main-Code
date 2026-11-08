@@ -28,8 +28,7 @@ export const enMandirs = {
   "region.Yorkshire": "Yorkshire",
   "map.seeWhatsOn": "See what's on →",
   "map.cluster": "{count} mandirs near here",
-  "map.clusterTitle": "{label}: zoom in",
-  "map.clusterLabel": "{label}. Zoom in to see them.",
+  "map.clusterLabel": "{label}. Opens a list of them.",
   "map.youAreHere": "You are here",
   "map.denied":
     "Your browser didn't share your location. You can zoom in on the map instead.",
