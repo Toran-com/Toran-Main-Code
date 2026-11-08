@@ -14,10 +14,16 @@ test("Diwali week in one place", async ({ page, request }) => {
   const notYet = page.getByText("Next year's Diwali dates aren't listed yet");
   await expect(days.or(notYet)).toBeVisible();
   if (await days.isVisible()) {
-    // Each festival day links to its own page.
-    await expect(
-      page.getByRole("link", { name: /^Dhanteras/ }),
-    ).toHaveAttribute("href", "/festivals/dhanteras");
+    // Each festival day links to its own page. Days already past drop off
+    // during the week, so check whichever comes first.
+    const day = page
+      .locator('a[href^="/festivals/"]')
+      .filter({ hasText: /^(Dhanteras|Diwali|Annakut|Bhai Dooj)/ })
+      .first();
+    await expect(day).toHaveAttribute(
+      "href",
+      /^\/festivals\/(dhanteras|diwali|annakut|bhai-dooj)$/,
+    );
     // And a way to see events near you.
     await expect(
       page.getByRole("link", { name: "Find near me" }),
