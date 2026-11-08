@@ -4,7 +4,7 @@ export const enEventsMap = {
   "eventsMap.label": "Map of events at mandirs",
   "eventsMap.pin.one": "{name}, {town}: {count} event",
   "eventsMap.pin.other": "{name}, {town}: {count} events",
-  "eventsMap.group": "{count} events at {mandirs} mandirs near here. Zoom in",
+  "eventsMap.group": "{count} events at {mandirs} mandirs near here",
   "eventsMap.more": "{count} more at this mandir →",
   "eventsMap.none": "These events' mandirs aren't on the map yet.",
 } as const;

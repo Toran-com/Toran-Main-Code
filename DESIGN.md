@@ -106,7 +106,16 @@ as decoration.
   One mandir is a small flame; several together are a midnight lamp with a
   gold rim and the number. Lights come on one after another as the map
   opens, glow brighter when pointed at or focused, and stay lit while
-  their card is open.
+  their card is open. A key under the map says what each means.
+- **Using a map:** it never traps the page. Scrolling scrolls the page
+  (Ctrl or ⌘ and scroll zooms, as on Google Maps); on a phone one finger
+  scrolls the page and two move the map, and a short hint says so. Big
+  44px buttons: zoom, full screen (where one finger moves it; Esc closes
+  it) and back to the whole UK. One tap on any light opens its card: a
+  group lists its mandirs (with "Zoom in here"), and every card has 18px
+  text, a filled main button and Directions (Google Maps). With a mouse,
+  a light's name shows as you point at it. "Near me" on the mandirs map
+  also lists the five nearest mandirs, with how far each is.
 
 ## Admin area
 
