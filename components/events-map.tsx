@@ -1,16 +1,22 @@
 "use client";
 
-import type { LeafletKeyboardEvent, Map as LeafletMap } from "leaflet";
+import type { Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
+import { MapKey } from "@/components/map-key";
 import {
+  cardFit,
   cityLabels,
+  directionsLink,
   keepLitWhileOpen,
   lamp,
   makeUkMap,
+  mapControls,
+  nameOnHover,
 } from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
 import { enEventsMap } from "@/lib/i18n/client/events-map";
+import { enMap } from "@/lib/i18n/client/map";
 import { clusterApart } from "@/lib/map-clusters";
 
 // What's on as a map of the UK (uk-map.ts): a lamp at each mandir with
@@ -37,22 +43,45 @@ const APART = 58;
 const sizeFor = (count: number) => 1 + Math.min(0.25, Math.sqrt(count) * 0.05);
 
 type Translate = ReturnType<typeof useT<keyof typeof enEventsMap>>;
+type MapTranslate = ReturnType<typeof useT<keyof typeof enMap>>;
 
-// The card that opens on a pin, built from text (never HTML): each
-// mandir's name and its next events.
-function card(pins: EventPin[], t: Translate): HTMLElement {
+// The card that opens on a lamp, built from text (never HTML): each
+// mandir's name, its next events and directions. "zoom", for a group that
+// zooming can split, puts "Zoom in here" first.
+function card(
+  pins: EventPin[],
+  t: Translate,
+  tm: MapTranslate,
+  zoom?: () => void,
+): HTMLElement {
   const box = document.createElement("div");
   box.className = "toran-popup";
-  for (const pin of pins) box.append(...section(pin, t));
+  if (zoom) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "toran-popup-zoom";
+    button.textContent = tm("mapUi.zoomHere");
+    button.addEventListener("click", zoom);
+    box.append(button);
+  }
+  for (const pin of pins) {
+    const item = document.createElement("div");
+    item.className = "toran-popup-item";
+    item.append(...section(pin, t, tm));
+    box.append(item);
+  }
   return box;
 }
 
-function section(pin: EventPin, t: Translate): HTMLElement[] {
+function section(pin: EventPin, t: Translate, tm: MapTranslate): HTMLElement[] {
   const parts: HTMLElement[] = [];
   const name = document.createElement("p");
   name.className = "toran-popup-name";
-  name.textContent = `${pin.name}, ${pin.town}`;
-  parts.push(name);
+  name.textContent = pin.name;
+  const town = document.createElement("p");
+  town.className = "toran-popup-meta";
+  town.textContent = pin.town;
+  parts.push(name, town);
   for (const event of pin.events) {
     const line = document.createElement("p");
     const when = document.createElement("span");
@@ -72,6 +101,17 @@ function section(pin: EventPin, t: Translate): HTMLElement[] {
     });
     parts.push(more);
   }
+  const actions = document.createElement("p");
+  actions.className = "toran-popup-actions";
+  actions.append(
+    directionsLink(
+      pin.latitude,
+      pin.longitude,
+      tm("mapUi.directions"),
+      tm("mapUi.directionsLabel", { name: pin.name }),
+    ),
+  );
+  parts.push(actions);
   return parts;
 }
 
@@ -83,6 +123,7 @@ export function EventsMap({
   origin: Position | null;
 }) {
   const t = useT(enEventsMap);
+  const tm = useT(enMap);
   const box = useRef<HTMLDivElement>(null);
   const live = useRef<{
     L: typeof import("leaflet");
@@ -95,9 +136,21 @@ export function EventsMap({
   useEffect(() => {
     let cancelled = false;
     let made: LeafletMap | null = null;
+    let unControl = () => {};
     void import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
       made = makeUkMap(L, box.current);
+      unControl = mapControls(L, made, box.current, {
+        expand: tm("mapUi.expand"),
+        close: tm("mapUi.close"),
+        wholeUk: tm("mapUi.wholeUk"),
+        scrollHint: tm(
+          /Mac|iPhone|iPad/.test(navigator.platform)
+            ? "mapUi.scrollHintMac"
+            : "mapUi.scrollHint",
+        ),
+        touchHint: tm("mapUi.touchHint"),
+      });
       live.current = {
         L,
         map: made,
@@ -108,10 +161,11 @@ export function EventsMap({
     });
     return () => {
       cancelled = true;
+      unControl();
       made?.remove();
       live.current = null;
     };
-  }, []);
+  }, [tm]);
 
   // Draw the circles, again at every zoom (groups split as you zoom in).
   useEffect(() => {
@@ -153,10 +207,10 @@ export function EventsMap({
             light: firstDraw,
             order,
           }),
-          title: label,
           keyboard: true,
           riseOnHover: true,
         });
+        nameOnHover(marker, label);
         marker.on("add", () => {
           const el = marker.getElement();
           el?.setAttribute("role", "button");
@@ -169,39 +223,27 @@ export function EventsMap({
         const bounds = L.latLngBounds(
           items.map((p) => [p.latitude, p.longitude] as [number, number]),
         );
-        // Mandirs too close to split by zooming are listed together.
-        if (
-          items.length === 1 ||
-          map.getZoom() >= 15 ||
-          bounds.getNorthEast().distanceTo(bounds.getSouthWest()) < 30
-        ) {
-          marker.bindPopup(() => card(items, t), {
-            maxWidth: 280,
-            // Clear of the zoom buttons.
-            autoPanPaddingTopLeft: [16, 96],
-          });
-          keepLitWhileOpen(marker);
-        } else {
-          // Zoom in on them, by at least a step so the group splits.
-          const zoomIn = () => {
-            const fit = map.getBoundsZoom(bounds, false, L.point(64, 64));
-            map.setView(
-              bounds.getCenter(),
-              Math.min(15, Math.max(map.getZoom() + 1, fit)),
-            );
-          };
-          marker.on("click", zoomIn);
-          // Leaflet only answers Enter on circles with a card.
-          marker.on(
-            "keypress",
-            ({ originalEvent: key }: LeafletKeyboardEvent) => {
-              if (key.key !== "Enter" && key.key !== " ") return;
-              key.preventDefault();
-              refocus = first.slug;
-              zoomIn();
-            },
+        // A tap opens the card; for a group that zooming can split, the
+        // card starts with "Zoom in here".
+        const splits =
+          items.length > 1 &&
+          map.getZoom() < 15 &&
+          bounds.getNorthEast().distanceTo(bounds.getSouthWest()) >= 30;
+        const zoom = () => {
+          refocus = first.slug;
+          map.closePopup();
+          // By at least a step, so the group splits.
+          const fit = map.getBoundsZoom(bounds, false, L.point(64, 64));
+          map.setView(
+            bounds.getCenter(),
+            Math.min(15, Math.max(map.getZoom() + 1, fit)),
           );
-        }
+        };
+        marker.bindPopup(
+          () => card(items, t, tm, splits ? zoom : undefined),
+          cardFit(map),
+        );
+        keepLitWhileOpen(marker);
         layer.addLayer(marker);
       });
       firstDraw = false;
@@ -236,7 +278,7 @@ export function EventsMap({
     return () => {
       map.off("zoomend", draw);
     };
-  }, [ready, pins, origin, t]);
+  }, [ready, pins, origin, t, tm]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -246,6 +288,7 @@ export function EventsMap({
         aria-label={t("eventsMap.label")}
         className="toran-map border-line bg-sunk shadow-card h-[65vh] min-h-80 w-full overflow-hidden rounded-2xl border"
       />
+      {pins.length > 0 && <MapKey many="events" />}
       {pins.length === 0 && (
         <p className="text-muted text-base">{t("eventsMap.none")}</p>
       )}

@@ -2,14 +2,20 @@
 
 import type { Map as LeafletMap } from "leaflet";
 import { useEffect, useRef, useState } from "react";
+import { MapKey } from "@/components/map-key";
 import {
+  cardFit,
   cityLabels,
+  directionsLink,
   keepLitWhileOpen,
   lamp,
   makeUkMap,
+  mapControls,
+  nameOnHover,
 } from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
+import { enMap } from "@/lib/i18n/client/map";
 import { enSeva } from "@/lib/i18n/client/seva";
 import type { Found } from "@/lib/seva-finder";
 
@@ -20,6 +26,7 @@ import type { Found } from "@/lib/seva-finder";
 // (decision 0011).
 
 type Translate = ReturnType<typeof useT<keyof typeof enSeva>>;
+type MapTranslate = ReturnType<typeof useT<keyof typeof enMap>>;
 
 type Pin = {
   slug: string;
@@ -59,30 +66,51 @@ function places(t: Translate, count: number): string {
   });
 }
 
-// The card that opens on a pin, built from text (never HTML).
-function card(pin: Pin, t: Translate): HTMLElement {
+// The card that opens on a lamp, built from text (never HTML): the
+// mandir, each event's free places and the way to its rota, and
+// directions.
+function card(pin: Pin, t: Translate, tm: MapTranslate): HTMLElement {
   const box = document.createElement("div");
   box.className = "toran-popup";
   const name = document.createElement("p");
   name.className = "toran-popup-name";
-  name.textContent = `${pin.name}, ${pin.town}`;
-  box.append(name);
+  name.textContent = pin.name;
+  const town = document.createElement("p");
+  town.className = "toran-popup-meta";
+  town.textContent = pin.town;
+  box.append(name, town);
   for (const { need, shifts } of pin.items) {
     const item = document.createElement("div");
     item.className = "toran-popup-item";
     const title = document.createElement("p");
     title.textContent = `${need.dateLabel}: ${need.title}`;
     const free = document.createElement("p");
+    free.className = "toran-popup-meta";
     free.textContent = places(
       t,
       shifts.reduce((n, s) => n + s.free, 0),
     );
+    const actions = document.createElement("p");
+    actions.className = "toran-popup-actions";
     const link = document.createElement("a");
     link.href = need.path;
+    link.className = "toran-popup-main";
     link.textContent = `${t("sevaFind.takeSlot")} →`;
-    item.append(title, free, link);
+    actions.append(link);
+    item.append(title, free, actions);
     box.append(item);
   }
+  const way = document.createElement("p");
+  way.className = "toran-popup-actions";
+  way.append(
+    directionsLink(
+      pin.latitude,
+      pin.longitude,
+      tm("mapUi.directions"),
+      tm("mapUi.directionsLabel", { name: pin.name }),
+    ),
+  );
+  box.append(way);
   return box;
 }
 
@@ -94,6 +122,7 @@ export function SevaMap({
   origin: Position | null;
 }) {
   const t = useT(enSeva);
+  const tm = useT(enMap);
   const box = useRef<HTMLDivElement>(null);
   const live = useRef<{
     L: typeof import("leaflet");
@@ -107,9 +136,21 @@ export function SevaMap({
   useEffect(() => {
     let cancelled = false;
     let made: LeafletMap | null = null;
+    let unControl = () => {};
     void import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
       made = makeUkMap(L, box.current);
+      unControl = mapControls(L, made, box.current, {
+        expand: tm("mapUi.expand"),
+        close: tm("mapUi.close"),
+        wholeUk: tm("mapUi.wholeUk"),
+        scrollHint: tm(
+          /Mac|iPhone|iPad/.test(navigator.platform)
+            ? "mapUi.scrollHintMac"
+            : "mapUi.scrollHint",
+        ),
+        touchHint: tm("mapUi.touchHint"),
+      });
       live.current = {
         L,
         map: made,
@@ -120,10 +161,11 @@ export function SevaMap({
     });
     return () => {
       cancelled = true;
+      unControl();
       made?.remove();
       live.current = null;
     };
-  }, []);
+  }, [tm]);
 
   useEffect(() => {
     const now = live.current;
@@ -146,11 +188,11 @@ export function SevaMap({
           light: true,
           order,
         }),
-        title: label,
         keyboard: true,
         riseOnHover: true,
-      }).bindPopup(() => card(pin, t));
+      }).bindPopup(() => card(pin, t, tm), cardFit(map));
       keepLitWhileOpen(marker);
+      nameOnHover(marker, label);
       marker.on("add", () => {
         const el = marker.getElement();
         el?.setAttribute("role", "button");
@@ -179,7 +221,7 @@ export function SevaMap({
         maxZoom: 13,
       });
     }
-  }, [ready, found, origin, t]);
+  }, [ready, found, origin, t, tm]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -189,6 +231,7 @@ export function SevaMap({
         aria-label={t("sevaFind.mapLabel")}
         className="toran-map border-line bg-sunk shadow-card h-[60vh] min-h-80 w-full overflow-hidden rounded-2xl border"
       />
+      {shown.length > 0 && <MapKey many="places" />}
       {shown.length === 0 && (
         <p className="text-muted text-base">{t("sevaFind.noneOnMap")}</p>
       )}
