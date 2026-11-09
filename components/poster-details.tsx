@@ -48,9 +48,7 @@ export function PosterDetails({ poster }: { poster: Poster }) {
       </p>
       {poster.read === "machine" && (
         <p>
-          <Badge tone="marigold">
-            Read from a picture by machine: check every detail
-          </Badge>
+          <Badge tone="marigold">Read by machine: check every detail</Badge>
         </p>
       )}
       {!checked.ok && (
