@@ -26,6 +26,13 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable",
       },
     ],
+    // On Android, a WhatsApp message can be shared straight to Toran, for
+    // a committee to read its events (app/(mandir)/share/page.tsx).
+    share_target: {
+      action: "/share",
+      method: "GET",
+      params: { title: "title", text: "text", url: "url" },
+    },
     shortcuts: [
       { name: "What's on", url: "/whats-on" },
       { name: "Mandirs", url: "/mandirs" },

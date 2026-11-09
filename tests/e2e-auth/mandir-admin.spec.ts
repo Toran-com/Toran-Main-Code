@@ -54,6 +54,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByRole("link", { name: "Add your first event" }),
   ).toBeVisible();
+  // The first screen shows the ways to add an event.
+  await expect(
+    member.getByRole("heading", { name: "Add events" }),
+  ).toBeVisible();
+  await expect(
+    member.getByRole("link", { name: /Type it in/ }),
+  ).toHaveAttribute("href", "#add-event");
   await member.getByLabel("What's happening?").fill("Annakut darshan");
   await member.getByLabel("What kind of event?").selectOption("festival");
   await member.getByLabel("Date").fill(nextWeek());
@@ -73,6 +80,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(member.getByText("Added.")).toBeVisible();
   // …and that step is ticked off.
   await expect(member.getByText("Add your first event (done)")).toBeVisible();
+
+  // A message shared to Toran (from WhatsApp, on Android) comes to this
+  // mandir's page, ready to read.
+  await member.goto(
+    `/share?text=${encodeURIComponent("Bhajan sandhya Sat 7pm")}`,
+  );
+  await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}\\?paste=Bhajan`));
 
   // It's on the public page at once, with the committee badge and the
   // Gujarati under the English.
@@ -196,7 +210,10 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByRole("button", { name: "Add event" }).click();
   await expect(member.getByText("Added.")).toBeVisible();
   await expect(
-    member.getByRole("listitem").filter({ hasText: "Weekly aarti" }),
+    member
+      .getByRole("region", { name: "Coming up" })
+      .getByRole("listitem")
+      .filter({ hasText: "Weekly aarti" }),
   ).toContainText(/Every \w+day · next/);
   await member.goto(`/mandirs/${SLUG}`);
   const weekly = member
@@ -224,6 +241,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   // The committee edits it: the form starts with its details filled in.
   await member.goto(`/manage/${SLUG}`);
   await member
+    .getByRole("region", { name: "Coming up" })
     .getByRole("listitem")
     .filter({ hasText: "Weekly aarti" })
     .getByRole("link", { name: "Edit" })

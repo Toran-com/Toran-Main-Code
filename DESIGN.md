@@ -134,6 +134,20 @@ colours and type:
 - The side bar only appears for an admin signed in with their second
   factor; anyone else sees the site's own header.
 
+## Committee area
+
+A mandir's own page for its committee (`/manage/<mandir>`), the full
+width of the screen:
+
+- **First screen:** the mandir's name and its public page, then "Add
+  events" as big tiles, one per way: a photo of a poster, a pasted
+  WhatsApp message (both read by Claude and checked before they're
+  published), typing it in, and ticking festivals or last year's events.
+  Beside them (under them on a phone): anything waiting to be checked,
+  the next three events with Edit, and what needs doing.
+- **Below:** adding and the events on the left; sharing and the mandir's
+  settings, folded, on the right. One column on a phone.
+
 ## Motion
 
 Calm and purposeful, never decoration for its own sake.

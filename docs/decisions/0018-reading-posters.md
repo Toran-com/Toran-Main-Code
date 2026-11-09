@@ -50,3 +50,12 @@ a dozen readings an hour from one server as a safety net, so it costs
 pennies a day. One poster has a made-up volunteer's name and number
 (07700 900xxx, kept for drama) to show they're left out; the page checks
 the drafts and says honestly if one wasn't.
+
+## Update, November 2026: pasted messages
+
+Committees can also paste a message (say, one forwarded on WhatsApp) at
+/manage/<mandir>. It's read the same way (`readMessage` in
+lib/poster-reader.ts), with the same instruction to leave out people's
+names and numbers, the same limit on how often, and the same review
+queue: nothing is published until a person checks it. The text isn't
+kept. The privacy notice says so.

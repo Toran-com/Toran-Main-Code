@@ -37,7 +37,12 @@ test("a committee plans a seva rota and volunteers take slots", async ({
     .filter({ hasText: "Diwali celebrations" });
   await diwali.getByText("More", { exact: true }).click();
   await diwali.getByRole("link", { name: "Seva rota" }).click();
-  await expect(page.getByText("Diwali celebrations")).toBeVisible();
+  // Next.js keeps the committee page in the document, hidden, so look
+  // only at what's on screen.
+  await expect(page).toHaveURL(/\/seva\//);
+  await expect(
+    page.getByText("Diwali celebrations").filter({ visible: true }),
+  ).toBeVisible();
 
   await page.getByLabel("Role", { exact: true }).fill("Kitchen");
   await page.getByLabel(/What it involves/).fill("Serving prasad");

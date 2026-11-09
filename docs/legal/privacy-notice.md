@@ -157,12 +157,13 @@ it; the committee ticks a box to confirm that and that Toran may show it.
 The photo is public. It is removed when the committee removes it, or
 straight away if anyone asks us to because it shows a person.
 
-**Reading a poster.** A committee, or Toran, can send a photo or PDF of a
-poster so its events are typed up automatically. The picture is sent to
-Anthropic (the Claude API) to be read, together with an instruction to
-leave out anyone's name or number. Toran doesn't keep the picture, only
-the event details it finds, which are checked before anything is
-published. Anthropic doesn't use what we send to train its models and
+**Reading a poster or a message.** A committee, or Toran, can send a
+photo or PDF of a poster, or paste in a message (for example one
+forwarded on WhatsApp), so its events are typed up automatically. The
+picture or text is sent to Anthropic (the Claude API) to be read,
+together with an instruction to leave out anyone's name or number. Toran
+doesn't keep the picture or the message, only the event details it
+finds, which are checked before anything is published. Anthropic doesn't use what we send to train its models and
 deletes it within 30 days.
 
 **A monthly email to committees** (switched off until our ICO
@@ -201,7 +202,7 @@ under contract:
 | Vercel                 | Hosting the website                                   | Servers in London; a global network delivers pages quickly |
 | Sentry                 | Error reports (with personal data removed)            | [EU or USA: check the region chosen]                       |
 | Resend                 | Sending login links (and later the weekly email)      | [USA or EU: check the region the account uses]             |
-| Anthropic (Claude API) | Reading poster photos and PDFs into events            | USA                                                        |
+| Anthropic (Claude API) | Reading posters and pasted messages into events       | USA                                                        |
 | postcodes.io           | Finding your postcode district when you press Near me | UK (a rounded position only, never linked to you)          |
 
 Some of these companies are based in the USA. Where data leaves the UK,
