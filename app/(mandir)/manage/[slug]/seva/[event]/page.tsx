@@ -259,12 +259,12 @@ async function Seva({
           )}
           <form
             action={addShift}
-            className="grid grid-cols-2 gap-3 sm:grid-cols-[1.4fr_1fr_1fr_1fr_auto] sm:items-end"
+            className="grid grid-cols-2 items-end gap-3"
             aria-label={`Add a shift to ${role.name}`}
           >
             {hidden}
             <input type="hidden" name="role" value={role.id} />
-            <label className="col-span-2 flex flex-col gap-1 sm:col-span-1">
+            <label className="col-span-2 flex flex-col gap-1">
               <span className="text-base font-semibold">Day</span>
               <input
                 name="date"
