@@ -5,17 +5,25 @@ import { redirect } from "next/navigation";
 import { requireToranAdmin } from "@/lib/auth";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { correctPoster, likenessFrom, reviewPoster } from "@/lib/poster-review";
-import { checkLink, POSTER_SOURCES, type PosterSource } from "@/lib/posters";
+import {
+  checkLink,
+  POSTER_SOURCES,
+  posterFrom,
+  type PosterSource,
+} from "@/lib/posters";
 import { createSessionClient } from "@/lib/supabase/session";
 import { alreadyKnown, comparableInput, knownFor } from "@/lib/duplicate-check";
 import { posterSource, queueRead } from "@/lib/poster-queue";
 import { londonDate } from "@/lib/london";
 import {
   isPosterType,
+  MAX_MESSAGE_CHARS,
   MAX_POSTER_BYTES,
   posterReadingOn,
+  readMessage,
   readPoster,
 } from "@/lib/poster-reader";
+import { hasPassed, PAST_QUEUE_NOTE } from "@/lib/queue-dates";
 import { fetchDocument } from "@/lib/website-check";
 import { parseWebsiteEvents } from "@/lib/website-import";
 
@@ -28,7 +36,9 @@ export async function addPoster(formData: FormData) {
   const from = String(formData.get("from") ?? "");
   const link = String(formData.get("link") ?? "").trim();
   const back: (query: string) => never = (query) =>
-    redirect(`/ops/posters?mandir=${encodeURIComponent(slug)}&${query}`);
+    redirect(
+      `/ops/posters?add=type&mandir=${encodeURIComponent(slug)}&${query}#add`,
+    );
 
   if (!(from in POSTER_SOURCES) || from === "visitor") back("error=from");
   if (!checkLink(link)) back("error=link");
@@ -62,7 +72,8 @@ export async function addPoster(formData: FormData) {
     confidence: 0.6,
   });
   if (error) back("error=failed");
-  redirect("/ops/posters?added=1");
+  // The form stays open, with the same mandir, for the next one.
+  back("added=1");
 }
 
 export async function reviewPosterAsToran(formData: FormData) {
@@ -161,7 +172,7 @@ export async function importWebsiteEvents(formData: FormData) {
     String(formData.get("rows") ?? ""),
   );
   const supabase = await createSessionClient();
-  if (!supabase) redirect("/ops/posters?error=failed#import");
+  if (!supabase) redirect("/ops/posters?add=rows&error=failed#add");
 
   const slugs = [...new Set(rows.map((r) => r.slug))];
   const { data: mandirs } = slugs.length
@@ -214,7 +225,7 @@ export async function importWebsiteEvents(formData: FormData) {
     .map((p) => `${p.line}:${p.problem}`)
     .join(",");
   redirect(
-    `/ops/posters?imported=${added}&skipped=${skipped}${report ? `&problems=${encodeURIComponent(report)}` : ""}#import`,
+    `/ops/posters?add=rows&imported=${added}&skipped=${skipped}${report ? `&problems=${encodeURIComponent(report)}` : ""}#add`,
   );
 }
 
@@ -227,7 +238,9 @@ export async function readPosterPicture(formData: FormData) {
   const from = String(formData.get("from") ?? "");
   const file = formData.get("poster");
   const back: (query: string) => never = (query) =>
-    redirect(`/ops/posters?mandir=${encodeURIComponent(slug)}&${query}#read`);
+    redirect(
+      `/ops/posters?add=photo&mandir=${encodeURIComponent(slug)}&${query}#add`,
+    );
 
   if (!posterReadingOn()) back("error=readingOff");
   if (!(from in POSTER_SOURCES) || from === "visitor") back("error=from");
@@ -318,3 +331,94 @@ export async function readFoundPatrika(formData: FormData) {
   );
   redirect(`/ops/posters?read=${added}&skipped=${skipped}`);
 }
+
+// A message someone sent Toran (often a WhatsApp forward), pasted in:
+// Claude reads the events out of it, as with a poster, and each one joins
+// the queue to be checked.
+export async function readMessageAsToran(formData: FormData) {
+  await requireToranAdmin("/ops/posters");
+  const slug = String(formData.get("mandir") ?? "");
+  const from = String(formData.get("from") ?? "");
+  const text = String(formData.get("message") ?? "").trim();
+  const back: (query: string) => never = (query) =>
+    redirect(
+      `/ops/posters?add=message&mandir=${encodeURIComponent(slug)}&${query}#add`,
+    );
+
+  if (!posterReadingOn()) back("error=readingOff");
+  if (!(from in POSTER_SOURCES) || from === "visitor") back("error=from");
+  if (text.length < 10) back("error=message");
+  if (text.length > MAX_MESSAGE_CHARS) back("error=messageLong");
+
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, name, town")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=mandir");
+
+  const read = await readMessage(text, {
+    mandir: `${mandir.name}, ${mandir.town}`,
+    today: londonDate(new Date()),
+  });
+  if (!read.ok) {
+    back(
+      `error=${read.error === "refused" ? "messageRefused" : "pictureFailed"}`,
+    );
+  }
+  const { added, skipped } = await queueRead(
+    supabase,
+    mandir.id,
+    from as PosterSource,
+    read.events,
+    "",
+  );
+  redirect(`/ops/posters?read=${added}&skipped=${skipped}&from-message=1`);
+}
+
+// Everything waiting whose date has passed, discarded in one go (the
+// nightly job does the same each night, lib/nightly.ts). Each is checked
+// again here, so only items still waiting and still past are touched.
+export async function discardPast(formData: FormData) {
+  await requireToranAdmin("/ops/posters");
+  const group = String(formData.get("group") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(
+      `/ops/posters?${group ? `from=${encodeURIComponent(group)}&` : ""}${query}`,
+    );
+  const ids = [
+    ...new Set(
+      formData
+        .getAll("poster")
+        .map(String)
+        .filter((id) => /^[0-9a-f-]{36}$/.test(id)),
+    ),
+  ].slice(0, MAX_PAST);
+  if (ids.length === 0) back("cleared=0");
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+
+  const { data: claims } = await supabase
+    .from("event_claims")
+    .select("id, proposed")
+    .in("id", ids)
+    .eq("status", "pending");
+  const today = londonDate(new Date());
+  const past = (claims ?? []).flatMap((c) => {
+    const poster = posterFrom(c.proposed);
+    return poster && hasPassed(poster, today) ? [c.id] : [];
+  });
+  if (past.length === 0) back("cleared=0");
+  const { data: done, error } = await supabase
+    .from("event_claims")
+    .update({ status: "rejected", note: PAST_QUEUE_NOTE })
+    .in("id", past)
+    .eq("status", "pending")
+    .select("id");
+  if (error) back("error=failed");
+  back(`cleared=${done?.length ?? 0}`);
+}
+
+const MAX_PAST = 500;

@@ -1,6 +1,9 @@
 import { timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
+import { londonDate } from "@/lib/london";
+import { posterFrom } from "@/lib/posters";
+import { hasPassed, PAST_QUEUE_NOTE } from "@/lib/queue-dates";
 import {
   checkWebsite,
   type CheckResult,
@@ -14,8 +17,9 @@ import {
 } from "@/lib/website-claims";
 
 // The nightly job (/api/cron/nightly, decision 0016): deletes what the
-// retention policy says to delete, reads every mandir's own events
-// calendar, then checks the mandir websites checked longest ago, and
+// retention policy says to delete, discards anything in the review queue
+// whose date has passed, reads every mandir's own events calendar, then
+// checks the mandir websites checked longest ago, and
 // records what it did as totals.
 
 // Websites to check in one night, a few at a time. One check can take
@@ -35,6 +39,8 @@ type Tally = { checked: number; added: number; failed: number };
 
 export type NightlySummary = {
   retention: Record<string, number> | null;
+  // Review-queue items discarded because their date had passed.
+  pastQueue?: number;
   calendars?: Tally;
   websites: Tally;
 };
@@ -87,6 +93,7 @@ export async function runNightly(
 ): Promise<NightlySummary> {
   const started = now();
   const { data: retention, error } = await db.rpc("run_retention");
+  const pastQueue = await discardPastQueue(db, londonDate(new Date(now())));
 
   const calendars = await inTurn(
     await calendarQueue(db, NIGHTLY_CALENDARS),
@@ -105,9 +112,41 @@ export async function runNightly(
 
   const summary: NightlySummary = {
     retention: error ? null : (retention as Record<string, number>),
+    pastQueue,
     calendars,
     websites,
   };
   await db.from("job_runs").insert({ job: "nightly", summary });
   return summary;
+}
+
+// Posters, messages and found events still waiting to be checked whose
+// date has passed: they can't be published any more, so they're
+// discarded, for Toran's queue and every committee's alike. Repeating
+// events go only once their repeats have ended. Kept, marked rejected, so
+// the same poster read again isn't queued again.
+export async function discardPastQueue(
+  db: SupabaseClient<Database>,
+  today: string,
+): Promise<number> {
+  const { data } = await db
+    .from("event_claims")
+    .select("id, proposed")
+    .eq("status", "pending")
+    .limit(2000);
+  const ids = (data ?? []).flatMap((c) => {
+    const poster = posterFrom(c.proposed);
+    return poster && hasPassed(poster, today) ? [c.id] : [];
+  });
+  if (ids.length === 0) return 0;
+  const { error } = await db
+    .from("event_claims")
+    .update({
+      status: "rejected",
+      reviewed_at: new Date().toISOString(),
+      note: PAST_QUEUE_NOTE,
+    })
+    .in("id", ids)
+    .eq("status", "pending");
+  return error ? 0 : ids.length;
 }

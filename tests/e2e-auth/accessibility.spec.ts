@@ -117,6 +117,8 @@ test("the admin area is accessible", async ({ page }) => {
     "/ops/mandirs/new",
     "/ops/mandirs/geeta-bhavan-leicester",
     "/ops/posters",
+    "/ops/posters?add=type",
+    "/ops/posters?add=rows",
     "/ops/duplicates",
     "/ops/websites",
     "/ops/mandirs/import",
