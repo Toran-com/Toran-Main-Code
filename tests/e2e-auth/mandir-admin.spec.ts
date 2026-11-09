@@ -363,7 +363,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(member.getByText(/^(Open now|Closed now) · /)).toBeVisible();
 
   // Toran types up a poster someone forwarded; the committee publishes it.
-  await admin.goto("/ops/posters");
+  await admin.goto("/ops/posters?add=type");
   await admin.getByRole("combobox", { name: /^Mandir/ }).selectOption(SLUG);
   await admin.getByLabel("What's happening?").fill("Sharad Purnima garba");
   await admin.getByLabel("Date").fill(nextWeek());

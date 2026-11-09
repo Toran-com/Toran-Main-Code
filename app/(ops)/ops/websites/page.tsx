@@ -176,7 +176,7 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
                           {d.kind === "pdf" ? "PDF" : "Picture"}: {d.label}
                         </a>
                         <Link
-                          href={`/ops/posters?mandir=${encodeURIComponent(r.slug)}&source=website&link=${encodeURIComponent(d.url)}#type-up`}
+                          href={`/ops/posters?add=type&mandir=${encodeURIComponent(r.slug)}&source=website&link=${encodeURIComponent(d.url)}#add`}
                           className="text-peacock text-base underline"
                         >
                           Type it up

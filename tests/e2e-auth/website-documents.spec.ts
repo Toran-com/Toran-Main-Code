@@ -42,7 +42,7 @@ test("a patrika found on a mandir's website can be typed up", async ({
   // The form starts with the mandir, the patrika as the link, and where
   // it came from.
   await expect(page).toHaveURL(/\/ops\/posters\?/);
-  const form = page.locator("#type-up").locator("..").locator("form");
+  const form = page.getByRole("form", { name: "Type it in" });
   await expect(
     form.getByRole("combobox", { name: "Mandir", exact: true }),
   ).toHaveValue(SLUG);

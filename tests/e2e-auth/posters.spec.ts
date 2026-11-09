@@ -18,6 +18,10 @@ test("Toran publishes a poster for a mandir with no committee", async ({
   test.setTimeout(90_000);
   await logInAsAdmin(page, `posters-${Date.now()}@example.com`);
   await page.goto("/ops/posters");
+  // The ways to add events come first; each opens its own form.
+  await expect(page.getByRole("heading", { name: "Add events" })).toBeVisible();
+  await expect(page.getByLabel("What's happening?")).toHaveCount(0);
+  await page.getByRole("link", { name: /^Type it in/ }).click();
   await page.getByRole("combobox", { name: /^Mandir/ }).selectOption(SLUG);
   await page.getByLabel("What's happening?").fill("Navratri garba");
   await page.getByLabel("Date").fill(nextWeek());
@@ -61,7 +65,7 @@ test("the review queue keeps one copy of each event, and a poster can be fixed f
   const slug = "hindu-cultural-religious-centre-leicester";
   const title = `Diwali deepotsav ${Date.now()}`;
   const addPoster = async (name: string, time: string) => {
-    await page.goto("/ops/posters");
+    await page.goto("/ops/posters?add=type");
     await page.getByRole("combobox", { name: /^Mandir/ }).selectOption(slug);
     await page.getByLabel("What's happening?").fill(name);
     await page.getByLabel("Date").fill(nextWeek());
@@ -209,6 +213,8 @@ test("a visitor tells us about an event, and Toran sees it in the queue", async 
     page.getByRole("listitem").filter({ hasText: "Spam event" }),
   ).toHaveCount(0);
   // Toran can't pretend to be a visitor when typing up a poster.
+  await page.getByRole("link", { name: /^Type it in/ }).click();
+  await expect(page.getByLabel("What's happening?")).toBeVisible();
   await expect(
     page.getByRole("option", { name: "Sent in by a visitor" }),
   ).toHaveCount(0);
@@ -227,7 +233,7 @@ test("Toran publishes several ticked events at once", async ({ page }) => {
   ];
   await logInAsAdmin(page, `ticked-${stamp}@example.com`);
   for (const { slug, title } of posters) {
-    await page.goto("/ops/posters");
+    await page.goto("/ops/posters?add=type");
     await page.getByRole("combobox", { name: /^Mandir/ }).selectOption(slug);
     await page.getByLabel("What's happening?").fill(title);
     await page.getByLabel("Date").fill(nextWeek());
@@ -254,4 +260,59 @@ test("Toran publishes several ticked events at once", async ({ page }) => {
       page.getByRole("article").filter({ hasText: title }),
     ).toContainText("7pm");
   }
+});
+
+test("Toran clears the events whose date has passed in one go", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  const stamp = Date.now();
+  // A mandir no other test looks at.
+  const slug = "sanatan-mandir-crawley-apple-tree-centre";
+  const poster = (title: string, date: string) =>
+    JSON.stringify({
+      title,
+      date,
+      time: "19:00",
+      summary: "",
+      repeat: "",
+      until: "",
+      from: "whatsapp",
+      link: "",
+    });
+  const lastWeek = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/London",
+  }).format(new Date(Date.now() - 7 * 86_400_000));
+  sql(
+    `insert into public.event_claims (mandir_id, proposed)
+       select id, '${poster(`Old garba ${stamp}`, lastWeek)}'::jsonb from public.mandirs where slug = '${slug}'
+       union all
+       select id, '${poster(`New garba ${stamp}`, nextWeek())}'::jsonb from public.mandirs where slug = '${slug}'`,
+  );
+  await logInAsAdmin(page, `past-${stamp}@example.com`);
+  await page.goto("/ops/posters");
+  const past = page.getByRole("region", { name: /^Date has passed/ });
+  await past.getByText(/^See (it|them)$/).click();
+  await expect(past).toContainText(`Old garba ${stamp}`);
+  // Not mixed in with what's still to check.
+  const waiting = page.getByRole("region", { name: /^Waiting to be checked/ });
+  await expect(waiting.getByText(`Old garba ${stamp}`)).toHaveCount(0);
+  await expect(waiting.getByText(`New garba ${stamp}`)).toBeVisible();
+
+  await past.getByRole("button", { name: /^Discard (it|all \d+)$/ }).click();
+  await expect(page.getByText(/whose date had passed/)).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: /^Date has passed/ }),
+  ).toHaveCount(0);
+  await expect(page.getByText(`New garba ${stamp}`)).toBeVisible();
+  // Kept as discarded, so reading the same poster again doesn't queue it.
+  expect(
+    sql(
+      `select status from public.event_claims where proposed->>'title' = 'Old garba ${stamp}'`,
+    ),
+  ).toBe("rejected");
+  // Tidy up, so the queue is as it was.
+  sql(
+    `update public.event_claims set status = 'rejected' where proposed->>'title' = 'New garba ${stamp}'`,
+  );
 });

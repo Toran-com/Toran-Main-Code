@@ -2,7 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import { nightlyStatus } from "@/lib/attention";
 import type { Database } from "@/lib/database.types";
-import { isCronRequest, runNightly } from "@/lib/nightly";
+import { discardPastQueue, isCronRequest, runNightly } from "@/lib/nightly";
+import { PAST_QUEUE_NOTE } from "@/lib/queue-dates";
 import type { CheckResult } from "@/lib/website-check";
 
 // A stand-in for the database: every query method returns the same
@@ -104,6 +105,7 @@ describe("runNightly", () => {
     expect(checked.sort()).toEqual(MANDIRS.map((m) => m.website));
     expect(summary).toEqual({
       retention: { invites: 2, approved_claims: 0 },
+      pastQueue: 0,
       calendars: { checked: 0, added: 0, failed: 0 },
       websites: { checked: 4, added: 2, failed: 0 },
     });
@@ -216,5 +218,59 @@ describe("nightlyStatus", () => {
       state: "late",
       text: "checked 0 websites, 2 couldn't be saved, 0 new events to the review queue, the clean-up failed",
     });
+  });
+});
+
+describe("discardPastQueue", () => {
+  it("discards waiting items whose dates have all passed", async () => {
+    const poster = (date: string, repeat = "", until = "") => ({
+      title: "Aarti",
+      date,
+      time: "19:00",
+      summary: "",
+      repeat,
+      until,
+      from: "whatsapp",
+      link: "",
+    });
+    const claims = [
+      { id: "past", proposed: poster("2026-11-01") },
+      { id: "today", proposed: poster("2026-11-09") },
+      { id: "weekly", proposed: poster("2026-01-04", "weekly") },
+      { id: "ended", proposed: poster("2026-01-04", "weekly", "2026-10-31") },
+      { id: "not-a-poster", proposed: { field: "time" } },
+    ];
+    const updates: { value: unknown; ids: unknown }[] = [];
+    const db = {
+      from: () => {
+        let value: unknown = null;
+        const builder: Record<string, unknown> = {
+          select: () => builder,
+          eq: () => builder,
+          limit: () => Promise.resolve({ data: claims }),
+          update: (v: unknown) => {
+            value = v;
+            return builder;
+          },
+          in: (_column: string, ids: unknown) => {
+            updates.push({ value, ids });
+            return builder;
+          },
+          then: (resolve: (v: unknown) => unknown) => resolve({ error: null }),
+        };
+        return builder;
+      },
+    } as unknown as SupabaseClient<Database>;
+
+    expect(await discardPastQueue(db, "2026-11-09")).toBe(2);
+    expect(updates).toEqual([
+      {
+        value: expect.objectContaining({
+          status: "rejected",
+          note: PAST_QUEUE_NOTE,
+        }),
+        ids: ["past", "ended"],
+      },
+    ]);
   });
 });
