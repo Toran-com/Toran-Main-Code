@@ -44,7 +44,9 @@ export async function pageWeight(page: Page) {
 export const BUDGET = { js: 250, total: 350 };
 
 // The mandirs map (/mandirs, map view) also downloads Leaflet and the map
-// code, about 45 KB, only once the map is shown (decision 0011). The map
-// pictures from OpenStreetMap load after the page, are cached by the
-// browser and aren't counted here.
+// code, about 45 KB, only once the map is shown (decision 0011). Not
+// counted here, as they load after the page and its pins: the streets.
+// Where the browser draws them (decision 0019) that's MapLibre, about
+// 275 KB more, then OpenFreeMap's tiles; on phones saving data or short
+// of memory, and in these tests, it's OpenStreetMap's pictures instead.
 export const MAP_JS = 50;

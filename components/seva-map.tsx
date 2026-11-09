@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { MapKey } from "@/components/map-key";
 import {
   cardFit,
-  cityLabels,
   directionsLink,
   keepLitWhileOpen,
   lamp,
@@ -128,7 +127,6 @@ export function SevaMap({
     L: typeof import("leaflet");
     map: LeafletMap;
     layer: import("leaflet").LayerGroup;
-    places: ReturnType<typeof cityLabels>;
   } | null>(null);
   const [ready, setReady] = useState(false);
   const shown = pins(found);
@@ -155,7 +153,6 @@ export function SevaMap({
         L,
         map: made,
         layer: L.layerGroup().addTo(made),
-        places: cityLabels(L, made),
       };
       setReady(true);
     });
@@ -170,7 +167,7 @@ export function SevaMap({
   useEffect(() => {
     const now = live.current;
     if (!ready || !now) return;
-    const { L, map, layer, places: cityNames } = now;
+    const { L, map, layer } = now;
     const placed = pins(found);
     layer.clearLayers();
     placed.forEach((pin, order) => {
@@ -200,8 +197,6 @@ export function SevaMap({
       });
       layer.addLayer(marker);
     });
-    // City names make way for the lights.
-    cityNames.avoid(placed.map((p) => [p.latitude, p.longitude]));
     if (origin) {
       layer.addLayer(
         L.circleMarker([origin.latitude, origin.longitude], {

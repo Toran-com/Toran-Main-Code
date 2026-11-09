@@ -80,15 +80,25 @@ export function EventListSkeleton({ count = 4 }: { count?: number }) {
 export function MandirsSkeleton() {
   return (
     <Loading>
-      <div className="flex flex-col gap-2">
-        <div className={`${block} h-6 w-40`} />
-        <div className={`${block} h-14`} />
+      <div className="border-line overflow-hidden rounded-2xl border lg:grid lg:h-[min(80vh,800px)] lg:min-h-[560px] lg:grid-cols-[minmax(340px,420px)_1fr]">
+        <div className="flex flex-col gap-3 p-4 sm:p-5">
+          <div className={`${block} h-8 w-56`} />
+          <div className={`${block} h-14`} />
+          <div className="flex items-center justify-between gap-3">
+            <div className={`${block} h-5 w-32`} />
+            <div className={`${block} h-11 w-36 rounded-full`} />
+          </div>
+          <div className="hidden flex-col gap-4 pt-3 lg:flex">
+            {[70, 55, 80, 60].map((w) => (
+              <div key={w} className="flex flex-col gap-2">
+                <div className={`${block} h-5`} style={{ width: `${w}%` }} />
+                <div className={`${block} h-4 w-1/3`} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className={`${block} h-[68svh] min-h-96 rounded-none lg:h-full`} />
       </div>
-      <div className="flex items-center justify-between gap-3">
-        <div className={`${block} h-5 w-32`} />
-        <div className={`${block} h-12 w-52 rounded-full`} />
-      </div>
-      <div className={`${block} h-[26rem] rounded-3xl sm:h-[32rem]`} />
     </Loading>
   );
 }

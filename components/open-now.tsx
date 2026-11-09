@@ -16,15 +16,18 @@ const never = () => null;
 
 // "Open now · until 12pm" or "Closed now · opens at 4pm", worked out on
 // the visitor's phone in UK time. Times and day names come ready
-// formatted in the page's language.
+// formatted in the page's language. "line" is the quieter one-line form
+// for a list of mandirs.
 export function OpenNow({
   sessions,
   times,
   days,
+  line = false,
 }: {
   sessions: Session[];
   times: Record<string, string>;
   days: Record<number, string>;
+  line?: boolean;
 }) {
   const t = useT(enHours);
   const now = useSyncExternalStore(subscribe, minute, never);
@@ -41,6 +44,24 @@ export function OpenNow({
             day: days[state.day],
             time: times[state.opens],
           });
+  if (line) {
+    return (
+      <p className="flex items-start gap-2 text-base">
+        <span
+          aria-hidden="true"
+          className={`mt-[0.6em] size-2 shrink-0 rounded-full ${state.open ? "bg-leaf" : "bg-muted"}`}
+        />
+        <span>
+          <span
+            className={`font-semibold ${state.open ? "text-leaf-ink" : "text-ink"}`}
+          >
+            {state.open ? t("hours.openNow") : t("hours.closedNow")}
+          </span>
+          <span className="text-muted"> · {detail}</span>
+        </span>
+      </p>
+    );
+  }
   return (
     <p
       className={`inline-flex w-fit items-center gap-2 rounded-full px-4 py-1.5 text-base font-semibold ${

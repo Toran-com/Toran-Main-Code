@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { MapKey } from "@/components/map-key";
 import {
   cardFit,
-  cityLabels,
   directionsLink,
   keepLitWhileOpen,
   lamp,
@@ -129,7 +128,6 @@ export function EventsMap({
     L: typeof import("leaflet");
     map: LeafletMap;
     layer: import("leaflet").LayerGroup;
-    places: ReturnType<typeof cityLabels>;
   } | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -155,7 +153,6 @@ export function EventsMap({
         L,
         map: made,
         layer: L.layerGroup().addTo(made),
-        places: cityLabels(L, made),
       };
       setReady(true);
     });
@@ -171,7 +168,7 @@ export function EventsMap({
   useEffect(() => {
     const now = live.current;
     if (!ready || !now) return;
-    const { L, map, layer, places } = now;
+    const { L, map, layer } = now;
     // The busiest first, so they keep their place when grouped.
     const ordered = [...pins].sort((a, b) => b.count - a.count);
     // After zooming in from the keyboard, the circle to keep focus on.
@@ -181,7 +178,6 @@ export function EventsMap({
     let firstDraw = true;
     const draw = () => {
       layer.clearLayers();
-      const lights: [number, number][] = [];
       const groups = clusterApart(
         ordered,
         (p) => map.latLngToLayerPoint([p.latitude, p.longitude]),
@@ -189,7 +185,6 @@ export function EventsMap({
       );
       groups.forEach(({ items }, order) => {
         const [first] = items;
-        lights.push([first.latitude, first.longitude]);
         const count = items.reduce((sum, p) => sum + p.count, 0);
         const label =
           items.length === 1
@@ -247,8 +242,6 @@ export function EventsMap({
         layer.addLayer(marker);
       });
       firstDraw = false;
-      // City names make way for the lights.
-      places.avoid(lights);
       if (origin) {
         layer.addLayer(
           L.circleMarker([origin.latitude, origin.longitude], {

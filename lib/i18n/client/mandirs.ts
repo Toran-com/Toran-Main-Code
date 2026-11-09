@@ -4,7 +4,7 @@ export const enMandirs = {
   "whatsOn.nearMe": "Near me",
   "whatsOn.finding": "Finding you…",
   "mandirs.find": "Find a mandir or town",
-  "mandirs.findExample": "e.g. Leicester, BAPS, Harrow",
+  "mandirs.findExample": "Town, postcode or mandir name",
   "mandirs.countOf": "{shown} of {total} mandirs",
   "mandirs.count": "{total} mandirs",
   "mandirs.showAs": "Show mandirs as",
@@ -28,7 +28,7 @@ export const enMandirs = {
   "region.Yorkshire": "Yorkshire",
   "map.seeWhatsOn": "See what's on →",
   "map.cluster": "{count} mandirs near here",
-  "map.clusterLabel": "{label}. Opens a list of them.",
+  "map.clusterLabel": "{label}. Zooms in to show them.",
   "map.youAreHere": "You are here",
   "map.denied":
     "Your browser didn't share your location. You can zoom in on the map instead.",
@@ -41,6 +41,19 @@ export const enMandirs = {
     "{count} mandir isn't on the map yet (no map position). It's in the list.",
   "map.missing.other":
     "{count} mandirs aren't on the map yet (no map position). They're in the list.",
+  "mandirs.inView.one": "1 mandir on this part of the map",
+  "mandirs.inView.other": "{count} mandirs on this part of the map",
+  "mandirs.nearYou": "Nearest to you first",
+  "mandirs.nearPlace": "Nearest to {place} first",
+  "mandirs.lookingUp": "Finding {place}…",
+  "mandirs.unknownPlace":
+    "We couldn't find “{place}”. Check the postcode, or try a town.",
+  "mandirs.noneHere": "No mandirs on this part of the map.",
+  "map.showOnMap": "Show {name} on the map",
+  "map.showOnMapShort": "Show on map",
+  "map.closeCard": "Close",
+  "map.cardLabel": "{name}, chosen on the map",
+  "map.milesShort": "{miles} mi",
 } as const;
 
 // A region's key, if it has a translation, so a region missing from the

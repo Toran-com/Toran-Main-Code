@@ -33,3 +33,4 @@ that replaces it and mark the old one Superseded.
 | 0016 | [A nightly job, run by Vercel Cron with the database's secret key](0016-nightly-job.md)                        | Proposed |
 | 0017 | [One copy of each event: same, maybe or different, with a database safety net](0017-one-copy-of-each-event.md) | Proposed |
 | 0018 | [Claude reads poster photos and PDFs into events, which a person checks](0018-reading-posters.md)              | Proposed |
+| 0019 | [A real street map from OpenFreeMap, and a mandir finder like a shop finder](0019-street-map.md)               | Proposed |
