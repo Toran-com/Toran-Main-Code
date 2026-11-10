@@ -348,7 +348,7 @@ export default async function EventPage({
                 {alsoOn.map((e) => (
                   <li
                     key={e.id}
-                    className="has-card-link group flex items-center gap-4 py-4 sm:gap-5"
+                    className="has-card-link group hover:bg-surface -mx-3 flex items-center gap-4 rounded-2xl px-3 py-4 transition-colors duration-200 sm:gap-5"
                   >
                     <Morph name={morphName.eventDate(e.id)}>
                       <DateTile

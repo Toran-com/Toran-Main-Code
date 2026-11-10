@@ -25,8 +25,20 @@ export function PageShell({
       <Suspense fallback={<div className="h-16 sm:h-[4.25rem]" />}>
         <SiteHeader />
       </Suspense>
+      {/* On a wide laptop screen a narrow page (log in, your account, a
+          form) has a faint rangoli either side of it, clear of the text,
+          so the page doesn't sit in an empty screen. Decoration only. */}
+      {!full && !wide && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-x-0 top-28 z-0 hidden justify-between min-[1400px]:flex"
+        >
+          <span className="rangoli-art -ml-36 block size-[30rem] opacity-15" />
+          <span className="rangoli-art -mr-36 block size-[30rem] opacity-15" />
+        </div>
+      )}
       <main
-        className={`rise mx-auto flex min-h-[100svh] w-full flex-1 flex-col gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-10 ${full ? "max-w-6xl" : wide ? "max-w-3xl" : "max-w-lg"}`}
+        className={`rise relative z-[1] mx-auto flex min-h-[100svh] w-full flex-1 flex-col gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-10 ${full ? "max-w-6xl" : wide ? "max-w-3xl" : "max-w-lg"}`}
       >
         <h1
           className={`font-display leading-[1.05] tracking-tight ${full ? "sr-only" : "text-5xl sm:text-6xl"}`}

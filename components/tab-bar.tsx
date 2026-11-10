@@ -9,27 +9,39 @@ export type TabIcon = "events" | "mandirs" | "festivals" | "my";
 // On a phone, the main places sit along the bottom of the screen, where a
 // thumb reaches, each with a picture and its name, as in most phone apps.
 // The labels stay at 18px whatever the text size, so four always fit
-// side by side; everything else on the page grows with "Text size".
+// side by side; everything else on the page grows with "Text size". The
+// bar is a little see-through, with the page blurred behind it, and the
+// pill behind the place you're in slides across when you change place.
 export function TabBar({
   tabs,
 }: {
   tabs: { href: string; label: string; icon: TabIcon }[];
 }) {
   const path = usePathname();
+  const isHere = (href: string) => path === href || path.startsWith(`${href}/`);
+  const active = tabs.findIndex(({ href }) => isHere(href));
   return (
     <nav
       aria-label="Main"
-      className="tab-bar border-line bg-surface fixed inset-x-0 bottom-0 z-30 border-t pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] md:hidden"
+      className="tab-bar border-line bg-surface/90 fixed inset-x-0 bottom-0 z-30 border-t pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur-lg backdrop-saturate-150 md:hidden"
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-4">
+      <ul className="relative mx-auto grid max-w-lg grid-cols-4">
+        {/* The pill behind the place you're in: it slides to the next. */}
+        {active >= 0 && (
+          <li
+            aria-hidden="true"
+            className="tab-pill"
+            style={{ translate: `${active * 100}% 0` }}
+          />
+        )}
         {tabs.map(({ href, label, icon }) => {
-          const here = path === href || path.startsWith(`${href}/`);
+          const here = isHere(href);
           return (
             <li key={href}>
               <Link
                 href={href}
                 aria-current={here ? "page" : undefined}
-                className={`flex flex-col items-center gap-0.5 px-1 pt-2 pb-2.5 text-center text-[18px] leading-tight no-underline transition-colors ${
+                className={`group relative flex flex-col items-center gap-0.5 px-1 pt-2 pb-2.5 text-center text-[18px] leading-tight no-underline transition-colors ${
                   here
                     ? "text-peacock font-semibold"
                     : "text-muted hover:text-ink font-medium"
@@ -37,9 +49,7 @@ export function TabBar({
               >
                 <span
                   aria-hidden="true"
-                  className={`grid h-8 w-14 place-items-center rounded-full transition-colors ${
-                    here ? "bg-peacock/12" : ""
-                  }`}
+                  className="grid h-8 w-14 place-items-center transition-transform duration-200 ease-out group-active:scale-90"
                 >
                   {ICONS[icon]}
                 </span>

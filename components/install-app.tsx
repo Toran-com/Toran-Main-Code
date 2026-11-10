@@ -44,7 +44,7 @@ export function InstallApp() {
             await prompt.prompt();
             setPrompt(null);
           }}
-          className="text-peacock cursor-pointer font-semibold underline"
+          className="text-night-accent cursor-pointer font-semibold underline"
         >
           Add Toran to your home screen
         </button>

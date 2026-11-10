@@ -76,7 +76,7 @@ export function EventCard({
   const source = sourceLabel(e);
   const kind = kindLabel(e.kind);
   return (
-    <article className="reveal has-card-link group flex gap-4 py-5 sm:gap-6 sm:py-6">
+    <article className="reveal has-card-link group hover:bg-surface -mx-3 flex gap-4 rounded-2xl px-3 py-5 transition-colors duration-200 sm:gap-6 sm:py-6">
       <Morph name={morphName.eventDate(e.id)}>
         {underDay ? (
           <TimeTile at={e.next_starts_at} allDay={e.all_day} />

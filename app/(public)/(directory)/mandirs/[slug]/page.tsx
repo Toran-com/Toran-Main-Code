@@ -402,7 +402,7 @@ function EventRow({
   return (
     <article
       id={`event-${event.id}`}
-      className="has-card-link group flex scroll-mt-28 gap-4 py-5 sm:gap-6 sm:py-6"
+      className="has-card-link group hover:bg-surface -mx-3 flex scroll-mt-28 gap-4 rounded-2xl px-3 py-5 transition-colors duration-200 sm:gap-6 sm:py-6"
     >
       <Morph name={morphName.eventDate(event.id)}>
         <DateTile

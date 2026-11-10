@@ -140,8 +140,9 @@ html[data-contrast="high"] {
 /* 18px body text minimum (docs/architecture.md, section 8). */
 html {
   font-size: 112.5%;
-  /* Room for the header, which stays at the top, when jumping to a section. */
-  scroll-padding-top: 6rem;
+  /* Room for the header, which stays at the top, and a bar that sticks
+     beneath it, when jumping to a section. */
+  scroll-padding-top: 8rem;
 }
 
 /* Bigger text, chosen with "Aa" in the header (lib/display.ts): 20px and
@@ -170,6 +171,14 @@ body {
    page, so the footer isn't hidden behind it. */
 @media (width < 48rem) {
   body:has(.tab-bar) {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+  /* Where the page ends in the midnight footer, the room is inside it,
+     so the page doesn't end in a strip of another colour. */
+  body:has(.tab-bar):has(.site-footer) {
+    padding-bottom: 0;
+  }
+  body:has(.tab-bar) .site-footer {
     padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
   }
 }
@@ -350,6 +359,265 @@ a:hover {
   }
 }
 
+/* The header as you scroll (components/scroll-chrome.tsx marks <html>).
+   Once the page has moved it turns a little see-through, the page blurred
+   behind it, with a soft shadow. On a phone it slides away while you
+   scroll down, to leave the screen to the page, and comes straight back
+   when you scroll up, when the menu is open, or when something in it has
+   the keyboard's focus; the bar along the bottom never moves. The blur is
+   on a layer behind the header, not the header itself, so the menu
+   inside it can still cover the whole screen. */
+html {
+  --header-h: 4rem;
+  /* Where things that stick under the header sit. */
+  --sticky-top: var(--header-h);
+}
+.site-header {
+  transition:
+    translate 320ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  backdrop-filter: blur(16px) saturate(1.5);
+  transition: opacity 200ms ease;
+}
+html[data-scrolled] .site-header {
+  background-color: color-mix(in srgb, var(--night) 88%, transparent);
+  box-shadow: 0 12px 32px -18px rgb(0 0 0 / 0.5);
+}
+html[data-scrolled] .site-header::before {
+  opacity: 1;
+}
+@media (width < 48rem) {
+  html[data-scroll="down"]:not(:has(.site-menu[open]))
+    .site-header:not(:focus-within) {
+    translate: 0 -105%;
+  }
+  html[data-scroll="down"]:not(:has(.site-menu[open])) {
+    --sticky-top: 0px;
+  }
+}
+html:has(.site-menu[open]) .site-header {
+  transition: none;
+}
+
+/* How far down the page you are: a thin gold line along the foot of the
+   header that fills as you scroll. Drawn by the scroll itself, so it's
+   only there in browsers that can do that, and not at all on a page
+   that fits the screen. */
+.scroll-progress {
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--night-accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+@keyframes scroll-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* Jumping to a part of a page ("Share", "Details", a region) glides
+   there rather than cutting. Next.js switches this off while going from
+   page to page (data-scroll-behavior on <html>). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Things that stick under the header (day headings in a list of events,
+   a committee's section bar): they follow the header as it slides away
+   and back on a phone. */
+.sticks {
+  position: sticky;
+  top: var(--sticky-top);
+  z-index: 10;
+  transition: top 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* The bar along the bottom of a phone: the pill behind the place you're
+   in slides to the next one with a little spring. */
+.tab-pill {
+  position: absolute;
+  top: 0.5rem;
+  left: 0;
+  width: 25%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: translate 420ms cubic-bezier(0.3, 1.35, 0.5, 1);
+}
+.tab-pill::before {
+  content: "";
+  width: 3.5rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--peacock) 13%, transparent);
+}
+
+/* Under a page's heading: a short gold rule ending in a diamond, drawn
+   from the left as the page opens. Decoration only. */
+.heading-mark {
+  position: relative;
+  display: block;
+  width: 3.5rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--marigold);
+  transform-origin: left;
+  animation: heading-mark 700ms cubic-bezier(0.2, 0.7, 0.2, 1) 150ms both;
+}
+.heading-mark::after {
+  content: "";
+  position: absolute;
+  right: -0.75rem;
+  top: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  translate: 0 -50%;
+  rotate: 45deg;
+  border-radius: 1px;
+  background: var(--marigold);
+}
+@keyframes heading-mark {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* The menu slides in from the right while the page behind it dims; a
+   small panel (the filters on What's on) pops open from its button. */
+@keyframes menu-slide {
+  from {
+    translate: 100% 0;
+  }
+}
+@keyframes menu-dim {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+    scale: 0.98;
+  }
+}
+.menu-panel {
+  animation: menu-slide 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.menu-backdrop {
+  animation: menu-dim 240ms ease both;
+}
+.pop-in {
+  transform-origin: top;
+  animation: pop-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* A card that folds away (components/fold.tsx) opens and closes smoothly,
+   in browsers that can animate to a height that isn't known ahead; in the
+   rest it simply opens. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) {
+    .fold {
+      interpolate-size: allow-keywords;
+    }
+    .fold::details-content {
+      block-size: 0;
+      overflow-y: clip;
+      transition:
+        block-size 320ms cubic-bezier(0.2, 0.7, 0.2, 1),
+        content-visibility 320ms allow-discrete;
+    }
+    .fold[open]::details-content {
+      block-size: auto;
+    }
+  }
+}
+
+/* A row to swipe sideways (festival cards, the steps of "See how Toran
+   works" on a phone): each card clicks into place, the next one peeks in
+   at the edge so it's plain there's more, and no scrollbar shows. The
+   row can also be moved with the keyboard's arrow keys when focused. */
+.swipe-row {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.swipe-row::-webkit-scrollbar {
+  display: none;
+}
+.swipe-row > * {
+  flex: none;
+  scroll-snap-align: center;
+}
+/* The same, on phones and tablets only: from laptop size up the row's
+   own layout applies (.swipe-row-small). */
+@media (width < 64rem) {
+  .swipe-row-small {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .swipe-row-small::-webkit-scrollbar {
+    display: none;
+  }
+  .swipe-row-small > * {
+    flex: none;
+    scroll-snap-align: center;
+  }
+}
+/* Cards at the edges sit a little smaller and settle to full size as they
+   reach the middle. Movement only, tied to the swipe. */
+@keyframes swipe-settle {
+  0%,
+  100% {
+    scale: 0.94;
+  }
+  35%,
+  65% {
+    scale: 1;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .swipe-row.swipe-settle > * {
+      animation: swipe-settle linear both;
+      animation-timeline: view(inline);
+    }
+    @media (width < 64rem) {
+      .swipe-row-small.swipe-settle > * {
+        animation: swipe-settle linear both;
+        animation-timeline: view(inline);
+      }
+    }
+  }
+}
+
 /* Scrolling: sections and cards (.reveal) rise gently into place as they
    come into view, tied to the scroll rather than a timer, as on Apple's
    and other product sites. Only for people who haven't asked their device
@@ -515,6 +783,14 @@ body:has(.own-toran) .site-toran {
   .rise,
   .rise-list > * {
     animation: none;
+  }
+
+  /* Paper has no use for the header, the bars or the footer. */
+  .site-header,
+  .site-toran,
+  .tab-bar,
+  .site-footer {
+    display: none;
   }
 }
 

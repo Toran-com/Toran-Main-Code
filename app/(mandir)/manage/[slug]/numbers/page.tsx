@@ -34,7 +34,7 @@ export default function NumbersPage(
   props: PageProps<"/manage/[slug]/numbers">,
 ) {
   return (
-    <PageShell title="Numbers">
+    <PageShell title="Numbers" wide>
       <Suspense fallback={<Loading />}>
         <Numbers {...props} />
       </Suspense>
@@ -121,7 +121,7 @@ async function Numbers({
         ))}
       </nav>
 
-      <dl className="grid grid-cols-2 gap-3">
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile
           label="Views of your page and events"
           value={numbers.totals.view}

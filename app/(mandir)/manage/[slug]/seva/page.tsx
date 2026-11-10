@@ -32,7 +32,7 @@ export default function SevaOverviewPage(
   props: PageProps<"/manage/[slug]/seva">,
 ) {
   return (
-    <PageShell title="Seva">
+    <PageShell title="Seva" wide>
       <Suspense fallback={<Loading />}>
         <Overview {...props} />
       </Suspense>

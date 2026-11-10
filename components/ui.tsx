@@ -4,8 +4,9 @@ import type { ReactNode } from "react";
 // for forms. Lists sit on the page with fine lines instead.
 // A day in a list of events or seva ("Today", "Friday 6 November"), in
 // the headline serif: calm, and easy to find when scrolling.
+// It stays under the header while its day's events scroll past.
 export const dayHeadingClass =
-  "font-display text-ink pb-1 text-3xl leading-tight";
+  "sticks font-display text-ink bg-bg/90 -mx-4 px-4 py-2 text-3xl leading-tight backdrop-blur-md sm:-mx-3 sm:rounded-2xl sm:px-3";
 
 export const cardClass =
   "reveal border-line bg-surface shadow-card rounded-3xl border";
@@ -43,13 +44,13 @@ export function Notice({
 export const inputClass =
   "border-line-strong bg-surface focus:outline-peacock hover:border-peacock/50 w-full rounded-2xl border px-4 py-3 text-lg transition-colors focus:outline-2";
 
-// Everything you press is a soft pill. Buttons press in a little when
-// tapped.
+// Everything you press is a soft pill. Buttons lift a little under the
+// pointer and press in when tapped.
 const press =
-  "inline-flex items-center justify-center gap-2 text-center no-underline transition duration-200 ease-out active:scale-[0.98] disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 text-center no-underline transition duration-200 ease-out hover:-translate-y-px active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none";
 
 // The main action: one per screen.
-export const buttonClass = `${press} bg-peacock text-on-peacock hover:bg-peacock-deep w-full rounded-full px-6 py-3 text-lg font-semibold disabled:opacity-60`;
+export const buttonClass = `${press} bg-peacock text-on-peacock hover:bg-peacock-deep hover:shadow-lift w-full rounded-full px-6 py-3 text-lg font-semibold disabled:opacity-60`;
 
 // Small pill buttons for actions on an item in a list (Edit, Cancel…),
 // so a row of them fits on a phone.

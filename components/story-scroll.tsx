@@ -22,8 +22,9 @@ export function StoryScroll({
     const steps = Array.from(
       root.querySelectorAll<HTMLElement>("[data-story-step]"),
     );
-    // On a phone the words sit under the phone, low on the screen; on a
-    // laptop beside it, in the middle.
+    // On a laptop the steps are a column, and the one in the middle of
+    // the screen's height is the step in view; on a phone they're a row
+    // to swipe, and it's the one in the middle of the screen's width.
     const wide = window.matchMedia("(min-width: 64rem)").matches;
     const observer = new IntersectionObserver(
       (entries) => {
@@ -35,7 +36,7 @@ export function StoryScroll({
           }
         }
       },
-      { rootMargin: wide ? "-45% 0px -45% 0px" : "-62% 0px -30% 0px" },
+      { rootMargin: wide ? "-45% 0px -45% 0px" : "0px -49% 0px -49%" },
     );
     for (const step of steps) observer.observe(step);
     return () => observer.disconnect();

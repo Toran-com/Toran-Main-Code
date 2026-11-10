@@ -7,6 +7,7 @@ import { DisplayControls } from "@/components/display-settings";
 import { LanguageSwitch } from "@/components/language-switch";
 import { MyToranLink } from "@/components/my-toran-link";
 import { Logo, Toran } from "@/components/ornaments";
+import { ScrollChrome } from "@/components/scroll-chrome";
 import { MenuSection, menuRowClass, SiteMenu } from "@/components/site-menu";
 import { SiteNav } from "@/components/site-nav";
 import { TabBar } from "@/components/tab-bar";
@@ -39,10 +40,12 @@ export const wideClass = "mx-auto w-full max-w-[88rem] px-4 sm:px-8 lg:px-12";
 // Search, My Toran and "Menu", which holds everything else: text size,
 // language, the way in for committees. On a phone the four places and My
 // Toran sit in a bar along the bottom of the screen instead
-// (components/tab-bar.tsx). From tablet size up the header stays at the
-// top as you scroll. It has a solid background, not a blurred one, so the
-// menu can cover the whole screen. The toran hangs below it, except where
-// the page hangs its own over a bold moment.
+// (components/tab-bar.tsx). The header stays at the top as you scroll: it
+// turns a little see-through, with the page blurred behind it, and on a
+// phone it slides away while you scroll down and comes back as soon as
+// you scroll up (components/scroll-chrome.tsx and app/globals.css). A thin
+// gold line along its foot shows how far down the page you are. The toran
+// hangs below it, except where the page hangs its own over a bold moment.
 export function SiteHeader({ toran = true }: { toran?: boolean }) {
   const t = pageT();
   // English, the translations that have been checked, and the page's own
@@ -64,7 +67,9 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
   );
   return (
     <>
-      <header className="site-header bg-night text-on-night z-30 md:sticky md:top-0">
+      <ScrollChrome />
+      <header className="site-header bg-night text-on-night sticky top-0 z-30">
+        <span aria-hidden="true" className="scroll-progress" />
         <div
           className={`${wideClass} flex items-center justify-between gap-x-3 py-2.5 sm:gap-x-6 sm:py-3`}
         >
@@ -167,6 +172,8 @@ const FOOTER_LINKS = {
   ],
 } as const;
 
+// The foot of every page: a midnight band under its own toran, so a page
+// ends as it began.
 export function SiteFooter() {
   const t = pageT();
   const columns = [
@@ -197,13 +204,14 @@ export function SiteFooter() {
     },
   ];
   return (
-    <footer className="border-line text-muted mt-16 border-t sm:mt-24">
+    <footer className="site-footer bg-night text-night-muted mt-16 sm:mt-24">
+      <Toran night />
       <div
         className={`${wideClass} flex flex-wrap justify-between gap-x-12 gap-y-10 py-12 text-base sm:py-14`}
       >
         <div className="flex max-w-md flex-[1_1_20rem] flex-col gap-4">
-          <span className="text-ink">
-            <Logo size="sm" />
+          <span className="text-on-night">
+            <Logo size="sm" night />
           </span>
           <p>{t("shell.footer")}</p>
           <InstallApp />
@@ -214,7 +222,7 @@ export function SiteFooter() {
         >
           {columns.map(({ heading, links }) => (
             <div key={heading} className="flex flex-col gap-2.5">
-              <p className="text-ink font-semibold">{heading}</p>
+              <p className="text-on-night font-semibold">{heading}</p>
               <ul className="flex flex-col gap-2.5">
                 {links.map(({ href, label }) => (
                   <li key={href}>
@@ -223,7 +231,7 @@ export function SiteFooter() {
                     <Link
                       href={href}
                       prefetch={false}
-                      className="hover:text-peacock no-underline hover:underline"
+                      className="hover:text-night-accent no-underline hover:underline"
                     >
                       {label}
                     </Link>
@@ -246,10 +254,13 @@ export function PageHeading({
   intro?: ReactNode;
 }) {
   return (
-    <div className="rise flex flex-col gap-3 pt-2 sm:gap-4 sm:pt-6">
-      <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
+    <div className="rise flex flex-col gap-2 pt-1 sm:gap-4 sm:pt-6">
+      <h1 className="font-display text-[2.75rem] leading-[1.05] tracking-tight sm:text-6xl">
         {title}
       </h1>
+      {/* A short gold rule with a diamond, drawn in as the page opens:
+          the same mark as beside a town in the lists. */}
+      <span aria-hidden="true" className="heading-mark" />
       {intro && (
         <p className="text-muted max-w-prose text-lg leading-relaxed">
           {intro}

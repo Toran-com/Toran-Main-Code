@@ -4,7 +4,8 @@ import { cardClass } from "@/components/ui";
 // A card that folds away: its heading is always there, tap to open it.
 // For the less-used parts of long pages (the committee page), so what's
 // done every week stays near the top. A link to the card's id opens it
-// (OpenFromHash).
+// (OpenFromHash). It opens and closes smoothly where the browser can
+// (app/globals.css, .fold).
 export function Fold({
   id,
   title,
@@ -20,7 +21,11 @@ export function Fold({
   children: ReactNode;
 }) {
   return (
-    <details id={id} open={open} className={`${cardClass} group scroll-mt-24`}>
+    <details
+      id={id}
+      open={open}
+      className={`${cardClass} fold group scroll-mt-24`}
+    >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 sm:p-7 [&::-webkit-details-marker]:hidden">
         <span className="flex flex-col gap-1">
           <h2 className="text-xl font-bold sm:text-2xl">{title}</h2>
