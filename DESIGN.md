@@ -67,7 +67,27 @@ as decoration.
   pages.
 - Sections: 64px apart on a phone, 96–112px on a laptop. Generous space
   is part of the look.
-- Header: one row. On a phone, four labelled tabs sit along the bottom.
+- Header: one row, always at the top. Once the page has scrolled it's a
+  little see-through with the page blurred behind it; on a phone it slides
+  away while you scroll down and comes back the moment you scroll up, so
+  the page has the screen. A thin gold line along its foot shows how far
+  down the page you are. On a phone, four labelled tabs sit along the
+  bottom and never move; the pill behind the current one slides across.
+- Footer: a midnight band under its own garland, so a page ends as it
+  began.
+- **First screen on a phone:** what the page is for and its main action
+  are both above the bar along the bottom. On the home page that's the
+  headline and "Find events near me"; on What's on it's the first event.
+- **Things that follow you:** a day's heading stays under the header
+  while its events scroll past (`.sticks`), as does the committee page's
+  section bar. On a phone, What's on has one floating button above the
+  bottom bar to switch to the map (or back to the list).
+- **Rows to swipe** (`.swipe-row`): festival cards, and on a phone the
+  six steps of "See how Toran works". Cards click into place, the next
+  one peeks in at the edge, and dots show where you are.
+- A page heading (`PageHeading`) has a short gold rule ending in a
+  diamond beneath it. Narrow pages (log in, your account, a form) have a
+  faint rangoli either side on a wide laptop screen, clear of the text.
 
 ## Shape and depth
 
@@ -157,8 +177,15 @@ width of the screen:
   published), typing it in, and ticking festivals or last year's events.
   Beside them (under them on a phone): anything waiting to be checked,
   the next three events with Edit, and what needs doing.
+- **Section bar:** straight under the name, one row of pills for every
+  part of the page and its two other pages (Seva, Numbers, Share,
+  Committee, Photo, Details, Your calendar). It stays under the header as
+  you scroll, and on a phone it swipes sideways.
 - **Below:** adding and the events on the left; sharing and the mandir's
-  settings, folded, on the right. One column on a phone.
+  settings, folded, on the right. One column on a phone. Folded cards
+  open and close smoothly.
+- **Its other pages:** Seva and Numbers are wide pages (Numbers shows its
+  four totals in one row on a laptop); forms stay narrow.
 
 ## Motion
 
@@ -175,18 +202,33 @@ Calm and purposeful, never decoration for its own sake.
   tile and name grow from its card into the event page; a mandir's name
   moves from the list into its heading. The rest crossfades in 180ms;
   the header and the bar along the bottom stay still.
-- **Scroll story:** on the home page a phone stays on screen while six
-  steps scroll past; its screen changes to the step in view and the
-  button that step is about is outlined in gold, with a gentle tap
-  (`components/home-story.tsx`). The phone is a picture; each step says
-  in words what its button does and links to try it.
+- **Scroll story:** on a laptop the home page keeps a phone on screen
+  while six steps scroll past; its screen changes to the step in view and
+  the button that step is about is outlined in gold, with a gentle tap
+  (`components/home-story.tsx`). On a phone the six steps are cards in a
+  row to swipe, each with its own phone. The phone is a picture; each
+  step says in words what its button does and links to try it.
 - **The welcome:** the lit diya (`components/hero-diya.tsx`) always fits
   on the first screen. Its flame flickers, leans towards the mouse and
   sways when the page is scrolled, with sparks rising from it; the warm
   light it throws across the welcome breathes, drifts after the mouse and
   grows as you scroll down.
-- **Pointer:** cards lift 3px (`.lift`); buttons press in slightly.
-- **Durations:** 200–450ms, easing `cubic-bezier(0.2, 0.7, 0.2, 1)`.
+- **Header and bars:** see "Spacing and layout". The header's slide,
+  its blur and the progress line follow the scroll
+  (`components/scroll-chrome.tsx` marks `<html>`; the line is CSS
+  `animation-timeline: scroll()`).
+- **Swiping:** in a row to swipe, cards at the edges sit a little smaller
+  and settle to full size in the middle (`.swipe-settle`).
+- **Opening things:** the menu slides in from the right while the page
+  dims; the filter panel pops open from its button; folded cards grow to
+  their height. Jumping to a part of a page glides there.
+- **Headings:** the gold rule under a page heading draws in from the
+  left.
+- **Pointer:** cards lift 3px (`.lift`); rows in a list of events tint;
+  buttons rise 1px under the pointer and press in when tapped.
+- **Durations:** 200–450ms, easing `cubic-bezier(0.2, 0.7, 0.2, 1)`; a
+  little spring (`cubic-bezier(0.3, 1.35, 0.5, 1)`) only for the tab
+  pill.
 - **Reduced motion:** everything above is off when the device asks for
   less motion. Never animate in a way that hides content from someone
   who can't scroll or animate.

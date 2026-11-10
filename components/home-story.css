@@ -5,8 +5,8 @@
    On a laptop one phone stays beside the steps and shows the screen for
    the step in view (data-active, set by components/story-scroll.tsx).
    Screens not in view are hidden outright, never left faint. On a phone,
-   each step has its own phone above its words instead, so nothing ever
-   covers the words on a small screen.
+   the steps are cards to swipe through, each with its own phone above
+   its words, so nothing ever covers the words on a small screen.
 
    The button each step is about is outlined in gold, with a gentle tap.
    With less motion asked for, nothing moves. */

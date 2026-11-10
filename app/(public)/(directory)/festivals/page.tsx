@@ -155,7 +155,7 @@ function FestivalCard({ date }: { date: FestivalDate }) {
     ...festivalText(date.festival.slug, date.festival),
   };
   return (
-    <article className="has-card-link group flex gap-4 py-5 sm:gap-6">
+    <article className="has-card-link group hover:bg-surface -mx-3 flex gap-4 rounded-2xl px-3 py-5 transition-colors duration-200 sm:gap-6">
       <DateTile
         date={date.starts_on}
         label={formatDateRange(date.starts_on, date.ends_on)}

@@ -65,12 +65,12 @@ export function SiteMenu({
           tabIndex={-1}
           aria-hidden="true"
           onClick={shut}
-          className="absolute inset-0 cursor-default bg-black/45"
+          className="menu-backdrop absolute inset-0 cursor-default bg-black/45"
         />
         <div
           role="group"
           aria-label={label}
-          className="bg-bg shadow-lift absolute inset-y-0 right-0 flex w-full max-w-md flex-col overflow-y-auto overscroll-contain"
+          className="menu-panel bg-bg shadow-lift absolute inset-y-0 right-0 flex w-full max-w-md flex-col overflow-y-auto overscroll-contain"
         >
           <div className="bg-bg border-line sticky top-0 z-10 flex items-center justify-between gap-4 border-b px-5 py-3">
             <p className="font-display text-3xl">{label}</p>

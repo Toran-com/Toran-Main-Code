@@ -94,17 +94,21 @@ export function HomeStory() {
           </ol>
         </div>
 
-        <ol className="flex flex-col gap-16 lg:order-1 lg:gap-0">
+        {/* On a phone the steps are cards in a row to swipe through, each
+            with its own phone above its words; on a laptop they're a
+            column, and the one phone beside them changes. */}
+        <ol
+          aria-label={t("story.title")}
+          className="swipe-row-small swipe-settle -mx-4 gap-4 px-4 pb-4 sm:-mx-8 sm:px-8 lg:order-1 lg:mx-0 lg:flex lg:flex-col lg:gap-0 lg:px-0 lg:pb-0"
+        >
           {STEPS.map((step, i) => (
             <li
               key={step.title}
               data-story-step={i}
-              className="story-step flex flex-col items-center gap-8 lg:min-h-[85svh] lg:items-start lg:justify-center"
+              className="story-step border-line bg-surface shadow-card flex w-[84vw] max-w-[24rem] flex-col items-center gap-6 rounded-3xl border p-5 pt-6 lg:min-h-[72svh] lg:w-auto lg:max-w-none lg:items-start lg:justify-center lg:gap-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
             >
-              {/* On a phone, each step has its own phone, just above its
-                  words; on a laptop the one beside the steps changes. */}
-              <div aria-hidden="true" className="reveal lg:hidden">
-                <Phone only={i} className="w-[min(64vw,15rem)]" />
+              <div aria-hidden="true" className="lg:hidden">
+                <Phone only={i} className="w-[min(50vw,11.5rem)]" />
               </div>
               <div className="flex max-w-xl flex-col gap-3 sm:gap-4">
                 <p className="text-muted flex items-center gap-3 text-base font-semibold">
@@ -130,6 +134,16 @@ export function HomeStory() {
                 </Link>
               </div>
             </li>
+          ))}
+        </ol>
+        {/* Which card you're on, on a phone. */}
+        <ol aria-hidden="true" className="flex justify-center gap-2 lg:hidden">
+          {STEPS.map((step, i) => (
+            <li
+              key={step.title}
+              data-dot={i}
+              className="story-dot bg-line-strong h-2 w-2 rounded-full"
+            />
           ))}
         </ol>
       </StoryScroll>

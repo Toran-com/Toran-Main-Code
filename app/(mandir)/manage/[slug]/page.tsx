@@ -435,17 +435,14 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </Card>
       )}
 
-      <Dashboard
-        slug={mandir.slug}
-        events={events}
-        posters={posters.length}
-        reading={posterReadingOn()}
-        picks={festivals.length + lastYear.length > 0}
-        todo={<CommitteeTodo facts={facts} />}
-      />
-
-      <nav aria-label="More for your mandir">
-        <ul className="flex flex-wrap gap-2">
+      {/* The mandir's own bar: every part of this page and its two other
+          pages, one tap away. It stays under the header as you scroll,
+          and on a phone it's a row to swipe. */}
+      <nav
+        aria-label="More for your mandir"
+        className="sticks border-line bg-bg/90 -mx-4 border-b px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6 lg:rounded-b-2xl"
+      >
+        <ul className="flex [scrollbar-width:none] gap-2 overflow-x-auto whitespace-nowrap [&::-webkit-scrollbar]:hidden">
           {[
             [`/manage/${mandir.slug}/seva`, "Seva"],
             [`/manage/${mandir.slug}/numbers`, "Numbers"],
@@ -455,7 +452,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             ["#details", "Details"],
             ["#calendar", "Your calendar"],
           ].map(([href, label]) => (
-            <li key={href}>
+            <li key={href} className="shrink-0">
               <a href={href} className={pillButtonClass}>
                 {label}
               </a>
@@ -463,6 +460,15 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           ))}
         </ul>
       </nav>
+
+      <Dashboard
+        slug={mandir.slug}
+        events={events}
+        posters={posters.length}
+        reading={posterReadingOn()}
+        picks={festivals.length + lastYear.length > 0}
+        todo={<CommitteeTodo facts={facts} />}
+      />
 
       {/* Below the first screen: adding and the events on the left; sharing
           and the mandir's settings on the right (one column on a phone). */}

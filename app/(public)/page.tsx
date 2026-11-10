@@ -63,7 +63,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
           <HeroLight />
           <Toran night />
           {/* On a laptop the welcome fills the screen under the header, with
-              the diya at the bottom; on a phone the diya comes first. */}
+              the diya at the bottom. On a phone the headline and the main
+              button come first, so both are on the first screen, and the
+              diya follows. */}
           <div
             className={`${wideClass} relative flex flex-col items-center justify-center gap-5 pt-6 pb-6 text-center sm:min-h-[calc(100svh-5.75rem)] sm:gap-6 sm:pt-8 sm:pb-8`}
           >
@@ -79,10 +81,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
                 <SeasonLink />
               </Suspense>
             </div>
-            <div className="order-first sm:order-last">
+            <div className="order-last">
               <HeroDiya />
             </div>
-            <h1 className="rise font-display max-w-5xl text-[3.25rem] leading-[1.02] tracking-tight sm:text-7xl lg:text-[clamp(4.5rem,10svh,6rem)]">
+            <h1 className="rise font-display max-w-5xl text-[2.75rem] leading-[1.04] tracking-tight sm:text-7xl sm:leading-[1.02] lg:text-[clamp(4.5rem,10svh,6rem)]">
               {t("home.tagline")}
             </h1>
             <p className="rise text-night-muted max-w-2xl text-xl leading-relaxed sm:text-2xl">

@@ -203,42 +203,72 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(19rem,24rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
       <div className="flex flex-col gap-3 lg:sticky lg:top-28">
         {place}
-        {/* Wraps with big text on a small phone; the filter panel then
-            opens across the whole row. */}
-        <div className="relative flex flex-wrap items-center justify-between gap-3">
+        {/* On a phone, the way to the map (or back to the list) floats
+            just above the bar along the bottom, always in reach, and
+            Filter and the days share one row, so the first events show on
+            the first screen. On a
+            laptop they sit in the rail. Wraps with big text on a small
+            phone; the filter panel then opens across the whole row. */}
+        <div className="relative flex flex-wrap items-center gap-x-2 gap-y-3">
           <nav
             aria-label={t("whatsOn.showAs")}
-            className="border-line-strong bg-surface flex rounded-full border p-1"
+            className="lg:border-line-strong lg:bg-surface fixed right-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-20 flex rounded-full md:bottom-6 lg:static lg:order-1 lg:border lg:p-1"
           >
             {(["list", "map"] as const).map((v) => (
               <Link
                 key={v}
                 href={here({ view: v })}
                 aria-current={view === v ? "page" : undefined}
-                className={`rounded-full px-4 py-1 text-base font-semibold no-underline ${
-                  view === v ? "bg-ink text-bg" : "text-ink hover:bg-sunk"
+                // On a phone only the other view shows, as one floating
+                // button ("Map" over the list, "List" over the map).
+                className={`rounded-full text-base font-semibold no-underline transition-colors lg:px-4 lg:py-1 ${
+                  view === v
+                    ? "lg:bg-ink lg:text-bg max-lg:sr-only"
+                    : "max-lg:bg-ink max-lg:text-bg max-lg:shadow-lift lg:text-ink lg:hover:bg-sunk inline-flex items-center gap-2 max-lg:px-5 max-lg:py-3"
                 }`}
               >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="size-5 lg:hidden"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {v === "map" ? (
+                    <>
+                      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+                      <circle cx="12" cy="9.5" r="2.5" />
+                    </>
+                  ) : (
+                    <path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" />
+                  )}
+                </svg>
                 {v === "list" ? t("whatsOn.list") : t("whatsOn.map")}
               </Link>
             ))}
           </nav>
-          <Filters
-            key={`${kind}|${region}`}
-            kind={kind}
-            region={region}
-            count={(kind ? 1 : 0) + (region ? 1 : 0)}
-            here={here}
-          />
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <nav aria-label={t("whatsOn.when")} className="flex gap-2">
+          <div className="lg:order-2 lg:ml-auto">
+            <Filters
+              key={`${kind}|${region}`}
+              kind={kind}
+              region={region}
+              count={(kind ? 1 : 0) + (region ? 1 : 0)}
+              here={here}
+            />
+          </div>
+          <nav
+            aria-label={t("whatsOn.when")}
+            className="flex gap-2 lg:order-3 lg:w-full"
+          >
             {(["today", "weekend"] as const).map((w) => (
               <Link
                 key={w}
                 href={here({ when: when === w ? "" : w })}
                 aria-current={when === w ? "page" : undefined}
-                className={`inline-flex rounded-full border px-4 py-1.5 text-base no-underline ${
+                className={`inline-flex rounded-full border px-3 py-1.5 text-base no-underline transition-colors sm:px-4 ${
                   when === w
                     ? "border-ink bg-ink text-bg font-semibold"
                     : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"
@@ -248,16 +278,23 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
               </Link>
             ))}
           </nav>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            {!mandirs.length && <FollowedOnly href={here({})} />}
-            <PlanLink />
-            <Link
-              href={localePath("/regular")}
-              className="text-peacock font-semibold underline"
-            >
-              {t("whatsOn.regular")}
-            </Link>
-          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <p className="text-muted" aria-live="polite">
+            {t.count("whatsOn.count", events.length)}
+            {position &&
+              events.length > 1 &&
+              view === "list" &&
+              t("whatsOn.nearestFirst")}
+          </p>
+          {!mandirs.length && <FollowedOnly href={here({})} />}
+          <PlanLink />
+          <Link
+            href={localePath("/regular")}
+            className="text-peacock font-semibold underline"
+          >
+            {t("whatsOn.regular")}
+          </Link>
         </div>
         {active.length > 0 && (
           <ul aria-label={t("whatsOn.chosen")} className="flex flex-wrap gap-2">
@@ -275,13 +312,6 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
             ))}
           </ul>
         )}
-        <p className="text-muted" aria-live="polite">
-          {t.count("whatsOn.count", events.length)}
-          {position &&
-            events.length > 1 &&
-            view === "list" &&
-            t("whatsOn.nearestFirst")}
-        </p>
       </div>
       <div className="flex min-w-0 flex-col gap-6">
         {problem && <Notice tone="error">{problem}</Notice>}
@@ -397,7 +427,7 @@ function Filters({
           </span>
         )}
       </summary>
-      <div className="border-line bg-surface absolute top-full right-0 left-0 z-20 mt-2 flex flex-col gap-5 rounded-3xl border p-5 shadow-[0_20px_48px_rgba(0,0,0,0.18)] lg:right-auto lg:w-[32rem]">
+      <div className="pop-in border-line bg-surface absolute top-full right-0 left-0 z-20 mt-2 flex flex-col gap-5 rounded-3xl border p-5 shadow-[0_20px_48px_rgba(0,0,0,0.18)] lg:right-auto lg:w-[32rem]">
         <Choices
           title={t("whatsOn.type")}
           all={t("whatsOn.anyType")}

@@ -57,6 +57,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-GB"
+      // Jumps within a page glide (app/globals.css); going from page to
+      // page still starts at the top at once.
+      data-scroll-behavior="smooth"
       className={`${marcellus.variable} ${gujaratiSerif.variable} ${mulish.variable} h-full antialiased`}
       // The visitor's text size and contrast are set on <html> before the
       // page is drawn (lib/display.ts), so it differs from the server's.
