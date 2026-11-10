@@ -98,24 +98,36 @@ as decoration.
 - **Garland** (`.toran`): a fine gold line with small drops, under the
   header.
 - **Maps** (`components/uk-map.ts`, shared by the mandirs, What's on and
-  Seva maps): a night-time map of the UK that Toran draws itself, with no
-  roads. The land is a soft fill of fine dots inside a thin gold coastline
-  (cream on light, midnight on dark), with only a few city names, which
-  move beside a light or step aside rather than sit under one. Streets
-  (OpenStreetMap, recoloured) fade in only when you zoom in to a town.
-  One mandir is a small flame; several together are a midnight lamp with a
-  gold rim and the number. Lights come on one after another as the map
-  opens, glow brighter when pointed at or focused, and stay lit while
-  their card is open. A key under the map says what each means.
+  Seva maps): a real street map (OpenFreeMap, drawn in the browser;
+  decision 0019) in Toran's colours (`components/map-style.ts`): warm
+  light land, soft blue water, green parks, white streets with grey
+  edges and gold motorways; on a dark page the same map at night,
+  midnight land and darker sea. No shops or cafés: the mandirs are the
+  only places marked. One mandir is a midnight pin with a gold flame;
+  several together are a midnight circle with a white edge, a gold ring
+  and the number. Pins drop in one after another as the map opens, lift
+  when pointed at or focused, and turn gold while chosen.
 - **Using a map:** it never traps the page. Scrolling scrolls the page
   (Ctrl or ⌘ and scroll zooms, as on Google Maps); on a phone one finger
   scrolls the page and two move the map, and a short hint says so. Big
   44px buttons: zoom, full screen (where one finger moves it; Esc closes
-  it) and back to the whole UK. One tap on any light opens its card: a
-  group lists its mandirs (with "Zoom in here"), and every card has 18px
-  text, a filled main button and Directions (Google Maps). With a mouse,
-  a light's name shows as you point at it. "Near me" on the mandirs map
-  also lists the five nearest mandirs, with how far each is.
+  it) and back to the whole UK. A circle zooms in when tapped (Enter or
+  Space from the keyboard). With a mouse, a pin's name shows as you
+  point at it.
+- **The mandir finder** (`/mandirs`, `components/directory-list.tsx`),
+  like the best shop finders: one search box (a town, a postcode or a
+  mandir's name) and "Near me" at the top; on a computer the list sits
+  beside the map in one card, and on a phone "Map" and "List" are tabs.
+  Each mandir in the list has its name (the way to its page), town and
+  tradition, "Open now · until 8:30pm" in green or "Closed now · opens
+  …", how far away once we know, and a "Show on map" button. Until the
+  list is sorted by distance it's grouped by region under small sticky
+  headings. Choosing a pin turns it gold, picks it out in the list (a
+  marigold edge) and shows its card over the bottom of the map: name in
+  the heading font, town, tradition and distance, open now, a filled
+  "See what's on" and Directions (Google Maps). Pointing at a mandir in
+  the list lifts its pin; moving the map narrows the list to what's on
+  it, nearest the middle first.
 
 ## Admin area
 

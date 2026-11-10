@@ -1,6 +1,6 @@
 # Privacy notice (DRAFT)
 
-> Draft of 2 November 2026, brought up to date with the site as built.
+> Draft of 9 November 2026, brought up to date with the site as built.
 > Not yet published as final. Text in [brackets] is for the founders to
 > fill in; everything else has been checked against the site and the
 > providers' own terms.
@@ -36,11 +36,14 @@ within one month.
   we can fix it. We set it up not to store IP addresses, cookies, browser
   headers or email addresses. Reports are deleted after 30 days (90 days
   on Sentry's Team plan).
-- **The mandirs map.** The map pictures come from OpenStreetMap. Your
-  browser fetches them directly, so OpenStreetMap sees your IP address, as
-  any website you visit does. If you press "Near me", your browser asks
-  first; your location only moves the map on your screen and is never sent
-  to us or kept.
+- **The maps.** The street map comes from OpenFreeMap (or, on some
+  phones, from OpenStreetMap). Your browser fetches it directly, so
+  OpenFreeMap or OpenStreetMap sees your IP address, as any website you
+  visit does; neither uses cookies. If you press "Near me", your browser
+  asks first; your location only moves the map on your screen and is
+  never sent to us or kept. If you type a postcode in the mandir search,
+  we look it up with postcodes.io for you, without anything about you,
+  and don't keep it.
 - **"Near me" on What's on and the festival pages.** If you press it, your
   browser asks first, then sends your position (rounded to about a
   kilometre) to postcodes.io to find your postcode district, such as
@@ -250,4 +253,4 @@ don't show a cookie banner. If that ever changes, we'll ask first.
 ## Changes
 
 We'll update this notice when we start collecting something new, and show
-the date at the top. Last updated: 2 November 2026.
+the date at the top. Last updated: 9 November 2026.

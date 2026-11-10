@@ -1,91 +1,64 @@
 /* The maps (components/uk-map.ts and the mandirs, What's on and Seva
    maps). Leaflet's own styles load just before these, so rules are scoped
-   to .toran-map to take precedence. Colours follow the page: a cream map
-   on a light page, a night-time one on a dark page. */
+   to .toran-map to take precedence. The street map itself is coloured in
+   components/map-style.ts; this is everything on top of it. */
 
 .toran-map {
-  --map-sea: radial-gradient(
-    120% 90% at 50% 35%,
-    color-mix(in srgb, var(--surface) 70%, var(--bg)),
-    var(--bg)
-  );
-  --map-land: #fffdf8;
-  --map-dots: rgb(20 33 61 / 0.16);
-  --map-coast: #c9963a;
-  --map-place: #4a4b5e;
-  --map-place-halo: #fffdf8;
-  --lamp-edge: #8a6418;
+  /* The land's colour, shown while the streets load. */
+  --map-land: #f4f2ed;
+  --pin: #14213d;
+  --pin-edge: #ffffff;
+  --pin-chosen: #d9a441;
 }
-@media screen and (prefers-color-scheme: dark) {
-  .toran-map {
-    --map-sea: radial-gradient(120% 90% at 50% 35%, #14213d, #0b1222 75%);
-    --map-land: #172748;
-    --map-dots: rgb(226 182 90 / 0.2);
-    --map-coast: rgb(226 182 90 / 0.75);
-    --map-place: #c9ccda;
-    --map-place-halo: #0b1222;
-    --lamp-edge: transparent;
-  }
+.toran-map[data-look="dark"] {
+  --map-land: #15233f;
+  --pin-edge: #f6e7b8;
 }
 
 .toran-map.leaflet-container {
   font-family: var(--font-mulish), system-ui, sans-serif;
   font-size: 1rem;
-  background: var(--map-sea);
+  background: var(--map-land);
 }
 
-/* The UK, drawn by Toran: a soft fill, fine dots, a gold coastline. It
-   fades away when the streets come in. */
-.toran-map .toran-land {
-  fill: var(--map-land);
-  fill-opacity: 1;
-  stroke: var(--map-coast);
-  stroke-width: 1.4;
-  stroke-linejoin: round;
-  transition:
-    fill-opacity 0.4s,
-    stroke-opacity 0.4s;
+/* The layer over the map for the chosen mandir's card: above the map and
+   its buttons, but only the card itself takes taps. */
+.toran-map .toran-map-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1100;
+  pointer-events: none;
 }
-.toran-map .toran-land-dots {
-  fill-opacity: 1;
-  transition: fill-opacity 0.4s;
+.toran-map .toran-map-overlay > * {
+  pointer-events: auto;
 }
-.toran-map .toran-dot-mark {
-  fill: var(--map-dots);
+/* Leaflet colours every link in the map; the card's own colours win. */
+.toran-map .toran-map-overlay a.toran-card-main {
+  color: var(--on-peacock);
 }
-.toran-map[data-depth="street"] .toran-land,
-.toran-map[data-depth="street"] .toran-land-dots {
-  fill-opacity: 0;
-  stroke-opacity: 0;
+.toran-map .toran-map-overlay a.toran-card-quiet {
+  color: var(--peacock);
 }
 
-/* The streets, recoloured: quiet and warm on a light page… */
-.toran-map .toran-tiles {
-  filter: grayscale(1) sepia(0.2) brightness(1.04) contrast(0.88);
+/* The street map fades in once drawn. */
+.toran-map .leaflet-gl-layer {
+  animation: toran-fade-in 0.5s ease-out;
 }
-/* …midnight blue on a dark one. */
-@media screen and (prefers-color-scheme: dark) {
-  .toran-map .toran-tiles {
-    filter: invert(0.88) grayscale(1) sepia(1) hue-rotate(190deg) saturate(2)
-      brightness(0.75) contrast(1.1);
+@keyframes toran-fade-in {
+  from {
+    opacity: 0;
   }
 }
 
-/* City names: few, quiet, in the heading font. */
-.toran-map .toran-place {
-  display: flex;
-  justify-content: center;
-  background: none;
-  border: 0;
-  font-family: var(--font-marcellus), Georgia, serif;
-  font-size: 1.125rem;
-  line-height: 1.4;
-  letter-spacing: 0.02em;
-  color: var(--map-place);
-  text-shadow:
-    0 0 3px var(--map-place-halo),
-    0 0 8px var(--map-place-halo);
-  white-space: nowrap;
+/* Where the streets are OpenStreetMap's pictures instead: a little
+   softer, to sit with the page… */
+.toran-map .toran-tiles {
+  filter: saturate(0.7) brightness(1.03) contrast(0.95);
+}
+/* …and midnight blue on a dark one. */
+.toran-map[data-look="dark"] .toran-tiles {
+  filter: invert(0.88) grayscale(1) sepia(1) hue-rotate(190deg) saturate(2)
+    brightness(0.75) contrast(1.1);
 }
 
 /* Zoom buttons and the credit, in the page's colours. */
@@ -205,8 +178,9 @@ html.toran-map-open {
   color: var(--peacock);
 }
 
-/* The lights. One mandir: a flame with a soft glow. Several: a midnight
-   lamp with a gold rim and the number, its flame on top. */
+/* The marks. One mandir: a midnight pin with a gold flame. Several: a
+   midnight circle with a white edge, a gold ring and the number. Chosen
+   (its card open, or picked in the list): gold. */
 .toran-map .toran-lamp {
   background: none;
   border: 0;
@@ -217,151 +191,115 @@ html.toran-map-open {
   display: block;
   width: 100%;
   height: 100%;
+  transform-origin: 50% 100%;
+  transition: scale 0.2s cubic-bezier(0.2, 0.8, 0.2, 1.3);
 }
-.toran-map .toran-lamp-glow {
-  position: absolute;
-  left: 50%;
-  top: 12px;
-  width: 56px;
-  aspect-ratio: 1;
-  translate: -50% -30%;
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    rgb(246 231 184 / 0.75),
-    rgb(217 164 65 / 0.35) 40%,
-    transparent
-  );
-  opacity: 0.7;
-  pointer-events: none;
-  transition:
-    opacity 0.25s,
-    scale 0.25s;
-}
-.toran-map .toran-lamp-flame {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 20px;
-  height: 27px;
-  translate: -50% 0;
+.toran-map .toran-pin-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
   overflow: visible;
-  transform-origin: 50% 85%;
-  animation: toran-flicker var(--f, 2s) ease-in-out var(--d, 0ms) infinite;
-  transition: scale 0.25s;
+  filter: drop-shadow(0 3px 4px rgb(11 18 34 / 0.35));
+}
+.toran-map .toran-pin-body {
+  fill: var(--pin);
+  stroke: var(--pin-edge);
+  stroke-width: 2;
+  transition: fill 0.2s;
 }
 .toran-map .toran-lamp-outer {
   fill: #d9a441;
-  stroke: var(--lamp-edge);
-  stroke-width: 1.2;
+  transition: fill 0.2s;
 }
 .toran-map .toran-lamp-core {
   fill: #fff4d6;
 }
-.toran-map .toran-lamp-many .toran-lamp-glow {
-  top: calc(18px + var(--disc) / 2);
-  width: calc(var(--disc) * 1.9);
-  translate: -50% -50%;
-  background: radial-gradient(
-    closest-side,
-    rgb(217 164 65 / 0.45),
-    rgb(217 164 65 / 0.15) 55%,
-    transparent
-  );
-}
-.toran-map .toran-lamp-many .toran-lamp-flame {
-  width: 15px;
-  height: 20px;
+.toran-map .toran-lamp-many .toran-lamp-inner {
+  transform-origin: 50% 50%;
 }
 .toran-map .toran-lamp-disc {
-  position: absolute;
-  left: 50%;
-  top: 18px;
-  width: var(--disc);
-  height: var(--disc);
-  translate: -50% 0;
   display: grid;
   place-items: center;
+  width: var(--disc);
+  height: var(--disc);
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 30%, #1d2f5c, #14213d 70%);
-  border: 2px solid #d9a441;
+  background: var(--pin);
+  border: 2px solid var(--pin-edge);
   box-shadow:
-    0 0 0 3px rgb(217 164 65 / 0.18),
-    0 6px 14px -6px rgb(0 0 0 / 0.6);
-  color: #f6e7b8;
+    0 0 0 3px rgb(217 164 65 / 0.85),
+    0 4px 10px rgb(11 18 34 / 0.35);
+  color: #ffffff;
   font-size: 1.125rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
-/* Pointed at, focused, or its card open: brighter. */
-.toran-map .toran-lamp:hover .toran-lamp-glow,
-.toran-map .toran-lamp:focus-visible .toran-lamp-glow,
-.toran-map .toran-lamp.toran-lit .toran-lamp-glow {
-  opacity: 1;
-  scale: 1.35;
+/* Pointed at or focused: lifted. Chosen: gold, and bigger. */
+.toran-map .toran-lamp:hover .toran-lamp-inner,
+.toran-map .toran-lamp:focus-visible .toran-lamp-inner,
+.toran-map .toran-lamp.toran-pointed .toran-lamp-inner {
+  scale: 1.12;
 }
-.toran-map .toran-lamp:hover .toran-lamp-flame,
-.toran-map .toran-lamp:focus-visible .toran-lamp-flame,
-.toran-map .toran-lamp.toran-lit .toran-lamp-flame {
-  scale: 1.25;
+.toran-map .toran-lamp.toran-lit,
+.toran-map .toran-lamp.toran-chosen {
+  z-index: 1000 !important;
+}
+.toran-map .toran-lamp.toran-lit .toran-lamp-inner,
+.toran-map .toran-lamp.toran-chosen .toran-lamp-inner {
+  scale: 1.22;
+}
+.toran-map .toran-lit .toran-pin-body,
+.toran-map .toran-chosen .toran-pin-body {
+  fill: var(--pin-chosen);
+  stroke: var(--pin);
+}
+.toran-map .toran-lit .toran-lamp-outer,
+.toran-map .toran-chosen .toran-lamp-outer {
+  fill: var(--pin);
+}
+.toran-map .toran-lit .toran-lamp-disc,
+.toran-map .toran-chosen .toran-lamp-disc {
+  background: var(--pin-chosen);
+  color: var(--pin);
 }
 .toran-map .toran-lamp:focus-visible {
-  outline: 3px solid var(--ink);
+  outline: 3px solid var(--peacock);
   outline-offset: 3px;
   border-radius: 12px;
 }
 
-/* As the map opens, the lights come on one after another. */
-.toran-map .toran-light-up .toran-lamp-flame {
-  animation:
-    toran-ignite 0.7s cubic-bezier(0.2, 0.8, 0.2, 1.25) var(--d, 0ms) backwards,
-    toran-flicker var(--f, 2s) ease-in-out var(--d, 0ms) infinite;
+/* As the map opens, the pins drop in one after another. */
+.toran-map .toran-light-up .toran-lamp-inner {
+  animation: toran-drop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1.2) var(--d, 0ms)
+    backwards;
 }
-.toran-map .toran-light-up .toran-lamp-glow,
-.toran-map .toran-light-up .toran-lamp-disc {
-  animation: toran-glow-in 0.8s ease-out var(--d, 0ms) backwards;
-}
-
-@keyframes toran-ignite {
-  from {
-    scale: 0;
-    opacity: 0;
-  }
-  60% {
-    scale: 1.3;
-    opacity: 1;
-  }
-  to {
-    scale: 1;
-  }
-}
-
-@keyframes toran-glow-in {
+@keyframes toran-drop {
   from {
     opacity: 0;
-    scale: 0.5;
+    translate: 0 -14px;
+    scale: 0.6;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toran-map .toran-light-up .toran-lamp-inner {
+    animation: none;
+  }
+  .toran-map .toran-lamp-inner {
+    transition: none;
   }
 }
 
-@keyframes toran-flicker {
-  0%,
-  100% {
-    transform: none;
-  }
-  20% {
-    transform: scale(0.95, 1.06) skewX(-3deg);
-  }
-  45% {
-    transform: scale(1.04, 0.95) skewX(2deg);
-  }
-  70% {
-    transform: scale(0.97, 1.05) skewX(-1.5deg);
-  }
-  85% {
-    transform: scale(1.02, 0.98) skewX(1deg);
-  }
+/* The postcode searched for: a gold ring. */
+.toran-map .leaflet-interactive.toran-searched,
+.toran-map path.toran-searched {
+  fill: #d9a441;
+  fill-opacity: 0.25;
+  stroke: #d9a441;
+  stroke-width: 3;
 }
 
 /* Where you are. */

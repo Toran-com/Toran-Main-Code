@@ -3,10 +3,11 @@ import { expectAccessible } from "../a11y";
 import { BUDGET, MAP_JS, ownDownloadsOnly, pageWeight } from "../speed";
 import { showMandirList, stubMapTiles } from "./helpers";
 
-// The map view of the mandir list. Which mandirs have map positions
-// depends on what other tests saved, so these tests don't count dots; the
-// dots themselves are covered by tests/unit/map-clusters.test.ts. Map
-// pictures are stubbed so the tests never call OpenStreetMap.
+// The map view of the mandir finder. Which mandirs have map positions
+// depends on what other tests saved, so these tests don't count pins; the
+// pins themselves are covered by tests/unit/map-clusters.test.ts. The
+// streets are stubbed so the tests never call OpenFreeMap or
+// OpenStreetMap (helpers.ts).
 
 async function openMap(page: Page) {
   await stubMapTiles(page);
@@ -62,15 +63,33 @@ test("groups of mandirs open from the keyboard", async ({ page }) => {
   const groups = page.locator(".toran-cluster");
   if (!(await groups.count())) return;
   // Enter zooms into a group and keeps focus on it, until it's one
-  // mandir (or mandirs at one address, listed in a card).
+  // mandir (or mandirs at one address, which Enter chooses).
   await groups.first().focus();
-  const focusedDot = page.locator(".toran-dot:focus");
-  const card = page.locator(".leaflet-popup");
+  const focusedPin = page.locator(".toran-dot:focus");
+  const card = page.getByRole("region", { name: /chosen on the map/ });
   await expect(async () => {
     await expect(page.locator(".leaflet-marker-icon:focus")).toHaveCount(1);
     if (await page.locator(".toran-cluster:focus").count()) {
       await page.keyboard.press("Enter");
     }
-    await expect(focusedDot.or(card).first()).toBeVisible({ timeout: 1_000 });
+    await expect(focusedPin.or(card).first()).toBeVisible({ timeout: 1_000 });
   }).toPass();
+});
+
+test("choosing a mandir on the map shows its card", async ({ page }) => {
+  await openMap(page);
+  const pins = page.locator(".toran-dot");
+  if (!(await pins.count())) return;
+  await pins.first().focus();
+  await page.keyboard.press("Enter");
+  const card = page.getByRole("region", { name: /chosen on the map/ });
+  await expect(card).toBeFocused();
+  await expect(
+    card.getByRole("link", { name: "See what's on →" }),
+  ).toBeVisible();
+  await expect(
+    card.getByRole("link", { name: /^Directions to / }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(card).toHaveCount(0);
 });

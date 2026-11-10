@@ -46,6 +46,7 @@ export type MandirSummary = Pick<
   | "status"
   | "latitude"
   | "longitude"
+  | "opening_hours"
 >;
 
 export type MandirEvent = Pick<
@@ -114,7 +115,9 @@ export async function listMandirs(): Promise<Loaded<MandirSummary[]>> {
   if (db === "misconfigured") return settle<never>(unavailable);
   const { data, error } = await db
     .from("mandirs")
-    .select("slug, name, town, region, tradition, status, latitude, longitude")
+    .select(
+      "slug, name, town, region, tradition, status, latitude, longitude, opening_hours",
+    )
     .order("name");
   return settle(error ? unavailable : { state: "ok", data });
 }

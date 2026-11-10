@@ -5,7 +5,9 @@ import { LoadProblem, PageHeading } from "@/components/public-shell";
 import { MandirsSkeleton } from "@/components/skeletons";
 import { Notice } from "@/components/ui";
 import { listMandirs } from "@/lib/directory";
+import { formatClock, formatWeekday } from "@/lib/format";
 import { localePath, pageT } from "@/lib/i18n/page";
+import { readSessions, WEEKDAYS } from "@/lib/opening-hours";
 import { pageMetadata } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -38,5 +40,19 @@ async function Directory() {
   if (result.data.length === 0) {
     return <Notice>{t("mandirs.none")}</Notice>;
   }
-  return <DirectoryList mandirs={result.data} />;
+  // Every opening and closing time the list may show, and the day names,
+  // ready in the page's language; whether each mandir is open is worked
+  // out on the visitor's phone (components/open-now.tsx).
+  const clocks = new Set(
+    result.data.flatMap((m) =>
+      readSessions(m.opening_hours).flatMap((s) => [s.opens, s.closes]),
+    ),
+  );
+  const hours = {
+    times: Object.fromEntries([...clocks].map((c) => [c, formatClock(c)])),
+    days: Object.fromEntries(
+      WEEKDAYS.map((d) => [d, formatWeekday(d, "long")]),
+    ),
+  };
+  return <DirectoryList mandirs={result.data} hours={hours} />;
 }

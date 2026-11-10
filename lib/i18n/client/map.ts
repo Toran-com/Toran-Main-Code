@@ -11,8 +11,6 @@ export const enMap = {
   "mapUi.directions": "Directions",
   "mapUi.directionsLabel": "Directions to {name} (opens Google Maps)",
   "mapUi.zoomHere": "Zoom in here",
-  "mapUi.key.one": "One mandir",
-  "mapUi.key.many": "Several mandirs: tap to see them",
   "mapUi.key.events": "Events at a mandir: tap to see them",
   "mapUi.key.places": "Places free at a mandir: tap to see them",
   "mapUi.nearest": "Nearest to you",

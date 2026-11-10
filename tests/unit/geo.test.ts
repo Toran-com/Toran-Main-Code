@@ -5,6 +5,7 @@ import {
   lookupPostcodes,
   normalisePostcode,
   outcodeNear,
+  postcodeIn,
 } from "@/lib/geo";
 import { formatMiles } from "@/lib/format";
 
@@ -130,5 +131,21 @@ describe("outcodeNear", () => {
         fetcher as unknown as typeof fetch,
       ),
     ).rejects.toThrow();
+  });
+});
+
+describe("postcodeIn", () => {
+  it("tidies full postcodes and districts", () => {
+    expect(postcodeIn("le4 6ar")).toBe("LE4 6AR");
+    expect(postcodeIn(" LE46AR ")).toBe("LE4 6AR");
+    expect(postcodeIn("ha3")).toBe("HA3");
+    expect(postcodeIn("SW1A")).toBe("SW1A");
+  });
+
+  it("leaves towns and mandirs' names to the name search", () => {
+    expect(postcodeIn("Leicester")).toBeNull();
+    expect(postcodeIn("BAPS")).toBeNull();
+    expect(postcodeIn("geeta leicester")).toBeNull();
+    expect(postcodeIn("")).toBeNull();
   });
 });

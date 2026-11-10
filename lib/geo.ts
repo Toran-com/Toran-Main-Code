@@ -17,6 +17,15 @@ export function normalisePostcode(input: string): string | null {
 
 type Fetch = typeof fetch;
 
+// A typed UK postcode or district ("LE4 6AR", "le4", "HA3"), tidied; null
+// for anything else (a town or a mandir's name).
+export function postcodeIn(query: string): string | null {
+  const full = normalisePostcode(query);
+  if (full) return full;
+  const outward = query.toUpperCase().replace(/\s/g, "");
+  return /^[A-Z]{1,2}[0-9][A-Z0-9]?$/.test(outward) ? outward : null;
+}
+
 // Looks up many postcodes at once. Postcodes it can't find map to null.
 export async function lookupPostcodes(
   postcodes: string[],

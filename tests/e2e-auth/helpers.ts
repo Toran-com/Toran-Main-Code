@@ -91,14 +91,21 @@ export async function openAdminTool(page: Page, name: string) {
     .click();
 }
 
-// The mandirs map's pictures come from OpenStreetMap. Tests get a blank
-// picture instead, so they never call OpenStreetMap or wait on it.
+// The maps' streets come from OpenFreeMap, drawn in the browser, or else
+// OpenStreetMap's pictures (decision 0019). Tests never call either:
+// OpenFreeMap answers that it's unavailable, so the map falls back to
+// the pictures, and every picture is blank.
 const BLANK_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
   "base64",
 );
 
 export async function stubMapTiles(page: Page) {
+  await page
+    .context()
+    .route("https://tiles.openfreemap.org/**", (route) =>
+      route.fulfill({ status: 503, body: "" }),
+    );
   await page
     .context()
     .route("https://tile.openstreetmap.org/**", (route) =>
