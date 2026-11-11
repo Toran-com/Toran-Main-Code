@@ -3,7 +3,9 @@ import { pageT } from "@/lib/i18n/page";
 
 // "Add to calendar" for one event: Google Calendar, or a calendar file for
 // Apple, Outlook and the rest. A plain disclosure, so it works without
-// JavaScript.
+// JavaScript. On an event's own page (primary) the choices open in place,
+// pushing what's below down, so they never cover the buttons under it; in
+// a list they open over the page and close when you tap elsewhere.
 export function AddToCalendar({
   mandirSlug,
   eventId,
@@ -21,7 +23,10 @@ export function AddToCalendar({
   const item =
     "hover:bg-sunk text-peacock rounded-xl px-4 py-2.5 font-semibold no-underline";
   return (
-    <details className={`group relative text-base ${primary ? "w-full" : ""}`}>
+    <details
+      data-popover={primary ? undefined : ""}
+      className={`group relative text-base ${primary ? "w-full" : ""}`}
+    >
       <summary
         aria-label={t("calendar.addLabel", { title })}
         className={`list-none [&::-webkit-details-marker]:hidden ${
@@ -44,7 +49,13 @@ export function AddToCalendar({
         </svg>
         {t("calendar.add")}
       </summary>
-      <div className="border-line bg-surface shadow-lift absolute top-full right-0 z-20 mt-2 flex w-56 flex-col rounded-2xl border p-1.5 sm:right-auto sm:left-0 sm:w-72">
+      <div
+        className={
+          primary
+            ? "pop-in border-line bg-surface mt-2 flex w-full flex-col rounded-2xl border p-1.5"
+            : "pop-in border-line bg-surface shadow-lift absolute top-full right-0 z-20 mt-2 flex w-56 flex-col rounded-2xl border p-1.5 sm:right-auto sm:left-0 sm:w-72"
+        }
+      >
         <a
           href={`/mandirs/${mandirSlug}/add-to-calendar${query}`}
           target="_blank"

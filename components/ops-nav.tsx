@@ -16,7 +16,7 @@ export function OpsNav({ counts }: { counts: OpsCounts }) {
     <nav aria-label="Admin" className="flex flex-col gap-5">
       {OPS_GROUPS.map((group) => (
         <section key={group.label} className="flex flex-col gap-1">
-          <h2 className="ops-nav-heading px-3 pb-1 text-sm font-bold tracking-[0.12em] uppercase">
+          <h2 className="ops-nav-heading px-3 pb-1 text-base font-bold tracking-[0.1em] uppercase">
             {group.label}
           </h2>
           <ul className="flex flex-col gap-0.5">

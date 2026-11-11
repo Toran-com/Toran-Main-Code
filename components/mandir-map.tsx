@@ -8,7 +8,13 @@ import type {
 } from "leaflet";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { lamp, makeUkMap, mapControls, nameOnHover } from "@/components/uk-map";
+import {
+  FRAME_PADDING,
+  lamp,
+  makeUkMap,
+  mapControls,
+  nameOnHover,
+} from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
 import { enMandirs } from "@/lib/i18n/client/mandirs";
@@ -293,7 +299,7 @@ export function MandirMap({
           L.latLngBounds(
             points.map((m) => [m.latitude, m.longitude] as [number, number]),
           ),
-          { padding: [40, 40], maxZoom: 13 },
+          { ...FRAME_PADDING, maxZoom: 13 },
         );
       }
     }
