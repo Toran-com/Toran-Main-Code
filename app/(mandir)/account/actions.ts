@@ -30,3 +30,32 @@ export async function declineInvite(formData: FormData) {
   });
   redirect(error ? "/account?error=failed" : "/account?done=declined");
 }
+
+// A family closes its account (decision 0020): the login and its saved
+// lists are deleted. The database refuses for anyone who runs or is
+// asking to run a mandir, or runs Toran; they ask Toran instead.
+export async function closeFamilyAccount(formData: FormData) {
+  if (formData.get("sure") !== "yes") redirect("/account?error=sure");
+  const supabase = await createSessionClient();
+  if (!supabase) redirect("/account?error=failed");
+  const { data: done, error } = await supabase.rpc("delete_my_family_account");
+  if (error || !done) redirect("/account?error=close");
+  // The login no longer exists; clear this browser's session too.
+  await supabase.auth.signOut();
+  redirect("/login?closed=1");
+}
+
+// Deletes what a family's account has saved, keeping the account.
+export async function forgetFamilySaved() {
+  const supabase = await createSessionClient();
+  if (!supabase) redirect("/account?error=failed");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=%2Faccount");
+  const { error } = await supabase
+    .from("family_saved")
+    .delete()
+    .eq("user_id", user.id);
+  redirect(error ? "/account?error=failed" : "/account?done=forgotten");
+}

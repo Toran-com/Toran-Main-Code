@@ -5,7 +5,13 @@ import { expect, test } from "@playwright/test";
 
 test("the header's search finds its way to results", async ({ page }) => {
   await page.goto("/festivals");
-  await page.getByRole("link", { name: "Search" }).click();
+  // On a phone of this size it's in the menu (the header makes room for
+  // "Log in"); from 430px wide it's a magnifier in the header too.
+  await page.locator("summary:visible", { hasText: "Menu" }).click();
+  await page
+    .getByRole("group", { name: "Menu" })
+    .getByRole("link", { name: "Search" })
+    .click();
   await expect(page).toHaveURL(/\/search$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Search");
   await page

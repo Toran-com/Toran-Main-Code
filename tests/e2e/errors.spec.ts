@@ -29,12 +29,17 @@ test("login and not-found pages have the full header, with a way to log in", asy
     await expect(
       page.getByRole("link", { name: "My Toran" }).first(),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: "Search" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Log in", exact: true }),
+    ).toBeVisible();
   }
-  // Committees log in from the menu.
+  // "Log in" in the header, and in the menu.
+  await page.goto("/");
+  await page.getByRole("link", { name: "Log in", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
   await page.goto("/");
   await page.locator("summary", { hasText: "Menu" }).click();
-  await page.getByRole("link", { name: "Committee log in" }).click();
+  await page.getByRole("link", { name: "Log in or create an account" }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Log in");
 });

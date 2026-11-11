@@ -40,14 +40,16 @@ const picture = async () => Buffer.from("poster");
 beforeEach(() => _resetLimitForTests());
 
 describe("the sample posters", () => {
-  it("each has its picture, small and full size", () => {
+  it("each has its picture, full size (JPEG) and small (WebP)", () => {
+    const file = (name: string) =>
+      readFileSync(path.join(process.cwd(), "public", "demo-posters", name));
     for (const p of DEMO_POSTERS) {
-      for (const file of [`${p.id}.jpg`, `${p.id}-small.jpg`]) {
-        const data = readFileSync(
-          path.join(process.cwd(), "public", "demo-posters", file),
-        );
-        expect(data.subarray(0, 2)).toEqual(Buffer.from([0xff, 0xd8]));
-      }
+      expect(file(`${p.id}.jpg`).subarray(0, 2)).toEqual(
+        Buffer.from([0xff, 0xd8]),
+      );
+      const small = file(`${p.id}-small.webp`);
+      expect(small.subarray(0, 4).toString()).toBe("RIFF");
+      expect(small.subarray(8, 12).toString()).toBe("WEBP");
     }
   });
 

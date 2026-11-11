@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FamilyAccountNote } from "@/components/family-account-note";
 import { Hub } from "@/components/hub";
 import { PageHeading } from "@/components/public-shell";
 import { localePath, pageT } from "@/lib/i18n/page";
@@ -22,6 +23,7 @@ export default function MyToranPage() {
   return (
     <div className="page-wide flex flex-col gap-8 sm:gap-10">
       <PageHeading title={t("my.title")} intro={t("my.intro")} />
+      <FamilyAccountNote />
       <Hub />
     </div>
   );

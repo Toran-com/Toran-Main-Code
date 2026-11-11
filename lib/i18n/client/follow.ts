@@ -4,6 +4,7 @@ export const enFollow = {
   "follow.follow": "Follow",
   "follow.following": "Following",
   "follow.saved": "Saved on this phone only, no account needed.",
+  "follow.savedAccount": "Saved to your account, on every device.",
   "follow.see": "See what's on at the mandirs you follow",
   "follow.only": "Only mandirs I follow ({count})",
   "follow.yours": "Your mandirs",

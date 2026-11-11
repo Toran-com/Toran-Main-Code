@@ -137,6 +137,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"family_saved": {
+                  Row: {
+                    "following": (string)[],"plan": NonNullable<Json>,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "following"?: (string)[],"plan"?: NonNullable<Json>,"updated_at"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "following"?: (string)[],"plan"?: NonNullable<Json>,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"festival_dates": {
                   Row: {
                     "calendar": Database["public"]['Enums']["calendar_tradition"] | null,"created_at": string,"ends_on": string,"festival_id": string,"id": string,"source": string | null,"starts_on": string,"verified": boolean
@@ -449,6 +463,9 @@ isOneToOne: false
                            },
 "decide_mandir_claim":
 { Args: { "approve": boolean,"claim": string }; Returns: undefined
+                           },
+"delete_my_family_account":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "drop_committee_invite":
 { Args: { "invite": string }; Returns: boolean

@@ -80,6 +80,11 @@ export const enHub = {
   "hub.settings.noPlace":
     "No place saved. What's on asks where you are the first time.",
   "hub.settings.forgetPlace": "Forget my place",
+  "hub.account.title": "Keep them on every device",
+  "hub.account.text":
+    "Log in with your email and the mandirs you follow and your plan are on your phone, tablet and laptop. Free, no password.",
+  "hub.account.button": "Log in or create an account",
+  "hub.account.saved": "Saved to your account, on every device you log in on.",
   "hub.move.title": "Moving to a new phone?",
   "hub.move.intro":
     "Send yourself this link and open it on the new phone. Everything here goes with it, straight from phone to phone.",

@@ -629,6 +629,27 @@ To switch it off again, set `DIGEST_SIGNUPS` to `off` and redeploy: the
 sign-up page goes and nothing more is sent, but unsubscribe links still
 work.
 
+### Log in, and family accounts (built, switched off)
+
+Every page's header has a gold **Log in** button (a person in a circle
+once logged in). It opens `/login`: one door for families, one for mandir
+committees, which leads with "Create your mandir's account, free"
+(decision 0020).
+
+**Family accounts are off.** While off, the family door says no account
+is needed and opens My Toran. To switch them on, after the ICO
+registration and once the DPIA covers them (decision 0006):
+
+1. Check the privacy notice: move "Family accounts" out of "Coming
+   later" into its own section.
+2. In **Vercel → Project → Settings → Environment Variables**, add
+   `NEXT_PUBLIC_FAMILY_ACCOUNTS` = `on`, for **Production**.
+3. Redeploy (the setting is built into the pages).
+
+Then families can log in from the family door; My Toran keeps their
+followed mandirs and plan on their account, on every device, and
+`/account` lets them delete what's saved or close the account.
+
 ### Translations (`/ops` → Translations)
 
 Public text comes from `lib/i18n/en.ts` (English) through a small

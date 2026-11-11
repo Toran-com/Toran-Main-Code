@@ -92,14 +92,19 @@ export function Logo({
   night?: boolean;
 }) {
   return (
-    <span className="flex items-center gap-3">
-      {/* A logo keeps its size whatever the text size (lib/display.ts). */}
+    <span className="flex items-center gap-3 max-[359px]:gap-2.5">
+      {/* A logo keeps its size whatever the text size (lib/display.ts),
+          a little smaller on the narrowest phones so the header fits. */}
       <ToranMark
         night={night}
-        className={size === "md" ? "size-[34px] sm:size-[38px]" : "size-[34px]"}
+        className={
+          size === "md"
+            ? "size-[34px] max-[359px]:size-[30px] sm:size-[38px]"
+            : "size-[34px]"
+        }
       />
       <span
-        className={`font-display leading-none tracking-[0.16em] uppercase ${size === "md" ? "text-[24px] sm:text-[27px]" : "text-[24px]"}`}
+        className={`font-display leading-none tracking-[0.16em] uppercase ${size === "md" ? "text-[24px] max-[379px]:text-[21px] max-[359px]:text-[19px] sm:text-[27px]" : "text-[24px]"}`}
       >
         Toran
       </span>

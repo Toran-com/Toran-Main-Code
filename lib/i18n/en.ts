@@ -288,7 +288,8 @@ export const en = {
   "shell.closeMenu": "Close",
   "shell.language": "Language",
   "shell.my": "My Toran",
-  "shell.logIn": "Committee log in",
+  "shell.logIn": "Log in or create an account",
+  "shell.logInShort": "Log in",
   "shell.account": "Your account",
   "my.title": "My Toran",
   "my.description":

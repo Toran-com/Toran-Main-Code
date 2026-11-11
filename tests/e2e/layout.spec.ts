@@ -184,17 +184,18 @@ test.describe("on a laptop", () => {
     await expect(header.getByRole("link", { name: "My Toran" })).toBeVisible();
     // No bar along the bottom on a laptop.
     await expect(page.locator(".tab-bar")).toBeHidden();
-    // Committees, text size and the rest are in the menu.
+    // "Log in" is always in the header; text size and the rest are in
+    // the menu.
     await expect(
-      header.getByRole("link", { name: "Committee log in" }),
-    ).toBeHidden();
+      header.getByRole("link", { name: "Log in", exact: true }),
+    ).toBeVisible();
     await page.locator("summary:visible", { hasText: "Menu" }).click();
     const menu = page.getByRole("group", { name: "Menu" });
     await expect(
       menu.getByRole("link", { name: "For mandir committees" }),
     ).toBeVisible();
     await expect(
-      menu.getByRole("link", { name: "Committee log in" }),
+      menu.getByRole("link", { name: "Log in or create an account" }),
     ).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(menu).toBeHidden();
