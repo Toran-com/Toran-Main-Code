@@ -10,6 +10,7 @@ import {
   pillButtonClass,
   quietButtonClass,
 } from "@/components/ui";
+import { CommitteeBar } from "@/components/committee-bar";
 import { PageShell } from "@/components/page-shell";
 import { upcomingFilter, withNextStart } from "@/lib/events";
 import { formatEventStart, londonDate } from "@/lib/format";
@@ -98,6 +99,7 @@ async function Overview({ params }: PageProps<"/manage/[slug]/seva">) {
 
   return (
     <>
+      <CommitteeBar slug={mandir.slug} current="seva" />
       <div className="flex flex-col gap-2">
         <Link
           href={`/manage/${mandir.slug}`}

@@ -15,10 +15,22 @@ test("home page shows the coming soon message", async ({ page }) => {
   await expect(page).toHaveURL(/\/whats-on\?type=festival$/);
 });
 
-test("the main button goes to What's on", async ({ page }) => {
+test("the main button goes to What's on, asking where you are the first time", async ({
+  page,
+}) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Find events near me" }).click();
-  await expect(page).toHaveURL(/\/whats-on$/);
+  await expect(page).toHaveURL(/\/whats-on\?pick=1$/);
+  await expect(
+    page.getByRole("dialog", { name: "Where are you?" }),
+  ).toBeVisible();
+  // Once a place is chosen, it goes straight there.
+  await page.evaluate(() =>
+    localStorage.setItem("toran:place", '{"near":"LE4","within":15}'),
+  );
+  await page.goto("/");
+  await page.getByRole("link", { name: "Find events near me" }).click();
+  await expect(page).toHaveURL(/\/whats-on\?near=LE4/);
 });
 
 test("text is at least 18px", async ({ page }) => {

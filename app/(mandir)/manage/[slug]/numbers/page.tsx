@@ -8,6 +8,7 @@ import {
   Notice,
   pillButtonClass,
 } from "@/components/ui";
+import { CommitteeBar } from "@/components/committee-bar";
 import { PageShell } from "@/components/page-shell";
 import { londonDate } from "@/lib/format";
 import { requireMandirAccess } from "@/lib/manage-access";
@@ -61,12 +62,15 @@ async function Numbers({
     since,
   });
   const back = (
-    <Link
-      href={`/manage/${mandir.slug}`}
-      className="text-peacock self-start font-semibold"
-    >
-      ← {mandir.name}
-    </Link>
+    <>
+      <CommitteeBar slug={mandir.slug} current="numbers" />
+      <Link
+        href={`/manage/${mandir.slug}`}
+        className="text-peacock self-start font-semibold"
+      >
+        ← {mandir.name}
+      </Link>
+    </>
   );
   if (error) {
     return (

@@ -11,6 +11,7 @@ import {
   makeUkMap,
   mapControls,
   nameOnHover,
+  FRAME_PADDING,
 } from "@/components/uk-map";
 import { useT } from "@/components/use-t";
 import type { Position } from "@/lib/geo";
@@ -261,7 +262,7 @@ export function EventsMap({
     if (points.length === 1) map.setView(points[0], 12, { animate: false });
     else if (points.length > 1) {
       map.fitBounds(L.latLngBounds(points), {
-        padding: [40, 40],
+        ...FRAME_PADDING,
         maxZoom: 13,
         animate: false,
       });

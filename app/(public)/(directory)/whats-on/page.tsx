@@ -405,7 +405,7 @@ function Filters({
     }));
   const regions = REGIONS.map((r) => ({ value: r, label: t(regionKey(r)!) }));
   return (
-    <details className="group shrink-0 lg:relative">
+    <details data-popover="" className="group shrink-0 lg:relative">
       <summary
         className={`${pillButtonClass} list-none [&::-webkit-details-marker]:hidden`}
       >

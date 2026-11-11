@@ -44,7 +44,10 @@ async function MandirList({ searchParams }: PageProps<"/ops/mandirs">) {
   return (
     <>
       <div className="flex flex-wrap items-end gap-3">
-        <form className="flex flex-1 gap-2" role="search">
+        <form
+          className="flex min-w-full flex-1 gap-2 sm:min-w-[20rem]"
+          role="search"
+        >
           <label className="sr-only" htmlFor="q">
             Search mandirs
           </label>

@@ -52,6 +52,13 @@ test("an event's page has its details, sharing and search engine data", async ({
   await expect(
     page.getByRole("link", { name: "Google Calendar" }),
   ).toHaveAttribute("href", `/mandirs/${SLUG}/add-to-calendar?event=${id}`);
+  // The choices open in place, so the buttons under them can still be
+  // pressed (on a phone they used to be covered).
+  await page
+    .getByRole("link", { name: "WhatsApp" })
+    .filter({ visible: true })
+    .first()
+    .click({ trial: true });
 
   // Link previews and search engines.
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
