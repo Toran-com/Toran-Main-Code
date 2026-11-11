@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { menuRowClass } from "@/components/site-menu";
 
-// The way back in for mandir committees, in the menu: "Committee log in"
-// to a visitor, "Your account" once logged in. The login session's cookie
-// (sb-…-auth-token) says which; until the page has loaded in the browser
-// it's "Committee log in".
+// The way in, in the menu: "Log in or create an account" to a visitor
+// (families and mandir committees, /login), "Your account" once logged
+// in. The login session's cookie (sb-…-auth-token) says which; until the
+// page has loaded in the browser it's "Log in or create an account".
 const noSubscribe = () => () => {};
 const loggedIn = () => /(^|;\s*)sb-[^=]+-auth-token/.test(document.cookie);
 

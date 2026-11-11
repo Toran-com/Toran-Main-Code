@@ -292,7 +292,8 @@ export const gu: Record<MessageKey, string> = {
   "shell.closeMenu": "બંધ કરો",
   "shell.language": "ભાષા",
   "shell.my": "મારું Toran",
-  "shell.logIn": "સમિતિ લૉગ ઇન",
+  "shell.logIn": "લૉગ ઇન કે ખાતું બનાવો",
+  "shell.logInShort": "લૉગ ઇન",
   "shell.account": "તમારું ખાતું",
   "my.title": "મારું Toran",
   "my.description":

@@ -64,6 +64,7 @@ import {
   shiftHours,
 } from "@/lib/seva-history";
 import { whatsAppLink } from "@/lib/whatsapp";
+import { FAMILY_ACCOUNTS } from "@/lib/family-flag";
 
 // My Toran: everything this phone keeps, in one place, with big tiles at
 // the top to jump to each part. Nothing here is stored by Toran: the
@@ -293,7 +294,11 @@ export function Hub() {
   return (
     <div id="top" className="flex flex-col gap-10 sm:gap-12">
       <MoveIn t={t} />
-      <p className="text-muted -mt-4 text-lg sm:-mt-6">{t("hub.onlyHere")}</p>
+      {/* With family accounts on, the note above the hub says where things
+          are kept instead (components/family-account-note.tsx). */}
+      {!FAMILY_ACCOUNTS && (
+        <p className="text-muted -mt-4 text-lg sm:-mt-6">{t("hub.onlyHere")}</p>
+      )}
 
       {fresh ? (
         <Welcome t={t} locale={locale} />

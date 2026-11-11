@@ -93,7 +93,7 @@ export function PosterDemo({
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- small pictures, already the right size */}
               <img
-                src={`/demo-posters/${p.id}-small.jpg`}
+                src={`/demo-posters/${p.id}-small.webp`}
                 alt={p.alt}
                 width={324}
                 height={405}

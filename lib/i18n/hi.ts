@@ -511,7 +511,8 @@ export const hi: Record<MessageKey, string> = {
   "shell.closeMenu": "बंद करें",
   "shell.language": "भाषा",
   "shell.my": "मेरा Toran",
-  "shell.logIn": "समिति लॉग इन",
+  "shell.logIn": "लॉग इन करें या खाता बनाएँ",
+  "shell.logInShort": "लॉग इन",
   "shell.account": "आपका खाता",
   "my.title": "मेरा Toran",
   "my.description":

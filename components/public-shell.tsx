@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Notice } from "@/components/ui";
 import { AccountLink } from "@/components/account-link";
+import { FamilySync } from "@/components/family-sync";
+import { HeaderLogin } from "@/components/header-login";
 import { InstallApp } from "@/components/install-app";
 import { DisplayControls } from "@/components/display-settings";
 import { LanguageSwitch } from "@/components/language-switch";
@@ -68,6 +70,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
   return (
     <>
       <ScrollChrome />
+      <FamilySync />
       <header className="site-header bg-night text-on-night sticky top-0 z-30">
         <span aria-hidden="true" className="scroll-progress" />
         <div
@@ -83,13 +86,14 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
           <SiteNav links={places} />
           {/* The header's buttons keep their size whatever the text size
               (at least 18px), so the row always fits a phone; the page
-              below grows. Below 360px wide, Search is in the menu only. */}
+              below grows. A gold "Log in" is always there; on phones under
+              430px wide Search is in the menu only, to make room for it. */}
           <div className="ml-auto flex items-center gap-[4px] sm:gap-[8px]">
             <Link
               href={localePath("/search")}
               aria-label={t("shell.search")}
               title={t("shell.search")}
-              className="text-on-night hover:bg-on-night/10 inline-flex size-[44px] items-center justify-center rounded-full no-underline transition-colors max-[359px]:hidden"
+              className="text-on-night hover:bg-on-night/10 inline-flex size-[44px] items-center justify-center rounded-full no-underline transition-colors max-[429px]:hidden"
             >
               <svg
                 aria-hidden="true"
@@ -104,6 +108,10 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
                 <path d="M16 16l4.5 4.5" />
               </svg>
             </Link>
+            <HeaderLogin
+              logIn={t("shell.logInShort")}
+              account={t("shell.account")}
+            />
             <MyToranLink label={t("shell.my")} href={localePath("/my")} />
             <SiteMenu label={t("shell.menu")} close={t("shell.closeMenu")}>
               <MenuSection heading={t("shell.find")}>

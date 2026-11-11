@@ -193,6 +193,15 @@ listings up to date; these are the mandirs' public information.
 - **Forwarding posters by WhatsApp or email:** the message, any image,
   and the sender's number or address, used to create the listing and then
   deleted within 90 days.
+- **Family accounts** (built, switched off until our ICO registration and
+  impact assessment cover them): log in with your email to keep the
+  mandirs you follow and your plan on every device. We'd keep your email
+  address, the web addresses of the mandirs you follow and the codes and
+  dates of the events in your plan (at most 30 of each), nothing else.
+  Which mandirs you follow can show your religion, so we use it only to
+  show you your own lists; nobody else can see it, not even the mandirs.
+  You can delete the lists, or close the account, at any time from "Your
+  account"; lists not changed for 2 years are deleted automatically.
 
 ## Who we share data with
 

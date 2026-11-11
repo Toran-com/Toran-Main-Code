@@ -17,9 +17,15 @@ import {
   committeeTodoCount,
   setupSteps,
 } from "@/lib/committee-tasks";
+import { FAMILY_ACCOUNTS } from "@/lib/family-accounts";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
-import { acceptInvite, declineInvite } from "./actions";
+import {
+  acceptInvite,
+  closeFamilyAccount,
+  declineInvite,
+  forgetFamilySaved,
+} from "./actions";
 
 export const metadata: Metadata = { title: pageTitle("Your account") };
 
@@ -37,6 +43,18 @@ const NOTICES: Record<string, { tone: "error" | "success"; text: string }> = {
     text: "Something went wrong. Please try again.",
   },
   "done=declined": { tone: "success", text: "Thanks. That invite is gone." },
+  "error=sure": {
+    tone: "error",
+    text: "To close your account, tick the box to say you're sure.",
+  },
+  "error=close": {
+    tone: "error",
+    text: "This account helps run a mandir, so it can't be closed here. Leave the mandir's committee first, or ask Toran to close it.",
+  },
+  "done=forgotten": {
+    tone: "success",
+    text: "Done. Nothing is saved on your account now, and your devices clear their lists the next time they open Toran logged in.",
+  },
   "done=left": {
     tone: "success",
     text: "Done. You no longer help run that mandir's page.",
@@ -86,6 +104,15 @@ async function Account({ searchParams }: PageProps<"/account">) {
       ])
     : [{ data: null }, { data: null }, { data: null }];
   const mandirs = (runs ?? []).flatMap((r) => (r.mandir ? [r.mandir] : []));
+  // A family account's saved lists (decision 0020), when switched on.
+  const { data: saved } =
+    FAMILY_ACCOUNTS && supabase
+      ? await supabase
+          .from("family_saved")
+          .select("following, plan")
+          .eq("user_id", user.id)
+          .maybeSingle()
+      : { data: null };
   // What each needs doing, so the account page says where to start.
   const todo = await Promise.all(
     mandirs.map(async (m) => {
@@ -205,6 +232,26 @@ async function Account({ searchParams }: PageProps<"/account">) {
             {c.mandir ? `, ${c.mandir.town}` : ""}.
           </p>
         ))}
+        {FAMILY_ACCOUNTS && (
+          <div className="border-line flex flex-col gap-3 border-t pt-4">
+            <h2 className="text-xl font-bold">Saved for your family</h2>
+            <p>
+              {saved
+                ? `${saved.following.length === 1 ? "1 mandir" : `${saved.following.length} mandirs`} followed and ${Array.isArray(saved.plan) && saved.plan.length === 1 ? "1 event" : `${Array.isArray(saved.plan) ? saved.plan.length : 0} events`} in your plan, on every device you log in on.`
+                : "Nothing yet. Follow mandirs and plan events, and they're kept here for every device you log in on."}
+            </p>
+            <Link href="/my" className={`${buttonClass} self-start`}>
+              Open My Toran
+            </Link>
+            {saved && (
+              <form action={forgetFamilySaved}>
+                <button type="submit" className={quietButtonClass}>
+                  Delete what&apos;s saved
+                </button>
+              </form>
+            )}
+          </div>
+        )}
         {mandirs.length === 0 && !claims?.length && !invites?.length && (
           <div className="flex flex-col gap-3">
             <p>
@@ -227,6 +274,36 @@ async function Account({ searchParams }: PageProps<"/account">) {
           </button>
         </form>
       </Card>
+      {FAMILY_ACCOUNTS &&
+        mandirs.length === 0 &&
+        !claims?.length &&
+        !user.isToranAdmin && (
+          <Card>
+            <h2 className="text-xl font-bold">Close your account</h2>
+            <p className="text-muted">
+              Deletes your login and everything it saved. What&apos;s on this
+              phone stays on this phone.
+            </p>
+            <form action={closeFamilyAccount} className="flex flex-col gap-4">
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="sure"
+                  value="yes"
+                  required
+                  className="mt-1.5 size-5 shrink-0"
+                />
+                <span>I&apos;m sure: close my account.</span>
+              </label>
+              <button
+                type="submit"
+                className={`${quietButtonClass} self-start`}
+              >
+                Close my account
+              </button>
+            </form>
+          </Card>
+        )}
     </>
   );
 }
