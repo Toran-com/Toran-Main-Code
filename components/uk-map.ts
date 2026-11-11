@@ -43,6 +43,14 @@ const MOVE_LIMIT: [[number, number], [number, number]] = [
   [66, 19],
 ];
 
+// The room left when a map frames its pins: more on the left, where the
+// zoom and other buttons are, so no pin starts out under them (where it
+// couldn't be tapped).
+export const FRAME_PADDING = {
+  paddingTopLeft: [72, 48] as [number, number],
+  paddingBottomRight: [48, 48] as [number, number],
+};
+
 export function makeUkMap(L: Leaflet, box: HTMLElement): LeafletMap {
   const map = L.map(box, {
     // Half steps, so the whole UK fills a phone's map.

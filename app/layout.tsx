@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Marcellus, Mulish, Noto_Serif_Gujarati } from "next/font/google";
 import { Suspense } from "react";
 import { CountVisits } from "@/components/count-visits";
+import { PopoverCloser } from "@/components/popover-closer";
 import { DISPLAY_SCRIPT } from "@/lib/display";
 import { pageMetadata, site, siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col font-sans">
         {children}
+        <PopoverCloser />
         <Suspense fallback={null}>
           <CountVisits />
         </Suspense>

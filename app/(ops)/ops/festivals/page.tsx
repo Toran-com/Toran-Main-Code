@@ -5,6 +5,7 @@ import { inputClass, Loading, Notice, quietButtonClass } from "@/components/ui";
 import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { calendarLabel, formatDateRange } from "@/lib/format";
+import { londonDate } from "@/lib/london";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { setFestivalDateChecked } from "./actions";
@@ -30,12 +31,16 @@ export default function OpsFestivalsPage(props: PageProps<"/ops/festivals">) {
 async function FestivalDates({ searchParams }: PageProps<"/ops/festivals">) {
   await requireToranAdmin("/ops/festivals");
   const supabase = await createSessionClient();
+  const today = londonDate();
   const { data: dates } = supabase
     ? await supabase
         .from("festival_dates")
         .select(
           "id, calendar, starts_on, ends_on, verified, source, festival:festivals (name)",
         )
+        // Only dates still to come (or happening now): a festival that's
+        // over needs no checking.
+        .or(`ends_on.gte.${today},and(ends_on.is.null,starts_on.gte.${today})`)
         .order("starts_on")
     : { data: [] };
   const query = await searchParams;

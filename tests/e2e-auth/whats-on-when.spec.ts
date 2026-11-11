@@ -28,3 +28,18 @@ test("What's on can show just today or this weekend", async ({ page }) => {
   await expect(page).not.toHaveURL(/when=/);
   await expect(page).toHaveURL(/type=festival/);
 });
+
+test("the filters close when you tap elsewhere or press Escape", async ({
+  page,
+}) => {
+  await page.goto("/whats-on");
+  const filters = page.locator("details[data-popover]").first();
+  await filters.locator("summary").click();
+  await expect(filters).toHaveAttribute("open", "");
+  await page.getByRole("heading", { level: 1 }).click();
+  await expect(filters).not.toHaveAttribute("open");
+  await filters.locator("summary").click();
+  await expect(filters).toHaveAttribute("open", "");
+  await page.keyboard.press("Escape");
+  await expect(filters).not.toHaveAttribute("open");
+});

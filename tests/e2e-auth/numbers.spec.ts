@@ -39,6 +39,16 @@ test("a committee sees its own numbers, and only its own", async ({ page }) => {
   await page.goto(`/manage/${SLUG}`);
   await page.getByRole("link", { name: "Numbers", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/manage/${SLUG}/numbers$`));
+  // The mandir's bar is here too, showing where you are, and goes on to
+  // its other pages.
+  const bar = page.getByRole("navigation", { name: "More for your mandir" });
+  await expect(
+    bar.getByRole("link", { name: "Numbers", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(bar.getByRole("link", { name: "Seva" })).toHaveAttribute(
+    "href",
+    `/manage/${SLUG}/seva`,
+  );
   const tile = (label: string) =>
     page.locator("dt", { hasText: label }).locator("+ dd");
   await expect(tile("Views of your page and events")).not.toHaveText("0");

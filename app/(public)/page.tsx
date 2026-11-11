@@ -7,6 +7,7 @@ import { HeroDiya, HeroLight } from "@/components/hero-diya";
 import { HomeStory } from "@/components/home-story";
 import { JsonLd } from "@/components/json-ld";
 import { LineIcon } from "@/components/line-icons";
+import { NearMeLink } from "@/components/near-me-link";
 import { Toran } from "@/components/ornaments";
 import { RememberPlace } from "@/components/remember-place";
 import { YourMandirs, type MandirBrief } from "@/components/your-mandirs";
@@ -84,23 +85,23 @@ export default function Home({ searchParams }: PageProps<"/">) {
             <div className="order-last">
               <HeroDiya />
             </div>
-            <h1 className="rise font-display max-w-5xl text-[2.75rem] leading-[1.04] tracking-tight sm:text-7xl sm:leading-[1.02] lg:text-[clamp(4.5rem,10svh,6rem)]">
+            <h1 className="rise font-display max-w-5xl text-[2.75rem] leading-[1.04] tracking-tight text-balance sm:text-7xl sm:leading-[1.02] lg:text-[clamp(4.5rem,10svh,6rem)]">
               {t("home.tagline")}
             </h1>
             <p className="rise text-night-muted max-w-2xl text-xl leading-relaxed sm:text-2xl">
               {t("home.intro")}
             </p>
             <div className="rise flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
-              <Link
+              <NearMeLink
                 href={localePath("/whats-on")}
-                className="bg-night-accent text-night inline-flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-xl font-bold no-underline shadow-[0_18px_44px_rgba(0,0,0,0.3)] transition hover:brightness-105 active:scale-[0.98] sm:w-auto"
+                className="bg-night-accent text-night inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-xl leading-tight font-bold text-balance no-underline shadow-[0_18px_44px_rgba(0,0,0,0.3)] transition hover:brightness-105 active:scale-[0.98] sm:w-auto sm:px-8"
               >
                 <LineIcon name="pin" />
                 {t("home.findNear")}
-              </Link>
+              </NearMeLink>
               <Link
                 href={localePath("/festivals")}
-                className="border-on-night/70 text-on-night hover:bg-on-night/10 inline-flex w-full items-center justify-center rounded-full border-2 px-8 py-[0.875rem] text-xl font-bold no-underline transition sm:w-auto"
+                className="border-on-night/70 text-on-night hover:bg-on-night/10 inline-flex w-full items-center justify-center rounded-full border-2 px-6 py-[0.875rem] text-xl leading-tight font-bold text-balance no-underline transition sm:w-auto sm:px-8"
               >
                 {t("home.allFestivals")}
               </Link>
