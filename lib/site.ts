@@ -17,9 +17,11 @@ export const site = {
   legalChecked: false,
 } as const;
 
-// Toran's own email address, for questions and privacy requests. None yet:
-// the contact page explains the other ways to reach Toran until there is.
-export const CONTACT_EMAIL: string | null = null;
+// Toran's own email addresses, both forwarded to Milan (decision 0021):
+// one for questions, one for requests about people's data (the privacy
+// notice gives the same one). null hides them on the contact page.
+export const CONTACT_EMAIL: string | null = "hello@toran.org.uk";
+export const PRIVACY_EMAIL: string | null = "privacy@toran.org.uk";
 
 // The live site's address, for links that must be complete (the sitemap,
 // search engine data). Vercel provides it; elsewhere it's this computer.

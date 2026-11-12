@@ -144,7 +144,7 @@ measures in section 7.
 | R3   | ✅ Seva on Toran keeps no names at all, so there is no list to leak; ☐ if names are ever needed: visible only to that mandir's committee, deleted 90 days after the event                                                                                                                                                                                                                                                                                                            | Low      |
 | R4   | ✅ No children's data is collected (seva keeps no names); ☐ if named sign-ups are ever built: age band, a parent's details for under-16s, the mandir's sign-off, and a solicitor's check first                                                                                                                                                                                                                                                                                       | Low      |
 | R5   | ✅ Retention schedule with automatic deletion every night for invites, requests, unconfirmed and departed email sign-ups; ☐ quarterly review of logins until their job exists                                                                                                                                                                                                                                                                                                        | Low      |
-| R6   | ✅ Database and hosting functions in London; ✅ Anthropic and Resend covered by data processing agreements [check each is signed or accepted for Toran's accounts]; ☐ Sentry EU region [check]                                                                                                                                                                                                                                                                                       | Low      |
+| R6   | ✅ Database and hosting functions in London; ✅ Anthropic and Resend covered by data processing agreements [check each is signed or accepted for Toran's accounts]; ✅ Sentry in its EU region (Germany)                                                                                                                                                                                                                                                                             | Low      |
 | R7   | ✅ Sentry set up to drop IP addresses, cookies, headers and user details, and to scrub email addresses from messages (tested); ✅ no personal data in URLs; ✅ server logs kept 1 hour to 1 day                                                                                                                                                                                                                                                                                      | Low      |
 | R8   | ✅ Decision 0008: a separate company number before automation; ☐ delete forwards from the phone once entered; ☐ don't forward them on                                                                                                                                                                                                                                                                                                                                                | Low      |
 | R9   | ✅ Anthropic's commercial terms exclude training on our data and delete it within 30 days; ✅ only the poster is sent, never who sent it, with an instruction to leave out names and numbers; ✅ every event read is checked by a person before it's published                                                                                                                                                                                                                       | Low      |
@@ -155,14 +155,15 @@ measures in section 7.
 
 ## 8. Actions before the pilot
 
-1. ✅ ICO fee paid, as a sole trader trading as Toran (November 2026);
-   ☐ add the registration number to the privacy notice.
+1. ✅ Registered with the ICO as a sole trader trading as Toran,
+   ZC300728 (November 2026); the number is in the privacy notice.
 2. ✅ A separate, unticked **explicit consent** box when asking to manage
    a page or accepting an invite, with the time stored.
 3. ✅ A one-page breach response plan (breach-plan.md): who decides, how
    to tell the ICO within 72 hours, and how to tell the people affected.
-4. Set up the privacy email address; publish `/privacy` and `/terms` as
-   final (`legalChecked: true` in `lib/site.ts`).
+4. ✅ The privacy email address (privacy@toran.org.uk); ☐ publish
+   `/privacy` and `/terms` as final (`legalChecked: true` in
+   `lib/site.ts`).
 5. Turn on two-factor login for every founder account.
 6. Check each provider's data processing agreement and transfer terms;
    fill in the regions in the privacy notice's processor table.
