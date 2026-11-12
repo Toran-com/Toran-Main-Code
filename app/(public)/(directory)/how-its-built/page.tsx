@@ -114,9 +114,9 @@ const PRINCIPLES: { title: string; body: ReactNode }[] = [
     title: "Private by design",
     body: (
       <>
-        No tracking cookies and no advertising. Visitors need no account, and
-        what they follow stays on their phone. Database rules decide who sees
-        what, tested for every role. See the{" "}
+        No tracking cookies. Visitors need no account, and what they follow
+        stays on their phone. Database rules decide who sees what, tested for
+        every role. See the{" "}
         <Link href="/privacy" className="text-peacock underline">
           privacy notice
         </Link>
