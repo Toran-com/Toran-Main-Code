@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeading } from "@/components/public-shell";
 import { Card } from "@/components/ui";
-import { CONTACT_EMAIL, pageMetadata } from "@/lib/site";
+import { CONTACT_EMAIL, PRIVACY_EMAIL, pageMetadata } from "@/lib/site";
 
 // Every way to reach Toran, by what you want to do, so people find the
 // quickest route rather than writing in.
@@ -56,18 +56,33 @@ export default function ContactPage() {
           </li>
         ))}
       </ul>
+      {CONTACT_EMAIL && (
+        <Card>
+          <h2 className="text-xl font-bold">Anything else</h2>
+          <p className="text-muted">
+            Questions, ideas, or something we haven&apos;t thought of. We read
+            everything and reply as soon as we can.
+          </p>
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="text-peacock self-start font-semibold underline"
+          >
+            {CONTACT_EMAIL}
+          </a>
+        </Card>
+      )}
       <section aria-labelledby="data" className="flex flex-col gap-3">
         <h2 id="data" className="font-display text-3xl leading-tight">
           Your data
         </h2>
-        {CONTACT_EMAIL ? (
+        {PRIVACY_EMAIL ? (
           <p className="max-w-prose">
             To see, correct or delete what Toran keeps about you, email{" "}
             <a
-              href={`mailto:${CONTACT_EMAIL}`}
+              href={`mailto:${PRIVACY_EMAIL}`}
               className="text-peacock underline"
             >
-              {CONTACT_EMAIL}
+              {PRIVACY_EMAIL}
             </a>
             . We reply within one month, and it&apos;s free.
           </p>

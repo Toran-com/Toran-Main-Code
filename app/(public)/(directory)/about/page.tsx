@@ -9,7 +9,7 @@ import { pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata(
   "About Toran",
-  "Toran brings together what's on at Hindu mandirs across the UK, so families can find it and committees can share it. Free, with no ads or tracking.",
+  "Toran brings together what's on at Hindu mandirs across the UK, so families can find it and committees can share it. Free, with no tracking.",
   "/about",
 );
 
@@ -79,7 +79,7 @@ export default function AboutPage() {
         </h2>
         <ul className="flex max-w-prose list-disc flex-col gap-2 pl-6">
           <li>Free for families and for mandirs.</li>
-          <li>No adverts, no tracking cookies, and no selling data.</li>
+          <li>No tracking cookies, and we never sell data.</li>
           <li>No account needed to look at anything.</li>
           <li>A seva slot needs no name.</li>
         </ul>

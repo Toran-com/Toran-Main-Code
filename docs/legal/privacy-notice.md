@@ -6,10 +6,10 @@
 > providers' own terms.
 
 Toran is run by **Milan Patel**, a sole trader trading as Toran, of
-[business address]. In this notice "we" means Milan Patel trading as
+1G Bartholomews, Brighton BN1 1HG. In this notice "we" means Milan Patel trading as
 Toran. We are the "controller" of the personal data described here,
 registered with the Information Commissioner's Office as a sole trader,
-registration number [ICO registration number].
+registration number ZC300728.
 
 Questions or requests about your data: **privacy@toran.org.uk**. We reply
 within one month.
@@ -215,7 +215,7 @@ under contract:
 | ---------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
 | Supabase               | Database, login and the mandirs' photos               | [London (UK): check the live project's region]             |
 | Vercel                 | Hosting the website                                   | Servers in London; a global network delivers pages quickly |
-| Sentry                 | Error reports (with personal data removed)            | [EU or USA: check the region chosen]                       |
+| Sentry                 | Error reports (with personal data removed)            | EU (Germany)                                               |
 | Resend                 | Sending login links (and later the weekly email)      | [USA or EU: check the region the account uses]             |
 | Anthropic (Claude API) | Reading posters and pasted messages into events       | USA                                                        |
 | postcodes.io           | Finding your postcode district when you press Near me | UK (a rounded position only, never linked to you)          |
