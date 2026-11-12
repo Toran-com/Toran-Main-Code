@@ -14,21 +14,27 @@ Supabase, Vercel or GitHub.
 
 ## 0. Only the founders can do these
 
-Accounts, money, signatures and promises in the company's name. Claude
-can't do them, but can check most of them afterwards. Start the slow ones
-(company, domain, ICO) first.
+Accounts, money, signatures and promises in Toran's name. Claude can't
+do them, but can check most of them afterwards.
 
-**The company and its name**
+**Who runs Toran** (decision 0021: Milan Patel, sole trader, trading as
+Toran)
 
-- [ ] **The company** is registered (decision 0007): its name, number and
-      registered office go in the privacy notice and terms.
-- [ ] **The domain** (toran.org.uk was free on 31 October), bought in the
-      company's name, with two addresses both founders can read: one for
-      privacy requests (e.g. `privacy@`) and one for everything else
-      (e.g. `hello@`). Put the second in `CONTACT_EMAIL` in `lib/site.ts`.
-- [ ] **ICO registration**: ico.org.uk → "Pay the data protection fee",
-      £52 a year (£47 by direct debit). The number goes in the privacy
-      notice.
+- [x] **Registered with HMRC** as self-employed (Self Assessment).
+- [x] **ICO fee paid** as a sole trader, trading name Toran.
+- [x] **The domain** toran.org.uk, connected to Vercel.
+- [ ] **The ICO registration number** (from the confirmation email) and
+      the **business address** to show: both go in the privacy notice
+      and terms.
+- [ ] **Two addresses on the domain**, forwarded to Milan's inbox
+      (Namecheap → Domain List → Manage → Redirect Email):
+      `privacy@toran.org.uk` and `hello@toran.org.uk`. Put the second in
+      `CONTACT_EMAIL` in `lib/site.ts`.
+- [ ] **A note with the other founder**, signed by both: Toran is Milan's
+      business, their role, not a partnership, and anything they made for
+      Toran belongs to Milan.
+- [ ] **A business bank account** (optional, recommended), with Toran's
+      bills moved onto it. Keep receipts for the tax return.
 
 **Accounts and plans**
 
@@ -36,20 +42,20 @@ can't do them, but can check most of them afterwards. Start the slow ones
       has no backups you can restore, and pauses after a week without
       visits. Pro keeps 7 days of daily backups.
 - [ ] **Vercel plan**: the free Hobby plan is for personal, non-commercial
-      use. Read Vercel's fair use terms and decide whether Toran, run by a
-      company, needs Pro ($20 a month per member). Pro also keeps logs for
+      use. Read Vercel's fair use terms and decide whether Toran, run as a
+      business, needs Pro ($20 a month per member). Pro also keeps logs for
       a day instead of an hour.
-- [ ] **Company accounts, not personal ones** (decision 0007) for GitHub,
-      Supabase, Vercel, Sentry, Resend and Anthropic, or at least both
-      founders added to each.
+- [ ] **Toran's own email address on its accounts** (decision 0021) for
+      GitHub, Supabase, Vercel, Sentry, Resend and Anthropic, not personal
+      mail.
 - [ ] **Two-factor login on every founder account**: GitHub, Supabase,
       Vercel, Sentry, Resend, Anthropic, the domain registrar and the email
       accounts behind them. (DPIA risk R10.)
 
 **Data protection paperwork** (docs/legal/README.md has the details)
 
-- [ ] **Accept each provider's data processing agreement** for the
-      company's accounts: Supabase, Vercel, Sentry, Resend and Anthropic.
+- [ ] **Accept each provider's data processing agreement** for
+      Toran's accounts: Supabase, Vercel, Sentry, Resend and Anthropic.
 - [ ] **Look up three regions** and fill them in the privacy notice:
       Supabase (Settings → General, we want London), Sentry (the
       `NEXT_PUBLIC_SENTRY_DSN` contains `ingest.de.sentry.io` for the EU)

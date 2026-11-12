@@ -262,5 +262,7 @@ rules → design polish.
 - Who on each committee should be the admin, based on the email replies?
 - Name check: trademark and domain for the final name before launch.
 
-Settled: a limited company (decision 0007), and the personal WhatsApp number
-for the pilot with a company number before automating (decision 0008).
+Settled: Toran is run by Milan Patel as a sole trader (decision 0021, which
+replaced the limited company of decision 0007), and the personal WhatsApp
+number for the pilot with a separate business number before automating
+(decision 0008).

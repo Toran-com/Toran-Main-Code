@@ -150,3 +150,26 @@ test("an event's own words are marked as English on translated pages", async ({
     "lang",
   );
 });
+
+test("an event added since the mandir's page was last loaded can be added to a calendar", async ({
+  page,
+  request,
+}) => {
+  // The mandir's page is loaded (and kept) first; the event arrives after.
+  await page.goto(`/mandirs/${SLUG}`);
+  const title = `Hanuman Chalisa ${Date.now()}`;
+  const id = addEvent(
+    "title, starts_at, status",
+    `'${title}', now() + interval '5 days', 'published'`,
+  );
+  await page.goto(`/mandirs/${SLUG}/events/${id}`);
+  await page.getByText("Add to calendar").click();
+  const href = await page
+    .getByRole("link", { name: "Google Calendar" })
+    .getAttribute("href");
+  const response = await request.get(href!, { maxRedirects: 0 });
+  expect(response.status()).toBe(303);
+  const google = new URL(response.headers().location);
+  expect(google.hostname).toBe("calendar.google.com");
+  expect(google.searchParams.get("text")).toBe(title);
+});

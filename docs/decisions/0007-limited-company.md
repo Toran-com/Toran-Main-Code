@@ -1,7 +1,7 @@
 # 0007. Set up as a limited company
 
 Date: 2026-10-07
-Status: Accepted
+Status: Superseded by 0021 (Toran is run by Milan Patel as a sole trader)
 
 ## Context
 

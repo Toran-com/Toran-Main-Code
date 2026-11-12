@@ -41,14 +41,14 @@ below.
 ## Before we start (you, about 30 minutes)
 
 1. **GitHub organisation.** On github.com: your profile picture → Your
-   organizations → New organization → Free plan. Name it after the company
-   (for example `Toran-com`). Add your partner as an owner.
+   organizations → New organization → Free plan. Name it after Toran
+   (for example `Toran-com`).
 2. **New repo** in that organisation: name `Toran-Main-Code`, private, with a README.
    Do not add a .gitignore or licence; the setup creates them.
 3. **Give Claude access.** Go to https://claude.ai/connect-github and install
    the Claude GitHub App on the new organisation (choose "only selected
    repositories" → `Toran-Main-Code`).
-4. **Accounts, all signed up with a company email, not personal ones:**
+4. **Accounts, all signed up with Toran's own email (`hello@toran.org.uk`), not personal mail:**
    - Supabase (database and login): create `toran-staging` now, region
      London; create `toran-prod` nearer launch (free projects pause after a
      week without use)
