@@ -23,13 +23,11 @@ Toran)
 - [x] **Registered with HMRC** as self-employed (Self Assessment).
 - [x] **ICO fee paid** as a sole trader, trading name Toran.
 - [x] **The domain** toran.org.uk, connected to Vercel.
-- [ ] **The ICO registration number** (from the confirmation email) and
-      the **business address** to show: both go in the privacy notice
-      and terms.
-- [ ] **Two addresses on the domain**, forwarded to Milan's inbox
-      (Namecheap → Domain List → Manage → Redirect Email):
-      `privacy@toran.org.uk` and `hello@toran.org.uk`. Put the second in
-      `CONTACT_EMAIL` in `lib/site.ts`.
+- [x] **ICO registration number** ZC300728 and the **business address**
+      (1G Bartholomews, Brighton BN1 1HG), in the privacy notice and terms.
+- [x] **Two addresses on the domain**, forwarded to Milan's inbox:
+      `privacy@toran.org.uk` and `hello@toran.org.uk`, both on the
+      contact page (`lib/site.ts`).
 - [ ] **A note with the other founder**, signed by both: Toran is Milan's
       business, their role, not a partnership, and anything they made for
       Toran belongs to Milan.

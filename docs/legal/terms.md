@@ -6,7 +6,7 @@
 
 These terms apply to everyone using Toran (the website at toran.org.uk).
 Toran is run by **Milan Patel**, a sole trader trading as Toran, of
-[business address]. "We" in these terms means Milan Patel trading as
+1G Bartholomews, Brighton BN1 1HG. "We" in these terms means Milan Patel trading as
 Toran. Contact: hello@toran.org.uk.
 
 ## 1. Using Toran
