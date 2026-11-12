@@ -1,12 +1,13 @@
 # Terms of use (DRAFT)
 
 > Draft of 2 November 2026, brought up to date with the site as built.
-> Not yet published as final. Text in [brackets] is for the founders to
-> fill in.
+> Not yet published as final. Text in [brackets] is still to be filled
+> in.
 
-These terms apply to everyone using Toran (the website at [domain]). Toran
-is run by **[Company name] Ltd** (company number [number], registered
-office [address]). Contact: [hello@domain].
+These terms apply to everyone using Toran (the website at toran.org.uk).
+Toran is run by **Milan Patel**, a sole trader trading as Toran, of
+[business address]. "We" in these terms means Milan Patel trading as
+Toran. Contact: hello@toran.org.uk.
 
 ## 1. Using Toran
 

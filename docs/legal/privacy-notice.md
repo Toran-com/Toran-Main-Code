@@ -1,16 +1,17 @@
 # Privacy notice (DRAFT)
 
-> Draft of 9 November 2026, brought up to date with the site as built.
-> Not yet published as final. Text in [brackets] is for the founders to
-> fill in; everything else has been checked against the site and the
+> Draft of 12 November 2026, brought up to date with the site as built.
+> Not yet published as final. Text in [brackets] is still to be filled
+> in; everything else has been checked against the site and the
 > providers' own terms.
 
-Toran is run by **[Company name] Ltd**, a company registered in England and
-Wales (number [number]), registered office [address]. We are the
-"controller" of the personal data described here. ICO registration number:
-[number].
+Toran is run by **Milan Patel**, a sole trader trading as Toran, of
+[business address]. In this notice "we" means Milan Patel trading as
+Toran. We are the "controller" of the personal data described here,
+registered with the Information Commissioner's Office as a sole trader,
+registration number [ICO registration number].
 
-Questions or requests about your data: **[privacy@domain]**. We reply
+Questions or requests about your data: **privacy@toran.org.uk**. We reply
 within one month.
 
 ## The short version
@@ -247,7 +248,7 @@ You can ask us to:
 - move it to another service.
 
 Where we rely on consent, you can withdraw it at any time. Email
-[privacy@domain]. We reply within one month, and it's free.
+privacy@toran.org.uk. We reply within one month, and it's free.
 
 If you're unhappy with how we've handled your data, please tell us first.
 You can also complain to the Information Commissioner's Office:
