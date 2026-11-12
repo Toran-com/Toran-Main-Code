@@ -139,14 +139,14 @@ isOneToOne: false
                   ]
                 },"family_saved": {
                   Row: {
-                    "following": (string)[],"plan": NonNullable<Json>,"updated_at": string,"user_id": string
+                    "consented_at": string,"following": (string)[],"plan": NonNullable<Json>,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "following"?: (string)[],"plan"?: NonNullable<Json>,"updated_at"?: string,"user_id"?: string
+                    "consented_at": string,"following"?: (string)[],"plan"?: NonNullable<Json>,"updated_at"?: string,"user_id"?: string
                   }
                   Update: {
-                    "following"?: (string)[],"plan"?: NonNullable<Json>,"updated_at"?: string,"user_id"?: string
+                    "consented_at"?: string,"following"?: (string)[],"plan"?: NonNullable<Json>,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     

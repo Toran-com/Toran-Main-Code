@@ -40,6 +40,13 @@ the DPIA before collecting personal data like this.
   lists unchanged for 2 years are deleted by the nightly clean-up.
   Committee and admin accounts can't be closed from the site (they're
   tied to mandirs' pages).
+- **Nothing kept without consent** (added 13 November 2026, DPIA
+  section 5): logging in alone saves nothing. My Toran asks first, with a
+  separate, unticked box; only once it's ticked and sent does the account
+  get a `family_saved` row, and the database records when
+  (`consented_at`, refusing a row without it). Deleting what's saved
+  withdraws consent: nothing more is saved until they agree again, and
+  their devices keep what's on them.
 - **While it's off** (the default, and the live site until the ICO
   registration and DPIA are done) the family door says no account is
   needed and opens My Toran; nothing new is collected.

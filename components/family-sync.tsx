@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { FAMILY_ACCOUNTS } from "@/lib/family-flag";
+import { AGREED } from "@/lib/family-state";
 
 // Family accounts (decision 0020): keeps My Toran's followed mandirs and
 // plan the same on every device a family logs in on
@@ -15,11 +16,19 @@ export function FamilySync() {
     if (!FAMILY_ACCOUNTS || !loggedIn()) return;
     let stop = () => {};
     let gone = false;
-    void import("@/lib/family-sync-run").then(({ start }) => {
-      if (!gone) stop = start();
-    });
+    const run = () =>
+      void import("@/lib/family-sync-run").then(({ start }) => {
+        if (gone) return;
+        stop();
+        stop = start();
+      });
+    run();
+    // Once the family agrees on My Toran, start again: now there's
+    // something to keep in step.
+    window.addEventListener(AGREED, run);
     return () => {
       gone = true;
+      window.removeEventListener(AGREED, run);
       stop();
     };
   }, []);

@@ -2,8 +2,11 @@
 // only when family accounts are on and someone is logged in: fetch what the
 // account holds, put it together with this phone's (lib/family-accounts.ts
 // says how), then save every change here to the account. start() returns
-// a function that stops it.
+// a function that stops it. An account that hasn't agreed to Toran keeping
+// its lists has nothing saved and nothing read: start() just says so
+// (lib/family-state.ts), and My Toran asks; agree() is the yes.
 import {
+  agreeToFamilySaving,
   loadFamilySaved,
   saveFamilySaved,
 } from "@/app/(public)/(directory)/my/actions";
@@ -15,6 +18,7 @@ import {
   onFollowingChange,
   parseFollowing,
 } from "@/lib/follow";
+import { AGREED, setFamilyState, SYNCED } from "@/lib/family-state";
 import {
   clearPlan,
   mergePlan,
@@ -23,7 +27,6 @@ import {
   planSnapshot,
 } from "@/lib/plan";
 
-const SYNCED = "toran:account-synced";
 const device = () => ({
   following: parseFollowing(followingSnapshot()),
   plan: parsePlan(planSnapshot()),
@@ -36,6 +39,17 @@ export function start(): () => void {
   let timer: ReturnType<typeof setTimeout> | undefined;
   void loadFamilySaved().then((loaded) => {
     if (cancelled || !loaded) return;
+    if (!loaded.saved) {
+      // Not agreed (or agreed and later deleted it): keep nothing, and
+      // leave what's on this phone as it is.
+      try {
+        localStorage.removeItem(SYNCED);
+      } catch {
+        // Nothing to forget.
+      }
+      setFamilyState("ask");
+      return;
+    }
     let synced: string | null = null;
     try {
       synced = localStorage.getItem(SYNCED);
@@ -58,6 +72,7 @@ export function start(): () => void {
       // Fine: next time counts as a first time again.
     }
     void saveFamilySaved(next);
+    setFamilyState("on");
     // From now on, each change here goes to the account.
     const save = () => {
       if (applying) return;
@@ -76,4 +91,12 @@ export function start(): () => void {
     cancelled = true;
     stop();
   };
+}
+
+// The family ticked the box: put this phone's lists on the account, then
+// tell components/family-sync.tsx to start keeping them in step.
+export async function agree(): Promise<boolean> {
+  const ok = await agreeToFamilySaving(true, device());
+  if (ok) window.dispatchEvent(new Event(AGREED));
+  return ok;
 }

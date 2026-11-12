@@ -45,16 +45,32 @@ test("a family's mandirs and plan follow them to another device", async ({
   await expect(phone.getByText("Check your email")).toBeVisible();
   await phone.goto(await latestLoginLink(email));
   await expect(phone).toHaveURL(/\/my$/);
+  // Nothing goes on the account until the family agrees, with a box of
+  // its own that starts unticked.
+  const agree = phone.getByLabel(/I agree to Toran keeping the mandirs/);
+  await expect(agree).not.toBeChecked();
+  await phone.getByRole("button", { name: "Save to my account" }).click();
+  await expect(agree).toBeVisible();
+  expect(
+    sql(`select count(*) from public.family_saved s
+      join auth.users u on u.id = s.user_id where u.email = '${email}'`),
+  ).toBe("0");
+  await agree.check();
+  await phone.getByRole("button", { name: "Save to my account" }).click();
   await expect(
     phone.getByText("Saved to your account, on every device"),
   ).toBeVisible();
-  // The account now holds it.
+  // The account now holds it, and when they agreed.
   await expect
     .poll(() =>
       sql(`select array_to_string(following, ',') from public.family_saved s
         join auth.users u on u.id = s.user_id where u.email = '${email}'`),
     )
     .toBe(SLUG);
+  expect(
+    sql(`select consented_at > now() - interval '5 minutes' from public.family_saved s
+      join auth.users u on u.id = s.user_id where u.email = '${email}'`),
+  ).toBe("t");
 
   // On a laptop, logging in brings it across. (Wait for the second
   // email: the first link has been used.)
@@ -72,6 +88,11 @@ test("a family's mandirs and plan follow them to another device", async ({
     .not.toBe(first);
   await laptop.goto(second);
   await expect(laptop).toHaveURL(/\/my$/);
+  // Agreed already, so no need to ask again.
+  await expect(
+    laptop.getByText("Saved to your account, on every device"),
+  ).toBeVisible();
+  await expect(laptop.getByLabel(/I agree to Toran keeping/)).toHaveCount(0);
   await laptop.goto(`/mandirs/${SLUG}`);
   const following = laptop.getByRole("button", { name: "Following" });
   await expect(following).toBeVisible();
@@ -93,6 +114,7 @@ test("a family's mandirs and plan follow them to another device", async ({
   await expect(
     phone.getByRole("heading", { name: "Saved for your family" }),
   ).toBeVisible();
+  await expect(phone.getByText(/You agreed to this on/)).toBeVisible();
   await phone.getByLabel(/I'm sure: close my account/).check();
   await phone.getByRole("button", { name: "Close my account" }).click();
   await expect(phone).toHaveURL(/\/login\?closed=1$/);

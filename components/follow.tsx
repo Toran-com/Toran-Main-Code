@@ -10,15 +10,16 @@ import {
   parseFollowing,
   setFollowing,
 } from "@/lib/follow";
-import { FAMILY_ACCOUNTS } from "@/lib/family-flag";
+import {
+  familyState,
+  familyStateOnServer,
+  onFamilyState,
+} from "@/lib/family-state";
 import { enFollow } from "@/lib/i18n/client/follow";
 import { withLocale } from "@/lib/i18n/paths";
 
 // Following mandirs on this phone (lib/follow.ts): a button on a mandir's
 // page, and on What's on a way to show only the mandirs followed.
-
-const noSubscribe = () => () => {};
-const hasSession = () => /(^|;\s*)sb-[^=]+-auth-token/.test(document.cookie);
 
 export function useFollowing(): string[] {
   const snapshot = useSyncExternalStore(
@@ -85,7 +86,10 @@ export function FollowButton({
 }) {
   const t = useT(enFollow);
   const locale = useLocale();
-  const loggedIn = useSyncExternalStore(noSubscribe, hasSession, () => false);
+  // Kept on the family's account too, once they've agreed (decision 0020).
+  const onAccount =
+    useSyncExternalStore(onFamilyState, familyState, familyStateOnServer) ===
+    "on";
   const following = useFollowing();
   const on = following.includes(slug);
   return (
@@ -107,9 +111,7 @@ export function FollowButton({
           className={`text-muted text-base ${beside ? "basis-full" : ""}`}
           aria-live="polite"
         >
-          {FAMILY_ACCOUNTS && loggedIn
-            ? t("follow.savedAccount")
-            : t("follow.saved")}{" "}
+          {onAccount ? t("follow.savedAccount") : t("follow.saved")}{" "}
           <Link
             href={whatsOnHref(locale, "", following)}
             className="text-peacock font-semibold underline"
