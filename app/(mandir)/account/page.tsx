@@ -53,7 +53,7 @@ const NOTICES: Record<string, { tone: "error" | "success"; text: string }> = {
   },
   "done=forgotten": {
     tone: "success",
-    text: "Done. Nothing is saved on your account now, and your devices clear their lists the next time they open Toran logged in.",
+    text: "Done. Nothing is saved on your account now, and nothing more will be unless you agree again on My Toran. What's on each device stays there.",
   },
   "done=left": {
     tone: "success",
@@ -109,7 +109,7 @@ async function Account({ searchParams }: PageProps<"/account">) {
     FAMILY_ACCOUNTS && supabase
       ? await supabase
           .from("family_saved")
-          .select("following, plan")
+          .select("following, plan, consented_at")
           .eq("user_id", user.id)
           .maybeSingle()
       : { data: null };
@@ -237,8 +237,8 @@ async function Account({ searchParams }: PageProps<"/account">) {
             <h2 className="text-xl font-bold">Saved for your family</h2>
             <p>
               {saved
-                ? `${saved.following.length === 1 ? "1 mandir" : `${saved.following.length} mandirs`} followed and ${Array.isArray(saved.plan) && saved.plan.length === 1 ? "1 event" : `${Array.isArray(saved.plan) ? saved.plan.length : 0} events`} in your plan, on every device you log in on.`
-                : "Nothing yet. Follow mandirs and plan events, and they're kept here for every device you log in on."}
+                ? `${saved.following.length === 1 ? "1 mandir" : `${saved.following.length} mandirs`} followed and ${Array.isArray(saved.plan) && saved.plan.length === 1 ? "1 event" : `${Array.isArray(saved.plan) ? saved.plan.length : 0} events`} in your plan, on every device you log in on. You agreed to this on ${new Date(saved.consented_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" })}.`
+                : "Nothing is saved on your account. To keep the mandirs you follow and your plan on every device you log in on, agree to it on My Toran."}
             </p>
             <Link href="/my" className={`${buttonClass} self-start`}>
               Open My Toran
@@ -246,7 +246,7 @@ async function Account({ searchParams }: PageProps<"/account">) {
             {saved && (
               <form action={forgetFamilySaved}>
                 <button type="submit" className={quietButtonClass}>
-                  Delete what&apos;s saved
+                  Delete what&apos;s saved and stop saving
                 </button>
               </form>
             )}

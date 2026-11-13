@@ -171,8 +171,9 @@ async function LoginDoors({
                 </button>
               </form>
               <p className="text-muted text-base">
-                Toran keeps only your email and the mandirs and events you save.
-                You can delete them, or your account, at any time.
+                Toran keeps only your email and, if you agree, the mandirs and
+                events you save. You can delete them, or your account, at any
+                time.
               </p>
             </>
           ) : (

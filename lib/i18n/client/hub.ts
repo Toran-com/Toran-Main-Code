@@ -85,6 +85,14 @@ export const enHub = {
     "Log in with your email and the mandirs you follow and your plan are on your phone, tablet and laptop. Free, no password.",
   "hub.account.button": "Log in or create an account",
   "hub.account.saved": "Saved to your account, on every device you log in on.",
+  "hub.account.agreeTitle": "Keep them on your account?",
+  "hub.account.agreeText":
+    "Toran can keep the mandirs you follow and the events in your plan with your account, so they're on every device you log in on. Which mandirs you follow can show your religion, so we only do this if you agree. Only you can see them, and you can delete them at any time from your account.",
+  "hub.account.agreeLabel":
+    "I agree to Toran keeping the mandirs I follow and my plan with my account.",
+  "hub.account.agreeButton": "Save to my account",
+  "hub.account.agreeFailed":
+    "That didn't save just now. Please try again in a minute.",
   "hub.move.title": "Moving to a new phone?",
   "hub.move.intro":
     "Send yourself this link and open it on the new phone. Everything here goes with it, straight from phone to phone.",

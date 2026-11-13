@@ -31,12 +31,14 @@ export function cleanSaved(value: unknown): FamilySaved {
   return { following: cleanSlugs(v.following), plan: cleanPlanned(v.plan) };
 }
 
-// What a device should hold after logging in. The first time a device
-// meets the account, nothing is lost: what's on the phone and what's in
-// the account are put together. After that, the account is the record
-// (every change on a device is saved to it straight away), so a mandir
-// unfollowed on the laptop is unfollowed on the phone too, and lists
-// deleted from the account are cleared here too.
+// What a device should hold after logging in, for an account that agreed
+// to keep its lists. The first time a device meets the account, nothing
+// is lost: what's on the phone and what's in the account are put
+// together. After that, the account is the record (every change on a
+// device is saved to it straight away), so a mandir unfollowed on the
+// laptop is unfollowed on the phone too. (An account with nothing saved,
+// because it hasn't agreed or deleted what it saved, isn't combined at
+// all: lib/family-sync-run.ts leaves the phone as it is.)
 export function combineSaved(
   device: FamilySaved,
   account: FamilySaved | null,

@@ -60,8 +60,8 @@ providers' own terms (12 November 2026).
 3. **Read the DPIA** and do the open actions at its end. Committee
    members' explicit consent (section 5) is built: a separate box when
    they ask to look after a page or accept an invite. Families' explicit
-   consent isn't built yet, and must be before family accounts are
-   switched on.
+   consent is built too: a separate, unticked box on My Toran before
+   anything is kept on their account.
 4. **Get a review.** The ICO has a free helpline and a small business hub
    (ico.org.uk/for-organisations/advice-for-small-organisations). A
    solicitor's fixed-fee review of the privacy notice and terms is worth
