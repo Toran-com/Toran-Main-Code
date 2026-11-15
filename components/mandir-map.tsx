@@ -12,6 +12,7 @@ import {
   FRAME_PADDING,
   lamp,
   makeUkMap,
+  removeUkMap,
   mapControls,
   nameOnHover,
 } from "@/components/uk-map";
@@ -164,7 +165,7 @@ export function MandirMap({
     return () => {
       cancelled = true;
       unControl();
-      made?.remove();
+      if (made) removeUkMap(made);
       live.current = null;
       setOverlay(null);
     };

@@ -9,6 +9,7 @@ import {
   keepLitWhileOpen,
   lamp,
   makeUkMap,
+  removeUkMap,
   mapControls,
   nameOnHover,
   FRAME_PADDING,
@@ -160,7 +161,7 @@ export function SevaMap({
     return () => {
       cancelled = true;
       unControl();
-      made?.remove();
+      if (made) removeUkMap(made);
       live.current = null;
     };
   }, [tm]);
