@@ -51,6 +51,18 @@ export const FRAME_PADDING = {
   paddingBottomRight: [48, 48] as [number, number],
 };
 
+// Take a map off the page. Leaflet finishes each zoom a quarter of a
+// second after it starts; a map removed in between (someone zooms, then
+// goes straight to another page) still got that call, found its panes
+// gone and threw "Cannot read properties of undefined (reading
+// '_leaflet_pos')" (Sentry, 15 November 2026). Stopping any pan or fly
+// and telling it the zoom is over first means the late call does nothing.
+export function removeUkMap(map: LeafletMap) {
+  (map as LeafletMap & { _animatingZoom?: boolean })._animatingZoom = false;
+  map.stop();
+  map.remove();
+}
+
 export function makeUkMap(L: Leaflet, box: HTMLElement): LeafletMap {
   const map = L.map(box, {
     // Half steps, so the whole UK fills a phone's map.
