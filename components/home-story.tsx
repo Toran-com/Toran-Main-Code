@@ -7,13 +7,12 @@ import { dateTileParts, formatClock } from "@/lib/format";
 import { localePath, pageT } from "@/lib/i18n/page";
 import type { MessageKey } from "@/lib/i18n/en";
 
-// "See how Toran works", on the home page. On a laptop the steps sit in a
-// box the height of the screen, beside a phone: each scroll moves exactly
-// one step, which slides in while the phone's screen changes to show it,
-// with the button you'd tap outlined in gold (components/story-scroll.tsx
-// marks the step in view; ./home-story.css does the rest). After the last
-// step the page scrolls on as usual, and "Skip the steps" goes straight
-// past them. On a phone the steps are cards to swipe, one at a time. The
+// "See how Toran works", on the home page. On a laptop a phone stays on
+// screen beside the steps as the page scrolls at its usual speed; each
+// step's words slide in as it reaches the middle, and the phone's screen
+// changes to show it, with the button you'd tap outlined in gold
+// (components/story-scroll.tsx marks the step in view; ./home-story.css
+// does the rest). "Skip the steps" goes straight past them. On a phone the steps are cards to swipe, one at a time. The
 // phone is a picture made of HTML, hidden from screen readers: each step
 // says in words what the button does, with a link to try it for real.
 
@@ -89,15 +88,14 @@ export function HomeStory() {
       <StoryScroll className="story grid gap-x-24 lg:grid-cols-[minmax(0,34rem)_auto] lg:justify-center">
         <div
           aria-hidden="true"
-          className="story-stage order-2 hidden flex-col items-center justify-center self-start lg:flex"
+          className="story-stage sticky top-28 order-2 hidden flex-col items-center self-start lg:flex"
         >
           <Phone className="w-[min(21rem,calc((100svh-12rem)*0.47))]" />
         </div>
 
         {/* On a phone the steps are cards in a row to swipe through, each
             with its own phone above its words; on a laptop they're a
-            column that moves one step at a time, and the one phone beside
-            them changes. */}
+            column, and the one phone beside them changes. */}
         <ol
           aria-label={t("story.title")}
           className="swipe-row-small swipe-settle -mx-4 gap-4 px-4 pb-4 sm:-mx-8 sm:px-8 lg:order-1 lg:mx-0 lg:flex lg:flex-col lg:gap-0 lg:px-0 lg:pb-0"
@@ -106,7 +104,7 @@ export function HomeStory() {
             <li
               key={step.title}
               data-story-step={i}
-              className="story-step border-line bg-surface shadow-card flex w-[84vw] max-w-[24rem] flex-col items-center gap-6 rounded-3xl border p-5 pt-6 lg:w-auto lg:max-w-none lg:items-start lg:justify-center lg:gap-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
+              className="story-step border-line bg-surface shadow-card flex w-[84vw] max-w-[24rem] flex-col items-center gap-6 rounded-3xl border p-5 pt-6 lg:min-h-[56svh] lg:w-auto lg:max-w-none lg:items-start lg:justify-center lg:gap-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
             >
               <div aria-hidden="true" className="lg:hidden">
                 <Phone only={i} className="w-[min(50vw,11.5rem)]" />
