@@ -7,10 +7,12 @@ import { dateTileParts, formatClock } from "@/lib/format";
 import { localePath, pageT } from "@/lib/i18n/page";
 import type { MessageKey } from "@/lib/i18n/en";
 
-// "See how Toran works", on the home page: a phone stays on screen while
-// the steps scroll past, and its screen changes to show each one, with
-// the button you'd tap outlined in gold (components/story-scroll.tsx
-// marks the step in view; app/globals.css, .story, does the rest). The
+// "See how Toran works", on the home page. On a laptop a phone stays on
+// screen beside the steps as the page scrolls at its usual speed; each
+// step's words slide in as it reaches the middle, and the phone's screen
+// changes to show it, with the button you'd tap outlined in gold
+// (components/story-scroll.tsx marks the step in view; ./home-story.css
+// does the rest). "Skip the steps" goes straight past them. On a phone the steps are cards to swipe, one at a time. The
 // phone is a picture made of HTML, hidden from screen readers: each step
 // says in words what the button does, with a link to try it for real.
 
@@ -75,23 +77,20 @@ export function HomeStory() {
           {t("story.title")}
         </h2>
         <p className="text-muted text-xl leading-relaxed">{t("story.intro")}</p>
+        <a
+          href="#story-end"
+          className="text-peacock hidden w-fit text-base font-semibold underline decoration-2 underline-offset-4 lg:inline"
+        >
+          {t("story.skip")} <span aria-hidden="true">↓</span>
+        </a>
       </div>
 
       <StoryScroll className="story grid gap-x-24 lg:grid-cols-[minmax(0,34rem)_auto] lg:justify-center">
         <div
           aria-hidden="true"
-          className="story-stage sticky top-28 order-2 hidden flex-col items-center gap-4 self-start lg:flex"
+          className="story-stage sticky top-28 order-2 hidden flex-col items-center self-start lg:flex"
         >
           <Phone className="w-[min(21rem,calc((100svh-12rem)*0.47))]" />
-          <ol className="flex gap-2">
-            {STEPS.map((step, i) => (
-              <li
-                key={step.title}
-                data-dot={i}
-                className="story-dot bg-line-strong h-2 w-2 rounded-full"
-              />
-            ))}
-          </ol>
         </div>
 
         {/* On a phone the steps are cards in a row to swipe through, each
@@ -105,12 +104,12 @@ export function HomeStory() {
             <li
               key={step.title}
               data-story-step={i}
-              className="story-step border-line bg-surface shadow-card flex w-[84vw] max-w-[24rem] flex-col items-center gap-6 rounded-3xl border p-5 pt-6 lg:min-h-[72svh] lg:w-auto lg:max-w-none lg:items-start lg:justify-center lg:gap-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
+              className="story-step border-line bg-surface shadow-card flex w-[84vw] max-w-[24rem] flex-col items-center gap-6 rounded-3xl border p-5 pt-6 lg:min-h-[56svh] lg:w-auto lg:max-w-none lg:items-start lg:justify-center lg:gap-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
             >
               <div aria-hidden="true" className="lg:hidden">
                 <Phone only={i} className="w-[min(50vw,11.5rem)]" />
               </div>
-              <div className="flex max-w-xl flex-col gap-3 sm:gap-4">
+              <div className="story-words flex max-w-xl flex-col gap-3 sm:gap-4">
                 <p className="text-muted flex items-center gap-3 text-base font-semibold">
                   <span
                     aria-hidden="true"
@@ -136,17 +135,9 @@ export function HomeStory() {
             </li>
           ))}
         </ol>
-        {/* Which card you're on, on a phone. */}
-        <ol aria-hidden="true" className="flex justify-center gap-2 lg:hidden">
-          {STEPS.map((step, i) => (
-            <li
-              key={step.title}
-              data-dot={i}
-              className="story-dot bg-line-strong h-2 w-2 rounded-full"
-            />
-          ))}
-        </ol>
       </StoryScroll>
+      {/* Where "Skip the steps" goes. */}
+      <span id="story-end" tabIndex={-1} className="-mt-10 scroll-mt-28" />
     </section>
   );
 }

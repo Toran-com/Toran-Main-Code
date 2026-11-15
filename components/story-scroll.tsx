@@ -3,8 +3,9 @@
 import { type ReactNode, useEffect, useRef } from "react";
 
 // The scroll story on the home page (components/home-story.tsx): marks
-// which step is in the middle of the screen, as data-active on the
-// story, so app/globals.css can show that step's screen in the phone.
+// which step is in the middle of view, as data-active on the story, so
+// components/home-story.css can show that step's screen in the phone and
+// slide its words in (data-ready says this script is running).
 // No React state, so scrolling never re-renders anything. Without
 // JavaScript the first screen stays and every step still reads in order.
 export function StoryScroll({
@@ -39,6 +40,7 @@ export function StoryScroll({
       { rootMargin: wide ? "-45% 0px -45% 0px" : "0px -49% 0px -49%" },
     );
     for (const step of steps) observer.observe(step);
+    root.dataset.ready = "";
     return () => observer.disconnect();
   }, []);
 

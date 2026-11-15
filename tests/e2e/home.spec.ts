@@ -81,6 +81,35 @@ test("“See how Toran works” changes the laptop's phone as you scroll", async
   await expect(stage).toHaveAttribute("aria-hidden", "true");
 });
 
+test("on a laptop, “See how Toran works” scrolls freely, with no dots and a way past", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const story = page.locator(".story");
+  // No dots that look like buttons.
+  await expect(page.locator(".story-dot")).toHaveCount(0);
+  // A way past the steps for anyone who doesn't want them.
+  await expect(
+    page.getByRole("link", { name: "Skip the steps" }),
+  ).toHaveAttribute("href", "#story-end");
+  await expect(page.locator("#story-end")).toHaveCount(1);
+
+  // Nothing holds the scroll back: a big scroll over the steps moves the
+  // page a long way, straight past several of them.
+  await page.locator("[data-story-step]").first().scrollIntoViewIfNeeded();
+  await expect(story).toHaveAttribute("data-active", "0");
+  const before = await page.evaluate(() => window.scrollY);
+  await page.mouse.move(400, 400);
+  await page.mouse.wheel(0, 1600);
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(before + 1000);
+  await expect
+    .poll(async () => Number(await story.getAttribute("data-active")))
+    .toBeGreaterThanOrEqual(2);
+});
+
 test("on a phone, each step of “See how Toran works” has its own phone", async ({
   page,
 }) => {

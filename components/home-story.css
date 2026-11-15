@@ -4,9 +4,11 @@
 
    On a laptop one phone stays beside the steps and shows the screen for
    the step in view (data-active, set by components/story-scroll.tsx).
-   Screens not in view are hidden outright, never left faint. On a phone,
-   the steps are cards to swipe through, each with its own phone above
-   its words, so nothing ever covers the words on a small screen.
+   The page scrolls at its usual speed and nothing holds it back or
+   pulls it into place (snapping, even gentle, fought mouse wheels). Screens not
+   in view are hidden outright, never left faint. On a phone, the steps
+   are cards to swipe through, each with its own phone above its words,
+   so nothing ever covers the words on a small screen.
 
    The button each step is about is outlined in gold, with a gentle tap.
    With less motion asked for, nothing moves. */
@@ -30,19 +32,27 @@
   transform: none;
   transition-delay: 0s;
 }
-.story-dot {
-  transition:
-    width 300ms ease,
-    background-color 300ms ease;
-}
-.story[data-active="0"] [data-dot="0"],
-.story[data-active="1"] [data-dot="1"],
-.story[data-active="2"] [data-dot="2"],
-.story[data-active="3"] [data-dot="3"],
-.story[data-active="4"] [data-dot="4"],
-.story[data-active="5"] [data-dot="5"] {
-  width: 1.5rem;
-  background-color: var(--color-marigold);
+/* The step in the middle is clear; the ones above and below wait, faint,
+   and slide up into place as they arrive. Only once the script has
+   started (data-ready), so without it every step reads in full. */
+@media (width >= 64rem) and (prefers-reduced-motion: no-preference) {
+  .story[data-ready] .story-words {
+    opacity: 0.25;
+    translate: 0 1.5rem;
+    transition:
+      opacity 420ms cubic-bezier(0.2, 0, 0, 1),
+      translate 620ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .story[data-active="0"] [data-story-step="0"] .story-words,
+  .story[data-active="1"] [data-story-step="1"] .story-words,
+  .story[data-active="2"] [data-story-step="2"] .story-words,
+  .story[data-active="3"] [data-story-step="3"] .story-words,
+  .story[data-active="4"] [data-story-step="4"] .story-words,
+  .story[data-active="5"] [data-story-step="5"] .story-words {
+    opacity: 1;
+    translate: none;
+    transition-delay: 80ms;
+  }
 }
 .story-number {
   border: 2px solid var(--color-line-strong);
@@ -110,7 +120,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .story-screen,
-  .story-dot,
   .story-number {
     transition: none;
   }
