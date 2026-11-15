@@ -42,7 +42,21 @@ export function sentryOptions() {
     release:
       process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ??
       process.env.VERCEL_GIT_COMMIT_SHA,
-    sendDefaultPii: false,
+    // Nothing about the person: no IP address, cookies, headers, request
+    // bodies, address-bar values or local variables. Version 11 of Sentry's
+    // library replaced sendDefaultPii with this, collecting by default, so
+    // it has to be said here: without it Sentry stored visitors' IP
+    // addresses (seen 15 November 2026), which the privacy notice says it
+    // doesn't. "userInfo: false" also tells Sentry's servers never to work
+    // the IP address out for themselves.
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      stackFrameVariables: false,
+    },
     tracesSampleRate: 0.1,
     beforeSend: scrubEvent,
   };
