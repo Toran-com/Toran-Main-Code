@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scrubEmails, scrubEvent } from "@/lib/observability";
+import { scrubEmails, scrubEvent, sentryOptions } from "@/lib/observability";
 
 describe("scrubEmails", () => {
   it("removes email addresses", () => {
@@ -34,6 +34,20 @@ describe("scrubEvent", () => {
       message: "for [email removed]",
       exception: { values: [{ value: "bad email [email removed]" }] },
       request: {},
+    });
+  });
+});
+
+describe("sentryOptions", () => {
+  it("collects nothing about the person, IP addresses included", () => {
+    const { dataCollection } = sentryOptions();
+    expect(dataCollection).toEqual({
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      stackFrameVariables: false,
     });
   });
 });
