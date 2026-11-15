@@ -44,6 +44,7 @@ export const en = {
   "story.intro":
     "Scroll through what you can do. The buttons outlined in gold are the ones you'll tap.",
   "story.step": "Step {n} of {total}",
+  "story.skip": "Skip the steps",
   "story.findTitle": "Find what's on near you",
   "story.findBody":
     "Press Find near me, or type a postcode. Events at the mandirs nearest you come first, straight from the mandirs themselves.",

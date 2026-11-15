@@ -81,6 +81,63 @@ test("“See how Toran works” changes the laptop's phone as you scroll", async
   await expect(stage).toHaveAttribute("aria-hidden", "true");
 });
 
+test("on a laptop, each scroll moves “See how Toran works” one step, then the page goes on", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const story = page.locator(".story");
+  // No dots that look like buttons.
+  await expect(page.locator(".story-dot")).toHaveCount(0);
+  // A way past the steps for anyone who doesn't want them.
+  await expect(
+    page.getByRole("link", { name: "Skip the steps" }),
+  ).toHaveAttribute("href", "#story-end");
+  await expect(page.locator("#story-end")).toHaveCount(1);
+
+  // Bring the box fully into view, with the mouse over it.
+  await story.evaluate((el) =>
+    window.scrollTo(
+      0,
+      el.getBoundingClientRect().bottom + window.scrollY - window.innerHeight,
+    ),
+  );
+  const box = (await story.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  const step = () =>
+    story.evaluate((el) => Math.round(el.scrollTop / el.clientHeight));
+  await expect.poll(step).toBe(0);
+
+  // However hard the flick, one step, and more scrolling straight after
+  // it (its glide running on) is held back.
+  await page.mouse.wheel(0, 3000);
+  await page.mouse.wheel(0, 200);
+  await page.waitForTimeout(900);
+  expect(await step()).toBe(1);
+  await expect(story).toHaveAttribute("data-active", "1");
+  // A fresh scroll on a trackpad (many small movements in a row) is one
+  // step: they add up until they count, then the rest is held back.
+  for (let i = 0; i < 20; i++) {
+    await page.mouse.wheel(0, 40);
+    await page.waitForTimeout(16);
+  }
+  await page.waitForTimeout(900);
+  expect(await step()).toBe(2);
+
+  // To the last step, then the page scrolls on past it.
+  for (const n of [3, 4, 5]) {
+    await page.waitForTimeout(700);
+    await page.mouse.wheel(0, 100);
+    await expect.poll(step).toBe(n);
+  }
+  await page.waitForTimeout(700);
+  const before = await page.evaluate(() => window.scrollY);
+  await page.mouse.wheel(0, 300);
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(before);
+});
+
 test("on a phone, each step of “See how Toran works” has its own phone", async ({
   page,
 }) => {

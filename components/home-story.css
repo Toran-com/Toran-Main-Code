@@ -2,11 +2,17 @@
    Kept beside the component rather than in app/globals.css, so it always
    ships with it.
 
-   On a laptop one phone stays beside the steps and shows the screen for
-   the step in view (data-active, set by components/story-scroll.tsx).
-   Screens not in view are hidden outright, never left faint. On a phone,
-   the steps are cards to swipe through, each with its own phone above
-   its words, so nothing ever covers the words on a small screen.
+   On a laptop the steps sit in a box the height of the screen (under the
+   header), with one phone beside them showing the screen for the step in
+   view (data-active, set by components/story-scroll.tsx). The box snaps:
+   each scroll, however hard, moves exactly one step (scroll-snap-stop),
+   and once the last step is reached the page scrolls on as usual.
+   Touchscreens and keyboards use the browser's own snapping; mouse wheels
+   and trackpads get a little help from components/story-scroll.tsx, so a
+   flick moves one step and the box is lined up on screen first. Screens not in view are hidden
+   outright, never left faint. On a phone, the steps are cards to swipe
+   through, each with its own phone above its words, so nothing ever
+   covers the words on a small screen.
 
    The button each step is about is outlined in gold, with a gentle tap.
    With less motion asked for, nothing moves. */
@@ -30,19 +36,48 @@
   transform: none;
   transition-delay: 0s;
 }
-.story-dot {
-  transition:
-    width 300ms ease,
-    background-color 300ms ease;
+@media (width >= 64rem) {
+  .story {
+    --story-h: calc(100svh - var(--header-h) - 2rem);
+    height: var(--story-h);
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+  }
+  .story::-webkit-scrollbar {
+    display: none;
+  }
+  .story-stage {
+    position: sticky;
+    top: 0;
+    height: var(--story-h);
+  }
+  .story-step {
+    height: var(--story-h);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
 }
-.story[data-active="0"] [data-dot="0"],
-.story[data-active="1"] [data-dot="1"],
-.story[data-active="2"] [data-dot="2"],
-.story[data-active="3"] [data-dot="3"],
-.story[data-active="4"] [data-dot="4"],
-.story[data-active="5"] [data-dot="5"] {
-  width: 1.5rem;
-  background-color: var(--color-marigold);
+/* The words of each step slide in as it arrives. Only once the script
+   has started (data-ready), so without it every step still reads. */
+@media (width >= 64rem) and (prefers-reduced-motion: no-preference) {
+  .story[data-ready] .story-words {
+    opacity: 0;
+    translate: 0 2.5rem;
+    transition:
+      opacity 420ms cubic-bezier(0.2, 0, 0, 1),
+      translate 620ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .story[data-active="0"] [data-story-step="0"] .story-words,
+  .story[data-active="1"] [data-story-step="1"] .story-words,
+  .story[data-active="2"] [data-story-step="2"] .story-words,
+  .story[data-active="3"] [data-story-step="3"] .story-words,
+  .story[data-active="4"] [data-story-step="4"] .story-words,
+  .story[data-active="5"] [data-story-step="5"] .story-words {
+    opacity: 1;
+    translate: none;
+    transition-delay: 80ms;
+  }
 }
 .story-number {
   border: 2px solid var(--color-line-strong);
@@ -110,7 +145,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .story-screen,
-  .story-dot,
   .story-number {
     transition: none;
   }
