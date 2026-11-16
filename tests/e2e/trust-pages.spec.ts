@@ -33,10 +33,11 @@ test("the privacy notice is shown in full, as final", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 2, name: "The short version" }),
   ).toBeVisible();
-  // The table of what committees' data is kept for.
+  // The tables of what's kept and why: one for family accounts, one for
+  // committee members.
   await expect(
     page.getByRole("columnheader", { name: "Lawful basis" }),
-  ).toBeVisible();
+  ).toHaveCount(2);
   // Nothing is left to fill in, and no Markdown shows through.
   await expect(page.locator("article mark")).toHaveCount(0);
   await expect(page.locator("article")).not.toContainText("**");
