@@ -32,10 +32,11 @@ test("the privacy notice is shown from its draft, marked as a draft", async ({
   await expect(
     page.getByRole("heading", { level: 2, name: "The short version" }),
   ).toBeVisible();
-  // The table of what committees' data is kept for.
+  // The tables of what's kept and why: one for family accounts, one for
+  // committee members.
   await expect(
     page.getByRole("columnheader", { name: "Lawful basis" }),
-  ).toBeVisible();
+  ).toHaveCount(2);
   // Text still to fill in is highlighted, and no Markdown shows through.
   await expect(page.locator("mark").first()).toBeVisible();
   await expect(page.locator("article")).not.toContainText("**");
