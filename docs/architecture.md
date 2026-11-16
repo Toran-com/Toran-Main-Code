@@ -223,7 +223,7 @@ Check these figures against current prices before committing.
 - **Tests first where mistakes hurt:** festival dates and sunrise, repeating
   events, who can edit what, the confirm-by-reply flow.
 - **Backups:** daily database backups, with one restore tested before launch.
-- **Accessibility:** WCAG 2.2 AA; 18px minimum body text; works on a
+- **Accessibility:** WCAG 2.2 AA; 17px minimum body text (20px and 22.5px from the menu); works on a
   five-year-old Android phone on 4G.
 - **Languages:** all text goes through a translation layer from day one;
   launch in English, add Gujarati first.

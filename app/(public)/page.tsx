@@ -85,7 +85,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
             <div className="order-last">
               <HeroDiya />
             </div>
-            <h1 className="rise font-display max-w-5xl text-[2.75rem] leading-[1.04] tracking-tight text-balance sm:text-7xl sm:leading-[1.02] lg:text-[clamp(4.5rem,10svh,6rem)]">
+            <h1 className="rise font-display max-w-5xl text-[2.375rem] leading-[1.04] tracking-tight text-balance sm:text-7xl sm:leading-[1.02] lg:max-w-6xl lg:text-[clamp(4.5rem,10svh,6rem)]">
               {t("home.tagline")}
             </h1>
             <p className="rise text-night-muted max-w-2xl text-xl leading-relaxed sm:text-2xl">
@@ -159,7 +159,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
               </p>
               <h2
                 id="committees"
-                className="font-display text-[2.5rem] leading-[1.05] tracking-tight sm:text-6xl"
+                className="font-display text-[1.875rem] leading-[1.05] tracking-tight sm:text-6xl"
               >
                 {t("home.committeesHeading")}
               </h2>

@@ -114,6 +114,9 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
             />
             <MyToranLink label={t("shell.my")} href={localePath("/my")} />
             <SiteMenu label={t("shell.menu")} close={t("shell.closeMenu")}>
+              {/* First, so anyone who finds the text too small (or too
+                  big) sees it as soon as the menu opens. */}
+              <DisplayControls />
               <MenuSection heading={t("shell.find")}>
                 {[
                   ...places,
@@ -126,7 +129,6 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
                   </Link>
                 ))}
               </MenuSection>
-              <DisplayControls />
               {languages.length > 1 && (
                 <MenuSection heading={t("shell.language")}>
                   <LanguageSwitch languages={languages} />
@@ -263,7 +265,7 @@ export function PageHeading({
 }) {
   return (
     <div className="rise flex flex-col gap-2 pt-1 sm:gap-4 sm:pt-6">
-      <h1 className="font-display text-[2.75rem] leading-[1.05] tracking-tight sm:text-6xl">
+      <h1 className="font-display text-[2.125rem] leading-[1.05] tracking-tight sm:text-6xl">
         {title}
       </h1>
       {/* A short gold rule with a diamond, drawn in as the page opens:

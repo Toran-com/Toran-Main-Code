@@ -206,7 +206,7 @@ export default async function EventPage({
               <Morph name={morphName.eventTitle(event.id)}>
                 <h1
                   lang={storedLang()}
-                  className={`font-display text-[2.75rem] leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl ${cancelled ? "line-through" : ""}`}
+                  className={`font-display text-[2.125rem] leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl ${cancelled ? "line-through" : ""}`}
                 >
                   {event.title}
                 </h1>

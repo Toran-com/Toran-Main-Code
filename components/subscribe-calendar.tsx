@@ -62,7 +62,9 @@ export function SubscribeCalendar({
           className="rangoli-art rangoli-art-night pointer-events-none absolute -top-20 -right-20 size-56 opacity-25"
         />
         <div className="relative flex flex-col gap-3 px-6 py-7 sm:px-7">
-          <h2 className="font-display text-[2rem] leading-tight">{title}</h2>
+          <h2 className="font-display text-[1.625rem] leading-tight sm:text-[2rem]">
+            {title}
+          </h2>
           <p className="text-night-muted">{body}</p>
           {links}
           <p className="text-night-muted text-base">{t("subscribe.note")}</p>
