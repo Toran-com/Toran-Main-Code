@@ -1,7 +1,7 @@
 # 0020. A Log in for everyone, and family accounts built but switched off
 
 Date: 2026-11-11
-Status: Proposed
+Status: Accepted (family accounts switched on for the pilot, November 2026)
 
 ## Context
 
@@ -50,6 +50,15 @@ the DPIA before collecting personal data like this.
 - **While it's off** (the default, and the live site until the ICO
   registration and DPIA are done) the family door says no account is
   needed and opens My Toran; nothing new is collected.
+
+- **Switched on for the pilot** (16 November 2026). The founders want
+  families to see from the start that they can have an account, not only
+  mandirs. With the ICO registration done (ZC300728), the DPIA covering
+  family accounts and signed, and the privacy notice describing them in
+  full (no longer under "Coming later"), `NEXT_PUBLIC_FAMILY_ACCOUNTS` is
+  set to `on` for Production in Vercel. The family door then leads, as
+  "Create your free family account". Unsetting the variable and
+  redeploying switches them off again; saved lists stay until deleted.
 
 ## Consequences
 

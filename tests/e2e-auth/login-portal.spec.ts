@@ -2,9 +2,9 @@ import { expect, test } from "@playwright/test";
 import { latestLoginLink, sql } from "./helpers";
 
 // "Log in" on every page, and the two doors it opens (decision 0020).
-// Family accounts are switched on for this test build only
-// (NEXT_PUBLIC_FAMILY_ACCOUNTS in .github/workflows/database.yml); the
-// live site keeps them off until the ICO registration and DPIA are done.
+// Family accounts are switched on for this test build
+// (NEXT_PUBLIC_FAMILY_ACCOUNTS in .github/workflows/database.yml), and on
+// the live site by the same variable in Vercel.
 const FAMILY = process.env.NEXT_PUBLIC_FAMILY_ACCOUNTS === "on";
 const SLUG = "geeta-bhavan-leicester";
 
@@ -15,7 +15,11 @@ test("Log in in the header opens a door for families and one for mandirs", async
   await page.getByRole("link", { name: "Log in", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(
-    page.getByRole("heading", { name: "Your mandirs and your plan" }),
+    page.getByRole("heading", {
+      name: FAMILY
+        ? "Create your free family account"
+        : "Your mandirs and your plan",
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Put your mandir's events on Toran" }),

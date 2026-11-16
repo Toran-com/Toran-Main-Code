@@ -21,19 +21,19 @@ This DPIA covers what is built now and what is planned. Sections marked
 
 ### What we collect, from whom
 
-| People                      | Data                                                                                                             | Status                                     |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Visitors                    | None stored by us. IP addresses in the hosting provider's logs for 1 hour to 1 day                               | Now                                        |
-| Visitors taking seva slots  | Nothing about the person: only that one more place is taken                                                      | Now                                        |
-| Committee members           | Email, login history, role at the mandir, a note, which mandirs they manage, events they confirmed, consent time | Now                                        |
-| Toran admins (the founders) | As above, plus an authenticator app link                                                                         | Now                                        |
-| Mandir contacts             | Organisation email or phone (sometimes a named person's), from public sources and outreach                       | Now                                        |
-| People in mandir photos     | None intended: photos must show the building only, with no people                                                | Now                                        |
-| Weekly email subscribers    | Email and an optional area (such as "London")                                                                    | Built, switched off until ICO registration |
-| Families with an account    | Email, login history, the mandirs they follow (web addresses) and their plan (event codes and dates), 30 of each | Built, switched off (decision 0020)        |
-| Committee members (email)   | A monthly summary of their page, sent to their login email                                                       | Preview only; nothing sends it             |
-| Seva volunteers by name     | Name, one contact detail, age band; for under-16s a parent's or guardian's details                               | Planned, not built                         |
-| People forwarding posters   | Phone number or email, the message and images                                                                    | Pilot by hand; planned automation          |
+| People                      | Data                                                                                                             | Status                                                   |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Visitors                    | None stored by us. IP addresses in the hosting provider's logs for 1 hour to 1 day                               | Now                                                      |
+| Visitors taking seva slots  | Nothing about the person: only that one more place is taken                                                      | Now                                                      |
+| Committee members           | Email, login history, role at the mandir, a note, which mandirs they manage, events they confirmed, consent time | Now                                                      |
+| Toran admins (the founders) | As above, plus an authenticator app link                                                                         | Now                                                      |
+| Mandir contacts             | Organisation email or phone (sometimes a named person's), from public sources and outreach                       | Now                                                      |
+| People in mandir photos     | None intended: photos must show the building only, with no people                                                | Now                                                      |
+| Weekly email subscribers    | Email and an optional area (such as "London")                                                                    | Built, switched off until ICO registration               |
+| Families with an account    | Email, login history, the mandirs they follow (web addresses) and their plan (event codes and dates), 30 of each | From the pilot, once this DPIA is signed (decision 0020) |
+| Committee members (email)   | A monthly summary of their page, sent to their login email                                                       | Preview only; nothing sends it                           |
+| Seva volunteers by name     | Name, one contact detail, age band; for under-16s a parent's or guardian's details                               | Planned, not built                                       |
+| People forwarding posters   | Phone number or email, the message and images                                                                    | Pilot by hand; planned automation                        |
 
 ### How it flows
 
@@ -51,7 +51,7 @@ This DPIA covers what is built now and what is planned. Sections marked
 - **When switched on:** weekly emails go out through Resend. Sign-ups are
   readable only by the sending job's secret key, not by any person
   through the site.
-- **Family accounts, when switched on:** a family logs in by emailed link
+- **Family accounts:** a family logs in by emailed link
   from the family door on /login. What My Toran already keeps on their
   phone (mandirs followed, their plan) is then also saved to their
   account (`family_saved`), so it appears on their other devices. Only

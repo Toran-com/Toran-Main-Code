@@ -145,14 +145,31 @@ async function LoginDoors({
               id="door-family"
               className="font-display text-3xl leading-tight sm:text-4xl"
             >
-              Your mandirs and your plan
+              {FAMILY_ACCOUNTS
+                ? "Create your free family account"
+                : "Your mandirs and your plan"}
             </h2>
           </div>
           {FAMILY_ACCOUNTS ? (
             <>
+              <ul className="flex flex-col gap-3">
+                <li className="flex gap-3">
+                  {tick}
+                  The mandirs you follow and the events you plan, on your phone,
+                  tablet and laptop
+                </li>
+                <li className="flex gap-3">
+                  {tick}
+                  Nothing lost when you change phone
+                </li>
+                <li className="flex gap-3">
+                  {tick}
+                  No password: just your email
+                </li>
+              </ul>
               <p className="text-muted">
-                Log in to keep the mandirs you follow and the events you plan on
-                your phone, tablet and laptop. Free.
+                New or already have one? Put in your email and we&apos;ll send
+                you a link. The first time, it creates your account.
               </p>
               <form action={requestLoginLink} className="flex flex-col gap-4">
                 <input type="hidden" name="next" value="/my" />
