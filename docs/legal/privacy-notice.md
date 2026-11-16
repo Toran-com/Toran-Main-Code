@@ -19,7 +19,8 @@ within one month.
 - You can browse Toran without an account. We don't use tracking cookies
   or advertising, and we don't sell or share data for marketing.
 - What you save (mandirs you follow, your plan, seva you've taken, your
-  text size) stays on your phone, not with us.
+  text size) stays on your phone, not with us, unless you choose to make
+  a family account and agree to keep your mandirs and plan on it.
 - Mandir committee members who look after a mandir's page log in with
   their email address. That's most of what we hold.
 - Knowing which mandir someone is involved with can reveal their religion.
@@ -27,8 +28,9 @@ within one month.
 
 ## If you just visit the site
 
-- **No account and no tracking cookies.** We don't record who you are or
-  which mandirs you look at.
+- **No account needed and no tracking cookies.** We don't record who you
+  are or which mandirs you look at. A family account is optional (see
+  "If you make a family account" below).
 - **Server logs.** Our hosting provider, Vercel, briefly keeps technical
   logs, including IP addresses, to run the site and protect it from abuse:
   one hour on its free plan, one day on its Pro plan. The site's servers
@@ -96,7 +98,9 @@ within one month.
 - **My Toran.** My Toran puts together what your phone keeps: the mandirs
   you follow, your plan, the seva you've done and the events you say you
   went to (after an event in your plan, or by pressing "I went" on an
-  event's page). All of it stays on your phone; you need no account. To
+  event's page). All of it stays on your phone; you need no account. (If
+  you make a family account and agree, your mandirs and plan are also
+  kept on it: see below.) To
   show their names, the page sends Toran the mandirs' web addresses and
   the events' codes, with nothing about you, and we don't keep them.
   "Moving to a new phone" makes a link with all of it inside, in the part
@@ -117,6 +121,35 @@ within one month.
   you: no IP address, browser or device, only the page's address and a
   running total. If your browser asks sites not to track you ("Do Not
   Track" or "Global Privacy Control"), you aren't counted at all.
+
+## If you make a family account
+
+A family account is optional: everything on Toran works without one. It
+keeps the mandirs you follow and your plan on every phone, tablet and
+laptop you log in on.
+
+| What we hold                                                                                                                      | Why                                                      | Lawful basis                                    |
+| --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------- |
+| Your email address and login records                                                                                              | To let you log in by emailed link                        | Contract: providing the account you asked for   |
+| If you agree: the web addresses of the mandirs you follow and the codes and dates of the events in your plan (at most 30 of each) | To show you the same lists on every device you log in on | Contract, and your **explicit consent** (below) |
+
+- **Logging in alone keeps nothing but your email.** Your lists are kept
+  only if you then agree, by ticking a separate box on My Toran, and we
+  record when you agreed.
+- **Which mandirs you follow can show your religion**, which the law
+  treats as special category data. That's why we ask for your explicit
+  consent first. We use your lists only to show them back to you. Nobody
+  else can see them: not the mandirs, not other visitors, and they never
+  appear on any page.
+- **Seva you've taken and events you went to** stay on your phone only,
+  even with an account.
+- **Withdrawing and deleting.** On "Your account" you can delete your
+  lists (which withdraws your consent: nothing more is kept until you
+  agree again) or close your account, which deletes your login and your
+  lists straight away. Your phone keeps its own copy until you clear it.
+- **How long.** Lists not changed for 2 years are deleted automatically.
+  Your login stays until you close your account; we review logins not
+  used for 24 months.
 
 ## If you sign up for the weekly email
 
@@ -194,17 +227,6 @@ listings up to date; these are the mandirs' public information.
 - **Forwarding posters by WhatsApp or email:** the message, any image,
   and the sender's number or address, used to create the listing and then
   deleted within 90 days.
-- **Family accounts** (built, switched off until our ICO registration and
-  impact assessment cover them): log in with your email to keep the
-  mandirs you follow and your plan on every device. Logging in keeps
-  only your email address; your lists are kept only if you then agree, by
-  ticking a separate box on My Toran, and we record when you agreed. We'd
-  keep the web addresses of the mandirs you follow and the codes and
-  dates of the events in your plan (at most 30 of each), nothing else.
-  Which mandirs you follow can show your religion, so we use it only to
-  show you your own lists; nobody else can see it, not even the mandirs.
-  You can delete the lists, or close the account, at any time from "Your
-  account"; lists not changed for 2 years are deleted automatically.
 
 ## Who we share data with
 

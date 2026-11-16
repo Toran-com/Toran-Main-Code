@@ -125,6 +125,8 @@ In **Vercel → Project → Settings → Environment Variables**, for
 - [ ] `NEXT_PUBLIC_SENTRY_DSN`: as before, for Production and Preview.
 - [ ] `ANTHROPIC_API_KEY`, only if reading posters is wanted (decision
       0018).
+- [ ] `NEXT_PUBLIC_FAMILY_ACCOUNTS` = `on` (decision 0020), only once
+      the DPIA is signed with family accounts in it.
 - [ ] **Leave the weekly email off** (`DIGEST_SIGNUPS` unset) until the
       ICO registration and DPIA are done (decision 0006). Switching it on
       later is in docs/app-setup.md, "Weekly email (built, switched off)".

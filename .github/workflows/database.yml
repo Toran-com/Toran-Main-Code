@@ -97,8 +97,8 @@ jobs:
 
       - name: Build against local Supabase
         # Family accounts (decision 0020) are switched on for this test
-        # build only, so their login and syncing are tested; the live site
-        # keeps them off until the ICO registration and DPIA are done.
+        # build, so their login and syncing are tested; the live site
+        # switches them on with the same variable in Vercel.
         env:
           NEXT_PUBLIC_FAMILY_ACCOUNTS: "on"
         run: pnpm build
