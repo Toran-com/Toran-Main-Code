@@ -104,25 +104,33 @@ export function HomeStory() {
             <li
               key={step.title}
               data-story-step={i}
-              className="story-step border-line bg-surface shadow-card flex w-[84vw] max-w-[24rem] flex-col items-center gap-6 rounded-3xl border p-5 pt-6 lg:min-h-[56svh] lg:w-auto lg:max-w-none lg:items-start lg:justify-center lg:gap-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
+              className="story-step border-line bg-surface shadow-card relative flex w-[84vw] max-w-[24rem] flex-col items-center gap-5 rounded-3xl border p-4 pt-5 lg:min-h-[56svh] lg:w-auto lg:max-w-none lg:items-start lg:justify-center lg:gap-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
             >
               <div aria-hidden="true" className="lg:hidden">
-                <Phone only={i} className="w-[min(50vw,11.5rem)]" />
+                <Phone
+                  only={i}
+                  short
+                  className="w-[min(44vw,10.25rem,calc((100svh-22rem)*0.66))]"
+                />
               </div>
-              <div className="story-words flex max-w-xl flex-col gap-3 sm:gap-4">
-                <p className="text-muted flex items-center gap-3 text-base font-semibold">
+              <div className="story-words flex max-w-xl flex-col gap-2 sm:gap-4">
+                {/* On a phone the number sits in the card's corner, beside
+                    the picture, so the step fits on one screen. */}
+                <p className="text-muted flex items-center gap-3 text-base font-semibold max-lg:absolute max-lg:top-4 max-lg:left-4">
                   <span
                     aria-hidden="true"
                     className="story-number font-display grid size-11 shrink-0 place-items-center rounded-full text-2xl"
                   >
                     {i + 1}
                   </span>
-                  {t("story.step", { n: i + 1, total: STEPS.length })}
+                  <span className="max-lg:sr-only">
+                    {t("story.step", { n: i + 1, total: STEPS.length })}
+                  </span>
                 </p>
                 <h3 className="font-display text-3xl leading-tight sm:text-5xl">
                   {t(step.title)}
                 </h3>
-                <p className="text-muted text-lg leading-relaxed sm:text-xl">
+                <p className="text-muted text-lg leading-normal sm:text-xl sm:leading-relaxed">
                   {t(step.body)}
                 </p>
                 <Link
@@ -144,7 +152,16 @@ export function HomeStory() {
 
 // The phone and its six screens, one for each step. Sizes are in cqw (a
 // hundredth of the phone's width), so it scales as one picture.
-function Phone({ only, className }: { only?: number; className: string }) {
+function Phone({
+  only,
+  short,
+  className,
+}: {
+  only?: number;
+  // Each step's own phone, on phones: shorter, without the empty middle.
+  short?: boolean;
+  className: string;
+}) {
   const t = pageT();
   // One screen (each step's own phone) or all six (the one that changes).
   const show = (n: number) => only === undefined || only === n;
@@ -160,7 +177,9 @@ function Phone({ only, className }: { only?: number; className: string }) {
   return (
     <div className={`story-phone [container-type:inline-size] ${className}`}>
       <div className="rounded-[13cqw] bg-[#0b1426] p-[2.6cqw] shadow-[0_30px_80px_rgba(20,33,61,0.35)]">
-        <div className="bg-bg text-ink relative aspect-[9/18.5] overflow-hidden rounded-[10.6cqw] text-[4.3cqw] leading-snug">
+        <div
+          className={`bg-bg text-ink relative ${short ? "aspect-[9/13.5]" : "aspect-[9/18.5]"} overflow-hidden rounded-[10.6cqw] text-[4.3cqw] leading-snug`}
+        >
           {/* 1. What's on, near you */}
           {show(0) && (
             <Screen n={0}>

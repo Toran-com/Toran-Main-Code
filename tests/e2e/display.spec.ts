@@ -8,7 +8,7 @@ test("text can be made bigger and higher in contrast, and stays so", async ({
   await page.goto("/");
   const size = () =>
     page.evaluate(() => getComputedStyle(document.documentElement).fontSize);
-  expect(await size()).toBe("18px");
+  expect(await size()).toBe("17px");
 
   await page.locator("summary", { hasText: "Menu" }).click();
   await page.getByRole("button", { name: /Largest/ }).click();
@@ -29,6 +29,6 @@ test("text can be made bigger and higher in contrast, and stays so", async ({
   await page.getByRole("button", { name: /Standard/ }).click();
   await page.getByRole("switch", { name: "Higher contrast" }).click();
   await page.reload();
-  expect(await size()).toBe("18px");
+  expect(await size()).toBe("17px");
   await expect(page.locator("html")).not.toHaveAttribute("data-contrast");
 });

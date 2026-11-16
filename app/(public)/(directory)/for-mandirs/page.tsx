@@ -99,7 +99,7 @@ export default function ForMandirsPage() {
           <h1 className="text-marigold-ink text-base font-semibold tracking-[0.12em] uppercase">
             For mandir committees
           </h1>
-          <p className="font-display text-[3.25rem] leading-[0.98] tracking-tight sm:text-7xl lg:text-[5.5rem]">
+          <p className="font-display text-[2.5rem] leading-[0.98] tracking-tight sm:text-7xl lg:text-[5.5rem]">
             Your events, <em className="text-peacock">where families look.</em>
           </p>
           <p className="text-muted max-w-xl text-lg leading-relaxed sm:text-xl">
@@ -143,7 +143,7 @@ export default function ForMandirsPage() {
                 <span className="text-muted text-base">
                   Shree Example Mandir
                 </span>
-                <span className="font-display text-[2rem] leading-tight">
+                <span className="font-display text-[1.625rem] leading-tight">
                   What needs doing
                 </span>
                 <ul className="divide-line mt-2 flex flex-col divide-y">
@@ -189,7 +189,7 @@ export default function ForMandirsPage() {
         <div className="relative flex flex-col gap-10 px-6 pt-4 pb-12 sm:px-12 sm:pb-16">
           <h2
             id="start"
-            className="font-display max-w-3xl text-[2.5rem] leading-[1.05] tracking-tight sm:text-6xl"
+            className="font-display max-w-3xl text-[1.875rem] leading-[1.05] tracking-tight sm:text-6xl"
           >
             Three steps to start
           </h2>
@@ -245,7 +245,7 @@ export default function ForMandirsPage() {
       <section aria-labelledby="helps" className="flex flex-col gap-10">
         <h2
           id="helps"
-          className="font-display max-w-3xl text-[2.5rem] leading-[1.05] tracking-tight sm:text-6xl"
+          className="font-display max-w-3xl text-[1.875rem] leading-[1.05] tracking-tight sm:text-6xl"
         >
           Everything a busy committee needs
         </h2>

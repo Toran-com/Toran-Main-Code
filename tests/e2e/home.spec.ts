@@ -33,12 +33,12 @@ test("the main button goes to What's on, asking where you are the first time", a
   await expect(page).toHaveURL(/\/whats-on\?near=LE4/);
 });
 
-test("text is at least 18px", async ({ page }) => {
+test("text is at least 17px", async ({ page }) => {
   await page.goto("/");
   const size = await page
     .getByText("Events and seva at UK mandirs")
     .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-  expect(size).toBeGreaterThanOrEqual(18);
+  expect(size).toBeGreaterThanOrEqual(17);
 });
 
 test("shared links get a preview picture", async ({ page, request }) => {

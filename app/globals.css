@@ -137,21 +137,38 @@ html[data-contrast="high"] {
   --font-sans: var(--font-mulish), "Segoe UI", system-ui, sans-serif;
 }
 
-/* 18px body text minimum (docs/architecture.md, section 8). */
+/* 17px body text minimum, the iPhone's own default text size
+   (docs/architecture.md, section 8). */
 html {
-  font-size: 112.5%;
+  font-size: 106.25%;
   /* Room for the header, which stays at the top, and a bar that sticks
      beneath it, when jumping to a section. */
   scroll-padding-top: 8rem;
 }
 
-/* Bigger text, chosen with "Aa" in the header (lib/display.ts): 20px and
-   22.5px instead of 18px. Everything is sized in rem, so it all grows. */
+/* Bigger text, chosen at the top of the menu (lib/display.ts): 20px and
+   22.5px instead of 17px. Everything is sized in rem, so it all grows. */
 html[data-text="lg"] {
   font-size: 125%;
 }
 html[data-text="xl"] {
   font-size: 140.625%;
+}
+
+/* On phones, a calmer heading scale, so a screen holds more than a title
+   and one card: page titles about 36px, section titles about 32px, card
+   titles about 22px. Laptops keep Tailwind's own sizes. */
+@media (width < 40rem) {
+  :root {
+    --text-7xl: 2.5rem;
+    --text-6xl: 2.25rem;
+    --text-5xl: 1.875rem;
+    --text-4xl: 1.75rem;
+    --text-3xl: 1.5rem;
+    --text-2xl: 1.3125rem;
+    --text-xl: 1.125rem;
+    --text-lg: 1.0625rem;
+  }
 }
 
 body {

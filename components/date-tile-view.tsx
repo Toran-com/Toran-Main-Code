@@ -24,8 +24,8 @@ export function DateTileView({
   }[size];
   const number = {
     sm: "text-[2.125rem] leading-[2rem]",
-    md: "text-[2.25rem] leading-[2.125rem] sm:text-[2.5rem] sm:leading-[2.375rem]",
-    lg: "text-[3.25rem] leading-[3rem] sm:text-[3.75rem] sm:leading-[3.5rem]",
+    md: "text-[1.875rem] leading-[1.875rem] sm:text-[2.5rem] sm:leading-[2.375rem]",
+    lg: "text-[2.5rem] leading-[2.375rem] sm:text-[3.75rem] sm:leading-[3.5rem]",
   }[size];
   return (
     <span
@@ -73,7 +73,7 @@ export function TimeTileView({
         <>
           <span
             aria-hidden="true"
-            className={`font-display ${parts.clock.length > 2 ? "text-[1.625rem] leading-[1.75rem] sm:text-[1.875rem] sm:leading-[2rem]" : "text-[2.25rem] leading-[2.125rem] sm:text-[2.5rem] sm:leading-[2.375rem]"}`}
+            className={`font-display ${parts.clock.length > 2 ? "text-[1.375rem] leading-[1.5rem] sm:text-[1.875rem] sm:leading-[2rem]" : "text-[1.875rem] leading-[1.875rem] sm:text-[2.5rem] sm:leading-[2.375rem]"}`}
           >
             {parts.clock}
           </span>

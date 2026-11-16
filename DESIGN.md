@@ -52,13 +52,19 @@ as decoration.
   letters carved over a doorway. Never fake bold (`font-synthesis: none`).
   Gujarati headings use Noto Serif Gujarati; Hindi uses the phone's own
   Devanagari font.
-- **Reading:** Mulish, 400/600/700. **18px minimum** (the page's `1rem`
-  is 18px; Larger is 20px and Largest is 22.5px).
+- **Reading:** Mulish, 400/600/700. **17px minimum**, the iPhone's own
+  default text size (the page's `1rem` is 17px; Larger, at the top of the
+  menu, is 20px and Largest is 22.5px).
 - **Wordmark:** "Toran" in Marcellus, uppercase, letter-spaced 0.16em,
   written in normal case in the HTML so screen readers say the word.
-- **Scale:** 18 (body) · 20 (lead) · 24 · 30 (day headings) · 36–48
-  (section headings) · 52–88 (page and home headlines). Line height 1.5
-  for reading and 1.0–1.15 for headlines. Keep lines to 60–75 characters.
+- **Scale on laptops:** 17 (body) · 19 (lead) · 25 · 32 (day headings) ·
+  38–51 (section headings) · 61–96 (page and home headlines).
+- **Scale on phones** (under 640px; `app/globals.css` sets smaller
+  Tailwind sizes there): 17 (body) · 18 (lead) · 22 (card titles) · 26–30
+  (day and section headings) · 36–40 (page and home headlines), so a
+  screen holds more than a title and one card.
+- Line height 1.5 for reading and 1.0–1.15 for headlines. Keep lines to
+  60–75 characters.
 
 ## Spacing and layout
 

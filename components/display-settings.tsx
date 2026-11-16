@@ -50,7 +50,7 @@ const LETTER: Record<TextSize, string> = {
 };
 
 // Bigger text and higher contrast, for anyone who finds the page hard to
-// read, in the menu (components/site-menu.tsx). Remembered on this phone
+// read, at the top of the menu (components/public-shell.tsx). Remembered on this phone
 // only.
 export function DisplayControls() {
   const t = useT(enDisplay);
