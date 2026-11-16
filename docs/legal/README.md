@@ -1,8 +1,9 @@
-# Legal drafts
+# Legal documents
 
-**Status: drafts for Milan to review. Not legal advice, and not
-yet checked by a solicitor. The privacy notice and terms are on the site
-(`/privacy`, `/terms`) marked as drafts, with every [bracket] highlighted.**
+**Status: checked by Milan and final (16 November 2026). The privacy
+notice and terms are on the site (`/privacy`, `/terms`) as final, and the
+DPIA is signed. Not legal advice, and not yet reviewed by a solicitor
+(recommended before the weekly email is switched on).**
 
 These cover what Toran does with personal data and the rules for using the
 site. Toran is run by Milan Patel as a sole trader (decision 0021), who
@@ -34,23 +35,23 @@ before publishing anything.
 - **Sentry's region:** EU (Germany): the live site sends error reports to
   `ingest.de.sentry.io`.
 
-## Blanks left (only Milan can answer)
+- **Regions:** Supabase in London (`eu-west-2`), Resend in the EU
+  (Ireland), Sentry in the EU (Germany), in the privacy notice.
+- **The terms' two liability and law lines** use standard wording,
+  agreed by Milan; a solicitor can still review them.
+- **DPIA signed** by Milan Patel on 16 November 2026, covering family
+  accounts; next review by 16 November 2027. Milan leads in the breach
+  plan.
+- **`legalChecked: true`** in `lib/site.ts`, so the pages show as final.
 
-Everything else in these drafts has been checked against the site and the
-providers' own terms (12 November 2026).
+## Still to do
 
-1. **Two regions**, each a quick look in its settings:
-   - Supabase → the live project → Settings → General: "Region" (we want
-     London, `eu-west-2`);
-   - Resend → Domains: the region shown for toran.org.uk, once the domain
-     is added there (login emails need it: go-live checklist, step 3).
-2. **Data processing agreements:** accept Anthropic's, Resend's,
+1. **Data processing agreements:** accept Anthropic's, Resend's,
    Supabase's, Vercel's and Sentry's for Toran's accounts (each is in the
-   provider's legal or settings pages).
-3. **The date** to sign off the DPIA, and who leads in the breach plan.
-4. **A solicitor's review** of the privacy notice and terms (two
-   bracketed notes in the terms), and the ICO helpline call before the
-   weekly email is switched on.
+   provider's legal or settings pages), and keep a copy.
+2. **Before the weekly email is switched on:** a solicitor's review of the
+   privacy notice and terms, the ICO helpline call, and the DPIA's
+   sections 4 to 7 redone for it.
 
 ## What to do, in order
 

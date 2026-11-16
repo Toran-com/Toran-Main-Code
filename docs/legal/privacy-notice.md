@@ -1,9 +1,7 @@
-# Privacy notice (DRAFT)
+# Privacy notice
 
-> Draft of 12 November 2026, brought up to date with the site as built.
-> Not yet published as final. Text in [brackets] is still to be filled
-> in; everything else has been checked against the site and the
-> providers' own terms.
+> Last updated 16 November 2026. Checked against the site as built and
+> the providers' own terms.
 
 Toran is run by **Milan Patel**, a sole trader trading as Toran, of
 1G Bartholomews, Brighton BN1 1HG. In this notice "we" means Milan Patel trading as
@@ -213,10 +211,10 @@ under contract:
 
 | Provider               | What for                                              | Where                                                      |
 | ---------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
-| Supabase               | Database, login and the mandirs' photos               | [London (UK): check the live project's region]             |
+| Supabase               | Database, login and the mandirs' photos               | London (UK)                                                |
 | Vercel                 | Hosting the website                                   | Servers in London; a global network delivers pages quickly |
 | Sentry                 | Error reports (with personal data removed)            | EU (Germany)                                               |
-| Resend                 | Sending login links (and later the weekly email)      | [USA or EU: check the region the account uses]             |
+| Resend                 | Sending login links (and later the weekly email)      | EU (Ireland)                                               |
 | Anthropic (Claude API) | Reading posters and pasted messages into events       | USA                                                        |
 | postcodes.io           | Finding your postcode district when you press Near me | UK (a rounded position only, never linked to you)          |
 
@@ -265,4 +263,4 @@ don't show a cookie banner. If that ever changes, we'll ask first.
 ## Changes
 
 We'll update this notice when we start collecting something new, and show
-the date at the top. Last updated: 9 November 2026.
+the date at the top. Last updated: 16 November 2026.

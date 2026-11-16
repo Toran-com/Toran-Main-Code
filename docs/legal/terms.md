@@ -1,8 +1,6 @@
-# Terms of use (DRAFT)
+# Terms of use
 
-> Draft of 2 November 2026, brought up to date with the site as built.
-> Not yet published as final. Text in [brackets] is still to be filled
-> in.
+> Last updated 16 November 2026.
 
 These terms apply to everyone using Toran (the website at toran.org.uk).
 Toran is run by **Milan Patel**, a sole trader trading as Toran, of
@@ -66,7 +64,7 @@ page **the same day**.
   streams.
 - Nothing in these terms limits our liability where the law doesn't allow
   it to be limited, such as for death or personal injury caused by
-  negligence, or for fraud. [Solicitor to confirm wording.]
+  negligence, or for fraud.
 
 ## 5. Changes and ending
 
@@ -77,6 +75,6 @@ Toran and ask us to delete your account at any time.
 ## 6. Law
 
 These terms are governed by the law of England and Wales, and disputes go
-to its courts. [Solicitor to confirm.]
+to its courts.
 
-Last updated: 2 November 2026.
+Last updated: 16 November 2026.
