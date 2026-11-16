@@ -11,10 +11,10 @@ export const site = {
   // Until launch, ask search engines not to list any page, so half-finished
   // listings don't appear in search results. Set to true at launch.
   launched: false,
-  // The privacy notice and terms (docs/legal) are drafts until the founders
-  // and a solicitor have checked them; until then their pages say so. Set
-  // to true once checked, and every [bracket] in them is filled in.
-  legalChecked: false,
+  // The privacy notice and terms (docs/legal) are checked and final
+  // (16 November 2026). While false, their pages say they're drafts and
+  // highlight every [bracket]; a test refuses true while a bracket is left.
+  legalChecked: true,
 } as const;
 
 // Toran's own email addresses, both forwarded to Milan (decision 0021):

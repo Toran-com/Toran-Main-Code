@@ -1,11 +1,12 @@
-# Breach response plan (DRAFT)
+# Breach response plan
 
-> Draft of 2 November 2026. What to do if personal data held by Toran is
+> 16 November 2026. What to do if personal data held by Toran is
 > lost, leaked, wrongly changed, or seen by someone who shouldn't see it.
 > Keep this short enough to follow in a hurry. DPIA section 8, action 3.
 
-**Who decides:** [name] (lead), or [name] if they can't be reached within
-a few hours. Either can start the steps below.
+**Who decides:** Milan Patel, who runs Toran and is the controller. No
+one else can act for Toran yet; if that changes, name the deputy here, and
+either can start the steps below.
 
 ## 1. Contain it (the first hour)
 

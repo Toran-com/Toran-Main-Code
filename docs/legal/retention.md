@@ -1,6 +1,6 @@
-# Retention schedule (DRAFT)
+# Retention schedule
 
-> Draft of 2 November 2026, brought up to date with the site as built.
+> Last updated 16 November 2026, with the site as built.
 > How long Toran keeps each kind of personal data, and how it is
 > deleted. Decision 0006: every table with personal data has a retention
 > period.

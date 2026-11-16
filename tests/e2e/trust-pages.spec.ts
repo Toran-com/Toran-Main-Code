@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 // The pages about Toran itself: every public page's footer reaches them,
-// the legal ones show the drafts from docs/legal, and anyone can ask for a
+// the legal ones show the documents in docs/legal, and anyone can ask for a
 // correction without giving their name.
 
 test("the footer reaches every page about Toran", async ({ page }) => {
@@ -24,11 +24,12 @@ test("the footer reaches every page about Toran", async ({ page }) => {
   }
 });
 
-test("the privacy notice is shown from its draft, marked as a draft", async ({
-  page,
-}) => {
+test("the privacy notice is shown in full, as final", async ({ page }) => {
   await page.goto("/privacy");
-  await expect(page.getByText("This is a draft.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Privacy notice" }),
+  ).toBeVisible();
+  await expect(page.getByText("This is a draft.")).toHaveCount(0);
   await expect(
     page.getByRole("heading", { level: 2, name: "The short version" }),
   ).toBeVisible();
@@ -37,8 +38,8 @@ test("the privacy notice is shown from its draft, marked as a draft", async ({
   await expect(
     page.getByRole("columnheader", { name: "Lawful basis" }),
   ).toHaveCount(2);
-  // Text still to fill in is highlighted, and no Markdown shows through.
-  await expect(page.locator("mark").first()).toBeVisible();
+  // Nothing is left to fill in, and no Markdown shows through.
+  await expect(page.locator("article mark")).toHaveCount(0);
   await expect(page.locator("article")).not.toContainText("**");
   await page.getByRole("link", { name: "terms" }).first().click();
   await expect(page).toHaveURL(/\/terms$/);
