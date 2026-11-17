@@ -16,7 +16,7 @@ Toran. Contact: hello@toran.org.uk.
   dates marked "Date not yet checked" are provisional.
 - Don't misuse the site: no attempts to break in, overload it, copy the
   whole directory automatically, or use it to send spam.
-- Buttons like "Directions", "Watch live", "Book tickets" and "Website"
+- Buttons like "Directions", "Watch on YouTube", "Book tickets" and "Website"
   take you to other sites. Tickets, live streams and bookings are between
   you and the mandir or that site; Toran doesn't sell tickets or take
   payments.

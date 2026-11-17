@@ -44,7 +44,8 @@ export type PracticalDetails = {
   postcode: string | null;
   website: string | null;
   phone: string | null;
-  // Where it streams its aarti and katha: shown as "Watch live".
+  // Its YouTube channel, or where it streams aarti and katha: shown as
+  // "Watch on YouTube" (or "Watch live" for anywhere else).
   live_url: string | null;
   // Parking, entrance, nearest station: shown with directions.
   getting_there: string | null;
@@ -208,7 +209,7 @@ export const FORM_ERRORS: Record<string, string> = {
   postcode: "That doesn't look like a UK postcode.",
   website: "That doesn't look like a website address.",
   live_url:
-    "That doesn't look like a web address for the live stream (for example a YouTube or Facebook page).",
+    "That doesn't look like a web address for YouTube or the livestream (for example the mandir's YouTube channel).",
   phone: "Please use only numbers, spaces and + ( ) in the phone number.",
   getting_there: 'Please keep "Getting there" under 400 characters.',
   getting_there_contact:

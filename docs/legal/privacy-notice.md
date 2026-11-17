@@ -55,7 +55,7 @@ within one month.
   time. It stays on your phone; clearing the site's data in your browser
   forgets it.
 - **Directions, live streams, tickets and mandirs' websites.** Buttons like
-  "Directions", "Watch live", "Book tickets" and "Website" take you to
+  "Directions", "Watch on YouTube", "Book tickets" and "Website" take you to
   another site (Google Maps, YouTube, a mandir's booking page and so on).
   Toran doesn't send them anything about you, but once you're there their
   own privacy notice applies.

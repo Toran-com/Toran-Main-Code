@@ -118,8 +118,8 @@ export function MandirFields({ values = {} }: { values?: Values }) {
         />
       </Field>
       <Field
-        label="Live stream"
-        hint="Where aarti or katha is streamed, e.g. a YouTube or Facebook page."
+        label="YouTube / Livestream"
+        hint="The mandir's YouTube channel, or where aarti or katha is streamed (Facebook, its own site)."
       >
         <input
           name="live_url"
