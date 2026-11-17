@@ -24,7 +24,7 @@ const SECTIONS = [
   { id: "posters", title: "Posters people send" },
   { id: "seva", title: "Seva rotas" },
   { id: "colleagues", title: "Inviting a colleague" },
-  { id: "share", title: "Sharing with families" },
+  { id: "share", title: "Sharing your events" },
   { id: "privacy", title: "What we keep" },
 ] as const;
 
@@ -172,7 +172,7 @@ export default function CommitteeGuidePage() {
           </li>
           <li>
             Add a short description, and the name and description in Gujarati if
-            you like. Families who read Gujarati see both.
+            you like. Anyone who reads Gujarati sees both.
           </li>
           <li>
             <Ui>Duplicate</Ui> copies an event you already have, for a second
@@ -185,7 +185,7 @@ export default function CommitteeGuidePage() {
         <p>Next to each event on your committee page:</p>
         <Steps>
           <li>
-            <Ui>Still on</Ui> tells families you&apos;ve checked it. They see
+            <Ui>Still on</Ui> tells everyone you&apos;ve checked it. They see
             &ldquo;Confirmed by the mandir&rdquo;.
           </li>
           <li>
@@ -207,8 +207,8 @@ export default function CommitteeGuidePage() {
 
       <Section id="posters">
         <p>
-          Families and volunteers can tell Toran about an event, or send a
-          poster or patrika. We type it up, and it waits for you under{" "}
+          Anyone, including your volunteers, can tell Toran about an event, or
+          send a poster or patrika. We type it up, and it waits for you under{" "}
           <Ui>Posters waiting for you</Ui>.
         </p>
         <Steps>
@@ -274,8 +274,8 @@ export default function CommitteeGuidePage() {
             the latest. Put it on the noticeboard or hand it out.
           </li>
           <li>
-            Families can add one event to their phone&apos;s calendar, or get
-            all your mandir&apos;s events there, with new ones appearing by
+            Anyone can add one event to their phone&apos;s calendar, or get all
+            your mandir&apos;s events there, with new ones appearing by
             themselves.
           </li>
         </Steps>
@@ -283,7 +283,7 @@ export default function CommitteeGuidePage() {
 
       <Section id="privacy">
         <Steps>
-          <li>Families don&apos;t need an account to see your events.</li>
+          <li>No one needs an account to see your events.</li>
           <li>
             Only events and your mandir&apos;s public details are shown. Your
             committee&apos;s email addresses and phone numbers are never public.

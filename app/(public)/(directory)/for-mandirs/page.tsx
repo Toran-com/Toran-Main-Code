@@ -11,7 +11,7 @@ import { pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata(
   "For mandir committees",
-  "Toran puts your mandir's events where families can find and share them, and helps with your seva rota. Free for mandirs.",
+  "Toran puts your mandir's events where people can find and share them, and helps with your seva rota. Free for mandirs.",
   "/for-mandirs",
 );
 
@@ -28,8 +28,8 @@ const icon = {
 
 const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   {
-    title: "Your events, where families look",
-    body: "Families find your page by postcode and share events on WhatsApp.",
+    title: "Your events, where people look",
+    body: "People find your page by postcode and share events on WhatsApp.",
     icon: (
       <svg {...icon}>
         <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
@@ -68,7 +68,7 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   },
   {
     title: "In English and Gujarati",
-    body: "Families see both.",
+    body: "Everyone sees both.",
     icon: (
       <span
         aria-hidden="true"
@@ -81,7 +81,7 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
   },
   {
     title: "Confirmed by the mandir",
-    body: "One tap on “Still on” shows families it's checked.",
+    body: "One tap on “Still on” shows everyone it's checked.",
     icon: (
       <svg {...icon}>
         <path d="M5 12.5l4.5 4.5L19 7.5" />
@@ -100,10 +100,10 @@ export default function ForMandirsPage() {
             For mandir committees
           </h1>
           <p className="font-display text-[2.5rem] leading-[0.98] tracking-tight sm:text-7xl lg:text-[5.5rem]">
-            Your events, <em className="text-peacock">where families look.</em>
+            Your events, <em className="text-peacock">where people look.</em>
           </p>
           <p className="text-muted max-w-xl text-lg leading-relaxed sm:text-xl">
-            Events where families find them, and help with your seva rota. Free
+            Events where people find them, and help with your seva rota. Free
             for mandirs.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -160,7 +160,7 @@ export default function ForMandirsPage() {
                       A festival is coming up
                     </span>
                     <span className="text-muted">
-                      Add your programme so families can find it.
+                      Add your programme so people can find it.
                     </span>
                   </li>
                   <li className="flex flex-col gap-1 py-3.5">
@@ -298,7 +298,7 @@ export default function ForMandirsPage() {
           </h2>
           <ul className="flex flex-col gap-3">
             {[
-              "Families don't need an account.",
+              "No one needs an account to see them.",
               "Your committee's contact details are never public.",
               "You can correct or remove your events at any time.",
             ].map((line) => (

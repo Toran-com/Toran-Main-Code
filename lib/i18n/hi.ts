@@ -85,15 +85,14 @@ export const hi: Record<MessageKey, string> = {
   "story.mockKitchen": "रसोई सेवा",
   "home.comingSoon": "जल्द आ रहा है",
   "home.committeesTitle": "समितियों के लिए यह कैसे काम करता है",
-  "home.committeesHeading":
-    "आपके कार्यक्रम, वहाँ जहाँ परिवार पहले से देखते हैं।",
+  "home.committeesHeading": "आपके कार्यक्रम, वहाँ जहाँ लोग पहले से देखते हैं।",
   "home.mandirCount": "पूरे UK में {count} मंदिर",
   "home.mandirsIntro": "कार्यक्रम देखने के लिए अपना मंदिर खोजें।",
   "home.regionCount.one": "{count} मंदिर",
   "home.regionCount.other": "{count} मंदिर",
   "home.step1Title": "जो आपके पास पहले से है, वह भेजें",
   "home.step2Title": "एक मिनट में जाँचें",
-  "home.step3Title": "परिवार उसे ढूँढ लेते हैं",
+  "home.step3Title": "लोग उसे ढूँढ लेते हैं",
   "home.committeesBody":
     "वही पोस्टर भेजें जो आप पहले से शेयर करते हैं। मंदिरों के लिए यह मुफ़्त है।",
 

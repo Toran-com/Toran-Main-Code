@@ -44,7 +44,7 @@ export default function GuideHandoutPage() {
               Your mandir&apos;s events on Toran
             </h1>
             <p className="text-muted text-xl">
-              Where families find what&apos;s on and share it. Free for mandirs.
+              Where people find what&apos;s on and share it. Free for mandirs.
             </p>
             <p className="text-muted break-all">Full guide: {url}</p>
           </div>

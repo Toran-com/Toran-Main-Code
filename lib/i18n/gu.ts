@@ -85,14 +85,14 @@ export const gu: Record<MessageKey, string> = {
   "story.mockKitchen": "રસોડા સેવા",
   "home.comingSoon": "ટૂંક સમયમાં",
   "home.committeesTitle": "સમિતિઓ માટે તે કેવી રીતે કામ કરે છે",
-  "home.committeesHeading": "તમારા કાર્યક્રમો, જ્યાં પરિવારો પહેલેથી જુએ છે.",
+  "home.committeesHeading": "તમારા કાર્યક્રમો, જ્યાં લોકો પહેલેથી જુએ છે.",
   "home.mandirCount": "યુકેમાં {count} મંદિરો",
   "home.mandirsIntro": "તમારું મંદિર શોધો અને જુઓ ત્યાં શું થઈ રહ્યું છે.",
   "home.regionCount.one": "{count} મંદિર",
   "home.regionCount.other": "{count} મંદિરો",
   "home.step1Title": "તમારી પાસે જે છે તે મોકલો",
   "home.step2Title": "એક મિનિટમાં તપાસો",
-  "home.step3Title": "પરિવારો તેને શોધે છે",
+  "home.step3Title": "લોકો તેને શોધે છે",
   "home.committeesBody":
     "તમે પહેલેથી શેર કરો છો તે પોસ્ટર મોકલો. મંદિરો માટે મફત.",
 

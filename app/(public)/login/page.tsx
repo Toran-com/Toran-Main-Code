@@ -26,7 +26,7 @@ import { requestLoginLink } from "./actions";
 export const metadata: Metadata = {
   title: pageTitle("Log in"),
   description:
-    "Log in to Toran, or create a free account: families keep their mandirs and plan, and mandir committees put their events on Toran.",
+    "Log in to Toran, or create a free account: keep your mandirs and plan on every device, and mandir committees put their events on Toran.",
 };
 
 const errors: Record<string, string> = {
@@ -139,14 +139,14 @@ async function LoginDoors({
         >
           <div className="flex flex-col gap-2">
             <p className="text-peacock text-base font-bold tracking-[0.08em] uppercase">
-              For families
+              For everyone
             </p>
             <h2
               id="door-family"
               className="font-display text-3xl leading-tight sm:text-4xl"
             >
               {FAMILY_ACCOUNTS
-                ? "Create your free family account"
+                ? "Create your free account"
                 : "Your mandirs and your plan"}
             </h2>
           </div>
@@ -217,8 +217,7 @@ async function LoginDoors({
                 Open My Toran
               </Link>
               <p className="text-muted text-base">
-                Accounts for families, to keep them on every device, are coming
-                soon.
+                Accounts, to keep them on every device, are coming soon.
               </p>
             </>
           )}
@@ -252,7 +251,7 @@ async function LoginDoors({
             </li>
             <li className="flex gap-3">
               {tick}
-              See how many families find you
+              See how many people find you
             </li>
           </ul>
           <Link href="/join" className={`${buttonClass} text-center`}>

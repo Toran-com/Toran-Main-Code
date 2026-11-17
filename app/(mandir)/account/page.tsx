@@ -234,7 +234,7 @@ async function Account({ searchParams }: PageProps<"/account">) {
         ))}
         {FAMILY_ACCOUNTS && (
           <div className="border-line flex flex-col gap-3 border-t pt-4">
-            <h2 className="text-xl font-bold">Saved for your family</h2>
+            <h2 className="text-xl font-bold">Saved to your account</h2>
             <p>
               {saved
                 ? `${saved.following.length === 1 ? "1 mandir" : `${saved.following.length} mandirs`} followed and ${Array.isArray(saved.plan) && saved.plan.length === 1 ? "1 event" : `${Array.isArray(saved.plan) ? saved.plan.length : 0} events`} in your plan, on every device you log in on. You agreed to this on ${new Date(saved.consented_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" })}.`
