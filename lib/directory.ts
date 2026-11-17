@@ -158,7 +158,12 @@ export async function getMandir(
     .limit(100);
   if (eventsError) return settle<never>(unavailable);
 
-  const events = withNextStart(rows, from).slice(0, 50);
+  // The daily aarti (lib/aarti-events.ts) is in the mandir's opening
+  // times on its page, so not listed again among its events.
+  const events = withNextStart(
+    rows.filter((e) => e.origin !== "aarti"),
+    from,
+  ).slice(0, 50);
   return settle({ state: "ok", data: { ...mandir, events } });
 }
 
