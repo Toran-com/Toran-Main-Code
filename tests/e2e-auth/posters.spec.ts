@@ -316,3 +316,46 @@ test("Toran clears the events whose date has passed in one go", async ({
     `update public.event_claims set status = 'rejected' where proposed->>'title' = 'New garba ${stamp}'`,
   );
 });
+
+test("Toran empties the queue to start afresh", async ({ page }) => {
+  const stamp = Date.now();
+  const slug = "dharma-mandir-newport";
+  const poster = (title: string, date: string) =>
+    JSON.stringify({
+      title,
+      date,
+      time: "19:00",
+      summary: "",
+      repeat: "none",
+      until: "",
+      from: "whatsapp",
+      link: "",
+    });
+  sql(
+    `insert into public.event_claims (mandir_id, proposed)
+       select id, '${poster(`Old patrika ${stamp}`, nextWeek())}'::jsonb from public.mandirs where slug = '${slug}'`,
+  );
+  await logInAsAdmin(page, `empty-${stamp}@example.com`);
+  await page.goto("/ops/posters");
+  await expect(page.getByText(`Old patrika ${stamp}`)).toBeVisible();
+  // It asks first.
+  let asked = "";
+  page.once("dialog", (dialog) => {
+    asked = dialog.message();
+    void dialog.accept();
+  });
+  await page
+    .getByRole("button", { name: /^Discard everything waiting \(\d+\)$/ })
+    .click();
+  await expect(
+    page.getByText(/^Discarded all \d+\. The queue is empty/),
+  ).toBeVisible();
+  expect(asked).toContain("None of them will be published");
+  await expect(page.getByText(`Old patrika ${stamp}`)).toHaveCount(0);
+  // Discarded, not deleted, with a note saying why.
+  expect(
+    sql(
+      `select status || ' ' || note from public.event_claims where proposed->>'title' = 'Old patrika ${stamp}'`,
+    ),
+  ).toBe("rejected Discarded: Toran emptied the queue.");
+});

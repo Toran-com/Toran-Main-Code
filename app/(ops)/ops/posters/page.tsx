@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { EventFields } from "@/components/event-fields";
 import { PosterPicture } from "@/components/poster-picture";
+import { ConfirmButton } from "@/components/confirm-button";
 import { Badge } from "@/components/public-shell";
 import { ReviewItem } from "@/components/review-item";
 import { buttonClass, inputClass, Loading, Notice } from "@/components/ui";
@@ -32,6 +33,7 @@ import {
 } from "@/lib/website-import";
 import {
   addPoster,
+  discardAll,
   discardPast,
   importWebsiteEvents,
   publishTicked,
@@ -163,17 +165,27 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       : { added: Number(query.read) || 0, skipped: Number(query.skipped) || 0 };
   const cleared =
     query.cleared === undefined ? null : Number(query.cleared) || 0;
-  const done = query.added
-    ? "Added to the queue. Add another below, or check it in the list."
-    : cleared !== null
-      ? cleared
-        ? `Discarded ${cleared} ${cleared === 1 ? "event" : "events"} whose date had passed.`
-        : "Nothing to discard: none of them have passed."
-      : read
-        ? readMessage(read, query["from-message"] === "1")
-        : query.published !== undefined && query.published !== "0"
-          ? tickedMessage(Number(query.published) || 0, Number(query.left) || 0)
-          : DONE[String(query.done ?? "")];
+  const emptied =
+    query.emptied === undefined ? null : Number(query.emptied) || 0;
+  const done =
+    emptied !== null
+      ? emptied
+        ? `Discarded all ${emptied}. The queue is empty: new posters, messages and website finds will start it afresh.`
+        : "Nothing was waiting."
+      : query.added
+        ? "Added to the queue. Add another below, or check it in the list."
+        : cleared !== null
+          ? cleared
+            ? `Discarded ${cleared} ${cleared === 1 ? "event" : "events"} whose date had passed.`
+            : "Nothing to discard: none of them have passed."
+          : read
+            ? readMessage(read, query["from-message"] === "1")
+            : query.published !== undefined && query.published !== "0"
+              ? tickedMessage(
+                  Number(query.published) || 0,
+                  Number(query.left) || 0,
+                )
+              : DONE[String(query.done ?? "")];
   const chosen = String(query.mandir ?? "");
   const reading = posterReadingOn();
   const ways = (Object.keys(WAYS) as Way[]).filter(
@@ -583,6 +595,27 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
             </ul>
           </nav>
         </div>
+        {/* Starting afresh: everything shown here, waiting or past, is
+            discarded in one go (none of it is published). */}
+        {shown.length > 0 && (
+          <form
+            action={discardAll}
+            className="flex flex-wrap items-center gap-3"
+          >
+            {shown.map((c) => (
+              <input key={c.id} type="hidden" name="poster" value={c.id} />
+            ))}
+            <ConfirmButton
+              question={`Discard all ${shown.length} in the queue? None of them will be published, including any waiting for a committee. This can't be undone.`}
+              className="border-kumkum/50 text-kumkum hover:bg-kumkum/5 inline-flex cursor-pointer items-center rounded-full border-2 px-4 py-1.5 text-base font-semibold"
+            >
+              Discard everything {group ? "shown" : "waiting"} ({shown.length})
+            </ConfirmButton>
+            <span className="text-muted text-base">
+              To start the queue afresh. None of it goes on the site.
+            </span>
+          </form>
+        )}
         {waiting.length === 0 && (
           <p className="text-muted">
             Nothing waiting. Add events above, and they&apos;ll wait here to be
