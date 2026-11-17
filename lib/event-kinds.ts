@@ -30,7 +30,8 @@ export function kindLabel(kind: string): string | null {
     : null;
 }
 
-export type EventOrigin = "mandir" | "poster" | "website" | "visitor";
+// "aarti": made from the mandir's daily aarti times (lib/aarti-events.ts).
+export type EventOrigin = "mandir" | "poster" | "website" | "visitor" | "aarti";
 
 // Where a published poster came from, as the event's origin.
 export function originOfPoster(from: string): EventOrigin {
