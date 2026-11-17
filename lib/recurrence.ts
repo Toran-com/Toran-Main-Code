@@ -1,6 +1,6 @@
 // Repeating events, kept to the patterns mandirs actually use: weekly,
 // fortnightly, "the first / second / … / last Saturday of the month", and
-// every day for a festival's run of nights (Navratri, Diwali week).
+// every day (a daily aarti, or a festival's run of nights like Navratri).
 // Stored as a small iCalendar RRULE in events.recurrence, with each actual
 // date written to event_occurrences so pages can query by date.
 
@@ -8,9 +8,6 @@ export type Repeat =
   | { kind: "daily" }
   | { kind: "weekly"; interval: 1 | 2 }
   | { kind: "monthly"; week: 1 | 2 | 3 | 4 | -1 }; // -1 = last
-
-// A festival's run: at most a month of days.
-export const MAX_DAILY_DAYS = 31;
 
 import type { SharedKey } from "@/lib/i18n/shared-messages";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
@@ -137,7 +134,10 @@ export function describeRule(rule: string): string | null {
 }
 
 // Every date (YYYY-MM-DD) the event happens, from the first date to the
-// "until" date inclusive. At most 60, as a safety limit.
+// "until" date inclusive. At most MAX_DATES, as a safety limit.
+// A year of days (a daily aarti), and a little more.
+const MAX_DATES = 370;
+
 export function occurrenceDates(rule: string, firstDate: string): string[] {
   const parsed = parseRule(rule);
   if (!parsed) return [firstDate];
@@ -148,7 +148,7 @@ export function occurrenceDates(rule: string, firstDate: string): string[] {
       parsed.repeat.kind === "daily" ? 1 : 7 * parsed.repeat.interval;
     for (
       let d = dateOnly(firstDate);
-      d <= until && out.length < 60;
+      d <= until && out.length < MAX_DATES;
       d = addDays(d, step)
     ) {
       out.push(iso(d));
@@ -157,7 +157,7 @@ export function occurrenceDates(rule: string, firstDate: string): string[] {
   }
   const { week } = parsed.repeat;
   const first = dateOnly(firstDate);
-  for (let m = 0; out.length < 60; m++) {
+  for (let m = 0; out.length < MAX_DATES; m++) {
     const monthStart = new Date(
       Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + m, 1),
     );

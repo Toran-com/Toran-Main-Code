@@ -17,9 +17,9 @@ export const enReport = {
     "Please choose a valid start time, or leave it empty for all day.",
   "report.error.repeat": "Please choose how often it repeats.",
   "report.error.until":
-    "Please choose an end date after the first date, and within a year of it.",
-  "report.error.untilDaily":
-    "For an event every day, please choose a last day within a month of the first, as for a festival like Navratri.",
+    "Please choose a last date after the first date, and within a year of it.",
+  "report.error.endTime":
+    "Please choose an end time after the start time (with a start time), or leave it empty.",
   "report.error.cost": "Please keep the cost short (80 characters at most).",
   "report.error.ticketsUrl":
     "That doesn't look like a web address for booking. Leave it empty if people book by phone or at the mandir.",

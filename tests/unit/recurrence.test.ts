@@ -93,13 +93,9 @@ describe("occurrenceDates", () => {
       "2027-01-30",
     ]);
   });
-  it("stops at 60 dates", () => {
-    const rule = toRule(
-      { kind: "weekly", interval: 1 },
-      "2026-10-17",
-      "2030-01-01",
-    );
-    expect(occurrenceDates(rule, "2026-10-17")).toHaveLength(60);
+  it("stops at 370 dates, just over a year of days", () => {
+    const rule = toRule({ kind: "daily" }, "2026-10-17", "2030-01-01");
+    expect(occurrenceDates(rule, "2026-10-17")).toHaveLength(370);
   });
 });
 

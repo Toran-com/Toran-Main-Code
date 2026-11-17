@@ -52,19 +52,19 @@ export function EventFields({
           </select>
         </label>
       )}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="flex flex-col gap-2">
-          <span className="font-semibold">Date</span>
-          <input
-            name="date"
-            type="date"
-            defaultValue={values?.date}
-            required
-            min={londonDate()}
-            className={inputClass}
-          />
-        </label>
-        <label className="flex flex-col gap-2">
+      <label className="flex flex-col gap-2">
+        <span className="font-semibold">Date</span>
+        <input
+          name="date"
+          type="date"
+          defaultValue={values?.date}
+          required
+          min={londonDate()}
+          className={inputClass}
+        />
+      </label>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="flex min-w-0 flex-col gap-2">
           <span className="font-semibold">Starts</span>
           <input
             name="time"
@@ -73,29 +73,50 @@ export function EventFields({
             className={inputClass}
           />
         </label>
+        <label className="flex min-w-0 flex-col gap-2">
+          <span className="font-semibold">Ends (optional)</span>
+          <input
+            name="end_time"
+            type="time"
+            defaultValue={values?.end_time}
+            className={inputClass}
+          />
+        </label>
       </div>
       <p className="text-muted -mt-3 text-base">
-        Leave the start time empty for an all-day event.
+        Leave both times empty for an all-day event.
       </p>
-      <details
-        className="flex flex-col gap-2"
-        open={!!values?.repeat && values.repeat !== "none"}
-      >
-        <summary className="cursor-pointer font-semibold">
-          Happens every day, week or month?
-        </summary>
-        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+      {/* Repeating: one tick, then how often. It's listed for a year from
+          the first date; a last date sooner is there for a festival's run
+          of nights. "How often" only shows (and only counts) once ticked
+          (lib/event-form.ts, eventInputFrom). */}
+      <div className="group/repeat flex flex-col gap-3">
+        {/* Sent whether or not the box is ticked, so an unticked box
+            means "doesn't repeat". */}
+        <input type="hidden" name="repeats" value="no" />
+        <label className="flex items-start gap-3 font-semibold">
+          <input
+            type="checkbox"
+            name="repeats"
+            value="yes"
+            defaultChecked={!!values?.repeat && values.repeat !== "none"}
+            className="accent-peacock mt-1 size-5 shrink-0"
+          />
+          It repeats (a weekly aarti, a class, a festival&apos;s nights)
+        </label>
+        <div className="border-line hidden flex-col gap-3 border-l-2 pl-4 group-has-[[name=repeats]:checked]/repeat:flex">
           <label className="flex flex-col gap-2">
-            <span className="font-semibold">Repeats</span>
+            <span className="font-semibold">How often?</span>
             <select
               name="repeat"
-              defaultValue={values?.repeat ?? "none"}
+              defaultValue={
+                values?.repeat && values.repeat !== "none"
+                  ? values.repeat
+                  : "weekly"
+              }
               className={inputClass}
             >
-              <option value="none">Doesn&apos;t repeat</option>
-              <option value="daily">
-                Every day (a festival&apos;s run, like Navratri)
-              </option>
+              <option value="daily">Every day</option>
               <option value="weekly">Every week</option>
               <option value="fortnightly">Every other week</option>
               <option value="monthly">Once a month (e.g. 2nd Saturday)</option>
@@ -104,20 +125,26 @@ export function EventFields({
               </option>
             </select>
           </label>
-          <label className="flex flex-col gap-2">
-            <span className="font-semibold">Repeats until</span>
-            <input
-              name="until"
-              type="date"
-              defaultValue={values?.until}
-              className={inputClass}
-            />
-          </label>
+          <p className="text-muted -mt-1 text-base">
+            It&apos;s listed for a year from the first date. You can change or
+            remove it any time.
+          </p>
+          <details open={!!values?.until}>
+            <summary className="text-peacock w-fit cursor-pointer text-base font-semibold">
+              Stops sooner? (optional)
+            </summary>
+            <label className="mt-2 flex flex-col gap-2">
+              <span className="font-semibold">Last day</span>
+              <input
+                name="until"
+                type="date"
+                defaultValue={values?.until}
+                className={inputClass}
+              />
+            </label>
+          </details>
         </div>
-        <p className="text-muted mt-2 text-base">
-          Leave &ldquo;until&rdquo; empty for six months. Up to a year.
-        </p>
-      </details>
+      </div>
       <details className="flex flex-col gap-2" open={!!values?.summary}>
         <summary className="cursor-pointer font-semibold">
           Add a short description (optional)

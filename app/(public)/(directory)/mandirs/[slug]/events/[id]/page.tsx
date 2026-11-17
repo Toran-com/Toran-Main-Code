@@ -74,7 +74,7 @@ function describe({ mandir, event }: MandirEventPage): string {
   const when = event.recurrence
     ? t("event.repeatsNext", {
         rule: rule ?? t("event.repeats"),
-        when: formatEventStart(event.next_starts_at, event.all_day),
+        when: nextWhen(event),
       })
     : formatEventWhen(event.starts_at, event.ends_at, event.all_day);
   return [
@@ -504,9 +504,7 @@ function Details({ page }: { page: MandirEventPage }) {
         <>
           <strong>{rule ?? t("event.repeats")}</strong>
           <br />
-          {t("event.next", {
-            when: formatEventStart(event.next_starts_at, event.all_day),
-          })}
+          {t("event.next", { when: nextWhen(event) })}
         </>
       ) : (
         <strong>
@@ -631,4 +629,25 @@ function venueOf(event: MandirEventPage["event"]) {
   return event.venue_name && event.venue_postcode
     ? { name: event.venue_name, postcode: event.venue_postcode }
     : undefined;
+}
+
+// The next date of a repeating event, with its end time if it has one:
+// each date lasts as long as the first ("Tue 24 Nov, 7:30pm – 8pm").
+function nextWhen(event: {
+  starts_at: string;
+  ends_at: string | null;
+  next_starts_at: string;
+  all_day: boolean;
+}): string {
+  const span =
+    event.ends_at && !event.all_day
+      ? Date.parse(event.ends_at) - Date.parse(event.starts_at)
+      : 0;
+  return span > 0
+    ? formatEventWhen(
+        event.next_starts_at,
+        new Date(Date.parse(event.next_starts_at) + span).toISOString(),
+        false,
+      )
+    : formatEventStart(event.next_starts_at, event.all_day);
 }
