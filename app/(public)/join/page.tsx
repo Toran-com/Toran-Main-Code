@@ -177,9 +177,8 @@ async function Join({ searchParams }: PageProps<"/join">) {
       <Card>
         <h2 className="text-2xl font-bold">I&apos;m visiting mandirs</h2>
         <p>
-          You don&apos;t need an account. The mandirs you follow, your
-          plan and the seva you&apos;ve taken are saved on this
-          phone, in My Toran.
+          You don&apos;t need an account. The mandirs you follow, your plan and
+          the seva you&apos;ve taken are saved on this phone, in My Toran.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/my" className={quietButtonClass}>
