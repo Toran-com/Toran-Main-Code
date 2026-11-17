@@ -504,8 +504,13 @@ Also on the page:
 
 ### Reading mandirs' websites (`/ops` → Websites)
 
-**Check** reads one mandir's website; **Check the next 5 websites** works
-through them, oldest check first. Each check reads the home page, up to
+Tick the mandirs to scan (or **All**, **Never checked**, **None**), then
+**Scan the ticked websites**: each is scanned in turn, with what was
+found shown as it goes. With Claude switched on, each scan also reads up
+to two patrikas or posters the site links to that haven't been read
+before. New events wait on the mandir's own page for its committee to
+check and publish, or in the review queue when it has no committee;
+nothing is published by itself. Each check reads the home page, up to
 five pages that look like an events list, and the event data they lead to:
 
 - event data in the pages (schema.org JSON-LD or microdata, or the older
@@ -550,8 +555,8 @@ same poster isn't queued again), then reads every
 mandir's own events calendar (the address a committee gives under **Your
 events calendar** on its page; kept private, as Google's secret address
 works like a password), then checks up to 12 mandir websites, oldest
-check first, like **Check the next 5 websites**. New events from both go
-to the review queue.
+check first. New events from both go to the review queue (and so to the
+committee's page, for a mandir with a committee).
 `/ops` → Needs attention shows when it last ran and what it did, and warns
 if it hasn't run for a day and a half.
 

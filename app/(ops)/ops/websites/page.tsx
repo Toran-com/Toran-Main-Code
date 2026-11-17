@@ -2,13 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Badge } from "@/components/public-shell";
-import {
-  buttonClass,
-  Card,
-  Loading,
-  Notice,
-  quietButtonClass,
-} from "@/components/ui";
+import { Card, Loading, Notice } from "@/components/ui";
+import { WebsiteScan } from "@/components/website-scan";
 import { OpsPage } from "@/components/ops-page";
 import { requireToranAdmin } from "@/lib/auth";
 import { formatEventStart, websiteLabel } from "@/lib/format";
@@ -16,15 +11,16 @@ import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { posterReadingOn } from "@/lib/poster-reader";
 import { readFoundPatrika } from "../posters/actions";
-import { checkNext, checkOne } from "./actions";
+import { scanWebsite } from "./actions";
 
 export const metadata: Metadata = {
   title: pageTitle("Websites · Admin"),
   robots: { index: false },
 };
 
-// Checking reads other people's websites, which can be slow.
-export const maxDuration = 60;
+// Scanning reads other people's websites, and their patrikas with
+// Claude, which can be slow: each mandir's scan gets this long.
+export const maxDuration = 120;
 
 const OUTCOMES = {
   found: { label: "Events found", tone: "peacock" },
@@ -77,15 +73,6 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
     checked.filter((r) => r.check?.last_outcome === outcome).length;
 
   const query = await searchParams;
-  const added = Number(query.added ?? 0);
-  const outcome = String(query.outcome ?? "") as Outcome;
-  const notice = query.error
-    ? null
-    : query.batch !== undefined
-      ? `Checked ${query.batch} websites. ${added} new ${added === 1 ? "event" : "events"} added to the review queue.`
-      : query.checked && outcome in OUTCOMES
-        ? `${OUTCOMES[outcome].label}. ${added} new ${added === 1 ? "event" : "events"} added to the review queue.`
-        : null;
 
   return (
     <>
@@ -95,7 +82,6 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
             "Something went wrong. Please try again."}
         </Notice>
       )}
-      {notice && <Notice tone="success">{notice}</Notice>}
 
       <Card>
         <p>
@@ -107,13 +93,10 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
           Claude when that&apos;s switched on. Names and descriptions are
           cleaned into plain text, times found in the description when the site
           gives none, and each event gets a likely type. Anything new goes to
-          the{" "}
-          <Link href="/ops/posters" className="text-peacock underline">
-            review queue
-          </Link>
-          , for the committee or Toran to check before it&apos;s published. It
-          obeys each site&apos;s robots.txt and never reads Facebook or
-          Instagram.
+          mandir&apos;s committee (on its own page) or Toran to check before
+          it&apos;s published. It obeys each site&apos;s robots.txt and never
+          reads Facebook or Instagram. The nightly job also checks a dozen a
+          night, oldest first.
         </p>
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat label="With a website" value={rows.length} />
@@ -121,15 +104,11 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
           <Stat label="Events found" value={count("found")} />
           <Stat label="Nothing readable" value={count("none")} />
         </dl>
-        <form action={checkNext}>
-          <button type="submit" className={buttonClass}>
-            Check the next 5 websites
-          </button>
-        </form>
-        <p className="text-muted text-base">
-          Starts with websites never checked, then the ones checked longest ago.
-          Takes up to a minute, and stops early if sites are slow.
-        </p>
+        <WebsiteScan
+          names={Object.fromEntries(rows.map((r) => [r.slug, r.name]))}
+          reading={reading}
+          scan={scanWebsite}
+        />
       </Card>
 
       <ul className="border-line bg-surface divide-line shadow-card divide-y rounded-2xl border">
@@ -140,6 +119,15 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
               key={r.id}
               className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3"
             >
+              <input
+                type="checkbox"
+                name="scan"
+                value={r.slug}
+                form="website-scan"
+                data-never={r.check?.last_checked_at ? undefined : "1"}
+                aria-label={`Scan ${r.name}`}
+                className="accent-peacock size-5 shrink-0 self-start sm:self-center"
+              />
               <div className="flex min-w-0 flex-1 flex-col">
                 <Link
                   href={`/ops/mandirs/${r.slug}`}
@@ -206,16 +194,6 @@ async function Websites({ searchParams }: PageProps<"/ops/websites">) {
                   {last === "found" && ` (${r.check?.last_found ?? 0})`}
                 </Badge>
               )}
-              <form action={checkOne}>
-                <input type="hidden" name="mandir" value={r.slug} />
-                <button
-                  type="submit"
-                  className={`${quietButtonClass} px-4 py-2 text-base`}
-                  aria-label={`Check ${r.name}'s website`}
-                >
-                  Check
-                </button>
-              </form>
             </li>
           );
         })}
