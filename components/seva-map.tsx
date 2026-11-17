@@ -163,6 +163,10 @@ export function SevaMap({
       unControl();
       if (made) removeUkMap(made);
       live.current = null;
+      // Next keeps a page alive while someone is on another tab, and
+      // takes its maps down; when the page comes back this effect makes a
+      // new map, and "ready" going false then true redraws the candles.
+      setReady(false);
     };
   }, [tm]);
 

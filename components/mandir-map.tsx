@@ -168,6 +168,13 @@ export function MandirMap({
       if (made) removeUkMap(made);
       live.current = null;
       setOverlay(null);
+      // Next keeps a page alive while someone is on another tab, and
+      // takes its maps down; when the page comes back this effect makes a
+      // new map, and "ready" going false then true redraws the candles.
+      // The new map frames the mandirs afresh, and draws every mark.
+      setReady(false);
+      shownKey.current = "";
+      marks.current.clear();
     };
   }, [tm]);
 

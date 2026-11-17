@@ -28,3 +28,29 @@ test("leaving a map in the middle of a zoom is quiet", async ({ page }) => {
   }
   expect(errors).toEqual([]);
 });
+
+// Next keeps a page alive while someone is elsewhere, then shows it again
+// as it was. The maps are taken down when they're hidden, and must draw
+// their candles again when they come back (Milan, 17 November 2026: going
+// to another tab and back left the Mandirs map empty).
+const tabs = (page: import("@playwright/test").Page) =>
+  page.getByRole("navigation", { name: "Main" });
+
+test("the Mandirs map draws its candles again after another tab", async ({
+  page,
+}) => {
+  const candles = page.locator(
+    ".toran-map .toran-dot, .toran-map .toran-cluster",
+  );
+  await page.goto("/mandirs");
+  // Phones open on the list; the map is a tap away.
+  await page.getByRole("button", { name: "Map", exact: true }).click();
+  await expect(candles.first()).toBeAttached();
+  for (let i = 0; i < 2; i++) {
+    await tabs(page).getByRole("link", { name: "Festivals" }).click();
+    await expect(page).toHaveURL(/\/festivals$/);
+    await tabs(page).getByRole("link", { name: "Mandirs" }).click();
+    await expect(page).toHaveURL(/\/mandirs$/);
+    await expect(candles.first()).toBeAttached();
+  }
+});
