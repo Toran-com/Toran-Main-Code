@@ -75,7 +75,7 @@ export function setupSteps(f: CommitteeFacts): SetupStep[] {
       key: "details",
       title: "Check your mandir's details",
       detail:
-        "Postcode, and a website or phone number, so families can find you.",
+        "Postcode, and a website or phone number, so people can find you.",
       href: "#details",
       done: !!f.details.postcode && !!(f.details.website || f.details.phone),
     },
@@ -83,8 +83,8 @@ export function setupSteps(f: CommitteeFacts): SetupStep[] {
       key: "event",
       title: "Add your first event",
       detail:
-        "A festival, a weekly aarti or a class: anything families can come to.",
-      href: "#add-event",
+        "A festival, a weekly aarti or a class: anything people can come to.",
+      href: "#add",
       done: f.eventsEver > 0,
     },
     {
@@ -130,7 +130,7 @@ export function committeeTasks(f: CommitteeFacts): CommitteeTask[] {
         unconfirmed.length === 1
           ? `Is “${unconfirmed[0].title}” still on?`
           : `Are ${unconfirmed.length} events coming up still on?`,
-      detail: "Press “Still on” and families see “Confirmed by the mandir”.",
+      detail: "Press “Still on” and people see “Confirmed by the mandir”.",
       href: "#upcoming",
       action: unconfirmed.length === 1 ? "Check it" : "Check them",
     });
@@ -168,7 +168,7 @@ export function committeeTasks(f: CommitteeFacts): CommitteeTask[] {
           : days === 1
             ? `${festival.title} is tomorrow`
             : `${festival.title} is in ${days} days`,
-      detail: "Add your programme so families can find it and share it.",
+      detail: "Add your programme so people can find it and share it.",
       href: "#festivals",
       action: "Add it",
     });
@@ -179,8 +179,8 @@ export function committeeTasks(f: CommitteeFacts): CommitteeTask[] {
       key: "empty",
       title: "Nothing coming up on your page",
       detail:
-        "Families see an empty page. Add your next event, or bring back one from last year.",
-      href: "#add-event",
+        "Visitors see an empty page. Add your next event, or bring back one from last year.",
+      href: "#add",
       action: "Add an event",
     });
   }

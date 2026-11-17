@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { logIn, sql } from "./helpers";
+import { addEventsBy, logIn, sql } from "./helpers";
 
 // A festival's nights in a row (Navratri garba, say), entered once: it
 // shows once on the mandir's page with its next date, and every night is
@@ -13,9 +13,12 @@ function inDays(days: number): string {
   }).format(new Date(Date.now() + days * 86_400_000));
 }
 
-// Fills "Add an event" for a run of nights. The form can come back with
-// its details kept and the repeat part already open.
+// Fills "Type it in" for a run of nights. After a mistake the form comes
+// back open, with the repeat part perhaps already open too.
 async function addRun(page: Page, title: string, lastDay: number) {
+  if (!(await page.getByRole("dialog", { name: "Type it in" }).isVisible())) {
+    await addEventsBy(page, "Type it in");
+  }
   await page.getByLabel("What's happening?").fill(title);
   await page.getByLabel("Date").fill(inDays(10));
   await page.getByLabel("Starts").fill("20:00");
@@ -25,7 +28,7 @@ async function addRun(page: Page, title: string, lastDay: number) {
   }
   await repeats.selectOption("daily");
   await page.getByLabel("Repeats until").fill(inDays(lastDay));
-  await page.getByRole("button", { name: "Add event" }).click();
+  await page.getByRole("button", { name: "Add event", exact: true }).click();
 }
 
 test("a run of nights is one event with every date listed", async ({

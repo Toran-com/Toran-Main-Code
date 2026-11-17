@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { logIn, sql } from "./helpers";
+import { logIn, sql, addEventsBy, eventMenu } from "./helpers";
 
 // A committee plans the seva rota for an event and gets it ready to send
 // to its volunteers' WhatsApp group. Uses a mandir no other test looks at.
@@ -26,16 +26,14 @@ test("a committee plans a seva rota and volunteers take slots", async ({
   );
 
   await page.goto(`/manage/${SLUG}`);
+  await addEventsBy(page, "Type it in");
   await page.getByLabel("What's happening?").fill("Diwali celebrations");
   await page.getByLabel("Date").fill(nextWeek());
   await page.getByLabel("Starts").fill("18:30");
-  await page.getByRole("button", { name: "Add event" }).click();
+  await page.getByRole("button", { name: "Add event", exact: true }).click();
   await expect(page.getByText("Added.")).toBeVisible();
 
-  const diwali = page
-    .getByRole("listitem")
-    .filter({ hasText: "Diwali celebrations" });
-  await diwali.getByText("More", { exact: true }).click();
+  const diwali = await eventMenu(page, "Diwali celebrations");
   await diwali.getByRole("link", { name: "Seva rota" }).click();
   // Next.js keeps the committee page in the document, hidden, so look
   // only at what's on screen.
@@ -44,11 +42,14 @@ test("a committee plans a seva rota and volunteers take slots", async ({
     page.getByText("Diwali celebrations").filter({ visible: true }),
   ).toBeVisible();
 
+  // Adding a role or a shift opens a sheet.
+  await page.getByRole("button", { name: "Add a role" }).click();
   await page.getByLabel("Role", { exact: true }).fill("Kitchen");
   await page.getByLabel(/What it involves/).fill("Serving prasad");
   await page.getByRole("button", { name: "Add role" }).click();
   await expect(page.getByText("Role added.")).toBeVisible();
 
+  await page.getByRole("button", { name: "Add a shift" }).click();
   const shift = page.getByRole("form", { name: "Add a shift to Kitchen" });
   await shift.getByLabel("From").fill("17:00");
   await shift.getByLabel("To").fill("20:00");

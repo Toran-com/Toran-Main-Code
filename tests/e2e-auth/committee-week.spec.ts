@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { logIn, sql } from "./helpers";
+import { logIn, sql, mandirSetting } from "./helpers";
 
-// The committee page's "Send this week's events" message and "What's
-// changed" list. Uses a mandir no other test looks at.
+// The committee page's "This week's events" message and "Recent
+// changes" sheet. Uses a mandir no other test looks at.
 const SLUG = "bharat-hindu-samaj-peterborough";
 const TITLE = "E2E week aarti";
 
@@ -26,9 +26,10 @@ test("a committee sees this week's message and what's changed", async ({
       from public.mandirs where slug = '${SLUG}'`);
 
   await page.goto(`/manage/${SLUG}`);
-  await expect(
-    page.getByRole("heading", { name: "Send this week's events" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Share" })).toBeVisible();
+  await expect(page.getByText("This week's events")).toBeVisible();
+  // The message itself is a tap away.
+  await page.getByText("See the message").click();
   await expect(page.getByText(`: ${TITLE}`).first()).toBeVisible();
   const whatsApp = await page
     .getByRole("link", { name: "Send on WhatsApp" })
@@ -39,15 +40,19 @@ test("a committee sees this week's message and what's changed", async ({
   expect(message).toContain(`6pm: ${TITLE}`);
   expect(message).toContain(`/mandirs/${SLUG}`);
 
-  const change = page
+  const changes = await mandirSetting(page, "Recent changes");
+  const change = changes
     .getByRole("listitem")
     .filter({ hasText: TITLE })
     .filter({ hasText: "from your website" });
   await expect(change.getByText("Added", { exact: true })).toBeVisible();
 
   // Reading posters needs Toran's Anthropic key, which tests don't have.
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Add events", exact: true }).click();
+  await expect(page.getByRole("button", { name: /^Type it in/ })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Have a poster? Send a photo" }),
+    page.getByRole("button", { name: /^Photo of a poster/ }),
   ).toHaveCount(0);
 
   sql(`delete from public.events where title = '${TITLE}'`);

@@ -41,7 +41,7 @@ test("a committee sees its own numbers, and only its own", async ({ page }) => {
   await expect(page).toHaveURL(new RegExp(`/manage/${SLUG}/numbers$`));
   // The mandir's bar is here too, showing where you are, and goes on to
   // its other pages.
-  const bar = page.getByRole("navigation", { name: "More for your mandir" });
+  const bar = page.getByRole("navigation", { name: "Your mandir on Toran" });
   await expect(
     bar.getByRole("link", { name: "Numbers", exact: true }),
   ).toHaveAttribute("aria-current", "page");

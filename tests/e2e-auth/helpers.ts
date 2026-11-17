@@ -121,3 +121,40 @@ export async function showMandirList(page: Page) {
   await list.click();
   await expect(list).toHaveAttribute("aria-pressed", "true");
 }
+
+// On a committee's page: opens "Add events" and chooses a way to add them
+// ("Type it in", "Tick festivals"…), which opens in a sheet.
+export async function addEventsBy(page: Page, way: string) {
+  await page.getByRole("button", { name: "Add events", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Add events" })
+    .getByRole("button", { name: new RegExp(`^${escape(way)}`) })
+    .click();
+  await expect(page.getByRole("dialog", { name: way })).toBeVisible();
+}
+
+// On a committee's page: opens the sheet of things to do with one of the
+// events coming up (Still on, Cancel, Duplicate, Seva rota, Remove).
+export async function eventMenu(page: Page, title: string) {
+  await page
+    .getByRole("button", { name: new RegExp(`^More for ${escape(title)}`) })
+    .first()
+    .click();
+  const sheet = page.locator("dialog[open]");
+  await expect(sheet).toBeVisible();
+  return sheet;
+}
+
+// On a committee's page: opens one of "Your mandir" (Committee, Photo,
+// Details, Your calendar, Recent changes).
+export async function mandirSetting(page: Page, name: string) {
+  await page
+    .getByRole("region", { name: "Your mandir" })
+    .getByRole("button", { name: new RegExp(`^${escape(name)}`) })
+    .click();
+  const sheet = page.locator("dialog[open]");
+  await expect(sheet).toBeVisible();
+  return sheet;
+}
+
+const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

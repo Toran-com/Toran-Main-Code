@@ -208,7 +208,7 @@ test("a visitor tells us about an event, and Toran sees it in the queue", async 
     .filter({ hasText: "Kartik deepotsav" });
   await expect(report).toContainText("ISKCON Leicester");
   await expect(report).toContainText("From: Sent in by a visitor");
-  await expect(report).toContainText("https://example.org/poster");
+  await expect(report).toContainText("More details on example.org");
   await expect(
     page.getByRole("listitem").filter({ hasText: "Spam event" }),
   ).toHaveCount(0);

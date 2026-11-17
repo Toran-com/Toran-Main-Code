@@ -473,22 +473,30 @@ do next, worked out from the page itself (`lib/committee-tasks.ts`):
 - a festival in the next 21 days with nothing added for it;
 - nothing coming up at all.
 
-New committees also see **Getting started**: check the mandir's details,
-add a first event, invite a colleague. Each step ticks itself off. The
-account page shows each mandir with how many things need doing and a link
-to the first.
+New committees also see the setup steps in the same **To do** list, with
+how far along they are: check the mandir's details, add a first event,
+invite a colleague. Each step ticks itself off, and each row opens the
+part of the page it's about. The account page shows each mandir with how
+many things need doing and a link to the first.
 
-Below that:
+Every form on the page waits in a sheet until it's wanted
+(`components/sheet.tsx`): **Add events** asks how, then shows that way's
+form; each event's "⋯" has Still on, Cancel, Duplicate, Seva rota and
+Remove; **Your mandir** has Committee, Photo, Details, Your calendar and
+Recent changes.
 
-- **Send this week's events**: the next seven days as one message, with a
-  link to the mandir's page, to send on WhatsApp or copy. Shown when
-  there's something on this week.
-- **What's changed in the last two weeks**: events added (and by whom: the
+Also on the page:
+
+- **Share → This week's events**: the next seven days as one message,
+  with a link to the mandir's page, to send on WhatsApp or copy. Shown
+  when there's something on this week.
+- **Recent changes** (under Your mandir): the last two weeks' events
+  added (and by whom: the
   committee, Toran, the mandir's website, a visitor's tip or a poster),
   changed, cancelled or removed. Events you added yourself are left out.
   Only who added an event is recorded, so changes don't say who made them.
-- **Have a poster? Send a photo**: the committee sends a photo or PDF of
-  its own poster and Claude reads the events off it, as Toran can in the
+- **Add events → Photo of a poster**: the committee sends a photo or PDF
+  of its own poster and Claude reads the events off it, as Toran can in the
   review queue. They wait under "Posters waiting for you" to be checked
   and published; nothing goes on the page by itself. Only shown once
   `ANTHROPIC_API_KEY` is set, and limited to 5 posters in 10 minutes per

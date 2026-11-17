@@ -5,6 +5,14 @@ import { formatEventStart } from "@/lib/format";
 import { POSTER_SOURCES, type Poster } from "@/lib/posters";
 import { describeRule } from "@/lib/recurrence";
 
+function siteName(link: string): string {
+  try {
+    return new URL(link).hostname.replace(/^www\./, "");
+  } catch {
+    return link;
+  }
+}
+
 // What a forwarded poster says, as it would appear once published.
 export function PosterDetails({ poster }: { poster: Poster }) {
   const checked = checkEvent(poster);
@@ -31,13 +39,16 @@ export function PosterDetails({ poster }: { poster: Poster }) {
       )}
       {poster.summary && <p>{poster.summary}</p>}
       {poster.summary_gu && <p lang="gu">{poster.summary_gu}</p>}
+      {/* Just the website's name, so a long address can't run off a
+          phone's screen. */}
       {poster.link && (
         <a
           href={poster.link}
           rel="noopener noreferrer"
-          className="text-peacock self-start underline"
+          className="text-peacock max-w-full self-start font-semibold break-all underline"
         >
-          {poster.link}
+          More details on {siteName(poster.link)}
+          <span aria-hidden="true"> ↗</span>
         </a>
       )}
       <p className="text-muted text-base">

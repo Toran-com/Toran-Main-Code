@@ -22,10 +22,9 @@ import { CHANGES_DAYS, recentChanges } from "@/lib/committee-changes";
 import { weekEvents, weekMessage } from "@/lib/committee-week";
 import { MAX_MESSAGE_CHARS, posterReadingOn } from "@/lib/poster-reader";
 import { CommitteeTodo } from "@/components/committee-todo";
-import { Fold } from "@/components/fold";
+import { AddEvents, Sheet, type AddWay } from "@/components/sheet";
 import { PhotoPicker } from "@/components/photo-picker";
 import { photoUrl } from "@/lib/mandir-photo";
-import { OpenFromHash } from "@/components/open-from-hash";
 import { VisitingFields } from "@/components/visiting-fields";
 import { HoursFields } from "@/components/hours-fields";
 import { readAartis, readSessions } from "@/lib/opening-hours";
@@ -370,31 +369,363 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           ? leftOut.trim()
           : DONE[String(query.done ?? "")]);
 
+  // Which sheet to open as the page comes back, to show what went wrong
+  // or what to do next, with the message in it.
+  const errorKey = String(query.error ?? "");
+  const doneKey = String(query.done ?? "");
+  const addOpen =
+    copy || query.new || query.dup || query.maybe || errorKey in EVENT_ERRORS
+      ? "add-event"
+      : paste || ["message", "messageLong", "messageRefused"].includes(errorKey)
+        ? "read-message"
+        : [
+              "readingOff",
+              "picture",
+              "pictureType",
+              "pictureSize",
+              "pictureRefused",
+              "pictureFailed",
+              "slow",
+            ].includes(errorKey)
+          ? "read-poster"
+          : errorKey === "none"
+            ? festivals.length
+              ? "festivals"
+              : "again"
+            : undefined;
+  const focus =
+    addOpen ??
+    (["invited", "uninvited", "removed", "joined"].includes(doneKey) ||
+    errorKey.startsWith("invite-")
+      ? "committee"
+      : errorKey.startsWith("photo-")
+        ? "photo"
+        : errorKey in FORM_ERRORS
+          ? "details"
+          : ["calendar", "calendar-removed"].includes(doneKey) ||
+              errorKey.startsWith("calendar-")
+            ? "calendar"
+            : undefined);
+  const notice = error ? (
+    <Notice tone="error">{error}</Notice>
+  ) : done ? (
+    <Notice tone="success">{done}</Notice>
+  ) : null;
+  const inSheet = (id: string) => (focus === id ? notice : null);
+  const stamp = now.getTime();
+
+  const ways: AddWay[] = [];
+  if (posterReadingOn()) {
+    ways.push({
+      id: "read-poster",
+      icon: "M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+      title: "Photo of a poster",
+      body: "Toran reads it and fills in the events for you to check.",
+      content: (
+        <>
+          <p className="text-muted">
+            Take a photo of the poster, or choose one. Toran reads the events
+            off it; they wait under &ldquo;Posters waiting for you&rdquo; until
+            you check and publish them. The photo isn&apos;t kept.
+          </p>
+          <PosterPicture
+            action={readPosterAsCommittee}
+            chosen={mandir.slug}
+            label="Photo or PDF of your poster"
+          />
+        </>
+      ),
+    });
+    ways.push({
+      id: "read-message",
+      icon: "M4 5h16v11H9l-5 4zM8 9h8M8 12h5",
+      title: "Paste a WhatsApp message",
+      body: "Copy it from WhatsApp, paste it, and Toran fills it in.",
+      content: (
+        <>
+          <p className="text-muted">
+            In WhatsApp, press and hold the message, then Copy. Paste it here.
+            The events wait under &ldquo;Posters waiting for you&rdquo; until
+            you check them. The message isn&apos;t kept.
+          </p>
+          <form action={readMessageAsCommittee} className="flex flex-col gap-4">
+            <input type="hidden" name="mandir" value={mandir.slug} />
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">The message</span>
+              <textarea
+                name="message"
+                required
+                minLength={10}
+                maxLength={MAX_MESSAGE_CHARS}
+                rows={6}
+                className={inputClass}
+                placeholder="Jai Shri Krishna 🙏 This Sunday 8 Nov, Diwali Lakshmi puja at 6.30pm…"
+                defaultValue={paste}
+              />
+            </label>
+            <button type="submit" className={buttonClass}>
+              Read the message
+            </button>
+          </form>
+        </>
+      ),
+    });
+  }
+  ways.push({
+    id: "add-event",
+    icon: "M4 20h4L19 9l-4-4L4 16zM13 7l4 4",
+    title: copy ? `Copy of “${copy.title}”` : "Type it in",
+    body: "The name, the date and the time. Everything else is optional.",
+    content: (
+      <>
+        {copy && (
+          <p className="text-muted">
+            Everything is filled in from that event: choose the new date.{" "}
+            <Link
+              href={`/manage/${mandir.slug}?new=1`}
+              className="text-peacock font-semibold underline"
+            >
+              Start blank instead
+            </Link>
+          </p>
+        )}
+        {query.dup && lookalikes?.[0] && (
+          <p className="bg-sunk rounded-2xl p-4">
+            Already on your page:{" "}
+            <Link
+              href={`/manage/${mandir.slug}/events/${lookalikes[0].id}`}
+              className="text-peacock font-semibold underline"
+            >
+              {lookalikes[0].title},{" "}
+              {formatEventStart(lookalikes[0].starts_at, lookalikes[0].all_day)}
+            </Link>
+            . Change that one instead.
+          </p>
+        )}
+        <form
+          key={copy ? copyId : draft ? String(query.draft) : "blank"}
+          action={addEvent}
+          className="flex flex-col gap-5"
+        >
+          <input type="hidden" name="slug" value={mandir.slug} />
+          {asking.length > 0 && (
+            <div
+              role="note"
+              className="border-marigold bg-marigold/10 flex flex-col gap-2 rounded-xl border-l-4 px-4 py-3"
+            >
+              <p className="font-semibold">Is this already on your page?</p>
+              <ul className="flex flex-col gap-1">
+                {asking.map((e) => (
+                  <li key={e.id}>
+                    <Link
+                      href={`/manage/${mandir.slug}/events/${e.id}`}
+                      className="text-peacock font-semibold underline"
+                    >
+                      {e.title}
+                    </Link>
+                    , {formatEventStart(e.starts_at, e.all_day)}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-muted text-base">
+                If it&apos;s the same event, change that one instead, so
+                it&apos;s only listed once.
+              </p>
+              <label className="flex items-start gap-3 font-semibold">
+                <input
+                  type="checkbox"
+                  name="different"
+                  value={asking.map((e) => e.id).join(",")}
+                  required
+                  className="mt-1 size-5"
+                />
+                It&apos;s a different event: add it as well
+              </label>
+            </div>
+          )}
+          <EventFields gujarati kinds tickets place values={formValues} />
+          <button type="submit" className={buttonClass}>
+            Add event
+          </button>
+        </form>
+      </>
+    ),
+  });
+  if (festivals.length) {
+    ways.push({
+      id: "festivals",
+      icon: "M5 12l4 4 10-10M5 19h14",
+      title: "Tick festivals",
+      body: "Festivals coming up, ready to add in a few taps.",
+      badge: `${festivals.length}`,
+      content: (
+        <>
+          <p className="text-muted">
+            Tick the ones your mandir is celebrating, change the name or add a
+            start time if you like, and add them all at once.
+          </p>
+          <QuickPicks
+            slug={mandir.slug}
+            picks={festivals}
+            action={addPickedEvents}
+            button="Add the ticked festivals"
+          />
+        </>
+      ),
+    });
+  }
+  if (lastYear.length) {
+    ways.push({
+      id: "again",
+      icon: "M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4",
+      title: "Again this year?",
+      body: "Your events from this time last year, moved to this year.",
+      badge: `${lastYear.length}`,
+      content: (
+        <>
+          <p className="text-muted">
+            Festival events follow this year&apos;s festival date. Check each
+            date, then tick the ones that are happening again.
+          </p>
+          <QuickPicks
+            slug={mandir.slug}
+            picks={lastYear}
+            action={addPickedEvents}
+            button="Add the ticked events"
+          />
+        </>
+      ),
+    });
+  }
+
+  const SHOWN = 6;
+  const eventRow = (event: (typeof events)[number]) => (
+    <li key={event.id} className="flex items-center gap-1">
+      <Link
+        href={`/manage/${mandir.slug}/events/${event.id}`}
+        className="hover:bg-sunk text-ink flex min-w-0 flex-1 flex-col rounded-2xl px-3 py-2.5 no-underline transition"
+      >
+        <span className="text-marigold-ink text-base font-semibold">
+          {event.recurrence && `${describeRule(event.recurrence)} · next `}
+          {formatEventStart(event.next_starts_at, event.all_day)}
+        </span>
+        <span className="line-clamp-2 leading-snug font-semibold">
+          {event.title}
+        </span>
+        {event.status === "cancelled" && (
+          <span className="mt-1">
+            <Badge tone="kumkum">Cancelled</Badge>
+          </span>
+        )}
+      </Link>
+      <Sheet
+        id={`event-${event.id}`}
+        title={event.title}
+        stamp={stamp}
+        triggerLabel={`More for ${event.title}`}
+        triggerClass="hover:bg-sunk text-muted hover:text-ink grid size-11 shrink-0 cursor-pointer place-items-center rounded-full transition active:scale-95"
+        trigger={
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6">
+            <circle cx="5" cy="12" r="2" fill="currentColor" />
+            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <circle cx="19" cy="12" r="2" fill="currentColor" />
+          </svg>
+        }
+      >
+        <p className="text-marigold-ink -mt-1 font-semibold">
+          {formatEventStart(event.next_starts_at, event.all_day)}
+        </p>
+        <form action={changeEvent} className="flex flex-col gap-2">
+          <input type="hidden" name="slug" value={mandir.slug} />
+          <input type="hidden" name="event" value={event.id} />
+          <Link
+            href={`/manage/${mandir.slug}/events/${event.id}`}
+            className={menuRowClass}
+          >
+            Edit
+          </Link>
+          {event.status === "cancelled" ? (
+            <EventButton intent="restore">It&apos;s back on</EventButton>
+          ) : (
+            <>
+              <EventButton intent="confirm">Still on</EventButton>
+              <EventButton intent="cancel">Cancel</EventButton>
+            </>
+          )}
+          <Link
+            href={`/manage/${mandir.slug}?copy=${event.id}`}
+            className={menuRowClass}
+          >
+            Duplicate
+          </Link>
+          {event.status !== "cancelled" && (
+            <Link
+              href={`/manage/${mandir.slug}/seva/${event.id}`}
+              className={menuRowClass}
+            >
+              Seva rota
+            </Link>
+          )}
+          <ConfirmButton
+            name="intent"
+            value="remove"
+            question={`Remove "${event.title}" from your page?`}
+            className={`${menuRowClass} text-kumkum`}
+          >
+            Remove
+          </ConfirmButton>
+        </form>
+      </Sheet>
+    </li>
+  );
+
+  const settingRow = (title: string, hint: string) => (
+    <>
+      <span className="flex min-w-0 flex-1 flex-col text-left">
+        <span className="font-semibold">{title}</span>
+        <span className="text-muted line-clamp-1 text-base">{hint}</span>
+      </span>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="text-muted size-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+    </>
+  );
+  const settingClass =
+    "hover:bg-sunk text-ink flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-3 transition active:scale-[0.99]";
+
   return (
     <>
-      <OpenFromHash />
-      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+      <header className="flex flex-col gap-4">
         <div className="flex min-w-0 flex-col gap-1">
           <p className="font-display text-3xl leading-tight sm:text-4xl">
             {mandir.name}
           </p>
-          <p className="text-muted">{mandir.town}</p>
+          <p className="text-muted">
+            {mandir.town} ·{" "}
+            {/* Not prefetched: the committee changes this page from here,
+                and a background fetch at the same moment could keep the
+                version from before. */}
+            <Link
+              href={`/mandirs/${mandir.slug}`}
+              prefetch={false}
+              className="text-peacock font-semibold"
+            >
+              See your public page<span aria-hidden="true"> ↗</span>
+            </Link>
+          </p>
         </div>
-        {/* Not prefetched: the committee changes this page from here, and
-            a background fetch at the same moment could keep the version
-            from before. */}
-        <Link
-          href={`/mandirs/${mandir.slug}`}
-          prefetch={false}
-          className={pillButtonClass}
-        >
-          See your public page
-          <span aria-hidden="true">↗</span>
-        </Link>
+        <CommitteeBar slug={mandir.slug} current="home" />
       </header>
-      <OpenFromHash />
-      {error && <Notice tone="error">{error}</Notice>}
-      {done && <Notice tone="success">{done}</Notice>}
+      {!focus && notice}
 
       {admin && !admin.consented_at && (
         <Card>
@@ -436,107 +767,20 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </Card>
       )}
 
-      {/* The mandir's own bar: every part of this page and its two other
-          pages, one tap away. It stays under the header as you scroll,
-          and on a phone it's a row to swipe. */}
-      <CommitteeBar slug={mandir.slug} current="home" />
-
-      <Dashboard
-        slug={mandir.slug}
-        events={events}
-        posters={posters.length}
-        reading={posterReadingOn()}
-        picks={festivals.length + lastYear.length > 0}
-        todo={<CommitteeTodo facts={facts} />}
-      />
-
-      {/* Below the first screen: adding and the events on the left; sharing
-          and the mandir's settings on the right (one column on a phone). */}
-      <div className="grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
-        <div className="flex min-w-0 flex-col gap-6">
-          <Card>
-            <h2
-              id="add-event"
-              className="scroll-mt-24 text-xl font-bold sm:text-2xl"
-            >
-              {copy
-                ? `Add a copy of \u201c${copy.title}\u201d`
-                : "Add an event"}
-            </h2>
-            {copy && (
-              <p className="text-muted">
-                Everything is filled in from that event: choose the new date.{" "}
-                <Link
-                  href={`/manage/${mandir.slug}#add-event`}
-                  className="text-peacock font-semibold underline"
-                >
-                  Start blank instead
-                </Link>
-              </p>
-            )}
-            {query.dup && lookalikes?.[0] && (
-              <p className="bg-sunk rounded-2xl p-4">
-                Already on your page:{" "}
-                <Link
-                  href={`/manage/${mandir.slug}/events/${lookalikes[0].id}`}
-                  className="text-peacock font-semibold underline"
-                >
-                  {lookalikes[0].title},{" "}
-                  {formatEventStart(
-                    lookalikes[0].starts_at,
-                    lookalikes[0].all_day,
-                  )}
-                </Link>
-                . Change that one instead.
-              </p>
-            )}
-            <form
-              key={copy ? copyId : draft ? String(query.draft) : "blank"}
-              action={addEvent}
-              className="flex flex-col gap-5"
-            >
-              <input type="hidden" name="slug" value={mandir.slug} />
-              {asking.length > 0 && (
-                <div
-                  role="note"
-                  className="border-marigold bg-marigold/10 flex flex-col gap-2 rounded-xl border-l-4 px-4 py-3"
-                >
-                  <p className="font-semibold">Is this already on your page?</p>
-                  <ul className="flex flex-col gap-1">
-                    {asking.map((e) => (
-                      <li key={e.id}>
-                        <Link
-                          href={`/manage/${mandir.slug}/events/${e.id}`}
-                          className="text-peacock font-semibold underline"
-                        >
-                          {e.title}
-                        </Link>
-                        , {formatEventStart(e.starts_at, e.all_day)}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="text-muted text-base">
-                    If it&apos;s the same event, change that one instead, so
-                    it&apos;s only listed once.
-                  </p>
-                  <label className="flex items-start gap-3 font-semibold">
-                    <input
-                      type="checkbox"
-                      name="different"
-                      value={asking.map((e) => e.id).join(",")}
-                      required
-                      className="mt-1 size-5"
-                    />
-                    It&apos;s a different event: add it as well
-                  </label>
-                </div>
-              )}
-              <EventFields gujarati kinds tickets place values={formValues} />
-              <button type="submit" className={buttonClass}>
-                Add event
-              </button>
-            </form>
-          </Card>
+      {/* On a phone, one column: the button to add events, what needs
+          doing, posters to check and what's coming up; then sharing and
+          the mandir's settings. Every form waits in a sheet until it's
+          wanted (components/sheet.tsx). */}
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
+        <div className="flex min-w-0 flex-col gap-5">
+          <AddEvents
+            ways={ways}
+            open={addOpen}
+            stamp={stamp}
+            notice={addOpen ? notice : null}
+            className={buttonClass}
+          />
+          <CommitteeTodo facts={facts} />
 
           {posters.length > 0 && (
             <Card>
@@ -547,10 +791,9 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                 Posters waiting for you
               </h2>
               <p className="text-muted">
-                Someone sent Toran {posters.length === 1 ? "this" : "these"} for
-                your mandir. If the details are right, publish. If
-                something&apos;s wrong, choose &ldquo;Fix something
-                first&rdquo;; if it isn&apos;t happening, discard it.
+                If the details are right, publish. If something&apos;s wrong,
+                choose &ldquo;Fix something first&rdquo;; if it isn&apos;t
+                happening, discard it.
               </p>
               <ul className="flex flex-col gap-3">
                 {posterItems.map((item) => (
@@ -572,582 +815,494 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             </Card>
           )}
 
-          <section className="flex flex-col gap-3" aria-labelledby="upcoming">
-            <h2
-              id="upcoming"
-              className="scroll-mt-24 text-xl font-bold sm:text-2xl"
-            >
-              Coming up
-            </h2>
-            {events?.length ? (
-              <ul className="flex flex-col gap-3">
-                {events.map((event) => (
-                  <li
-                    key={event.id}
-                    className="border-line bg-surface shadow-card flex flex-col gap-2 rounded-2xl border p-4"
-                  >
-                    <div className="flex flex-col gap-1">
-                      <p className="text-marigold-ink font-semibold">
-                        {event.recurrence && (
-                          <span className="text-ink">
-                            {describeRule(event.recurrence)} · next{" "}
-                          </span>
-                        )}
-                        {formatEventStart(event.next_starts_at, event.all_day)}
-                      </p>
-                      <p className="text-lg leading-snug font-bold">
-                        {event.title}
-                      </p>
-                      {event.status === "cancelled" && (
-                        <p>
-                          <Badge tone="kumkum">Cancelled</Badge>
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-start gap-2">
-                      <Link
-                        href={`/manage/${mandir.slug}/events/${event.id}`}
-                        className={pillButtonClass}
-                      >
-                        Edit
-                      </Link>
-                      <details className="group/more min-w-0 flex-1">
-                        <summary
-                          className={`${pillButtonClass} w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
-                        >
-                          More
-                          <svg
-                            aria-hidden="true"
-                            viewBox="0 0 24 24"
-                            className="ml-1 inline-block size-5 transition-transform group-open/more:rotate-180"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="m6 9 6 6 6-6" />
-                          </svg>
-                        </summary>
-                        <form
-                          action={changeEvent}
-                          className="bg-sunk mt-2 flex flex-wrap gap-2 rounded-2xl p-3"
-                        >
-                          <input
-                            type="hidden"
-                            name="slug"
-                            value={mandir.slug}
-                          />
-                          <input type="hidden" name="event" value={event.id} />
-                          {event.status === "cancelled" ? (
-                            <EventButton intent="restore">
-                              It&apos;s back on
-                            </EventButton>
-                          ) : (
-                            <>
-                              <EventButton intent="confirm">
-                                Still on
-                              </EventButton>
-                              <EventButton intent="cancel">Cancel</EventButton>
-                            </>
-                          )}
-                          <Link
-                            href={`/manage/${mandir.slug}?copy=${event.id}#add-event`}
-                            className={pillButtonClass}
-                          >
-                            Duplicate
-                          </Link>
-                          {event.status !== "cancelled" && (
-                            <Link
-                              href={`/manage/${mandir.slug}/seva/${event.id}`}
-                              className={pillButtonClass}
-                            >
-                              Seva rota
-                            </Link>
-                          )}
-                          <ConfirmButton
-                            name="intent"
-                            value="remove"
-                            question={`Remove "${event.title}" from your page?`}
-                            className={pillButtonClass}
-                          >
-                            Remove
-                          </ConfirmButton>
-                        </form>
-                      </details>
-                    </div>
+          <section
+            aria-labelledby="upcoming"
+            className="border-line bg-surface shadow-card flex flex-col rounded-3xl border"
+          >
+            <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-1">
+              <h2 id="upcoming" className="scroll-mt-24 text-xl font-bold">
+                Coming up
+                {events.length > 0 && (
+                  <span className="text-muted font-normal">
+                    {" "}
+                    · {events.length}
+                  </span>
+                )}
+              </h2>
+              <a href="#add" className={pillButtonClass}>
+                <span aria-hidden="true">+</span> Add
+              </a>
+            </div>
+            {events.length ? (
+              <ul className="flex flex-col px-2 pb-2">
+                {events.slice(0, SHOWN).map(eventRow)}
+                {events.length > SHOWN && (
+                  <li>
+                    <details className="group/all">
+                      <summary className="text-peacock flex cursor-pointer list-none items-center gap-1 px-3 py-3 font-semibold [&::-webkit-details-marker]:hidden">
+                        <span className="group-open/all:hidden">
+                          Show {events.length - SHOWN} more
+                        </span>
+                        <span className="hidden group-open/all:inline">
+                          Show fewer
+                        </span>
+                      </summary>
+                      <ul className="flex flex-col">
+                        {events.slice(SHOWN).map(eventRow)}
+                      </ul>
+                    </details>
                   </li>
-                ))}
+                )}
               </ul>
             ) : (
-              <p className="text-muted">
-                Nothing coming up yet. Events you add appear here and on your
-                public page.
+              <p className="text-muted px-5 pb-5">
+                Nothing coming up yet. A photo of your next poster is the
+                quickest way to start.
               </p>
             )}
           </section>
         </div>
-        <div id="share" className="flex min-w-0 scroll-mt-24 flex-col gap-6">
-          {thisWeek.length > 0 && (
-            <Card>
-              <h2 className="text-xl font-bold sm:text-2xl">
-                Send this week&apos;s events
-              </h2>
-              <p className="text-muted">
-                One message for your WhatsApp groups: the next seven days, with
-                a link to everything else.
-              </p>
-              <p className="bg-sunk rounded-2xl p-4 whitespace-pre-line">
-                {weekMessage(mandir, thisWeek, publicUrl)}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href={whatsAppLink(
-                    weekMessage(mandir, thisWeek, publicUrl),
-                    "",
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={pillPrimaryClass}
-                >
-                  Send on WhatsApp
-                </a>
-                <CopyText
-                  text={weekMessage(mandir, thisWeek, publicUrl)}
-                  label="Copy the message"
-                />
-              </div>
-            </Card>
-          )}
 
-          {changes.length > 0 && (
-            <Card>
-              <h2 className="text-xl font-bold sm:text-2xl">
-                What&apos;s changed in the last two weeks
-              </h2>
-              <ul className="flex flex-col gap-2">
-                {changes.map((c) => (
-                  <li
-                    key={`${c.id}-${c.at}`}
-                    className="border-line flex flex-wrap items-baseline gap-x-2 rounded-2xl border p-3"
-                  >
-                    <Badge tone={c.what === "Added" ? "peacock" : "marigold"}>
-                      {c.what}
-                    </Badge>
-                    <span className="font-semibold">{c.title}</span>
-                    <span className="text-muted text-base">
-                      {c.by ? `${c.by}, ` : ""}
-                      {formatEventStart(c.at, true)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
-
-          {kit && (
-            <Card>
-              <h2 className="text-xl font-bold sm:text-2xl">
-                Share your {kit.season.period} programme
-              </h2>
-              <p className="text-muted">
-                A picture and a message for your WhatsApp groups, and a sheet
-                for the noticeboard, made from the {kit.events.length}{" "}
-                {kit.events.length === 1 ? "event" : "events"} you have on Toran
-                for {kit.season.period}. They change when your events do.
-              </p>
-              <Link
-                href={`/mandirs/${mandir.slug}/kit/${kit.season.slug}`}
-                className={`${buttonClass} self-start`}
-              >
-                Get the picture and sheet
-              </Link>
-            </Card>
-          )}
-
-          {festivals.length > 0 && (
-            <Fold
-              id="festivals"
-              title="Festivals coming up"
-              hint={`${festivals.length} you could add in a few taps`}
+        <div className="flex min-w-0 flex-col gap-5">
+          {(thisWeek.length > 0 || kit) && (
+            <section
+              id="share"
+              aria-labelledby="share-title"
+              className="border-line bg-surface shadow-card flex scroll-mt-24 flex-col gap-3 rounded-3xl border p-5"
             >
-              <p className="text-muted">
-                Tick the ones your mandir is celebrating, change the name or add
-                a start time if you like, and add them all at once.
-              </p>
-              <QuickPicks
-                slug={mandir.slug}
-                picks={festivals}
-                action={addPickedEvents}
-                button="Add the ticked festivals"
-              />
-            </Fold>
-          )}
-
-          {lastYear.length > 0 && (
-            <Fold
-              id="again"
-              title="Again this year?"
-              hint={`${lastYear.length} from this time last year`}
-            >
-              <p className="text-muted">
-                Your events from this time last year, moved to this year&apos;s
-                dates. Festival events follow this year&apos;s festival date.
-                Check each date, then tick the ones that are happening again.
-              </p>
-              <QuickPicks
-                slug={mandir.slug}
-                picks={lastYear}
-                action={addPickedEvents}
-                button="Add the ticked events"
-              />
-            </Fold>
-          )}
-
-          {posterReadingOn() && (
-            <Fold id="read-poster" title="Have a poster? Send a photo">
-              <p className="text-muted">
-                Toran reads the events off it and fills them in for you. They
-                wait under &ldquo;Posters waiting for you&rdquo; until you check
-                and publish them. The photo isn&apos;t kept.
-              </p>
-              <PosterPicture
-                action={readPosterAsCommittee}
-                chosen={mandir.slug}
-                label="Photo or PDF of your poster"
-              />
-            </Fold>
-          )}
-
-          {posterReadingOn() && (
-            <Fold
-              id="read-message"
-              title="Got it on WhatsApp? Paste the message"
-              open={Boolean(paste)}
-            >
-              <p className="text-muted">
-                Copy the message from WhatsApp (press and hold it, then Copy),
-                paste it here, and Toran fills in the events for you. They wait
-                under &ldquo;Posters waiting for you&rdquo; until you check and
-                publish them. The message isn&apos;t kept.
-              </p>
-              <form
-                action={readMessageAsCommittee}
-                className="flex flex-col gap-4"
-              >
-                <input type="hidden" name="mandir" value={mandir.slug} />
-                <label className="flex flex-col gap-2">
-                  <span className="font-semibold">The message</span>
-                  <textarea
-                    name="message"
-                    required
-                    minLength={10}
-                    maxLength={MAX_MESSAGE_CHARS}
-                    rows={6}
-                    className={inputClass}
-                    placeholder="Jai Shri Krishna 🙏 This Sunday 8 Nov, Diwali Lakshmi puja at 6.30pm…"
-                    defaultValue={paste}
-                  />
-                </label>
-                <button type="submit" className={buttonClass}>
-                  Read the message
-                </button>
-              </form>
-            </Fold>
-          )}
-
-          <Fold
-            id="committee"
-            title="Your committee on Toran"
-            hint={`${(members ?? []).length} on Toran${invites?.length ? `, ${invites.length} invited` : ""}`}
-            open={["invited", "uninvited", "removed", "joined"].includes(
-              String(query.done ?? ""),
-            )}
-          >
-            <p className="text-muted">
-              Everyone here can add and change your mandir&apos;s events. Invite
-              a colleague so you&apos;re not the only one.
-            </p>
-            <ul className="flex flex-col gap-2">
-              {(members ?? []).map((member) => (
-                <li
-                  key={member.user_id}
-                  className="border-line flex flex-wrap items-center justify-between gap-2 rounded-2xl border p-4"
-                >
-                  <span className="break-all">
-                    <span className="font-semibold">{member.email}</span>
-                    {member.user_id === user.id && (
-                      <span className="text-muted"> (you)</span>
-                    )}
-                  </span>
-                  {(member.user_id === user.id || member.added_by_me) && (
-                    <form action={removeMember}>
-                      <input type="hidden" name="slug" value={mandir.slug} />
-                      <input
-                        type="hidden"
-                        name="member"
-                        value={member.user_id}
-                      />
-                      <ConfirmButton
-                        question={
-                          member.user_id === user.id
-                            ? `Stop helping run ${mandir.name} on Toran?`
-                            : `Take ${member.email} off your committee?`
-                        }
-                        className={pillButtonClass}
-                      >
-                        {member.user_id === user.id ? "Leave" : "Remove"}
-                      </ConfirmButton>
-                    </form>
-                  )}
-                </li>
-              ))}
-            </ul>
-            {invites && invites.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xl font-bold">Waiting to accept</h3>
-                <p className="text-muted text-base">
-                  Toran doesn&apos;t email them, so send them the message
-                  yourself.
-                </p>
-                <ul className="flex flex-col gap-2">
-                  {invites.map((invite) => (
-                    <li
-                      key={invite.id}
-                      className="border-line flex flex-col gap-3 rounded-2xl border p-4"
-                    >
-                      <p>
-                        <span className="font-semibold break-all">
-                          {invite.email}
-                        </span>
-                        <span className="text-muted text-base">
-                          {" "}
-                          · until {formatEventStart(invite.expires_at, true)}
-                        </span>
-                      </p>
-                      <form
-                        action={cancelInvite}
-                        className="flex flex-wrap gap-2"
-                      >
-                        <input type="hidden" name="slug" value={mandir.slug} />
-                        <input type="hidden" name="invite" value={invite.id} />
-                        <a
-                          href={whatsAppLink(
-                            inviteShareText(mandir, invite.email),
-                            `${siteUrl()}/account`,
-                          )}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={pillPrimaryClass}
-                        >
-                          Send on WhatsApp
-                        </a>
-                        <button type="submit" className={pillButtonClass}>
-                          Cancel invite
-                        </button>
-                      </form>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <form action={inviteMember} className="flex flex-col gap-3">
-              <input type="hidden" name="slug" value={mandir.slug} />
-              <label className="flex flex-col gap-2">
-                <span className="font-semibold">Their email address</span>
-                <span className="text-muted -mt-1 text-base">
-                  They log in with this address to accept. The invite lasts 14
-                  days.
-                </span>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="off"
-                  className={inputClass}
-                />
-              </label>
-              <button type="submit" className={quietButtonClass}>
-                Invite
-              </button>
-            </form>
-          </Fold>
-
-          <Fold
-            id="photo"
-            title="Photo of your mandir"
-            hint={
-              mandir.photo_path
-                ? "Shown at the top of your page"
-                : "Add one for the top of your page"
-            }
-            open={
-              ["photo", "photo-removed"].includes(String(query.done ?? "")) ||
-              String(query.error ?? "").startsWith("photo-")
-            }
-          >
-            <div className="flex flex-col gap-5 px-5 pb-6 sm:px-7">
-              {mandir.photo_path && photoUrl(mandir.photo_path, 640) && (
+              <h2 id="share-title" className="text-xl font-bold">
+                Share
+              </h2>
+              {thisWeek.length > 0 && (
                 <div className="flex flex-col gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- already the right size */}
-                  <img
-                    src={photoUrl(mandir.photo_path, 640)!}
-                    alt={`${mandir.name} now`}
-                    className="aspect-[16/9] w-full max-w-md rounded-2xl object-cover"
-                  />
-                  <form action={removePhoto}>
-                    <input type="hidden" name="slug" value={mandir.slug} />
-                    <button type="submit" className={quietButtonClass}>
-                      Remove the photo
-                    </button>
-                  </form>
+                  <p>
+                    <span className="font-semibold">
+                      This week&apos;s events
+                    </span>
+                    <span className="text-muted">
+                      {" "}
+                      · {thisWeek.length} in the next seven days, as one message
+                      for your WhatsApp groups
+                    </span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <a
+                      href={whatsAppLink(
+                        weekMessage(mandir, thisWeek, publicUrl),
+                        "",
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={pillPrimaryClass}
+                    >
+                      Send on WhatsApp
+                    </a>
+                    <CopyText
+                      text={weekMessage(mandir, thisWeek, publicUrl)}
+                      label="Copy the message"
+                    />
+                  </div>
+                  <details>
+                    <summary className="text-peacock w-fit cursor-pointer text-base font-semibold">
+                      See the message
+                    </summary>
+                    <p className="bg-sunk mt-2 rounded-2xl p-4 text-base break-words whitespace-pre-line">
+                      {weekMessage(mandir, thisWeek, publicUrl)}
+                    </p>
+                  </details>
                 </div>
               )}
-              <form action={savePhoto} className="flex flex-col gap-4">
-                <input type="hidden" name="slug" value={mandir.slug} />
-                <p className="text-muted">
-                  A photo of the mandir building, outside or inside. People see
-                  it at the top of your page and when your page is shared.
-                </p>
-                <PhotoPicker />
-                <label className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    name="agree"
-                    value="yes"
-                    required
-                    className="accent-peacock mt-1 size-6 shrink-0"
-                  />
-                  <span>
-                    It&apos;s a photo of the building with no people in it, and
-                    we&apos;re happy for Toran to show it.
+              {kit && (
+                <p
+                  className={thisWeek.length ? "border-line border-t pt-3" : ""}
+                >
+                  <Link
+                    href={`/mandirs/${mandir.slug}/kit/${kit.season.slug}`}
+                    className="text-peacock font-semibold"
+                  >
+                    Your {kit.season.period} programme: a picture and a sheet
+                    <span aria-hidden="true"> →</span>
+                  </Link>
+                  <span className="text-muted block text-base">
+                    Made from the {kit.events.length}{" "}
+                    {kit.events.length === 1 ? "event" : "events"} you have on
+                    Toran.
                   </span>
-                </label>
-                <button type="submit" className={`${buttonClass} self-start`}>
-                  {mandir.photo_path
-                    ? "Use this photo instead"
-                    : "Add the photo"}
-                </button>
-              </form>
-            </div>
-          </Fold>
+                </p>
+              )}
+            </section>
+          )}
 
-          <Fold
-            id="details"
-            title="Your mandir's details"
-            hint="Postcode, website, opening times, visiting"
-            // Open again after saving, or to fix what wasn't saved.
-            open={
-              query.done === "details" ||
-              String(query.error ?? "") in FORM_ERRORS
-            }
+          <section
+            aria-labelledby="your-mandir"
+            className="border-line bg-surface shadow-card flex flex-col rounded-3xl border"
           >
-            <p className="text-muted">
-              Shown on your public page. To change the mandir&apos;s name or
-              town, ask Toran.
-            </p>
-            <form
-              action={updatePracticalDetails}
-              className="flex flex-col gap-5"
-            >
-              <input type="hidden" name="slug" value={mandir.slug} />
-              <label className="flex flex-col gap-2">
-                <span className="font-semibold">Postcode</span>
-                <input
-                  name="postcode"
-                  autoComplete="off"
-                  defaultValue={mandir.postcode ?? ""}
-                  className={inputClass}
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="font-semibold">Website</span>
-                <input
-                  name="website"
-                  inputMode="url"
-                  defaultValue={mandir.website ?? ""}
-                  className={inputClass}
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="font-semibold">Live stream</span>
-                <span className="text-muted -mt-1 text-base">
-                  If you stream aarti or katha, the YouTube or Facebook page (or
-                  your own). Shown as &ldquo;Watch live&rdquo;.
-                </span>
-                <input
-                  name="live_url"
-                  inputMode="url"
-                  defaultValue={mandir.live_url ?? ""}
-                  className={inputClass}
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="font-semibold">Mandir phone number</span>
-                <span className="text-muted -mt-1 text-base">
-                  The mandir&apos;s own number, not a personal mobile, as
-                  it&apos;s shown publicly.
-                </span>
-                <input
-                  name="phone"
-                  type="tel"
-                  defaultValue={mandir.phone ?? ""}
-                  className={inputClass}
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="font-semibold">Getting there</span>
-                <span className="text-muted -mt-1 text-base">
-                  Parking, which entrance to use, the nearest station or bus.
-                  Shown on your page and with every event, next to directions.
-                </span>
-                <textarea
-                  name="getting_there"
-                  rows={3}
-                  maxLength={400}
-                  defaultValue={mandir.getting_there ?? ""}
-                  placeholder="e.g. Free parking behind the hall. Enter by the side gate on Station Road."
-                  className={inputClass}
-                />
-              </label>
-              <HoursFields
-                sessions={readSessions(mandir.opening_hours)}
-                aartis={readAartis(mandir.aarti_times)}
-              />
-              <VisitingFields
-                facilities={mandir.facilities}
-                note={mandir.visiting_note}
-              />
-              <button type="submit" className={quietButtonClass}>
-                Save details
-              </button>
-            </form>
-          </Fold>
-
-          <CalendarCard
-            slug={mandir.slug}
-            calendar={calendar}
-            open={["calendar", "calendar-removed"].includes(
-              String(query.done ?? ""),
-            )}
-          />
+            <h2 id="your-mandir" className="px-5 pt-4 pb-1 text-xl font-bold">
+              Your mandir
+            </h2>
+            <div className="flex flex-col px-2 pb-2">
+              <div>
+                <Sheet
+                  id="committee"
+                  title="Your committee on Toran"
+                  open={focus === "committee"}
+                  stamp={stamp}
+                  triggerClass={settingClass}
+                  trigger={settingRow(
+                    "Committee",
+                    `${(members ?? []).length} on Toran${invites?.length ? `, ${invites.length} invited` : ""}`,
+                  )}
+                >
+                  {inSheet("committee")}
+                  <p className="text-muted">
+                    Everyone here can add and change your mandir&apos;s events.
+                    Invite a colleague so you&apos;re not the only one.
+                  </p>
+                  <ul className="flex flex-col gap-2">
+                    {(members ?? []).map((member) => (
+                      <li
+                        key={member.user_id}
+                        className="border-line flex flex-wrap items-center justify-between gap-2 rounded-2xl border p-4"
+                      >
+                        <span className="min-w-0 break-all">
+                          <span className="font-semibold">{member.email}</span>
+                          {member.user_id === user.id && (
+                            <span className="text-muted"> (you)</span>
+                          )}
+                        </span>
+                        {(member.user_id === user.id || member.added_by_me) && (
+                          <form action={removeMember}>
+                            <input
+                              type="hidden"
+                              name="slug"
+                              value={mandir.slug}
+                            />
+                            <input
+                              type="hidden"
+                              name="member"
+                              value={member.user_id}
+                            />
+                            <ConfirmButton
+                              question={
+                                member.user_id === user.id
+                                  ? `Stop helping run ${mandir.name} on Toran?`
+                                  : `Take ${member.email} off your committee?`
+                              }
+                              className={pillButtonClass}
+                            >
+                              {member.user_id === user.id ? "Leave" : "Remove"}
+                            </ConfirmButton>
+                          </form>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  {invites && invites.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <h3 className="text-lg font-bold">Waiting to accept</h3>
+                      <p className="text-muted text-base">
+                        Toran doesn&apos;t email them, so send them the message
+                        yourself.
+                      </p>
+                      <ul className="flex flex-col gap-2">
+                        {invites.map((invite) => (
+                          <li
+                            key={invite.id}
+                            className="border-line flex flex-col gap-3 rounded-2xl border p-4"
+                          >
+                            <p>
+                              <span className="font-semibold break-all">
+                                {invite.email}
+                              </span>
+                              <span className="text-muted text-base">
+                                {" "}
+                                · until{" "}
+                                {formatEventStart(invite.expires_at, true)}
+                              </span>
+                            </p>
+                            <form
+                              action={cancelInvite}
+                              className="flex flex-wrap gap-2"
+                            >
+                              <input
+                                type="hidden"
+                                name="slug"
+                                value={mandir.slug}
+                              />
+                              <input
+                                type="hidden"
+                                name="invite"
+                                value={invite.id}
+                              />
+                              <a
+                                href={whatsAppLink(
+                                  inviteShareText(mandir, invite.email),
+                                  `${siteUrl()}/account`,
+                                )}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={pillPrimaryClass}
+                              >
+                                Send on WhatsApp
+                              </a>
+                              <button type="submit" className={pillButtonClass}>
+                                Cancel invite
+                              </button>
+                            </form>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <form action={inviteMember} className="flex flex-col gap-3">
+                    <input type="hidden" name="slug" value={mandir.slug} />
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Their email address</span>
+                      <span className="text-muted -mt-1 text-base">
+                        They log in with this address to accept. The invite
+                        lasts 14 days.
+                      </span>
+                      <input
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="off"
+                        className={inputClass}
+                      />
+                    </label>
+                    <button type="submit" className={buttonClass}>
+                      Invite
+                    </button>
+                  </form>
+                </Sheet>
+              </div>
+              <div>
+                <Sheet
+                  id="photo"
+                  title="Photo of your mandir"
+                  open={focus === "photo"}
+                  stamp={stamp}
+                  triggerClass={settingClass}
+                  trigger={settingRow(
+                    "Photo",
+                    mandir.photo_path
+                      ? "Shown at the top of your page"
+                      : "Add one for the top of your page",
+                  )}
+                >
+                  {inSheet("photo")}
+                  {mandir.photo_path && photoUrl(mandir.photo_path, 640) && (
+                    <div className="flex flex-col gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- already the right size */}
+                      <img
+                        src={photoUrl(mandir.photo_path, 640)!}
+                        alt={`${mandir.name} now`}
+                        className="aspect-[16/9] w-full rounded-2xl object-cover"
+                      />
+                      <form action={removePhoto}>
+                        <input type="hidden" name="slug" value={mandir.slug} />
+                        <button type="submit" className={quietButtonClass}>
+                          Remove the photo
+                        </button>
+                      </form>
+                    </div>
+                  )}
+                  <form action={savePhoto} className="flex flex-col gap-4">
+                    <input type="hidden" name="slug" value={mandir.slug} />
+                    <p className="text-muted">
+                      A photo of the mandir building, outside or inside. People
+                      see it at the top of your page and when your page is
+                      shared.
+                    </p>
+                    <PhotoPicker />
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        name="agree"
+                        value="yes"
+                        required
+                        className="accent-peacock mt-1 size-6 shrink-0"
+                      />
+                      <span>
+                        It&apos;s a photo of the building with no people in it,
+                        and we&apos;re happy for Toran to show it.
+                      </span>
+                    </label>
+                    <button type="submit" className={buttonClass}>
+                      {mandir.photo_path
+                        ? "Use this photo instead"
+                        : "Add the photo"}
+                    </button>
+                  </form>
+                </Sheet>
+              </div>
+              <div>
+                <Sheet
+                  id="details"
+                  title="Your mandir's details"
+                  open={focus === "details"}
+                  stamp={stamp}
+                  triggerClass={settingClass}
+                  trigger={settingRow(
+                    "Details",
+                    "Postcode, website, opening times, visiting",
+                  )}
+                >
+                  {inSheet("details")}
+                  <p className="text-muted">
+                    Shown on your public page. To change the mandir&apos;s name
+                    or town, ask Toran.
+                  </p>
+                  <form
+                    action={updatePracticalDetails}
+                    className="flex flex-col gap-5"
+                  >
+                    <input type="hidden" name="slug" value={mandir.slug} />
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Postcode</span>
+                      <input
+                        name="postcode"
+                        autoComplete="off"
+                        defaultValue={mandir.postcode ?? ""}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Website</span>
+                      <input
+                        name="website"
+                        inputMode="url"
+                        defaultValue={mandir.website ?? ""}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Live stream</span>
+                      <span className="text-muted -mt-1 text-base">
+                        If you stream aarti or katha, the YouTube or Facebook
+                        page (or your own). Shown as &ldquo;Watch live&rdquo;.
+                      </span>
+                      <input
+                        name="live_url"
+                        inputMode="url"
+                        defaultValue={mandir.live_url ?? ""}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Mandir phone number</span>
+                      <span className="text-muted -mt-1 text-base">
+                        The mandir&apos;s own number, not a personal mobile, as
+                        it&apos;s shown publicly.
+                      </span>
+                      <input
+                        name="phone"
+                        type="tel"
+                        defaultValue={mandir.phone ?? ""}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Getting there</span>
+                      <span className="text-muted -mt-1 text-base">
+                        Parking, which entrance to use, the nearest station or
+                        bus. Shown on your page and with every event, next to
+                        directions.
+                      </span>
+                      <textarea
+                        name="getting_there"
+                        rows={3}
+                        maxLength={400}
+                        defaultValue={mandir.getting_there ?? ""}
+                        placeholder="e.g. Free parking behind the hall. Enter by the side gate on Station Road."
+                        className={inputClass}
+                      />
+                    </label>
+                    <HoursFields
+                      sessions={readSessions(mandir.opening_hours)}
+                      aartis={readAartis(mandir.aarti_times)}
+                    />
+                    <VisitingFields
+                      facilities={mandir.facilities}
+                      note={mandir.visiting_note}
+                    />
+                    <button type="submit" className={buttonClass}>
+                      Save details
+                    </button>
+                  </form>
+                </Sheet>
+              </div>
+              <div>
+                <Sheet
+                  id="calendar"
+                  title="Your events calendar"
+                  open={focus === "calendar"}
+                  stamp={stamp}
+                  triggerClass={settingClass}
+                  trigger={settingRow(
+                    "Your calendar",
+                    calendar
+                      ? `Reading ${feedLabel(calendar.url)}`
+                      : "Google Calendar, Outlook or your website",
+                  )}
+                >
+                  {inSheet("calendar")}
+                  <CalendarFields slug={mandir.slug} calendar={calendar} />
+                </Sheet>
+              </div>
+              {changes.length > 0 && (
+                <div>
+                  <Sheet
+                    id="changes"
+                    title="What's changed lately"
+                    stamp={stamp}
+                    triggerClass={settingClass}
+                    trigger={settingRow(
+                      "Recent changes",
+                      `${changes.length} in the last two weeks`,
+                    )}
+                  >
+                    <ul className="flex flex-col gap-2">
+                      {changes.map((c) => (
+                        <li
+                          key={`${c.id}-${c.at}`}
+                          className="border-line flex flex-wrap items-baseline gap-x-2 rounded-2xl border p-3"
+                        >
+                          <Badge
+                            tone={c.what === "Added" ? "peacock" : "marigold"}
+                          >
+                            {c.what}
+                          </Badge>
+                          <span className="font-semibold">{c.title}</span>
+                          <span className="text-muted text-base">
+                            {c.by ? `${c.by}, ` : ""}
+                            {formatEventStart(c.at, true)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Sheet>
+                </div>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </>
   );
 }
 
+const menuRowClass =
+  "border-line hover:bg-sunk text-ink flex w-full cursor-pointer items-center rounded-2xl border px-4 py-3 text-left font-semibold no-underline transition active:scale-[0.99]";
+
 // "Your events calendar": the address of the calendar the mandir already
 // keeps, which Toran reads every night (lib/nightly.ts). Its address is
 // never shown in full: Google's secret address works like a password.
-function CalendarCard({
+function CalendarFields({
   slug,
   calendar,
-  open,
 }: {
   slug: string;
-  // Open again after saving or removing it.
-  open: boolean;
   calendar: {
     url: string;
     last_read_at: string | null;
@@ -1164,16 +1319,7 @@ function CalendarCard({
         ? "Toran couldn't read it last time. Check the address still works, or paste it again."
         : `Last read ${formatEventStart(calendar.last_read_at, true)}: ${calendar.last_found ?? 0} coming up, ${calendar.last_added ?? 0} new for you to check.`;
   return (
-    <Fold
-      id="calendar"
-      title="Your events calendar"
-      open={open}
-      hint={
-        calendar
-          ? `Reading ${feedLabel(calendar.url)}`
-          : "Google Calendar, Outlook or your website"
-      }
-    >
+    <>
       <p>
         Already keep your events in Google Calendar, Outlook or your
         website&apos;s calendar? Give Toran its address and it&apos;s checked
@@ -1228,11 +1374,11 @@ function CalendarCard({
             </li>
           </ul>
         </details>
-        <button type="submit" className={`${quietButtonClass} self-start`}>
+        <button type="submit" className={buttonClass}>
           Save calendar
         </button>
       </form>
-    </Fold>
+    </>
   );
 }
 
@@ -1244,171 +1390,8 @@ function EventButton({
   children: ReactNode;
 }) {
   return (
-    <button
-      type="submit"
-      name="intent"
-      value={intent}
-      className={pillButtonClass}
-    >
+    <button type="submit" name="intent" value={intent} className={menuRowClass}>
       {children}
     </button>
-  );
-}
-
-// The first screen of the committee page: the ways to add events (a
-// photo of a poster, a WhatsApp message, typing it in, ticking festivals),
-// then anything waiting to be checked, the next few events and what needs
-// doing. Each way opens its form further down the page.
-function Dashboard({
-  slug,
-  events,
-  posters,
-  reading,
-  picks,
-  todo,
-}: {
-  slug: string;
-  events: {
-    id: string;
-    title: string;
-    next_starts_at: string;
-    all_day: boolean;
-  }[];
-  posters: number;
-  reading: boolean;
-  picks: boolean;
-  todo: ReactNode;
-}) {
-  const ways = [
-    reading && {
-      href: "#read-poster",
-      icon: "M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
-      title: "Photo of a poster",
-      body: "Toran reads it and fills in the events.",
-    },
-    reading && {
-      href: "#read-message",
-      icon: "M4 5h16v11H9l-5 4zM8 9h8M8 12h5",
-      title: "Paste a WhatsApp message",
-      body: "Copy it, paste it, Toran fills it in.",
-    },
-    {
-      href: "#add-event",
-      icon: "M4 20h4L19 9l-4-4L4 16zM13 7l4 4",
-      title: "Type it in",
-      body: "The name, date and time.",
-    },
-    picks && {
-      href: "#festivals",
-      icon: "M5 12l4 4 10-10M5 19h14",
-      title: "Tick festivals",
-      body: "Festivals and last year's events, in a few taps.",
-    },
-  ].filter((w) => !!w);
-  const next = events.slice(0, 3);
-  return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-8">
-      <section aria-labelledby="add-events" className="flex flex-col gap-4">
-        <h2 id="add-events" className="text-2xl font-bold sm:text-3xl">
-          Add events
-        </h2>
-        <ul className="grid grid-cols-2 gap-3 sm:gap-4">
-          {ways.map((way) => (
-            <li key={way.href}>
-              <a
-                href={way.href}
-                className="border-line bg-surface shadow-card hover:border-peacock/50 flex h-full flex-col gap-2 rounded-3xl border p-4 no-underline transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] sm:min-h-32 sm:p-5"
-              >
-                <span
-                  aria-hidden="true"
-                  className="bg-peacock/10 text-peacock grid size-11 place-items-center rounded-2xl"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="size-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d={way.icon} />
-                  </svg>
-                </span>
-                <span className="text-ink text-lg leading-snug font-bold">
-                  {way.title}
-                </span>
-                {/* On a phone the title says enough, so all four fit. */}
-                <span className="text-muted hidden text-base leading-snug sm:block">
-                  {way.body}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-      <div className="flex min-w-0 flex-col gap-4">
-        {posters > 0 && (
-          <a
-            href="#posters"
-            className="border-marigold bg-marigold/10 text-ink flex items-center justify-between gap-3 rounded-3xl border-2 p-5 font-bold no-underline"
-          >
-            <span>
-              {posters === 1
-                ? "1 event waiting for you to check"
-                : `${posters} events waiting for you to check`}
-            </span>
-            <span aria-hidden="true">→</span>
-          </a>
-        )}
-        <section
-          aria-labelledby="next-up"
-          className="border-line bg-surface shadow-card flex flex-col gap-3 rounded-3xl border p-5"
-        >
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 id="next-up" className="text-xl font-bold">
-              Next up
-            </h2>
-            {events.length > 0 && (
-              <a href="#upcoming" className="text-peacock font-semibold">
-                All {events.length}
-              </a>
-            )}
-          </div>
-          {next.length ? (
-            <ul className="divide-line flex flex-col divide-y">
-              {next.map((event) => (
-                <li
-                  key={event.id}
-                  className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
-                >
-                  <span className="flex min-w-0 flex-col">
-                    <span className="text-marigold-ink text-base font-semibold">
-                      {formatEventStart(event.next_starts_at, event.all_day)}
-                    </span>
-                    <span className="truncate font-semibold">
-                      {event.title}
-                    </span>
-                  </span>
-                  <Link
-                    href={`/manage/${slug}/events/${event.id}`}
-                    className={`${pillButtonClass} shrink-0`}
-                    aria-label={`Edit ${event.title}`}
-                  >
-                    Edit
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted">
-              Nothing coming up yet. A photo of your next poster is the quickest
-              way to start.
-            </p>
-          )}
-        </section>
-        {todo}
-      </div>
-    </div>
   );
 }

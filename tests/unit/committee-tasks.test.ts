@@ -139,7 +139,7 @@ describe("committeeTasks", () => {
 
   it("says when the page has gone quiet", () => {
     expect(committeeTasks({ ...settled, events: [] })).toMatchObject([
-      { key: "empty", href: "#add-event" },
+      { key: "empty", href: "#add" },
     ]);
     // Not when a festival task already asks for an event.
     expect(
