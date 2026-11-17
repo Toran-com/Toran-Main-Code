@@ -95,6 +95,17 @@ jobs:
       - name: Install packages
         run: pnpm install --frozen-lockfile
 
+      - name: Give the mandirs map positions
+        # Live, the nightly job finds each mandir's position from its
+        # postcode; the test database has none, so the maps would have no
+        # candles for the tests to check. Spread them over England and
+        # Wales, the same way every run.
+        run: |
+          psql "$DB_URL" -qc "update public.mandirs set
+            latitude = 51 + (abs(hashtext(slug)) % 300) / 100.0,
+            longitude = -3 + (abs(hashtext(slug) / 7) % 400) / 100.0
+            where latitude is null"
+
       - name: Build against local Supabase
         # Family accounts (decision 0020) are switched on for this test
         # build, so their login and syncing are tested; the live site
