@@ -153,7 +153,7 @@ export default function HowItsBuiltPage() {
     <div className="page-wide flex flex-col gap-16 sm:gap-24">
       <PageHeading
         title="How Toran is built"
-        intro="Toran is for families of every age, on whatever phone they have. That sets the bar: fast on a slow connection, easy for everyone to use, private by design, and tested on every change."
+        intro="Toran is for people of every age, on whatever phone they have. That sets the bar: fast on a slow connection, easy for everyone to use, private by design, and tested on every change."
       />
 
       <section aria-labelledby="numbers" className="flex flex-col gap-6">

@@ -1006,8 +1006,8 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               <form action={savePhoto} className="flex flex-col gap-4">
                 <input type="hidden" name="slug" value={mandir.slug} />
                 <p className="text-muted">
-                  A photo of the mandir building, outside or inside. Families
-                  see it at the top of your page and when your page is shared.
+                  A photo of the mandir building, outside or inside. People see
+                  it at the top of your page and when your page is shared.
                 </p>
                 <PhotoPicker />
                 <label className="flex items-start gap-3">

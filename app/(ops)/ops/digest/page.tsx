@@ -37,7 +37,7 @@ export default function OpsDigestPage(props: PageProps<"/ops/digest">) {
   return (
     <OpsPage
       title="Weekly digest"
-      intro="The weekly email to families, as it would go out."
+      intro="The weekly email to subscribers, as it would go out."
     >
       <Suspense fallback={<Loading />}>
         <DigestPreview {...props} />

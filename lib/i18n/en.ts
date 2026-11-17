@@ -83,14 +83,14 @@ export const en = {
   "story.mockKitchen": "Kitchen seva",
   "home.comingSoon": "Coming soon",
   "home.committeesTitle": "How it works for committees",
-  "home.committeesHeading": "Your events, where families already look.",
+  "home.committeesHeading": "Your events, where people already look.",
   "home.mandirCount": "{count} mandirs across the UK",
   "home.mandirsIntro": "Find yours to see what's on.",
   "home.regionCount.one": "{count} mandir",
   "home.regionCount.other": "{count} mandirs",
   "home.step1Title": "Send what you already have",
   "home.step2Title": "Check it in a minute",
-  "home.step3Title": "Families find it",
+  "home.step3Title": "People find it",
   "home.committeesBody":
     "Send the poster you already share. It's free for mandirs.",
 

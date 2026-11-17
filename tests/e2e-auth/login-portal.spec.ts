@@ -8,7 +8,7 @@ import { latestLoginLink, sql } from "./helpers";
 const FAMILY = process.env.NEXT_PUBLIC_FAMILY_ACCOUNTS === "on";
 const SLUG = "geeta-bhavan-leicester";
 
-test("Log in in the header opens a door for families and one for mandirs", async ({
+test("Log in in the header opens a door for everyone and one for mandirs", async ({
   page,
 }) => {
   await page.goto("/festivals");
@@ -16,9 +16,7 @@ test("Log in in the header opens a door for families and one for mandirs", async
   await expect(page).toHaveURL(/\/login$/);
   await expect(
     page.getByRole("heading", {
-      name: FAMILY
-        ? "Create your free family account"
-        : "Your mandirs and your plan",
+      name: FAMILY ? "Create your free account" : "Your mandirs and your plan",
     }),
   ).toBeVisible();
   await expect(
@@ -116,7 +114,7 @@ test("a family's mandirs and plan follow them to another device", async ({
   // The account page says what's saved, and the family can close it.
   await phone.goto("/account");
   await expect(
-    phone.getByRole("heading", { name: "Saved for your family" }),
+    phone.getByRole("heading", { name: "Saved to your account" }),
   ).toBeVisible();
   await expect(phone.getByText(/You agreed to this on/)).toBeVisible();
   await phone.getByLabel(/I'm sure: close my account/).check();

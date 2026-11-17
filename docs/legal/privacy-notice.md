@@ -18,7 +18,7 @@ within one month.
   or advertising, and we don't sell or share data for marketing.
 - What you save (mandirs you follow, your plan, seva you've taken, your
   text size) stays on your phone, not with us, unless you choose to make
-  a family account and agree to keep your mandirs and plan on it.
+  an account of your own and agree to keep your mandirs and plan on it.
 - Mandir committee members who look after a mandir's page log in with
   their email address. That's most of what we hold.
 - Knowing which mandir someone is involved with can reveal their religion.
@@ -27,8 +27,8 @@ within one month.
 ## If you just visit the site
 
 - **No account needed and no tracking cookies.** We don't record who you
-  are or which mandirs you look at. A family account is optional (see
-  "If you make a family account" below).
+  are or which mandirs you look at. An account of your own is optional (see
+  "If you make an account of your own" below).
 - **Server logs.** Our hosting provider, Vercel, briefly keeps technical
   logs, including IP addresses, to run the site and protect it from abuse:
   one hour on its free plan, one day on its Pro plan. The site's servers
@@ -97,7 +97,7 @@ within one month.
   you follow, your plan, the seva you've done and the events you say you
   went to (after an event in your plan, or by pressing "I went" on an
   event's page). All of it stays on your phone; you need no account. (If
-  you make a family account and agree, your mandirs and plan are also
+  you make an account of your own and agree, your mandirs and plan are also
   kept on it: see below.) To
   show their names, the page sends Toran the mandirs' web addresses and
   the events' codes, with nothing about you, and we don't keep them.
@@ -120,9 +120,9 @@ within one month.
   running total. If your browser asks sites not to track you ("Do Not
   Track" or "Global Privacy Control"), you aren't counted at all.
 
-## If you make a family account
+## If you make an account of your own
 
-A family account is optional: everything on Toran works without one. It
+An account of your own is optional: everything on Toran works without one. It
 keeps the mandirs you follow and your plan on every phone, tablet and
 laptop you log in on.
 

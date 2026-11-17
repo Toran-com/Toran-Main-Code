@@ -35,7 +35,7 @@ export default function DemoPage() {
 
       <section aria-labelledby="families" className="flex flex-col gap-5">
         <div className="flex flex-col gap-3">
-          <p className="text-muted font-semibold">What families see</p>
+          <p className="text-muted font-semibold">What people see</p>
           <h1
             id="families"
             className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl"
@@ -137,7 +137,7 @@ export default function DemoPage() {
             We type it up for your mandir&apos;s page, and a committee member
             checks it before it goes live.
           </li>
-          <li>Families find it, and share each event with their own groups.</li>
+          <li>People find it, and share each event with their own groups.</li>
         </ol>
         <p className="font-semibold">It&apos;s free for mandirs.</p>
         <div className="flex flex-wrap gap-3">

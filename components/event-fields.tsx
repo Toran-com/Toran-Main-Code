@@ -265,7 +265,7 @@ export function EventFields({
               />
             </label>
             <p className="text-muted text-base">
-              Shown under the English, for families who read Gujarati.
+              Shown under the English, for anyone who reads Gujarati.
             </p>
           </div>
         </details>
