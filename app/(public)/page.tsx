@@ -14,7 +14,6 @@ import { YourMandirs, type MandirBrief } from "@/components/your-mandirs";
 import { SiteFooter, SiteHeader, wideClass } from "@/components/public-shell";
 import { buttonClass, quietButtonClass } from "@/components/ui";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
-import { EVENT_KINDS, kindLabel } from "@/lib/event-kinds";
 import { formatDateRange, formatEventStart } from "@/lib/format";
 import { regionKey } from "@/lib/i18n/client/mandirs";
 import { getSeasonBanner } from "@/lib/season-banner";
@@ -40,9 +39,6 @@ import { sevaSummary } from "@/lib/seva-needs";
 // Only the address: the title, description and link preview picture come
 // from the root layout.
 export const metadata: Metadata = { alternates: { canonical: "/" } };
-
-// The kinds of event offered as quick links under the search.
-const QUICK_KINDS = ["festival", "aarti", "bhajan", "class"] as const;
 
 // The home page (DESIGN.md): one midnight welcome that fills the first
 // screen, its headline in the middle, the main button in gold and a lit
@@ -106,20 +102,6 @@ export default function Home({ searchParams }: PageProps<"/">) {
                 {t("home.allFestivals")}
               </Link>
             </div>
-            <nav aria-label={t("whatsOn.type")} className="rise">
-              <ul className="flex flex-wrap justify-center gap-2">
-                {QUICK_KINDS.map((kind) => (
-                  <li key={kind}>
-                    <Link
-                      href={`${localePath("/whats-on")}?type=${kind}`}
-                      className="border-on-night/30 text-on-night hover:bg-on-night/10 inline-flex rounded-full border px-4 py-2 text-base font-medium no-underline transition-colors"
-                    >
-                      {kindLabel(kind) ?? EVENT_KINDS[kind]}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
           </div>
         </section>
 

@@ -7,12 +7,11 @@ test("home page shows the coming soon message", async ({ page }) => {
     "What's on at mandirs near you",
   );
   await expect(page.getByText("Coming soon")).toBeVisible();
-  // The quick links go straight to What's on, filtered.
-  await page
-    .getByRole("navigation", { name: "Type of event" })
-    .getByRole("link", { name: "Festival" })
-    .click();
-  await expect(page).toHaveURL(/\/whats-on\?type=festival$/);
+  // Two buttons and nothing more under the headline: the kinds of event
+  // are on What's on, not here (Milan, 17 November 2026).
+  await expect(
+    page.getByRole("navigation", { name: "Type of event" }),
+  ).toHaveCount(0);
 });
 
 test("the main button goes to What's on, asking where you are the first time", async ({
