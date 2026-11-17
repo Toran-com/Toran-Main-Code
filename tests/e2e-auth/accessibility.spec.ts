@@ -75,7 +75,7 @@ test("a committee's pages are accessible", async ({ page }) => {
   await expect(
     page
       .getByRole("region", { name: "Coming up" })
-      .getByText("Accessibility check", { exact: true }),
+      .getByRole("link", { name: /Accessibility check/ }),
   ).toBeVisible();
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/seva/${event}`);

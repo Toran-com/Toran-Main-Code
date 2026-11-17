@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ConfirmButton } from "@/components/confirm-button";
+import { Sheet } from "@/components/sheet";
 import { Badge } from "@/components/public-shell";
 import { ShareButtons } from "@/components/share-buttons";
 import {
@@ -11,6 +12,7 @@ import {
   inputClass,
   Loading,
   Notice,
+  pillButtonClass,
   quietButtonClass,
 } from "@/components/ui";
 import { PageShell } from "@/components/page-shell";
@@ -102,6 +104,9 @@ async function Seva({
   const hasShifts = rota.some((r) => r.shifts.length);
 
   const query = await searchParams;
+  // Each time the page is drawn afresh, so a sheet closes once its form
+  // is sent (components/sheet.tsx).
+  const stamp = new Date().getTime();
   const error = ERRORS[String(query.error ?? "")];
   const done = DONE[String(query.done ?? "")];
   const hidden = (
@@ -257,50 +262,64 @@ async function Seva({
           ) : (
             <p className="text-muted">No shifts yet.</p>
           )}
-          <form
-            action={addShift}
-            className="grid grid-cols-2 items-end gap-3"
-            aria-label={`Add a shift to ${role.name}`}
+          <Sheet
+            id={`shift-${role.id}`}
+            title={`Add a shift to ${role.name}`}
+            stamp={stamp}
+            triggerClass={`${pillButtonClass} self-start`}
+            trigger={
+              <>
+                <span aria-hidden="true">+</span> Add a shift
+              </>
+            }
           >
-            {hidden}
-            <input type="hidden" name="role" value={role.id} />
-            <label className="col-span-2 flex flex-col gap-1">
-              <span className="text-base font-semibold">Day</span>
-              <input
-                name="date"
-                type="date"
-                required
-                defaultValue={eventDay}
-                className={inputClass}
-              />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-base font-semibold">From</span>
-              <input name="from" type="time" required className={inputClass} />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-base font-semibold">To</span>
-              <input name="to" type="time" required className={inputClass} />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-base font-semibold">People</span>
-              <input
-                name="needed"
-                type="number"
-                min={1}
-                max={500}
-                required
-                defaultValue={2}
-                className={inputClass}
-              />
-            </label>
-            <button
-              type="submit"
-              className={`${quietButtonClass} px-4 py-2 text-base`}
+            <form
+              action={addShift}
+              className="grid grid-cols-2 items-end gap-3"
+              aria-label={`Add a shift to ${role.name}`}
             >
-              Add shift
-            </button>
-          </form>
+              {hidden}
+              <input type="hidden" name="role" value={role.id} />
+              <label className="col-span-2 flex flex-col gap-1">
+                <span className="text-base font-semibold">Day</span>
+                <input
+                  name="date"
+                  type="date"
+                  required
+                  defaultValue={eventDay}
+                  className={inputClass}
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-base font-semibold">From</span>
+                <input
+                  name="from"
+                  type="time"
+                  required
+                  className={inputClass}
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-base font-semibold">To</span>
+                <input name="to" type="time" required className={inputClass} />
+              </label>
+              <label className="col-span-2 flex flex-col gap-1">
+                <span className="text-base font-semibold">People</span>
+                <input
+                  name="needed"
+                  type="number"
+                  min={1}
+                  max={500}
+                  required
+                  defaultValue={2}
+                  className={inputClass}
+                />
+              </label>
+              <button type="submit" className={`${buttonClass} col-span-2`}>
+                Add shift
+              </button>
+            </form>
+          </Sheet>
           <form action={removeFromRota}>
             {hidden}
             <input type="hidden" name="kind" value="role" />
@@ -315,10 +334,18 @@ async function Seva({
         </Card>
       ))}
 
-      <Card>
-        <h2 className="text-2xl font-bold">
-          {rota.length ? "Add another role" : "Add a role"}
-        </h2>
+      <Sheet
+        id="add-role"
+        title={rota.length ? "Add another role" : "Add a role"}
+        stamp={stamp}
+        triggerClass={quietButtonClass}
+        trigger={
+          <>
+            <span aria-hidden="true">+</span>{" "}
+            {rota.length ? "Add another role" : "Add a role"}
+          </>
+        }
+      >
         <form action={addRole} className="flex flex-col gap-4">
           {hidden}
           <label className="flex flex-col gap-2">
@@ -352,7 +379,7 @@ async function Seva({
             Add role
           </button>
         </form>
-      </Card>
+      </Sheet>
 
       {hasShifts && (
         <Card>

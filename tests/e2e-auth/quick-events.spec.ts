@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { logIn, sql } from "./helpers";
+import { logIn, sql, addEventsBy, eventMenu } from "./helpers";
 
 // A committee fills its page quickly: ticks a festival coming up, brings
 // back last year's event on this year's date, and duplicates an event.
@@ -49,17 +49,17 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await page.goto(`/manage/${SLUG}`);
 
   // The festival, with a start time, in one go.
-  await page.getByText("Festivals coming up", { exact: true }).click();
+  await addEventsBy(page, "Tick festivals");
   await page.getByRole("checkbox", { name: /^Test Utsav/ }).check();
   await page.getByLabel("Time for Test Utsav").fill("18:00");
   await page.getByRole("button", { name: "Add the ticked festivals" }).click();
   await expect(page.getByText("Added.")).toBeVisible();
-  // In the full list (the first screen's "Next up" shows it too).
+  // The sheet has gone, and it's in the list.
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   const added = page
     .getByRole("region", { name: "Coming up" })
     .getByRole("listitem")
-    .filter({ hasText: "Test Utsav" })
-    .filter({ has: page.getByRole("link", { name: "Edit" }) });
+    .filter({ hasText: "Test Utsav" });
   await expect(added).toContainText("6pm");
   // Not offered again.
   await expect(page.getByRole("checkbox", { name: /^Test Utsav/ })).toHaveCount(
@@ -67,7 +67,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   );
 
   // Last year's bhajans, the evening before this year's festival.
-  await page.getByText("Again this year?", { exact: true }).click();
+  await addEventsBy(page, "Again this year?");
   const again = page.getByRole("checkbox", { name: /^Utsav eve bhajans/ });
   await expect(again).toBeVisible();
   await expect(page.getByLabel("Day for Utsav eve bhajans")).toHaveValue(
@@ -82,16 +82,15 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   const bhajans = page
     .getByRole("region", { name: "Coming up" })
     .getByRole("listitem")
-    .filter({ hasText: "Utsav eve bhajans" })
-    .filter({ has: page.getByRole("link", { name: "Edit" }) });
+    .filter({ hasText: "Utsav eve bhajans" });
   await expect(bhajans).toHaveCount(1);
   await expect(bhajans).toContainText("7pm");
 
   // Duplicate it for another evening.
-  await bhajans.getByText("More", { exact: true }).click();
-  await bhajans.getByRole("link", { name: "Duplicate" }).click();
+  const menu = await eventMenu(page, "Utsav eve bhajans");
+  await menu.getByRole("link", { name: "Duplicate" }).click();
   await expect(
-    page.getByRole("heading", { name: /Add a copy of .Utsav eve bhajans./ }),
+    page.getByRole("dialog", { name: /Copy of .Utsav eve bhajans./ }),
   ).toBeVisible();
   await expect(page.getByLabel("What's happening?")).toHaveValue(
     "Utsav eve bhajans",
@@ -99,7 +98,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await expect(page.getByLabel("What kind of event?")).toHaveValue("bhajan");
   await expect(page.getByLabel("Starts")).toHaveValue("19:00");
   await page.getByLabel("Date").fill(inDays(27));
-  await page.getByRole("button", { name: "Add event" }).click();
+  await page.getByRole("button", { name: "Add event", exact: true }).click();
   await expect(page.getByText("Added.")).toBeVisible();
   await expect(bhajans).toHaveCount(2);
 
@@ -110,7 +109,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
     await page.getByLabel("What's happening?").fill(title);
     await page.getByLabel("Date").fill(inDays(20));
     await page.getByLabel("Starts").fill(time);
-    await page.getByRole("button", { name: "Add event" }).click();
+    await page.getByRole("button", { name: "Add event", exact: true }).click();
   };
   await addAgain("Utsav Eve Bhajans", "19:00");
   await expect(
@@ -126,7 +125,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await page
     .getByRole("checkbox", { name: "It's a different event: add it as well" })
     .check();
-  await page.getByRole("button", { name: "Add event" }).click();
+  await page.getByRole("button", { name: "Add event", exact: true }).click();
   await expect(page.getByText("Added.")).toBeVisible();
 
   // On the public page too.

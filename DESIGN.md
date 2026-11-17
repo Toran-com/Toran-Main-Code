@@ -112,6 +112,10 @@ as decoration.
 - **Link:** lapis, underlined. Hover makes the underline thicker.
 - **Chips and filters** (`pillButtonClass`): white with a hairline
   border; the selected one is filled midnight.
+- **Sheets** (`components/sheet.tsx`): a form or a choice that comes up
+  from the bottom of a phone when its button is pressed, with a handle,
+  a title and a close button; Escape or a tap outside closes it. Used
+  wherever a form would otherwise fill the screen before anyone needs it.
 - **Cards** (`cardClass`): white, 24px radius, hairline border,
   `shadow-card`; they rise into view on scroll.
 - **Focus:** a 3px lapis ring, 3px from the edge; gold on midnight.
@@ -177,19 +181,32 @@ colours and type:
 A mandir's own page for its committee (`/manage/<mandir>`), the full
 width of the screen:
 
-- **First screen:** the mandir's name and its public page, then "Add
-  events" as big tiles, one per way: a photo of a poster, a pasted
-  WhatsApp message (both read by Claude and checked before they're
-  published), typing it in, and ticking festivals or last year's events.
-  Beside them (under them on a phone): anything waiting to be checked,
-  the next three events with Edit, and what needs doing.
-- **Section bar:** straight under the name, one row of pills for every
-  part of the page and its two other pages (Seva, Numbers, Share,
-  Committee, Photo, Details, Your calendar). It stays under the header as
-  you scroll, and on a phone it swipes sideways.
-- **Below:** adding and the events on the left; sharing and the mandir's
-  settings, folded, on the right. One column on a phone. Folded cards
-  open and close smoothly.
+Made for a phone first: committees mostly use it on one, so every form
+waits until it's wanted and nothing is wider than the screen.
+
+- **Top:** the mandir's name, its town and a link to its public page, then
+  three equal parts that always fit: Events (this page), Seva, Numbers.
+  Nothing scrolls sideways.
+- **"Add events":** one full-width button. It opens a sheet that asks how
+  (a photo of a poster, a pasted WhatsApp message, typing it in, ticking
+  festivals or last year's events) and then shows only that way's form,
+  with a back arrow to the choices.
+- **To do:** one card of rows to tap, setup steps first (with "Set up 2
+  of 3"), then what needs doing now. A row opens the part it's about.
+- **Posters waiting for you**, when there are any.
+- **Coming up:** one line per event (date and name; tap to edit) and a
+  "⋯" button for a sheet with Still on, Cancel, Duplicate, Seva rota and
+  Remove. The first six, then "Show more".
+- **Share:** this week's message to send on WhatsApp or copy (the message
+  itself a tap away), and the festival's picture and sheet.
+- **Your mandir:** rows for Committee, Photo, Details, Your calendar and
+  Recent changes, each opening its own sheet.
+- **Sheets** (`components/sheet.tsx`): come up from the bottom of a phone,
+  sit in the middle of a bigger screen, over a dimmed page. A link to a
+  sheet's id (`#details`, `#add-event`) opens it; after sending its form
+  it closes, or stays open to say what went wrong.
+- On a laptop: two columns, adding and events on the left, sharing and
+  the mandir on the right.
 - **Its other pages:** Seva and Numbers are wide pages (Numbers shows its
   four totals in one row on a laptop); forms stay narrow.
 

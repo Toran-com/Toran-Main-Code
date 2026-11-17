@@ -1,6 +1,6 @@
 import { deflateSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
-import { logInAsAdmin } from "./helpers";
+import { logInAsAdmin, mandirSetting } from "./helpers";
 
 // A photo of the mandir: added on its committee page, shown at the top of
 // its public page, and taken off again. Uses a mandir no other test looks
@@ -14,7 +14,7 @@ test("a photo of the mandir goes on its page and comes off again", async ({
   test.setTimeout(90_000);
   await logInAsAdmin(page, `photo-${Date.now()}@example.com`);
   await page.goto(`/manage/${SLUG}`);
-  await page.getByText("Photo of your mandir", { exact: true }).click();
+  await mandirSetting(page, "Photo");
   await page.getByLabel("Choose a photo").setInputFiles({
     name: "mandir.png",
     mimeType: "image/png",
@@ -39,7 +39,7 @@ test("a photo of the mandir goes on its page and comes off again", async ({
   expect(file.headers()["content-type"]).toBe("image/jpeg");
 
   await page.goto(`/manage/${SLUG}`);
-  await page.getByText("Photo of your mandir", { exact: true }).click();
+  await mandirSetting(page, "Photo");
   await page.getByRole("button", { name: "Remove the photo" }).click();
   await expect(page.getByText("Photo removed from your page.")).toBeVisible();
   await page.goto(`/mandirs/${SLUG}`);

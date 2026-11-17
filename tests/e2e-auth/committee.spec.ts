@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { logIn, sql } from "./helpers";
+import { logIn, sql, mandirSetting } from "./helpers";
 
 // A committee member invites a colleague, who accepts on their account
 // page; then people are taken off and the first member leaves. Uses a
@@ -32,8 +32,8 @@ test("invite a colleague, who accepts; remove and leave", async ({
   await first.getByRole("button", { name: "Agree", exact: true }).click();
   await expect(first.getByText("Thanks. That's recorded.")).toBeVisible();
   await expect(first.getByText("One thing to agree to")).toHaveCount(0);
-  // The committee part folds away until it's wanted.
-  await first.getByText("Your committee on Toran", { exact: true }).click();
+  // The committee part waits under "Your mandir" until it's wanted.
+  await mandirSetting(first, "Committee");
   await first
     .getByLabel("Their email address")
     .fill(colleagueEmail.toUpperCase());

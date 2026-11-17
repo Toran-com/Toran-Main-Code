@@ -101,7 +101,8 @@ on").
 
 - **Pages about Toran** (privacy, terms, about, contact, accessibility,
   "Correct or remove something"), linked from every footer.
-- **Committee home**: "Getting started" and "What needs doing" at the top
-  of the committee page, and a summary on the account page.
+- **Committee home**: one "To do" list (setup steps, then what needs
+  doing) near the top of the committee page, and a summary on the account
+  page.
 - **Review queue**: one queue for posters, visitors' events and the
   website checker, with look-alikes flagged and "Fix something first".

@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { logIn, logInAsAdmin } from "./helpers";
+import {
+  logIn,
+  logInAsAdmin,
+  addEventsBy,
+  eventMenu,
+  mandirSetting,
+} from "./helpers";
 
 // A committee member claims a mandir, a Toran admin approves it, and the
 // member adds an event that appears on the public page straight away.
@@ -48,19 +54,14 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByRole("link", { name: new RegExp(NAME) }).click();
   await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}$`));
   // A new committee is shown where to start.
+  await expect(member.getByRole("heading", { name: "To do" })).toBeVisible();
   await expect(
-    member.getByRole("heading", { name: "Getting started" }),
-  ).toBeVisible();
-  await expect(
-    member.getByRole("link", { name: "Add your first event" }),
-  ).toBeVisible();
-  // The first screen shows the ways to add an event.
-  await expect(
-    member.getByRole("heading", { name: "Add events" }),
-  ).toBeVisible();
-  await expect(
-    member.getByRole("link", { name: /Type it in/ }),
-  ).toHaveAttribute("href", "#add-event");
+    member.getByRole("link", { name: /Add your first event/ }),
+  ).toHaveAttribute("href", "#add");
+  // One button for adding events: it asks how, then shows only that
+  // way's form, in a sheet.
+  await expect(member.getByLabel("What's happening?")).toBeHidden();
+  await addEventsBy(member, "Type it in");
   await member.getByLabel("What's happening?").fill("Annakut darshan");
   await member.getByLabel("What kind of event?").selectOption("festival");
   await member.getByLabel("Date").fill(nextWeek());
@@ -76,10 +77,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member
     .getByLabel("Where to book (optional)")
     .fill("krishnatemple-leicester.example.org/annakut");
-  await member.getByRole("button", { name: "Add event" }).click();
+  await member.getByRole("button", { name: "Add event", exact: true }).click();
   await expect(member.getByText("Added.")).toBeVisible();
-  // …and that step is ticked off.
-  await expect(member.getByText("Add your first event (done)")).toBeVisible();
+  // The sheet has gone, and that step is ticked off.
+  await expect(member.getByRole("dialog")).toHaveCount(0);
+  await expect(member.getByText(/Done:.*Add your first event/)).toBeVisible();
 
   // A message shared to Toran (from WhatsApp, on Android) comes to this
   // mandir's page, ready to read.
@@ -200,6 +202,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
 
   // A weekly event shows once, with its next date.
   await member.goto(`/manage/${SLUG}`);
+  await addEventsBy(member, "Type it in");
   await member.getByLabel("What's happening?").fill("Weekly aarti");
   await member.getByLabel("Date").fill(nextWeek());
   await member.getByLabel("Starts").fill("19:00");
@@ -207,7 +210,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member
     .getByRole("combobox", { name: /^Repeats/ })
     .selectOption("weekly");
-  await member.getByRole("button", { name: "Add event" }).click();
+  await member.getByRole("button", { name: "Add event", exact: true }).click();
   await expect(member.getByText("Added.")).toBeVisible();
   await expect(
     member
@@ -244,7 +247,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     .getByRole("region", { name: "Coming up" })
     .getByRole("listitem")
     .filter({ hasText: "Weekly aarti" })
-    .getByRole("link", { name: "Edit" })
+    .getByRole("link", { name: /Weekly aarti/ })
     .click();
   await expect(member).toHaveURL(new RegExp(`/manage/${SLUG}/events/`));
   // The committee's page stays in the document, hidden, after moving on
@@ -287,12 +290,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
 
   // Cancelling shows on the public page too.
   await member.goto(`/manage/${SLUG}`);
-  const annakut = member
-    .getByRole("listitem")
-    .filter({ hasText: "Annakut darshan" });
-  // Everything but Edit is under More.
-  await annakut.getByText("More", { exact: true }).click();
-  await annakut.getByRole("button", { name: "Cancel" }).click();
+  // Everything but Edit is in the event's "More" sheet.
+  const annakut = await eventMenu(member, "Annakut darshan");
+  await annakut.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(member.getByText("Marked as cancelled")).toBeVisible();
   await member.goto(`/mandirs/${SLUG}`);
   await expect(
@@ -305,7 +305,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
 
   // The committee corrects its own details, which fold away until wanted.
   await member.goto(`/manage/${SLUG}`);
-  await member.getByText("Your mandir's details", { exact: true }).click();
+  await mandirSetting(member, "Details");
   await member
     .getByLabel("Website")
     .fill("krishnatemple-leicester.example.org");
@@ -399,10 +399,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     asked = dialog.message();
     void dialog.accept();
   });
-  const removing = member
-    .getByRole("listitem")
-    .filter({ hasText: "Annakut darshan" });
-  await removing.getByText("More", { exact: true }).click();
+  const removing = await eventMenu(member, "Annakut darshan");
   await removing.getByRole("button", { name: "Remove" }).click();
   await expect(member.getByText("Removed from your page.")).toBeVisible();
   expect(asked).toContain("Annakut darshan");
