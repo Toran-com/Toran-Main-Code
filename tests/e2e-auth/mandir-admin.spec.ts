@@ -337,25 +337,47 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member
     .getByRole("button", { name: "Copy Monday's times to every day" })
     .click();
+  // Weekends close earlier in the evening: Saturday's times, changed, then
+  // copied to Sunday.
+  const saturday = member.getByRole("group", { name: "Saturday" });
+  await saturday.getByLabel("Closes").nth(1).fill("19:30");
+  await member
+    .getByRole("button", { name: "Copy Saturday's times to Sunday" })
+    .click();
+  await expect(
+    member.getByRole("group", { name: "Sunday" }).getByLabel("Closes").nth(1),
+  ).toHaveValue("19:30");
+  // Aartis: one every day, and an evening aarti that's earlier on Sundays.
+  const time = member.getByLabel("Time", { exact: true });
+  const days = member.getByLabel("Which days?");
   await member.getByLabel("Aarti 1").fill("Mangla aarti");
-  await member.getByLabel("Time", { exact: true }).first().fill("07:30");
+  await time.nth(0).fill("07:30");
+  await member.getByLabel("Aarti 2").fill("Sandhya aarti");
+  await time.nth(1).fill("18:00");
+  await days.nth(1).selectOption("Monday to Saturday");
+  await member.getByLabel("Aarti 3").fill("Sandhya aarti");
+  await time.nth(2).fill("16:30");
+  await days.nth(2).selectOption("Sundays");
   await member.getByRole("button", { name: "Save details" }).click();
   await expect(member.getByText("Saved. Your public page")).toBeVisible();
   await expect(member.getByLabel("Step-free way in")).toBeChecked();
-  // The aarti becomes an event every day for a year, in What's on, and the
-  // committee is told so.
+  // Each aarti becomes an event on its days for a year, in What's on, and
+  // the committee is told so.
   await expect(
     member.getByText(
-      /Also in What's on every day: your aarti \(Mangla aarti 7:30am\)/,
+      "Also in What's on: your aartis (Mangla aarti 7:30am, Sandhya aarti 4:30pm Sun, Sandhya aarti 6pm Mon – Sat)",
+      { exact: false },
     ),
   ).toBeVisible();
   expect(
     sql(
-      `select e.title || ' ' || e.kind || ' ' || (e.recurrence like '%FREQ=DAILY%')
+      `select string_agg(e.title || ' ' || e.kind || ' ' || substring(e.recurrence from 'FREQ=[A-Z]+(?:;BYDAY=[A-Z,]+)?'), ' | ' order by e.starts_at::time)
          from public.events e join public.mandirs m on m.id = e.mandir_id
          where m.slug = '${SLUG}' and e.origin = 'aarti' and e.status = 'published'`,
     ),
-  ).toBe("Mangla aarti aarti true");
+  ).toBe(
+    "Mangla aarti aarti FREQ=DAILY | Sandhya aarti aarti FREQ=WEEKLY;BYDAY=SU | Sandhya aarti aarti FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA",
+  );
   // Saving again doesn't add it twice.
   await mandirSetting(member, "Details");
   await member.getByRole("button", { name: "Save details" }).click();
@@ -365,7 +387,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
       `select count(*) from public.events e join public.mandirs m on m.id = e.mandir_id
          where m.slug = '${SLUG}' and e.origin = 'aarti' and e.status = 'published'`,
     ),
-  ).toBe("1");
+  ).toBe("3");
   await member.goto(`/mandirs/${SLUG}`);
   await expect(
     member
@@ -377,6 +399,16 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByRole("link", { name: "Watch on YouTube" }),
   ).toHaveAttribute("href", "https://www.youtube.com/@krishnatemple/live");
+  // The aartis, with the days of any that aren't every day.
+  const aartiTimes = member
+    .getByRole("listitem")
+    .filter({ hasText: "Sandhya" });
+  await expect(aartiTimes.filter({ hasText: "Mon – Sat" })).toContainText(
+    "6pm",
+  );
+  await expect(aartiTimes.filter({ hasText: "Sun" }).first()).toContainText(
+    "4:30pm",
+  );
   // A big "Call" button, with the number on it.
   await expect(
     member.getByRole("link", { name: /^Call .* on 0116 000 0000$/ }),
@@ -389,9 +421,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   );
   await expect(visiting).not.toContainText("Hearing loop");
   const hours = member.getByRole("region", { name: "Opening times" });
-  await expect(hours).toContainText("Mon – Sun");
+  await expect(hours).toContainText("Mon – Fri");
   await expect(hours).toContainText("7:30am – 12pm");
   await expect(hours).toContainText("4pm – 8pm");
+  await expect(hours).toContainText("Sat – Sun");
+  await expect(hours).toContainText("4pm – 7:30pm");
   await expect(hours).toContainText("Mangla aarti");
   await expect(member.getByText(/^(Open now|Closed now) · /)).toBeVisible();
 

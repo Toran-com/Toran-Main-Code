@@ -33,7 +33,12 @@ import { eventCount, shortSevaShifts } from "@/lib/committee-facts";
 import type { CommitteeFacts } from "@/lib/committee-tasks";
 import { upcomingFilter, withNextStart } from "@/lib/events";
 import { feedLabel } from "@/lib/calendar-feed";
-import { formatEventStart, formatTimeOfDay, londonDate } from "@/lib/format";
+import {
+  formatClock,
+  formatDays,
+  formatEventStart,
+  londonDate,
+} from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { inviteShareText, whatsAppLink } from "@/lib/share";
 import { pageTitle, siteUrl } from "@/lib/site";
@@ -202,6 +207,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const all = withNextStart(rows ?? [], from);
   const events = all.filter((e) => e.origin !== "aarti");
   const dailyAarti = all.filter((e) => e.origin === "aarti");
+  const aartis = readAartis(mandir.aarti_times);
   const { data: claims } = await supabase!
     .from("event_claims")
     .select("id, proposed")
@@ -878,14 +884,16 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                 quickest way to start.
               </p>
             )}
-            {dailyAarti.length > 0 && (
+            {dailyAarti.length > 0 && aartis.length > 0 && (
               <p className="text-muted border-line border-t px-5 py-3 text-base">
-                Also in What&apos;s on every day: your{" "}
-                {dailyAarti.length === 1 ? "aarti" : "aartis"} (
-                {dailyAarti
-                  .map(
-                    (e) =>
-                      `${e.title} ${formatTimeOfDay(e.next_starts_at, false)}`,
+                Also in What&apos;s on
+                {aartis.every((a) => !a.days) ? " every day" : ""}: your{" "}
+                {aartis.length === 1 ? "aarti" : "aartis"} (
+                {aartis
+                  .map((a) =>
+                    [a.name, formatClock(a.time), formatDays(a.days)]
+                      .filter(Boolean)
+                      .join(" "),
                   )
                   .join(", ")}
                 ), from{" "}
@@ -1259,7 +1267,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                     </label>
                     <HoursFields
                       sessions={readSessions(mandir.opening_hours)}
-                      aartis={readAartis(mandir.aarti_times)}
+                      aartis={aartis}
                     />
                     <VisitingFields
                       facilities={mandir.facilities}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  daysInWords,
   describeRule,
   occurrenceDates,
   parseRule,
@@ -121,5 +122,48 @@ describe("a festival's run of days", () => {
     expect(dates).toHaveLength(9);
     expect(dates[0]).toBe("2026-10-02");
     expect(dates.at(-1)).toBe("2026-10-10");
+  });
+});
+
+describe("some days of the week", () => {
+  // Monday 23 November 2026, for a year.
+  const rule = toRule(
+    { kind: "days", days: [1, 2, 3, 4, 5, 6] },
+    "2026-11-23",
+    "2027-11-23",
+  );
+  it("writes and reads the days, from Monday", () => {
+    expect(rule).toBe(
+      "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA;UNTIL=20271123",
+    );
+    expect(parseRule(rule)).toEqual({
+      repeat: { kind: "days", days: [1, 2, 3, 4, 5, 6] },
+      weekday: -1,
+      until: "2027-11-23",
+    });
+  });
+  it("has every date but Sundays", () => {
+    const dates = occurrenceDates(rule, "2026-11-23");
+    expect(dates.slice(0, 7)).toEqual([
+      "2026-11-23",
+      "2026-11-24",
+      "2026-11-25",
+      "2026-11-26",
+      "2026-11-27",
+      "2026-11-28",
+      "2026-11-30",
+    ]);
+    expect(dates).toHaveLength(314);
+  });
+  it("describes them", () => {
+    expect(describeRule(rule)).toBe("Every Monday to Saturday");
+    expect(daysInWords([6, 0])).toBe("Saturday and Sunday");
+    expect(daysInWords([1, 3, 5])).toBe("Monday, Wednesday and Friday");
+    expect(daysInWords([1, 2, 3, 4, 5, 0])).toBe("Monday to Friday and Sunday");
+  });
+  it("refuses a day twice", () => {
+    expect(parseRule("RRULE:FREQ=WEEKLY;BYDAY=MO,MO;UNTIL=20271123")).toBe(
+      null,
+    );
   });
 });

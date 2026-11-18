@@ -355,13 +355,18 @@ After your authenticator code, `/ops` has three tabs:
     changing and the food served, plus a short note (what to wear, photos).
     Committees set the same on their own page. They show on the mandir's
     page, and in one line on each event's page. **Opening times** (up to
-    two sessions a day, with "Copy Monday's times to every day") and up to
-    six **aarti times** are set in the same form; the mandir's page shows
-    the week, the aartis, and "Open now · until 12pm" or "Closed now ·
-    opens at 4pm", worked out on the visitor's phone in UK time. Each
-    aarti also becomes an event every day for a year, so it's in What's
-    on and near me (`lib/aarti-events.ts`, origin "aarti"). Saving the
-    times again keeps them in step (a changed time replaces its event),
+    two sessions a day, each day its own, with buttons to copy Monday's
+    times to every day or to Tue – Fri, and Saturday's to Sunday)
+    and up to six **aarti times**, each on its own days (every day, Monday
+    to Saturday, weekends, Saturdays, Sundays or ticked days; an aarti at
+    another time on Sundays is given twice), are set in the same form;
+    the mandir's page shows the week, the aartis with their days, and
+    "Open now · until 12pm" or "Closed now · opens at 4pm", worked out on
+    the visitor's phone in UK time. Each aarti also becomes an event on
+    its days for a year (a daily rule, or `FREQ=WEEKLY;BYDAY=MO,…,SA`), so
+    it's in What's on and near me (`lib/aarti-events.ts`, origin "aarti").
+    Saving the times again keeps them in step (a changed time or days
+    replaces its event),
     and the nightly job renews them before their year runs out. They're
     left out of the mandir's own event list (the aarti times are already
     on its page), this week's WhatsApp message, the weekly email and the

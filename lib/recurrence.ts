@@ -1,13 +1,16 @@
 // Repeating events, kept to the patterns mandirs actually use: weekly,
-// fortnightly, "the first / second / … / last Saturday of the month", and
-// every day (a daily aarti, or a festival's run of nights like Navratri).
+// fortnightly, "the first / second / … / last Saturday of the month",
+// every day (a daily aarti, or a festival's run of nights like Navratri),
+// and on some days of the week (an evening aarti Monday to Saturday).
 // Stored as a small iCalendar RRULE in events.recurrence, with each actual
 // date written to event_occurrences so pages can query by date.
 
 export type Repeat =
   | { kind: "daily" }
   | { kind: "weekly"; interval: 1 | 2 }
-  | { kind: "monthly"; week: 1 | 2 | 3 | 4 | -1 }; // -1 = last
+  | { kind: "monthly"; week: 1 | 2 | 3 | 4 | -1 } // -1 = last
+  // Some days of each week: 0 is Sunday … 6 is Saturday.
+  | { kind: "days"; days: number[] };
 
 import type { SharedKey } from "@/lib/i18n/shared-messages";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
@@ -53,6 +56,12 @@ export function toRule(
   if (repeat.kind === "weekly") {
     return `RRULE:FREQ=WEEKLY;INTERVAL=${repeat.interval};BYDAY=${day};UNTIL=${end}`;
   }
+  if (repeat.kind === "days") {
+    const byday = mondayFirst(repeat.days)
+      .map((d) => DAYS[d])
+      .join(",");
+    return `RRULE:FREQ=WEEKLY;BYDAY=${byday};UNTIL=${end}`;
+  }
   return `RRULE:FREQ=MONTHLY;BYDAY=${repeat.week}${day};UNTIL=${end}`;
 }
 
@@ -74,6 +83,17 @@ export function parseRule(rule: string): Parsed | null {
   const until = `${untilMatch[1]}-${untilMatch[2]}-${untilMatch[3]}`;
   if (parts.FREQ === "DAILY") {
     return { repeat: { kind: "daily" }, weekday: -1, until };
+  }
+  // Some days of the week: BYDAY=MO,TU,WE.
+  if (parts.FREQ === "WEEKLY" && (parts.BYDAY ?? "").includes(",")) {
+    if ((parts.INTERVAL ?? "1") !== "1") return null;
+    const days = parts.BYDAY.split(",").map((d) =>
+      DAYS.indexOf(d as (typeof DAYS)[number]),
+    );
+    if (days.some((d) => d < 0) || new Set(days).size !== days.length) {
+      return null;
+    }
+    return { repeat: { kind: "days", days }, weekday: -1, until };
   }
   const byday = /^(-1|[1-4])?(SU|MO|TU|WE|TH|FR|SA)$/.exec(parts.BYDAY ?? "");
   if (!byday) return null;
@@ -111,6 +131,15 @@ export function describeRule(rule: string): string | null {
       ? sharedT()("repeat.daily", { until })
       : `Every day until ${until}`;
   }
+  if (parsed.repeat.kind === "days") {
+    return pageLocale() !== "en"
+      ? sharedT()("repeat.weekly", {
+          day: mondayFirst(parsed.repeat.days)
+            .map((d) => sharedT()(`repeat.day.${d}` as SharedKey))
+            .join(", "),
+        })
+      : `Every ${daysInWords(parsed.repeat.days)}`;
+  }
   if (pageLocale() !== "en") {
     // Gujarati or Hindi wording, from the translations (lib/i18n).
     const t = sharedT();
@@ -133,6 +162,36 @@ export function describeRule(rule: string): string | null {
   return `${ORDINALS[String(parsed.repeat.week)]} ${day} of the month`;
 }
 
+// Days of the week from Monday, as a week reads on a mandir's notice.
+export function mondayFirst(days: readonly number[]): number[] {
+  return [...days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7));
+}
+
+// "Monday to Saturday", "Saturday and Sunday", "Monday, Wednesday and
+// Friday": three or more days in a row read as a run.
+export function daysInWords(days: readonly number[]): string {
+  const sorted = mondayFirst(days);
+  const parts: string[] = [];
+  for (let i = 0; i < sorted.length;) {
+    let j = i;
+    while (
+      j + 1 < sorted.length &&
+      (sorted[j + 1] + 6) % 7 === ((sorted[j] + 6) % 7) + 1
+    ) {
+      j++;
+    }
+    if (j - i >= 2) {
+      parts.push(`${DAY_NAMES[sorted[i]]} to ${DAY_NAMES[sorted[j]]}`);
+    } else {
+      for (let k = i; k <= j; k++) parts.push(DAY_NAMES[sorted[k]]);
+    }
+    i = j + 1;
+  }
+  return parts.length > 1
+    ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`
+    : parts[0];
+}
+
 // Every date (YYYY-MM-DD) the event happens, from the first date to the
 // "until" date inclusive. At most MAX_DATES, as a safety limit.
 // A year of days (a daily aarti), and a little more.
@@ -143,6 +202,17 @@ export function occurrenceDates(rule: string, firstDate: string): string[] {
   if (!parsed) return [firstDate];
   const out: string[] = [];
   const until = dateOnly(parsed.until);
+  if (parsed.repeat.kind === "days") {
+    const on = new Set(parsed.repeat.days);
+    for (
+      let d = dateOnly(firstDate);
+      d <= until && out.length < MAX_DATES;
+      d = addDays(d, 1)
+    ) {
+      if (on.has(d.getUTCDay())) out.push(iso(d));
+    }
+    return out;
+  }
   if (parsed.repeat.kind === "daily" || parsed.repeat.kind === "weekly") {
     const step =
       parsed.repeat.kind === "daily" ? 1 : 7 * parsed.repeat.interval;

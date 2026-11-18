@@ -10,6 +10,7 @@ import {
 } from "@/lib/directory-format";
 import type { SharedKey } from "@/lib/i18n/shared-messages";
 import { londonDate, londonTime } from "@/lib/london";
+import { dayRuns, type Weekday } from "@/lib/opening-hours";
 import { pageLocale, sharedT } from "@/lib/i18n/locale";
 
 const LONDON = "Europe/London";
@@ -158,6 +159,21 @@ export function formatWeekday(day: number, style: "short" | "long"): string {
     weekday: style,
     timeZone: "UTC",
   }).format(new Date(Date.UTC(2026, 10, 1 + day)));
+}
+
+// The days an aarti is on, short: "Mon – Sat", "Sat, Sun", "Sun". Null
+// for every day.
+export function formatDays(
+  days: readonly Weekday[] | undefined,
+): string | null {
+  if (!days?.length || days.length === 7) return null;
+  return dayRuns(days)
+    .map(([from, to]) =>
+      from === to
+        ? formatWeekday(from, "short")
+        : `${formatWeekday(from, "short")} – ${formatWeekday(to, "short")}`,
+    )
+    .join(", ");
 }
 
 // "7:30pm" in UK time.

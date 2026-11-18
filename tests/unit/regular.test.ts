@@ -68,6 +68,23 @@ describe("regularGroups", () => {
       ]),
     ).toEqual([]);
   });
+
+  it("leaves out aartis and anything on several days a week", () => {
+    expect(
+      regularGroups([
+        event({
+          id: "sunday-aarti",
+          origin: "aarti",
+          recurrence: "RRULE:FREQ=WEEKLY;BYDAY=SU;UNTIL=20271120",
+        }),
+        event({
+          id: "evening-aarti",
+          recurrence:
+            "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA;UNTIL=20271120",
+        }),
+      ]),
+    ).toEqual([]);
+  });
 });
 
 describe("weekdayName", () => {
