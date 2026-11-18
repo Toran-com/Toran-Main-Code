@@ -3,6 +3,7 @@ import {
   logInAsAdmin,
   openAdminTool,
   showMandirList,
+  sql,
   stubMapTiles,
 } from "./helpers";
 
@@ -95,22 +96,53 @@ test("an admin edits, hides and adds mandirs, and checks festival dates", async 
   await expect(page.getByText("Marked as not checked.")).toBeVisible();
 });
 
-test("an admin sees which mandir websites can be checked", async ({ page }) => {
+test("an admin ticks mandirs' websites and scans them all", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  // A site that can't be reached, so the scan is quick and touches no real
+  // website (reading real sites is tested with a fake site instead:
+  // tests/unit/website-check.test.ts).
+  const slug = "hindu-temple-geeta-bhawan-derby";
+  const before = sql(
+    `select website from public.mandirs where slug = '${slug}'`,
+  );
+  sql(
+    `update public.mandirs set website = 'http://127.0.0.1:9/' where slug = '${slug}'`,
+  );
   await logInAsAdmin(page, `websites-${Date.now()}@example.com`);
   await openAdminTool(page, "Websites");
   await expect(page).toHaveURL(/\/ops\/websites$/);
-  // Lists mandirs with a website, each with its own check. (Checking
-  // itself reads real websites, so it's tested with a fake site instead:
-  // tests/unit/website-check.test.ts.)
   await expect(page.getByText("With a website")).toBeVisible();
-  await expect(
-    page.getByRole("button", {
-      name: "Check Geeta Bhavan Leicester's website",
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Check the next 5 websites" }),
-  ).toBeVisible();
+  // Nothing ticked, nothing to scan.
+  const scan = page.getByRole("button", { name: /^Scan the ticked websites/ });
+  await expect(scan).toHaveText("Scan the ticked websites (0)");
+  await expect(scan).toBeDisabled();
+  // "All" and "None" tick and untick every one.
+  await page.getByRole("button", { name: "All", exact: true }).click();
+  await expect(scan).not.toHaveText("Scan the ticked websites (0)");
+  await page.getByRole("button", { name: "None", exact: true }).click();
+  await expect(scan).toHaveText("Scan the ticked websites (0)");
+
+  const name = sql(`select name from public.mandirs where slug = '${slug}'`);
+  await page.getByRole("checkbox", { name: `Scan ${name}` }).check();
+  await expect(scan).toHaveText("Scan the ticked websites (1)");
+  await scan.click();
+  const status = page.getByRole("status").filter({ hasText: "Scanned" });
+  await expect(status).toContainText("Scanned 1 website.", {
+    timeout: 60_000,
+  });
+  await expect(status).toContainText(name);
+  // The check is recorded.
+  expect(
+    sql(
+      `select count(*) from public.sources s join public.mandirs m on m.id = s.mandir_id
+         where m.slug = '${slug}' and s.kind = 'crawler' and s.last_checked_at is not null`,
+    ),
+  ).toBe("1");
+  sql(
+    `update public.mandirs set website = ${before ? `'${before}'` : "null"} where slug = '${slug}'`,
+  );
 });
 
 test("the admin pages are hidden from everyone else", async ({ page }) => {
