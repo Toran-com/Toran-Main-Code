@@ -1,8 +1,9 @@
 // Reads events a mandir's own website already publishes in machine-readable
 // forms: schema.org event data in the page (JSON-LD or microdata), the
 // older hCalendar and h-event microformats, iCalendar (.ics) feeds, Google
-// Calendars embedded in the page, and the event list of WordPress's The
-// Events Calendar plugin. Patrikas and posters (PDFs and pictures) are
+// Calendars embedded in the page, the event list of WordPress's The
+// Events Calendar plugin, and the events feed some sites built as web
+// apps load their events from (/api/events). Patrikas and posters (PDFs and pictures) are
 // found but not read: they're listed for a person to type up. No guessing
 // events from page text; that would need AI. Whatever it reads is
 // cleaned into plain text a family can read, then checked by a person in
@@ -468,6 +469,75 @@ export function eventsFromTribeApi(json: string, base: string): FoundEvent[] {
       time: e.all_day === true ? "" : start.time,
       summary: text(e.excerpt) || text(e.description),
       link: linkOf(e.url, base) || base,
+    });
+    return event ? [event] : [];
+  });
+}
+
+// ---- A site's own events feed -------------------------------------------------
+
+// Some mandirs' sites, built as web apps (Next.js), write no events into
+// their pages: the browser loads them afterwards from the site's own
+// feed, /api/events (London Sree Ayyappan Temple's, for one). Worth
+// asking for when the site is such an app with an events page.
+export function hasEventsFeed(html: string): boolean {
+  return (
+    /\/_next\/static\//.test(html) &&
+    /<a\b[^>]*\bhref\s*=\s*["']\/events\/?["']/i.test(html)
+  );
+}
+
+export function eventsFeedUrl(origin: string): string {
+  return `${origin}/api/events?upcoming=true&limit=200`;
+}
+
+// "Ekadasi Viratham - ஏகாதசி விரதம்": an English name, then the same in
+// the mandir's own script. The English is the name; the other, the start
+// of the description.
+export function splitScripts(title: string): { name: string; other: string } {
+  const m = /^(.*?[A-Za-z].*?)\s+[-–]\s+([^\x00-\x7F][^A-Za-z]*)$/.exec(
+    title.trim(),
+  );
+  return m ? { name: m[1], other: m[2].trim() } : { name: title, other: "" };
+}
+
+// Its answer: { events: [{ title, description, slug, start_date,
+// start_time, is_all_day }] }, dates and times in the mandir's own (UK)
+// time.
+export function eventsFromFeed(json: string, origin: string): FoundEvent[] {
+  let data: unknown;
+  try {
+    data = JSON.parse(json);
+  } catch {
+    return [];
+  }
+  const list = (data as { events?: unknown } | null)?.events;
+  if (!Array.isArray(list)) return [];
+  return list.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const e = item as Record<string, unknown>;
+    const date = typeof e.start_date === "string" ? e.start_date.trim() : "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return [];
+    const startTime =
+      typeof e.start_time === "string"
+        ? (/^([01]\d|2[0-3]):[0-5]\d/.exec(e.start_time)?.[0] ?? "")
+        : "";
+    const { name, other } = splitScripts(text(e.title));
+    // The description, less any line that only repeats the name.
+    const described = text(e.description)
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter((line) => line && line !== name && line !== text(e.title))
+      .join(" ");
+    const slug = typeof e.slug === "string" ? e.slug : "";
+    const event = finish({
+      title: name,
+      date,
+      time: e.is_all_day === true ? "" : startTime,
+      summary: described || other,
+      link: slug
+        ? (absolute(`/events/${encodeURIComponent(slug)}`, origin) ?? origin)
+        : origin,
     });
     return event ? [event] : [];
   });

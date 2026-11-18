@@ -4,6 +4,8 @@ import { londonDate } from "@/lib/format";
 import {
   candidateLinks,
   eventPageLinks,
+  eventsFeedUrl,
+  eventsFromFeed,
   eventsFromIcs,
   eventsFromJsonLd,
   eventsFromMicrodata,
@@ -11,6 +13,7 @@ import {
   eventsFromTribeApi,
   type FoundDocument,
   type FoundEvent,
+  hasEventsFeed,
   mentionsDates,
   patrikaLinks,
   type Platform,
@@ -206,7 +209,13 @@ async function fetchPublic(
 // why nothing was found when that's the case.
 function describe(
   platform: Platform,
-  read: { pages: number; feeds: number; tribe: boolean; google: boolean },
+  read: {
+    pages: number;
+    feeds: number;
+    tribe: boolean;
+    google: boolean;
+    app: boolean;
+  },
   found: number,
   writtenOut: boolean,
   documents: number,
@@ -223,6 +232,11 @@ function describe(
     );
   }
   if (read.google) notes.push("Read the Google Calendar shown on the site.");
+  if (read.app) {
+    notes.push(
+      "Built as a web app that loads its events in the browser: read its events feed.",
+    );
+  }
   if (documents) {
     notes.push(
       `Found ${documents} ${documents === 1 ? "patrika or poster" : "patrikas or posters"} to type up.`,
@@ -249,7 +263,8 @@ function describe(
 
 // Checks one website: its home page and up to five pages that look like an
 // events list, then the event data they lead to: calendar feeds, Google
-// Calendars, WordPress's The Events Calendar, and single event pages.
+// Calendars, WordPress's The Events Calendar, a web app's events feed,
+// and single event pages.
 // Patrikas and posters on the pages read are noted too (at most five).
 // Stops after about 25 seconds.
 export async function checkWebsite(
@@ -284,7 +299,7 @@ export async function checkWebsite(
   if (!first) return unreachable();
 
   const found: FoundEvent[] = [];
-  const read = { pages: 1, feeds: 0, tribe: false, google: false };
+  const read = { pages: 1, feeds: 0, tribe: false, google: false, app: false };
   const documents = new Map<string, FoundDocument>();
   const fromPage = (html: string, url: string) => {
     for (const d of patrikaLinks(html, url)) {
@@ -313,6 +328,22 @@ export async function checkWebsite(
       const events = result ? eventsFromTribeApi(result.text, first.url) : [];
       if (events.length) {
         read.tribe = true;
+        found.push(...events);
+      }
+    }
+  }
+
+  // Sites built as web apps load their events in the browser from their
+  // own feed, which says more than their pages ever do.
+  if (!found.length && hasEventsFeed(first.text)) {
+    const url = eventsFeedUrl(new URL(first.url).origin);
+    if (allowed(url)) {
+      const result = await fetchText(url);
+      const events = result
+        ? eventsFromFeed(result.text, new URL(first.url).origin)
+        : [];
+      if (events.length) {
+        read.app = true;
         found.push(...events);
       }
     }
