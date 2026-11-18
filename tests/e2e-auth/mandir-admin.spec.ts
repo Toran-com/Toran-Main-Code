@@ -5,6 +5,7 @@ import {
   addEventsBy,
   eventMenu,
   mandirSetting,
+  sql,
 } from "./helpers";
 
 // A committee member claims a mandir, a Toran admin approves it, and the
@@ -341,6 +342,30 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByRole("button", { name: "Save details" }).click();
   await expect(member.getByText("Saved. Your public page")).toBeVisible();
   await expect(member.getByLabel("Step-free way in")).toBeChecked();
+  // The aarti becomes an event every day for a year, in What's on, and the
+  // committee is told so.
+  await expect(
+    member.getByText(
+      /Also in What's on every day: your aarti \(Mangla aarti 7:30am\)/,
+    ),
+  ).toBeVisible();
+  expect(
+    sql(
+      `select e.title || ' ' || e.kind || ' ' || (e.recurrence like '%FREQ=DAILY%')
+         from public.events e join public.mandirs m on m.id = e.mandir_id
+         where m.slug = '${SLUG}' and e.origin = 'aarti' and e.status = 'published'`,
+    ),
+  ).toBe("Mangla aarti aarti true");
+  // Saving again doesn't add it twice.
+  await mandirSetting(member, "Details");
+  await member.getByRole("button", { name: "Save details" }).click();
+  await expect(member.getByText("Saved. Your public page")).toBeVisible();
+  expect(
+    sql(
+      `select count(*) from public.events e join public.mandirs m on m.id = e.mandir_id
+         where m.slug = '${SLUG}' and e.origin = 'aarti' and e.status = 'published'`,
+    ),
+  ).toBe("1");
   await member.goto(`/mandirs/${SLUG}`);
   await expect(
     member

@@ -43,6 +43,8 @@ export function buildDigest(
       const day = londonDate(new Date(e.next_starts_at));
       return (
         e.status !== "cancelled" &&
+        // Not every day's aarti (lib/aarti-events.ts), just the events.
+        e.origin !== "aarti" &&
         day >= start &&
         day <= end &&
         (!region || e.mandir.region === region)

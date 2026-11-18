@@ -23,6 +23,7 @@ import {
   PHOTO_BUCKET,
   PHOTO_WIDTHS,
 } from "@/lib/mandir-photo";
+import { syncAartiEvents } from "@/lib/aarti-events";
 import { parsePracticalDetails } from "@/lib/mandir-form";
 import { queueRead } from "@/lib/poster-queue";
 import {
@@ -243,10 +244,13 @@ export async function updatePracticalDetails(formData: FormData) {
     .from("mandirs")
     .update({ ...values, ...position })
     .eq("slug", slug)
-    .select("slug");
+    .select("id");
   if (error || !data?.length) back("error=failed");
+  // Its aarti times, as daily events in What's on (lib/aarti-events.ts).
+  await syncAartiEvents(supabase, data[0].id, values.aarti_times ?? []);
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");
+  updateTag("events");
   back("done=details");
 }
 

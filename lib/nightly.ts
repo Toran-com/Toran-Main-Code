@@ -1,3 +1,4 @@
+import { renewAartiEvents } from "@/lib/aarti-events";
 import { timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
@@ -41,6 +42,8 @@ export type NightlySummary = {
   retention: Record<string, number> | null;
   // Review-queue items discarded because their date had passed.
   pastQueue?: number;
+  // Daily aarti events added or renewed from mandirs' aarti times.
+  aarti?: number;
   calendars?: Tally;
   websites: Tally;
 };
@@ -94,6 +97,7 @@ export async function runNightly(
   const started = now();
   const { data: retention, error } = await db.rpc("run_retention");
   const pastQueue = await discardPastQueue(db, londonDate(new Date(now())));
+  const aarti = await renewAartiEvents(db, new Date(now()));
 
   const calendars = await inTurn(
     await calendarQueue(db, NIGHTLY_CALENDARS),
@@ -113,6 +117,7 @@ export async function runNightly(
   const summary: NightlySummary = {
     retention: error ? null : (retention as Record<string, number>),
     pastQueue,
+    aarti,
     calendars,
     websites,
   };

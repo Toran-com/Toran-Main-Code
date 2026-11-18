@@ -33,7 +33,7 @@ import { eventCount, shortSevaShifts } from "@/lib/committee-facts";
 import type { CommitteeFacts } from "@/lib/committee-tasks";
 import { upcomingFilter, withNextStart } from "@/lib/events";
 import { feedLabel } from "@/lib/calendar-feed";
-import { formatEventStart, londonDate } from "@/lib/format";
+import { formatEventStart, formatTimeOfDay, londonDate } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { inviteShareText, whatsAppLink } from "@/lib/share";
 import { pageTitle, siteUrl } from "@/lib/site";
@@ -187,7 +187,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
   const { data: rows } = await supabase!
     .from("events")
     .select(
-      "id, title, summary, starts_at, all_day, status, confirmed_at, recurrence, festival_date_id, event_occurrences (starts_at, cancelled)",
+      "id, title, summary, starts_at, all_day, status, confirmed_at, recurrence, festival_date_id, origin, event_occurrences (starts_at, cancelled)",
     )
     .eq("mandir_id", mandir.id)
     .neq("status", "removed")
@@ -195,7 +195,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     .gte("event_occurrences.starts_at", from)
     .order("starts_at")
     .limit(100);
-  const events = withNextStart(rows ?? [], from);
+  // The daily aarti from the mandir's details (lib/aarti-events.ts) is
+  // kept apart: it's in What's on every day, but not in this list, this
+  // week's message or the "Still on?" reminders.
+  const all = withNextStart(rows ?? [], from);
+  const events = all.filter((e) => e.origin !== "aarti");
+  const dailyAarti = all.filter((e) => e.origin === "aarti");
   const { data: claims } = await supabase!
     .from("event_claims")
     .select("id, proposed")
@@ -858,6 +863,23 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               <p className="text-muted px-5 pb-5">
                 Nothing coming up yet. A photo of your next poster is the
                 quickest way to start.
+              </p>
+            )}
+            {dailyAarti.length > 0 && (
+              <p className="text-muted border-line border-t px-5 py-3 text-base">
+                Also in What&apos;s on every day: your{" "}
+                {dailyAarti.length === 1 ? "aarti" : "aartis"} (
+                {dailyAarti
+                  .map(
+                    (e) =>
+                      `${e.title} ${formatTimeOfDay(e.next_starts_at, false)}`,
+                  )
+                  .join(", ")}
+                ), from{" "}
+                <a href="#details" className="text-peacock font-semibold">
+                  your details
+                </a>
+                .
               </p>
             )}
           </section>
