@@ -37,6 +37,7 @@ import { formatEventStart, formatTimeOfDay, londonDate } from "@/lib/format";
 import { describeRule } from "@/lib/recurrence";
 import { inviteShareText, whatsAppLink } from "@/lib/share";
 import { pageTitle, siteUrl } from "@/lib/site";
+import { GUIDE_PATH } from "@/lib/committee-guide";
 import { createSessionClient } from "@/lib/supabase/session";
 import { ConfirmButton } from "@/components/confirm-button";
 import { EventFields } from "@/components/event-fields";
@@ -783,6 +784,18 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             open={addOpen}
             stamp={stamp}
             notice={addOpen ? notice : null}
+            help={
+              <a
+                href={`${GUIDE_PATH}#add`}
+                target="_blank"
+                rel="noopener"
+                className="text-peacock text-base font-semibold"
+              >
+                Not sure which? See how each way works
+                <span aria-hidden="true"> ↗</span>
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            }
             className={buttonClass}
           />
           <CommitteeTodo facts={facts} />
@@ -1276,6 +1289,23 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                   <CalendarFields slug={mandir.slug} calendar={calendar} />
                 </Sheet>
               </div>
+              <a
+                href={GUIDE_PATH}
+                target="_blank"
+                rel="noopener"
+                className={`${settingClass} no-underline`}
+              >
+                <span className="flex min-w-0 flex-1 flex-col text-left">
+                  <span className="font-semibold">Committee guide</span>
+                  <span className="text-muted line-clamp-1 text-base">
+                    How everything here works, step by step
+                  </span>
+                </span>
+                <span aria-hidden="true" className="text-muted text-lg">
+                  ↗
+                </span>
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
               {changes.length > 0 && (
                 <div>
                   <Sheet

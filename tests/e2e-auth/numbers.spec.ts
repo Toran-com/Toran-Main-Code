@@ -35,8 +35,20 @@ test("a committee sees its own numbers, and only its own", async ({ page }) => {
      on conflict (day, metric, path) do update set count = c.count + excluded.count`,
   );
 
-  // From the committee's page.
+  // From the committee's page. The committee guide is a tap away, in a
+  // new tab so the page stays where it was: from "Your mandir", and from
+  // the "?" by the tabs, at the part about the page you're on.
   await page.goto(`/manage/${SLUG}`);
+  const guide = page
+    .getByRole("region", { name: "Your mandir" })
+    .getByRole("link", { name: /^Committee guide/ });
+  await expect(guide).toHaveAttribute("href", "/for-mandirs/guide");
+  await expect(guide).toHaveAttribute("target", "_blank");
+  await expect(
+    page
+      .getByRole("navigation", { name: "Your mandir on Toran" })
+      .getByRole("link", { name: "Committee guide (opens in a new tab)" }),
+  ).toHaveAttribute("href", "/for-mandirs/guide#hub");
   await page.getByRole("link", { name: "Numbers", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/manage/${SLUG}/numbers$`));
   // The mandir's bar is here too, showing where you are, and goes on to
@@ -49,6 +61,9 @@ test("a committee sees its own numbers, and only its own", async ({ page }) => {
     "href",
     `/manage/${SLUG}/seva`,
   );
+  await expect(
+    bar.getByRole("link", { name: "Committee guide (opens in a new tab)" }),
+  ).toHaveAttribute("href", "/for-mandirs/guide#numbers");
   const tile = (label: string) =>
     page.locator("dt", { hasText: label }).locator("+ dd");
   await expect(tile("Views of your page and events")).not.toHaveText("0");
