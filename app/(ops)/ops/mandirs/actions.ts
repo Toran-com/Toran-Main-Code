@@ -10,6 +10,7 @@ import {
   type Position,
 } from "@/lib/geo";
 import { checkMandirRows, type CheckedRow } from "@/lib/mandir-import";
+import { syncAartiEvents } from "@/lib/aarti-events";
 import { parseMandirDetails, slugFor } from "@/lib/mandir-form";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -45,12 +46,18 @@ export async function createMandir(formData: FormData) {
   let slug = base;
   for (let n = 2; used.has(slug); n++) slug = `${base}-${n}`;
 
-  const { error } = await supabase.from("mandirs").insert({
-    ...values,
-    ...(await positionFor(values.postcode)),
-    slug,
-  });
-  if (error) redirect("/ops/mandirs/new?error=failed");
+  const { data: created, error } = await supabase
+    .from("mandirs")
+    .insert({
+      ...values,
+      ...(await positionFor(values.postcode)),
+      slug,
+    })
+    .select("id")
+    .single();
+  if (error || !created) redirect("/ops/mandirs/new?error=failed");
+  // Its aarti times, as daily events in What's on (lib/aarti-events.ts).
+  await syncAartiEvents(supabase, created.id, values.aarti_times ?? []);
   updateTag("mandirs");
   updateTag("events");
   redirect(`/ops/mandirs/${slug}?saved=added`);
@@ -77,15 +84,18 @@ export async function updateMandir(formData: FormData) {
   if (!before) back("error=failed");
   const moved = before.postcode !== values.postcode || before.latitude === null;
 
-  const { error } = await supabase
+  const { data: saved, error } = await supabase
     .from("mandirs")
     .update({
       ...values,
       status: status as "listed" | "claimed" | "hidden",
       ...(moved ? await positionFor(values.postcode) : {}),
     })
-    .eq("slug", slug);
-  if (error) back("error=failed");
+    .eq("slug", slug)
+    .select("id")
+    .single();
+  if (error || !saved) back("error=failed");
+  await syncAartiEvents(supabase, saved.id, values.aarti_times ?? []);
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");
   updateTag("events");

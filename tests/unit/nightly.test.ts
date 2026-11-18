@@ -106,6 +106,7 @@ describe("runNightly", () => {
     expect(summary).toEqual({
       retention: { invites: 2, approved_claims: 0 },
       pastQueue: 0,
+      aarti: 0,
       calendars: { checked: 0, added: 0, failed: 0 },
       websites: { checked: 4, added: 2, failed: 0 },
     });

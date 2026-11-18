@@ -358,7 +358,14 @@ After your authenticator code, `/ops` has three tabs:
     two sessions a day, with "Copy Monday's times to every day") and up to
     six **aarti times** are set in the same form; the mandir's page shows
     the week, the aartis, and "Open now · until 12pm" or "Closed now ·
-    opens at 4pm", worked out on the visitor's phone in UK time;
+    opens at 4pm", worked out on the visitor's phone in UK time. Each
+    aarti also becomes an event every day for a year, so it's in What's
+    on and near me (`lib/aarti-events.ts`, origin "aarti"). Saving the
+    times again keeps them in step (a changed time replaces its event),
+    and the nightly job renews them before their year runs out. They're
+    left out of the mandir's own event list (the aarti times are already
+    on its page), this week's WhatsApp message, the weekly email and the
+    "Still on?" reminders;
   - hide it from the public site the same day a mandir asks;
   - see who looks after its page and remove someone's access. When nobody
     is left, the page can be claimed again.

@@ -79,7 +79,7 @@ export async function loadCommitteeFacts(
     db
       .from("events")
       .select(
-        "id, title, status, confirmed_at, starts_at, all_day, recurrence, festival_date_id, event_occurrences (starts_at, cancelled)",
+        "id, title, status, confirmed_at, starts_at, all_day, recurrence, festival_date_id, origin, event_occurrences (starts_at, cancelled)",
       )
       .eq("mandir_id", mandir.id)
       .neq("status", "removed")
@@ -107,7 +107,11 @@ export async function loadCommitteeFacts(
       .order("starts_on"),
     eventCount(db, mandir.id),
   ]);
-  const events = withNextStart(rows ?? [], from);
+  // Not the daily aarti (lib/aarti-events.ts): no "Still on?" for it.
+  const events = withNextStart(
+    (rows ?? []).filter((e) => e.origin !== "aarti"),
+    from,
+  );
   return {
     slug: mandir.slug,
     today,
