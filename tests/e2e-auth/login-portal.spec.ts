@@ -115,6 +115,14 @@ test("a family's mandirs and plan follow them to another device", async ({
   // goes through once it's back online.
   const errors: string[] = [];
   phone.on("pageerror", (e) => errors.push(e.message));
+  // Once this page has read the account (a server action), so it's
+  // keeping the lists in step.
+  const synced = phone.waitForResponse(
+    (r) =>
+      r.request().method() === "POST" && !!r.request().headers()["next-action"],
+  );
+  await phone.reload();
+  await synced;
   await phone.context().setOffline(true);
   await phone.getByRole("button", { name: "Follow", exact: true }).click();
   await phone.waitForTimeout(1500);

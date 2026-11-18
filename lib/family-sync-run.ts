@@ -71,61 +71,77 @@ export function start(): () => void {
   let cancelled = false;
   let applying = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  // No signal: leave the phone as it is; the next page load tries again.
-  void loadFamilySaved()
-    .catch(() => null)
-    .then((loaded) => {
-      if (cancelled || !loaded) return;
-      if (!loaded.saved) {
-        // Not agreed (or agreed and later deleted it): keep nothing, and
-        // leave what's on this phone as it is.
-        try {
-          localStorage.removeItem(SYNCED);
-        } catch {
-          // Nothing to forget.
-        }
-        setFamilyState("ask");
-        return;
-      }
-      let synced: string | null = null;
+  // No signal: leave the phone as it is, and try again once it's back
+  // online (or a few seconds later, a few times).
+  let loads = 0;
+  let unwait = () => {};
+  const loadAgain = () => {
+    if (cancelled) return;
+    if (!navigator.onLine) {
+      const back = () => begin();
+      window.addEventListener("online", back, { once: true });
+      unwait = () => window.removeEventListener("online", back);
+    } else if (loads < RETRIES) {
+      loads++;
+      const wait = setTimeout(begin, RETRY_MS);
+      unwait = () => clearTimeout(wait);
+    }
+  };
+  const begin = () => void loadFamilySaved().then(apply, loadAgain);
+  const apply = (loaded: Awaited<ReturnType<typeof loadFamilySaved>>) => {
+    if (cancelled || !loaded) return;
+    if (!loaded.saved) {
+      // Not agreed (or agreed and later deleted it): keep nothing, and
+      // leave what's on this phone as it is.
       try {
-        synced = localStorage.getItem(SYNCED);
+        localStorage.removeItem(SYNCED);
       } catch {
-        // Storage blocked: treat as the first time, which loses nothing.
+        // Nothing to forget.
       }
-      const here = device();
-      const next = combineSaved(here, loaded.saved, synced !== loaded.userId);
-      if (JSON.stringify(next) !== JSON.stringify(here)) {
-        applying = true;
-        clearFollowing();
-        mergeFollowing(next.following);
-        clearPlan();
-        mergePlan(next.plan);
-        applying = false;
-      }
-      try {
-        localStorage.setItem(SYNCED, loaded.userId);
-      } catch {
-        // Fine: next time counts as a first time again.
-      }
-      saveQuietly(next);
-      setFamilyState("on");
-      // From now on, each change here goes to the account.
-      const save = () => {
-        if (applying) return;
-        clearTimeout(timer);
-        timer = setTimeout(() => saveQuietly(device()), 600);
-      };
-      const offFollow = onFollowingChange(save);
-      const offPlan = onPlanChange(save);
-      stop = () => {
-        offFollow();
-        offPlan();
-        clearTimeout(timer);
-      };
-    });
+      setFamilyState("ask");
+      return;
+    }
+    let synced: string | null = null;
+    try {
+      synced = localStorage.getItem(SYNCED);
+    } catch {
+      // Storage blocked: treat as the first time, which loses nothing.
+    }
+    const here = device();
+    const next = combineSaved(here, loaded.saved, synced !== loaded.userId);
+    if (JSON.stringify(next) !== JSON.stringify(here)) {
+      applying = true;
+      clearFollowing();
+      mergeFollowing(next.following);
+      clearPlan();
+      mergePlan(next.plan);
+      applying = false;
+    }
+    try {
+      localStorage.setItem(SYNCED, loaded.userId);
+    } catch {
+      // Fine: next time counts as a first time again.
+    }
+    saveQuietly(next);
+    setFamilyState("on");
+    // From now on, each change here goes to the account.
+    const save = () => {
+      if (applying) return;
+      clearTimeout(timer);
+      timer = setTimeout(() => saveQuietly(device()), 600);
+    };
+    const offFollow = onFollowingChange(save);
+    const offPlan = onPlanChange(save);
+    stop = () => {
+      offFollow();
+      offPlan();
+      clearTimeout(timer);
+    };
+  };
+  begin();
   return () => {
     cancelled = true;
+    unwait();
     stop();
   };
 }
