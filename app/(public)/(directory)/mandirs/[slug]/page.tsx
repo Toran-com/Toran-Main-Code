@@ -360,7 +360,9 @@ function QuickLinks({ mandir }: { mandir: MandirDetails }) {
         {mandir.live_url && (
           <a href={mandir.live_url} rel="noopener" className={actionPillClass}>
             <PlayIcon />
-            {t("mandir.watchLive")}
+            {isYouTube(mandir.live_url)
+              ? t("mandir.watchYouTube")
+              : t("mandir.watchLive")}
           </a>
         )}
         <ShareButtons
@@ -567,4 +569,15 @@ function MandirPhoto({ path, alt }: { path: string; alt: string }) {
       />
     </picture>
   );
+}
+
+// A YouTube address (youtube.com, m.youtube.com, youtu.be), for "Watch on
+// YouTube" rather than "Watch live".
+function isYouTube(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.replace(/^(www|m)\./, "");
+    return host === "youtube.com" || host === "youtu.be";
+  } catch {
+    return false;
+  }
 }

@@ -1177,10 +1177,14 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                       />
                     </label>
                     <label className="flex flex-col gap-2">
-                      <span className="font-semibold">Live stream</span>
+                      <span className="font-semibold">
+                        YouTube / Livestream
+                      </span>
                       <span className="text-muted -mt-1 text-base">
-                        If you stream aarti or katha, the YouTube or Facebook
-                        page (or your own). Shown as &ldquo;Watch live&rdquo;.
+                        Your YouTube channel, or wherever you stream aarti or
+                        katha (Facebook, or your own site). Shown on your page
+                        as &ldquo;Watch on YouTube&rdquo; or &ldquo;Watch
+                        live&rdquo;.
                       </span>
                       <input
                         name="live_url"
