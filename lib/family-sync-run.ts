@@ -33,28 +33,37 @@ const device = () => ({
 });
 
 // Saves to the account, never failing loudly: a phone that loses its
-// signal (or is put away) mid-save tries again once it's back online.
-// Whatever's on the phone stays as it is either way.
+// signal (or is put away) mid-save tries again once it's back online, or
+// a few seconds later if it already is (up to a few times). Whatever's on
+// the phone stays as it is either way.
+const RETRY_MS = 3000;
+const RETRIES = 3;
+let retrying = false;
+let tries = 0;
+
 function saveQuietly(value: ReturnType<typeof device>) {
   void saveFamilySaved(value)
     .then((ok) => {
-      if (!ok) retryWhenOnline();
+      if (ok) tries = 0;
+      else retryLater();
     })
-    .catch(retryWhenOnline);
+    .catch(retryLater);
 }
 
-let retrying = false;
-function retryWhenOnline() {
+function retryLater() {
   if (retrying) return;
-  retrying = true;
-  window.addEventListener(
-    "online",
-    () => {
-      retrying = false;
-      saveQuietly(device());
-    },
-    { once: true },
-  );
+  const again = () => {
+    retrying = false;
+    saveQuietly(device());
+  };
+  if (!navigator.onLine) {
+    retrying = true;
+    window.addEventListener("online", again, { once: true });
+  } else if (tries < RETRIES) {
+    retrying = true;
+    tries++;
+    setTimeout(again, RETRY_MS);
+  }
 }
 
 export function start(): () => void {

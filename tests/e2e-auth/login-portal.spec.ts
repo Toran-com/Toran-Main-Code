@@ -124,9 +124,11 @@ test("a family's mandirs and plan follow them to another device", async ({
   ).toBe("0");
   await phone.context().setOffline(false);
   await expect
-    .poll(() =>
-      sql(`select array_to_string(following, ',') from public.family_saved s
+    .poll(
+      () =>
+        sql(`select array_to_string(following, ',') from public.family_saved s
         join auth.users u on u.id = s.user_id where u.email = '${email}'`),
+      { timeout: 15_000 },
     )
     .toBe(SLUG);
   expect(errors).toEqual([]);
