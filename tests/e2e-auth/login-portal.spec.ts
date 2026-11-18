@@ -111,6 +111,26 @@ test("a family's mandirs and plan follow them to another device", async ({
     phone.getByRole("button", { name: "Follow", exact: true }),
   ).toBeVisible();
 
+  // The phone loses its signal while following: no error, and the save
+  // goes through once it's back online.
+  const errors: string[] = [];
+  phone.on("pageerror", (e) => errors.push(e.message));
+  await phone.context().setOffline(true);
+  await phone.getByRole("button", { name: "Follow", exact: true }).click();
+  await phone.waitForTimeout(1500);
+  expect(
+    sql(`select cardinality(following) from public.family_saved s
+      join auth.users u on u.id = s.user_id where u.email = '${email}'`),
+  ).toBe("0");
+  await phone.context().setOffline(false);
+  await expect
+    .poll(() =>
+      sql(`select array_to_string(following, ',') from public.family_saved s
+        join auth.users u on u.id = s.user_id where u.email = '${email}'`),
+    )
+    .toBe(SLUG);
+  expect(errors).toEqual([]);
+
   // The account page says what's saved, and the family can close it.
   await phone.goto("/account");
   await expect(
