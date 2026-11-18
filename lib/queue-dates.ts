@@ -31,3 +31,7 @@ export function bySoonest(a: Dated, b: Dated): number {
 // The note left on a queue item discarded because its date had passed.
 export const PAST_QUEUE_NOTE =
   "Discarded: its date passed before it was checked.";
+
+// The note left on everything discarded when Toran empties the queue to
+// start afresh.
+export const CLEARED_QUEUE_NOTE = "Discarded: Toran emptied the queue.";

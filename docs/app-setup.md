@@ -539,6 +539,15 @@ with Claude**: Toran fetches the file as carefully as the site's pages
 poster sent in, so its events wait in the review queue marked "read by
 machine". Only files a check found for that mandir can be read.
 
+### Emptying the review queue
+
+**Discard everything waiting** at the top of the queue's list (`/ops` →
+Review queue) discards everything shown, after asking. Nothing is
+published, including what's waiting for a committee. Each item is kept,
+marked discarded with the note "Toran emptied the queue", so the same
+poster isn't queued again. With a "Where it came from" filter on, only
+those shown are discarded.
+
 ### Nightly job (decision 0016)
 
 Every night at about 02:15 UTC, Vercel runs `/api/cron/nightly`. It

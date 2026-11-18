@@ -23,7 +23,11 @@ import {
   readMessage,
   readPoster,
 } from "@/lib/poster-reader";
-import { hasPassed, PAST_QUEUE_NOTE } from "@/lib/queue-dates";
+import {
+  CLEARED_QUEUE_NOTE,
+  hasPassed,
+  PAST_QUEUE_NOTE,
+} from "@/lib/queue-dates";
 import { fetchDocument } from "@/lib/website-check";
 import { parseWebsiteEvents } from "@/lib/website-import";
 
@@ -422,3 +426,32 @@ export async function discardPast(formData: FormData) {
 }
 
 const MAX_PAST = 500;
+
+// Everything waiting, discarded in one go, to start the queue afresh. Only
+// what the page showed (and is still waiting) is touched, so anything
+// sent in since stays. Discarded, not deleted: each keeps a note saying
+// why, and nothing is published.
+export async function discardAll(formData: FormData) {
+  await requireToranAdmin("/ops/posters");
+  const ids = [
+    ...new Set(
+      formData
+        .getAll("poster")
+        .map(String)
+        .filter((id) => /^[0-9a-f-]{36}$/.test(id)),
+    ),
+  ].slice(0, MAX_ALL);
+  if (ids.length === 0) redirect("/ops/posters?emptied=0");
+  const supabase = await createSessionClient();
+  if (!supabase) redirect("/ops/posters?error=failed");
+  const { data: done, error } = await supabase
+    .from("event_claims")
+    .update({ status: "rejected", note: CLEARED_QUEUE_NOTE })
+    .in("id", ids)
+    .eq("status", "pending")
+    .select("id");
+  if (error) redirect("/ops/posters?error=failed");
+  redirect(`/ops/posters?emptied=${done?.length ?? 0}`);
+}
+
+const MAX_ALL = 2000;
