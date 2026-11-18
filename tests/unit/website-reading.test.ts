@@ -20,6 +20,8 @@ import {
   platformOf,
   shorten,
   timeIn,
+  eventsFromFeed,
+  splitScripts,
 } from "@/lib/website-events";
 
 const PAGE = "https://mandir.example.org/events/";
@@ -168,6 +170,64 @@ describe("eventsFromMicrodata", () => {
         kind: "bhajan",
       },
     ]);
+  });
+});
+
+describe("a web app's events feed", () => {
+  it("reads it, with the English name and the other script as its description", () => {
+    const json = JSON.stringify({
+      events: [
+        {
+          title: "Ekadasi Viratham - ஏகாதசி விரதம்",
+          slug: "ekadasi-viratham--2026-11-20",
+          description: "Ekadasi Viratham\nஏகாதசி விரதம்",
+          start_date: "2026-11-20",
+          start_time: null,
+          is_all_day: true,
+        },
+        {
+          title: "Mandala Pooja",
+          slug: "mandala-pooja",
+          description: "Abhishekam and annadanam.",
+          start_date: "2026-12-26",
+          start_time: "18:30:00",
+          is_all_day: false,
+        },
+        { title: "No date", start_date: null },
+      ],
+    });
+    expect(eventsFromFeed(json, "https://temple.example.org")).toEqual([
+      {
+        title: "Ekadasi Viratham",
+        date: "2026-11-20",
+        time: "",
+        summary: "ஏகாதசி விரதம்",
+        link: "https://temple.example.org/events/ekadasi-viratham--2026-11-20",
+        kind: guessKind("Ekadasi Viratham"),
+      },
+      {
+        title: "Mandala Pooja",
+        date: "2026-12-26",
+        time: "18:30",
+        summary: "Abhishekam and annadanam.",
+        link: "https://temple.example.org/events/mandala-pooja",
+        kind: guessKind("Mandala Pooja"),
+      },
+    ]);
+    expect(eventsFromFeed("<html>", "https://temple.example.org")).toEqual([]);
+  });
+
+  it("keeps numbers with the English name", () => {
+    expect(
+      splitScripts("Karthikai Somavaram - 2 - கார்த்திகை சோமவாரம் - 2"),
+    ).toEqual({
+      name: "Karthikai Somavaram - 2",
+      other: "கார்த்திகை சோமவாரம் - 2",
+    });
+    expect(splitScripts("Diwali - Lakshmi Puja")).toEqual({
+      name: "Diwali - Lakshmi Puja",
+      other: "",
+    });
   });
 });
 
@@ -345,6 +405,40 @@ describe("checkWebsite", () => {
     expect(result.notes).toContain(
       "Built with WordPress and The Events Calendar: read its list of events.",
     );
+  });
+
+  it("reads the events feed of a site built as a web app", async () => {
+    site = {
+      "https://app.example.org/":
+        '<script src="/_next/static/chunks/main.js"></script><a href="/events">Events</a>',
+      "https://app.example.org/events":
+        '<script src="/_next/static/chunks/main.js"></script><p>Loading…</p>',
+      "https://app.example.org/api/events?upcoming=true&limit=200":
+        JSON.stringify({
+          events: [
+            {
+              title: "Pirathosha Viratham - பிரதோஷ விரதம்",
+              slug: "pirathosha-viratham",
+              start_date: "2026-10-22",
+              is_all_day: true,
+            },
+          ],
+        }),
+    };
+    const result = await checkWebsite("https://app.example.org/", now);
+    expect(result.outcome).toBe("found");
+    expect(result.events.map((e) => `${e.title} ${e.date} ${e.link}`)).toEqual([
+      "Pirathosha Viratham 2026-10-22 https://app.example.org/events/pirathosha-viratham",
+    ]);
+    expect(result.notes).toContain(
+      "Built as a web app that loads its events in the browser: read its events feed.",
+    );
+  });
+
+  it("doesn't ask other sites for an events feed", async () => {
+    site = { "https://plain.example.org/": '<a href="/events">Events</a>' };
+    await checkWebsite("https://plain.example.org/", now);
+    expect(fetched.some((u) => u.includes("/api/events"))).toBe(false);
   });
 
   it("reads a Google Calendar shown on an events page", async () => {
