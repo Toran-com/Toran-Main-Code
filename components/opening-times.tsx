@@ -1,6 +1,6 @@
 import { OpenNow } from "@/components/open-now";
 import type { Json } from "@/lib/database.types";
-import { formatClock, formatWeekday } from "@/lib/format";
+import { formatClock, formatDays, formatWeekday } from "@/lib/format";
 import { pageT } from "@/lib/i18n/page";
 import {
   readAartis,
@@ -26,7 +26,8 @@ export function OpenNowBadge({ hours }: { hours: Json | null }) {
 }
 
 // "Opening times" on a mandir's page: the week, with days that have the
-// same times run together, then the aarti times.
+// same times run together, then the aarti times, each with its days
+// unless it's every day.
 export function OpeningTimes({
   hours,
   aartis: aartiValue,
@@ -74,10 +75,15 @@ export function OpeningTimes({
           <ul className="flex flex-col gap-1">
             {aartis.map((a) => (
               <li
-                key={`${a.time}-${a.name}`}
+                key={`${a.time}-${a.name}-${a.days?.join("") ?? ""}`}
                 className="flex justify-between gap-4"
               >
-                <span>{a.name}</span>
+                <span>
+                  {a.name}
+                  {a.days && (
+                    <span className="text-muted"> · {formatDays(a.days)}</span>
+                  )}
+                </span>
                 <span className="font-semibold">{formatClock(a.time)}</span>
               </li>
             ))}

@@ -1,8 +1,9 @@
 // Classes and regular groups (/regular): every weekly, fortnightly or
 // monthly event across the mandirs, by the day of the week it's on, so a
 // family can see what's on every Tuesday evening, say. A festival's run of
-// nights isn't a regular group, so daily ones are left out. Pure, so it's
-// tested on its own.
+// nights isn't a regular group, so daily ones are left out, and so are a
+// mandir's aartis (in What's on every day they're on) and anything on
+// several days a week. Pure, so it's tested on its own.
 
 import { londonTime } from "@/lib/london";
 import { parseRule } from "@/lib/recurrence";
@@ -18,8 +19,9 @@ export function regularGroups(events: readonly ListedEvent[]): RegularDay[] {
   const days = new Map<number, ListedEvent[]>();
   for (const e of events) {
     if (e.status !== "published" || !e.recurrence) continue;
+    if (e.origin === "aarti") continue;
     const rule = parseRule(e.recurrence);
-    if (!rule || rule.repeat.kind === "daily") continue;
+    if (!rule || rule.weekday < 0) continue;
     const weekday = rule.weekday === 0 ? 7 : rule.weekday;
     days.set(weekday, [...(days.get(weekday) ?? []), e]);
   }

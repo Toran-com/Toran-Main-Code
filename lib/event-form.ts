@@ -180,6 +180,7 @@ export function eventInputFromEvent(event: {
 
 function repeatChoiceFor(repeat: Repeat): string {
   if (repeat.kind === "daily") return "daily";
+  if (repeat.kind === "days") return `days:${repeat.days.join(",")}`;
   if (repeat.kind === "weekly") {
     return repeat.interval === 1 ? "weekly" : "fortnightly";
   }
@@ -304,6 +305,15 @@ function repeatFromChoice(choice: string, date: string): Repeat | null {
     return { kind: "monthly", week: week >= 5 ? -1 : (week as 1 | 2 | 3 | 4) };
   }
   if (choice === "monthly-last") return { kind: "monthly", week: -1 };
+  // Some days of the week, "days:1,2,3" (0 is Sunday): not one of the
+  // form's choices, but how a mandir's aarti on some days is kept
+  // (lib/aarti-events.ts). The first date is one of the days.
+  const days = /^days:([0-6](,[0-6])*)$/.exec(choice);
+  if (days) {
+    const list = [...new Set(days[1].split(",").map(Number))];
+    if (!list.includes(new Date(`${date}T00:00:00Z`).getUTCDay())) return null;
+    return { kind: "days", days: list };
+  }
   return null;
 }
 

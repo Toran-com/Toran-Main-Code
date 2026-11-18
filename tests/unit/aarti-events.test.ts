@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { planAartiEvents } from "@/lib/aarti-events";
+import { firstAndRepeat, planAartiEvents } from "@/lib/aarti-events";
 
 const today = "2026-11-18";
 const mangla = { name: "Mangla aarti", time: "07:00" };
@@ -90,5 +90,61 @@ describe("planAartiEvents", () => {
         today,
       ),
     ).toEqual({ keep: [], remove: ["a"], add: [] });
+  });
+});
+
+describe("aartis on some days", () => {
+  const evening = {
+    name: "Sandhya aarti",
+    time: "18:00",
+    days: [1, 2, 3, 4, 5, 6] as (1 | 2 | 3 | 4 | 5 | 6 | 7)[],
+  };
+  it("replaces one whose days changed", () => {
+    expect(
+      planAartiEvents(
+        [evening],
+        [
+          {
+            id: "a",
+            title: "Sandhya aarti",
+            time: "18:00",
+            until: "2027-11-18",
+          },
+        ],
+        today,
+      ),
+    ).toEqual({ keep: [], remove: ["a"], add: [evening] });
+  });
+  it("keeps one on the same days", () => {
+    expect(
+      planAartiEvents(
+        [evening],
+        [
+          {
+            id: "a",
+            title: "Sandhya aarti",
+            time: "18:00",
+            until: "2027-11-18",
+            days: [1, 2, 3, 4, 5, 6],
+          },
+        ],
+        today,
+      ),
+    ).toEqual({ keep: ["a"], remove: [], add: [] });
+  });
+  it("starts on the first of its days", () => {
+    // Wednesday 18 November 2026.
+    expect(firstAndRepeat(undefined, today)).toEqual({
+      date: today,
+      repeat: "daily",
+    });
+    expect(firstAndRepeat([7], today)).toEqual({
+      date: "2026-11-22",
+      repeat: "days:0",
+    });
+    expect(firstAndRepeat([1, 2, 3, 4, 5, 6], today)).toEqual({
+      date: today,
+      repeat: "days:1,2,3,4,5,6",
+    });
   });
 });

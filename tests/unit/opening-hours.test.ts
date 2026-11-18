@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  aartiDaysChoice,
+  dayRuns,
   londonNow,
   openState,
   parseHours,
+  readAartis,
   type Session,
   weekRows,
 } from "@/lib/opening-hours";
@@ -159,11 +162,83 @@ describe("the committee's form", () => {
       error: "aarti",
     });
   });
+  it("reads the days each aarti is on", () => {
+    const f = form({
+      "aarti-name-0": "Mangla aarti",
+      "aarti-time-0": "09:30",
+      "aarti-days-0": "all",
+      "aarti-name-1": "Sandhya aarti",
+      "aarti-time-1": "18:00",
+      "aarti-days-1": "1-6",
+      "aarti-name-2": "Sandhya aarti",
+      "aarti-time-2": "16:30",
+      "aarti-days-2": "7",
+      "aarti-name-3": "Bhajan aarti",
+      "aarti-time-3": "20:00",
+      "aarti-days-3": "custom",
+    });
+    f.append("aarti-day-3", "5");
+    f.append("aarti-day-3", "2");
+    expect(parseHours(f)).toEqual({
+      ok: true,
+      sessions: [],
+      aartis: [
+        { name: "Mangla aarti", time: "09:30" },
+        { name: "Sandhya aarti", time: "16:30", days: [7] },
+        { name: "Sandhya aarti", time: "18:00", days: [1, 2, 3, 4, 5, 6] },
+        { name: "Bhajan aarti", time: "20:00", days: [2, 5] },
+      ],
+    });
+  });
+  it("refuses an aarti on no days", () => {
+    expect(
+      parseHours(
+        form({
+          "aarti-name-0": "Sandhya aarti",
+          "aarti-time-0": "18:00",
+          "aarti-days-0": "custom",
+        }),
+      ),
+    ).toEqual({ ok: false, error: "aarti" });
+  });
   it("allows everything to be left empty", () => {
     expect(parseHours(form({}))).toEqual({
       ok: true,
       sessions: [],
       aartis: [],
     });
+  });
+});
+
+describe("aarti days", () => {
+  it("reads what the database keeps, every day when no days are given", () => {
+    expect(
+      readAartis([
+        { name: "Mangla aarti", time: "07:30" },
+        { name: "Sandhya aarti", time: "18:00", days: [6, 1, 9, 2] },
+        { name: "Shayan aarti", time: "20:00", days: [1, 2, 3, 4, 5, 6, 7] },
+      ]),
+    ).toEqual([
+      { name: "Mangla aarti", time: "07:30" },
+      { name: "Sandhya aarti", time: "18:00", days: [1, 2, 6] },
+      { name: "Shayan aarti", time: "20:00" },
+    ]);
+  });
+  it("chooses the form's choice for the days", () => {
+    expect(aartiDaysChoice({})).toBe("all");
+    expect(aartiDaysChoice({ days: [1, 2, 3, 4, 5, 6] })).toBe("1-6");
+    expect(aartiDaysChoice({ days: [7] })).toBe("7");
+    expect(aartiDaysChoice({ days: [2, 5] })).toBe("custom");
+  });
+  it("runs days in a row together", () => {
+    expect(dayRuns([1, 2, 3, 4, 5, 6])).toEqual([[1, 6]]);
+    expect(dayRuns([6, 7])).toEqual([
+      [6, 6],
+      [7, 7],
+    ]);
+    expect(dayRuns([5, 1, 3, 2])).toEqual([
+      [1, 3],
+      [5, 5],
+    ]);
   });
 });

@@ -2,7 +2,7 @@
 -- times are refused.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(7);
+select plan(11);
 
 insert into auth.users (id, email) values
   ('aaaaaaaa-0000-0000-0000-000000000001', 'a@example.com');
@@ -44,6 +44,25 @@ select throws_ok(
   $$update public.mandirs set aarti_times = '[{"name": "", "time": "07:30"}]'
     where slug = 'mandir-one'$$,
   '23514', null, 'an aarti needs a name');
+
+select lives_ok(
+  $$update public.mandirs set aarti_times =
+      '[{"name": "Sandhya aarti", "time": "18:00", "days": [1, 2, 3, 4, 5, 6]},
+        {"name": "Sandhya aarti", "time": "16:30", "days": [7]}]'
+    where slug = 'mandir-one'$$,
+  'an aarti can be on some days only');
+select throws_ok(
+  $$update public.mandirs set aarti_times = '[{"name": "Sandhya aarti", "time": "18:00", "days": [0]}]'
+    where slug = 'mandir-one'$$,
+  '23514', null, 'not a day that doesn''t exist');
+select throws_ok(
+  $$update public.mandirs set aarti_times = '[{"name": "Sandhya aarti", "time": "18:00", "days": []}]'
+    where slug = 'mandir-one'$$,
+  '23514', null, 'on at least one day');
+select throws_ok(
+  $$update public.mandirs set aarti_times = '[{"name": "Sandhya aarti", "time": "18:00", "days": [6, 6]}]'
+    where slug = 'mandir-one'$$,
+  '23514', null, 'each day once');
 
 select * from finish();
 rollback;

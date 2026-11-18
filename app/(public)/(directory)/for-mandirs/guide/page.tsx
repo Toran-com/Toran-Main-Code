@@ -456,8 +456,13 @@ export default function CommitteeGuidePage() {
           <Steps>
             <Step>
               Add your <Ui>Aarti times</Ui>, and they&apos;re in What&apos;s on
-              every day for families looking for an aarti near them. Change the
-              times, and they change there too.
+              for families looking for an aarti near them. Change the times, and
+              they change there too.
+            </Step>
+            <Step>
+              Each aarti has <Ui>Which days?</Ui>: every day, Monday to
+              Saturday, weekends, Sundays, or the days you tick. An aarti at a
+              different time on Sundays? Give it twice, once for each.
             </Step>
             <Step>
               Add your <Ui>YouTube / Livestream</Ui> link, and your page shows{" "}
