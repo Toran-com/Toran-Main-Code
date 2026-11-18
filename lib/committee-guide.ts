@@ -16,11 +16,11 @@ export const HANDOUT_STEPS = [
   },
   {
     title: "Add what’s coming up",
-    body: "Tick the festivals your mandir celebrates, bring back last year’s events, or add one in a minute. Or send us your patrika and we’ll type it up for you to check.",
+    body: "Press “Add events” and choose a way: a photo of your poster, a WhatsApp message pasted in, festivals ticked, or typed in. Toran fills in the details for you to check.",
   },
   {
     title: "Keep it right",
-    body: "Press “Still on”, “Cancel” or “Edit” next to any event. Families see the change straight away.",
+    body: "Your “To do” list says what needs doing. Press ⋯ next to any event for “Still on”, “Cancel” or “Edit”. Families see the change straight away.",
   },
   {
     title: "Share it",
@@ -28,6 +28,6 @@ export const HANDOUT_STEPS = [
   },
   {
     title: "Bring in a colleague",
-    body: "Invite another committee member by email so you’re not the only one. Plan seva with a rota for your volunteers’ group.",
+    body: "Invite another committee member by email, under “Your mandir”, so you’re not the only one. Plan seva with a rota for your volunteers’ group.",
   },
 ] as const;

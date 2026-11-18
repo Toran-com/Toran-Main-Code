@@ -844,6 +844,221 @@ body:has(.own-toran) .site-toran {
   }
 }
 
+/* The committee guide's pictures (/for-mandirs/guide,
+   components/guide-screens.tsx): parts of the committee's page drawn
+   small, each playing out one thing on a loop (a tap, a sheet coming up,
+   a tick going in). Each is drawn at the end of its story, and only moves
+   for anyone who hasn't asked their device for less motion, so it reads
+   the same either way and its colours are always at full strength. */
+.guide-screen {
+  --loop: 9s;
+}
+/* The guide's numbered steps, each number in a circle. */
+.guide-steps {
+  counter-reset: step;
+}
+.guide-steps > li::before {
+  counter-increment: step;
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--peacock) 12%, transparent);
+  color: var(--peacock);
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* A finger's tap: a ring that swells and goes. */
+  .guide-tap {
+    animation: guide-tap var(--loop) ease-out var(--at, 0s) infinite;
+  }
+  /* Four rows lit up in turn: give each its --i, from 0 to 3. */
+  .guide-cycle > * {
+    animation: guide-cycle 8s ease-in-out calc(var(--i) * 2s) infinite;
+  }
+  /* Something that comes up after the tap, and goes again. */
+  .guide-pop {
+    animation: guide-pop var(--loop) cubic-bezier(0.2, 0.7, 0.2, 1)
+      var(--at, 0s) infinite;
+  }
+  /* A sheet sliding up from the bottom of the phone. */
+  .guide-rise {
+    animation: guide-rise var(--loop) cubic-bezier(0.2, 0.7, 0.2, 1)
+      var(--at, 0s) infinite;
+  }
+  /* A tick box being ticked, and what it opens. */
+  .guide-tick {
+    animation: guide-tick var(--loop) step-end infinite;
+  }
+  .guide-tick svg {
+    animation: guide-tick-mark var(--loop) ease-out infinite;
+  }
+  .guide-open {
+    animation: guide-open var(--loop) cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+  }
+  /* A bar filling, and a message being written. */
+  .guide-fill {
+    transform-origin: left;
+    animation: guide-fill var(--loop) cubic-bezier(0.2, 0.7, 0.2, 1)
+      var(--at, 0s) infinite;
+  }
+  .guide-grow {
+    transform-origin: bottom;
+    animation: guide-grow var(--loop) cubic-bezier(0.2, 0.7, 0.2, 1)
+      var(--at, 0s) infinite;
+  }
+  .guide-type {
+    animation: guide-type var(--loop) steps(24, end) var(--at, 0s) infinite;
+  }
+}
+.guide-tap {
+  opacity: 0;
+}
+@keyframes guide-tap {
+  0%,
+  8% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  12% {
+    opacity: 0.55;
+    scale: 1;
+  }
+  22%,
+  100% {
+    opacity: 0;
+    scale: 1.7;
+  }
+}
+@keyframes guide-cycle {
+  0%,
+  26%,
+  100% {
+    background-color: transparent;
+    border-color: var(--line);
+  }
+  4%,
+  22% {
+    background-color: var(--sunk);
+    border-color: var(--peacock);
+  }
+}
+@keyframes guide-pop {
+  0%,
+  14% {
+    scale: 0.6;
+    opacity: 0;
+  }
+  20%,
+  88% {
+    scale: none;
+    opacity: 1;
+  }
+  96%,
+  100% {
+    scale: 0.6;
+    opacity: 0;
+  }
+}
+@keyframes guide-rise {
+  0%,
+  14% {
+    translate: 0 105%;
+  }
+  24%,
+  86% {
+    translate: none;
+  }
+  96%,
+  100% {
+    translate: 0 105%;
+  }
+}
+@keyframes guide-tick {
+  0% {
+    background-color: var(--surface);
+    border-color: var(--line-strong);
+  }
+  16% {
+    background-color: var(--peacock);
+    border-color: var(--peacock);
+  }
+  90% {
+    background-color: var(--surface);
+    border-color: var(--line-strong);
+  }
+}
+@keyframes guide-tick-mark {
+  0%,
+  15% {
+    scale: 0;
+  }
+  20%,
+  89% {
+    scale: none;
+  }
+  90%,
+  100% {
+    scale: 0;
+  }
+}
+@keyframes guide-open {
+  0%,
+  18% {
+    clip-path: inset(0 0 100% 0);
+  }
+  28%,
+  86% {
+    clip-path: inset(0);
+  }
+  96%,
+  100% {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+@keyframes guide-fill {
+  0%,
+  10% {
+    scale: 0 1;
+  }
+  40%,
+  90% {
+    scale: none;
+  }
+  100% {
+    scale: 0 1;
+  }
+}
+@keyframes guide-grow {
+  0%,
+  10% {
+    scale: 1 0;
+  }
+  40%,
+  90% {
+    scale: none;
+  }
+  100% {
+    scale: 1 0;
+  }
+}
+@keyframes guide-type {
+  0%,
+  10% {
+    clip-path: inset(0 0 100% 0);
+  }
+  45%,
+  90% {
+    clip-path: inset(0);
+  }
+  100% {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
 /* Notice-board printouts (/mandirs/<slug>/print): A4, white paper. */
 @media print {
   @page {

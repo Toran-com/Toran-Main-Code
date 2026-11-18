@@ -29,20 +29,20 @@ English and Gujarati, and by following every link from the home page.
 
 ## Mandir committees
 
-| Page                  | Address                             | For                                                            | Leads to                                           |
-| --------------------- | ----------------------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
-| For mandir committees | `/for-mandirs`                      | What Toran does for a mandir, free                             | The guide, the demo, finding your mandir           |
-| Committee guide       | `/for-mandirs/guide` (and `/print`) | How it works, step by step; a one-page handout                 | Finding your mandir, the demo                      |
-| Try it                | `/demo`                             | A sample mandir to click around                                | Finding your mandir, What's on                     |
-| Look after this page  | `/mandirs/<mandir>/claim`           | Ask to look after a mandir's page                              | Your account (after logging in)                    |
-| Log in                | `/login`                            | Email link, no password                                        | Your account                                       |
-| Your account          | `/account`                          | Your mandirs, invites to accept, requests being checked        | Each mandir's committee page                       |
-| Committee page        | `/manage/<mandir>`                  | Posters to check, events, festivals to add, committee, details | Edit an event, a seva rota, the public page, print |
-| Edit an event         | `/manage/<mandir>/events/<id>`      | Change an event                                                | The committee page                                 |
-| Seva                  | `/manage/<mandir>/seva`             | Every rota, what's still short, one message for the group      | Each seva rota, the Seva page                      |
-| Seva rota             | `/manage/<mandir>/seva/<id>`        | Roles and shifts; the message for the volunteers' group        | The public seva page                               |
-| Numbers               | `/manage/<mandir>/numbers`          | Views, calendar adds, shares; download as a spreadsheet        | The committee page                                 |
-| Print a notice        | `/mandirs/<mandir>/print`           | One page of what's on, with a QR code                          | —                                                  |
+| Page                  | Address                             | For                                                              | Leads to                                           |
+| --------------------- | ----------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------- |
+| For mandir committees | `/for-mandirs`                      | What Toran does for a mandir, free                               | The guide, the demo, finding your mandir           |
+| Committee guide       | `/for-mandirs/guide` (and `/print`) | What the hub does for a mandir, and how, step by step; a handout | Finding your mandir, the demo                      |
+| Try it                | `/demo`                             | A sample mandir to click around                                  | Finding your mandir, What's on                     |
+| Look after this page  | `/mandirs/<mandir>/claim`           | Ask to look after a mandir's page                                | Your account (after logging in)                    |
+| Log in                | `/login`                            | Email link, no password                                          | Your account                                       |
+| Your account          | `/account`                          | Your mandirs, invites to accept, requests being checked          | Each mandir's committee page                       |
+| Committee page        | `/manage/<mandir>`                  | Posters to check, events, festivals to add, committee, details   | Edit an event, a seva rota, the public page, print |
+| Edit an event         | `/manage/<mandir>/events/<id>`      | Change an event                                                  | The committee page                                 |
+| Seva                  | `/manage/<mandir>/seva`             | Every rota, what's still short, one message for the group        | Each seva rota, the Seva page                      |
+| Seva rota             | `/manage/<mandir>/seva/<id>`        | Roles and shifts; the message for the volunteers' group          | The public seva page                               |
+| Numbers               | `/manage/<mandir>/numbers`          | Views, calendar adds, shares; download as a spreadsheet          | The committee page                                 |
+| Print a notice        | `/mandirs/<mandir>/print`           | One page of what's on, with a QR code                            | —                                                  |
 
 ## Toran admins (`/ops`, with an authenticator app)
 
