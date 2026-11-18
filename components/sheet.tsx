@@ -218,6 +218,7 @@ export function AddEvents({
   open,
   stamp = 0,
   notice,
+  help,
   className,
 }: {
   ways: AddWay[];
@@ -225,6 +226,8 @@ export function AddEvents({
   stamp?: number;
   // A message for the way `open` names (what went wrong, say).
   notice?: ReactNode;
+  // Under the choices: where to read more about them.
+  help?: ReactNode;
   className: string;
 }) {
   const ids = ["add", ...ways.map((w) => w.id)];
@@ -346,6 +349,7 @@ export function AddEvents({
                 </li>
               ))}
             </ul>
+            {help}
           </div>
           {/* Each way's form, kept while you look at another, so nothing
               typed is lost. */}
