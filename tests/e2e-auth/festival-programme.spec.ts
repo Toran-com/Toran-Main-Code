@@ -22,12 +22,14 @@ async function addRun(page: Page, title: string, lastDay: number) {
   await page.getByLabel("What's happening?").fill(title);
   await page.getByLabel("Date").fill(inDays(10));
   await page.getByLabel("Starts").fill("20:00");
-  const repeats = page.getByRole("combobox", { name: /^Repeats/ });
-  if (!(await repeats.isVisible())) {
-    await page.getByText("Happens every day, week or month?").click();
+  // One tick, then how often; it stops sooner than a year here.
+  await page.getByLabel(/^It repeats/).check();
+  await page.getByLabel("How often?").selectOption("daily");
+  const last = page.getByLabel("Last day");
+  if (!(await last.isVisible())) {
+    await page.getByText("Stops sooner? (optional)").click();
   }
-  await repeats.selectOption("daily");
-  await page.getByLabel("Repeats until").fill(inDays(lastDay));
+  await last.fill(inDays(lastDay));
   await page.getByRole("button", { name: "Add event", exact: true }).click();
 }
 
@@ -44,9 +46,9 @@ test("a run of nights is one event with every date listed", async ({
   );
   await page.goto(`/manage/${SLUG}`);
 
-  // Longer than a month is refused.
-  await addRun(page, title, 60);
-  await expect(page.getByText(/within a month of the first/)).toBeVisible();
+  // Longer than a year is refused.
+  await addRun(page, title, 400);
+  await expect(page.getByText(/within a year of it/)).toBeVisible();
 
   await addRun(page, title, 14);
   await expect(page.getByText("Added.")).toBeVisible();

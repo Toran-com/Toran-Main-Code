@@ -6,7 +6,6 @@ import { type EventKind, isEventKind } from "@/lib/event-kinds";
 import { londonDate, londonTime, londonToUtc } from "@/lib/format";
 import { normalisePostcode } from "@/lib/geo";
 import {
-  MAX_DAILY_DAYS,
   occurrenceDates,
   parseRule,
   type Repeat,
@@ -16,12 +15,18 @@ import {
 
 const DAY_MS = 86_400_000;
 
+// A repeating event runs for a year from its first date, unless it's
+// given a last date sooner.
+export const REPEAT_DAYS = 365;
+
 // What the forms send, as text. Also what a poster in the queue stores
 // (posters don't carry the Gujarati, so it's optional).
 export type EventInput = {
   title: string;
   date: string;
   time: string;
+  // When it ends ("21:00"), if the form gave one: optional, on the same day.
+  end_time?: string;
   summary: string;
   repeat: string;
   until: string;
@@ -50,7 +55,7 @@ export type EventError =
   | "time"
   | "repeat"
   | "until"
-  | "untilDaily"
+  | "endTime"
   | "cost"
   | "ticketsUrl"
   | "locationNote"
@@ -66,6 +71,8 @@ export type CheckedEvent = {
   kind: EventKind;
   allDay: boolean;
   startsAt: Date;
+  // When it ends, if given (never for an all-day event).
+  endsAt: Date | null;
   rule: string | null;
   // Every date's start, for a repeating event (empty otherwise).
   occurrences: Date[];
@@ -90,14 +97,22 @@ export const EVENT_FIELDS = [
 
 export function eventInputFrom(source: {
   get(name: string): unknown;
+  getAll?(name: string): unknown[];
 }): EventInput {
   const text = (name: string) => String(source.get(name) ?? "").trim();
+  // The form's "It repeats" box (components/event-fields.tsx): "How often"
+  // only counts when it's ticked. A form without the box sends just
+  // "repeat".
+  const ticks = source.getAll?.("repeats").map(String) ?? [];
+  const repeat =
+    ticks.length && !ticks.includes("yes") ? "none" : text("repeat") || "none";
   return {
     title: text("title"),
     date: text("date"),
     time: text("time"),
+    end_time: text("end_time"),
     summary: text("summary"),
-    repeat: text("repeat") || "none",
+    repeat,
     until: text("until"),
     title_gu: text("title_gu"),
     summary_gu: text("summary_gu"),
@@ -121,6 +136,9 @@ export function eventInputFromEvent(event: {
   all_day: boolean;
   recurrence: string | null;
   next_starts_at: string;
+  // When the first date ends, if it has an end time.
+  starts_at?: string;
+  ends_at?: string | null;
   kind?: string;
   cost_note?: string | null;
   tickets_needed?: boolean;
@@ -135,6 +153,16 @@ export function eventInputFromEvent(event: {
     title: event.title,
     date: londonDate(at),
     time: event.all_day ? "" : londonTime(at),
+    end_time:
+      !event.all_day && event.ends_at
+        ? londonTime(
+            new Date(
+              at.getTime() +
+                (Date.parse(event.ends_at) -
+                  Date.parse(event.starts_at ?? event.next_starts_at)),
+            ),
+          )
+        : "",
     summary: event.summary ?? "",
     repeat: parsed ? repeatChoiceFor(parsed.repeat) : "none",
     until: parsed?.until ?? "",
@@ -204,35 +232,28 @@ export function checkEvent(
   const allDay = time === "";
   const startsAt = londonToUtc(date, allDay ? "00:00" : time);
   if (!startsAt) return fail(allDay ? "date" : "time");
+  // An end time is optional, and needs a start time before it.
+  const endTime = input.end_time?.trim() ?? "";
+  let endsAt: Date | null = null;
+  if (endTime) {
+    endsAt = allDay ? null : londonToUtc(date, endTime);
+    if (!endsAt || endsAt <= startsAt) return fail("endTime");
+  }
 
-  // Repeating: every date is worked out now, up to a year ahead.
+  // Repeating: every date is worked out now. It runs for a year unless
+  // it's given a last date sooner (a festival's nights).
   let rule: string | null = null;
   let occurrences: Date[] = [];
   if (input.repeat !== "none") {
     const repeat = repeatFromChoice(input.repeat, date);
     if (!repeat) return fail("repeat");
     const first = new Date(`${date}T00:00:00Z`).getTime();
-    const until =
-      input.until || new Date(first + 182 * DAY_MS).toISOString().slice(0, 10);
-    const lastAllowed = new Date(first + 366 * DAY_MS)
+    const yearOn = new Date(first + REPEAT_DAYS * DAY_MS)
       .toISOString()
       .slice(0, 10);
-    if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(until) ||
-      until <= date ||
-      until > lastAllowed
-    ) {
+    const until = input.until || yearOn;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(until) || until <= date || until > yearOn) {
       return fail("until");
-    }
-    // A run of days is a festival's: a month at most.
-    if (
-      repeat.kind === "daily" &&
-      until >
-        new Date(first + (MAX_DAILY_DAYS - 1) * DAY_MS)
-          .toISOString()
-          .slice(0, 10)
-    ) {
-      return fail("untilDaily");
     }
     rule = toRule(repeat, date, until);
     occurrences = occurrenceDates(rule, date).flatMap((d) => {
@@ -251,6 +272,7 @@ export function checkEvent(
       kind,
       allDay,
       startsAt,
+      endsAt,
       rule,
       occurrences,
       costNote: costNote || null,
@@ -296,9 +318,9 @@ export const EVENT_ERRORS: Record<EventError, string> = {
   time: "Please choose a valid start time, or leave it empty for all day.",
   repeat: "Please choose how often it repeats.",
   until:
-    "Please choose an end date after the first date, and within a year of it.",
-  untilDaily:
-    "For an event every day, please choose a last day within a month of the first, as for a festival like Navratri.",
+    "Please choose a last date after the first date, and within a year of it.",
+  endTime:
+    "Please choose an end time after the start time (with a start time), or leave it empty.",
   cost: "Please keep the cost short (80 characters at most).",
   ticketsUrl:
     "That doesn't look like a web address for booking. Leave it empty if people book by phone or at the mandir.",

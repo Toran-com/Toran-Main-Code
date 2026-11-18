@@ -180,6 +180,7 @@ describe("eventInputFrom", () => {
       title: "Aarti",
       date: "2026-10-17",
       time: "",
+      end_time: "",
       summary: "",
       repeat: "none",
       until: "",
@@ -257,6 +258,7 @@ describe("eventInputFromEvent", () => {
       title: "Aarti",
       date: "2026-10-17",
       time: "19:30",
+      end_time: "",
       summary: "",
       repeat: "none",
       until: "",
@@ -347,18 +349,85 @@ describe("an event every day", () => {
     );
   });
 
-  it("keeps a run of days to a month", () => {
+  it("runs for a year unless it stops sooner, like a daily aarti", () => {
+    const aarti = checkEvent(
+      { ...base, date: "2026-11-01", time: "07:00", repeat: "daily" },
+      now,
+    );
+    expect(aarti.ok && aarti.event.rule).toBe(
+      "RRULE:FREQ=DAILY;UNTIL=20271101",
+    );
+    expect(aarti.ok && aarti.event.occurrences).toHaveLength(366);
+    // Never longer than a year.
     expect(
       checkEvent(
-        { ...base, date: "2026-11-01", repeat: "daily", until: "2026-12-15" },
+        { ...base, date: "2026-11-01", repeat: "daily", until: "2027-11-02" },
         now,
       ),
-    ).toEqual({ ok: false, error: "untilDaily" });
+    ).toEqual({ ok: false, error: "until" });
+  });
+});
+
+describe("repeating for a year", () => {
+  it("lists a weekly event for a year from its first date", () => {
+    const result = checkEvent({ ...base, repeat: "weekly" }, now);
+    expect(result.ok && result.event.rule).toBe(
+      "RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SU;UNTIL=20271108",
+    );
+    expect(result.ok && result.event.occurrences).toHaveLength(53);
+  });
+
+  it("counts 'How often' only when 'It repeats' is ticked", () => {
+    const form = new FormData();
+    form.append("repeats", "no");
+    form.set("repeat", "weekly");
+    expect(eventInputFrom(form).repeat).toBe("none");
+    form.append("repeats", "yes");
+    expect(eventInputFrom(form).repeat).toBe("weekly");
+    // A form without the box sends just "repeat".
+    const plain = new FormData();
+    plain.set("repeat", "daily");
+    expect(eventInputFrom(plain).repeat).toBe("daily");
+  });
+});
+
+describe("an end time", () => {
+  it("is kept when it's after the start", () => {
+    const result = checkEvent({ ...base, end_time: "21:00" }, now);
+    expect(result.ok && result.event.endsAt?.toISOString()).toBe(
+      "2026-11-08T21:00:00.000Z",
+    );
+  });
+
+  it("is optional", () => {
+    const result = checkEvent(base, now);
+    expect(result.ok && result.event.endsAt).toBeNull();
+  });
+
+  it("must be after the start, and needs a start time", () => {
+    expect(checkEvent({ ...base, end_time: "18:00" }, now)).toEqual({
+      ok: false,
+      error: "endTime",
+    });
+    expect(checkEvent({ ...base, time: "", end_time: "21:00" }, now)).toEqual({
+      ok: false,
+      error: "endTime",
+    });
+  });
+
+  it("comes back into the form when editing, for the next date too", () => {
     expect(
-      checkEvent(
-        { ...base, date: "2026-11-01", repeat: "daily", until: "2026-12-01" },
-        now,
-      ).ok,
-    ).toBe(true);
+      eventInputFromEvent({
+        title: "Aarti",
+        summary: null,
+        title_gu: null,
+        summary_gu: null,
+        all_day: false,
+        recurrence: "RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SA;UNTIL=20271231",
+        starts_at: "2026-10-17T18:30:00Z",
+        ends_at: "2026-10-17T20:00:00Z",
+        next_starts_at: "2026-10-24T18:30:00Z",
+      }).end_time,
+    ).toBe("21:00");
   });
 });

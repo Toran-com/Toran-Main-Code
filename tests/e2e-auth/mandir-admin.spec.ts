@@ -206,10 +206,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.getByLabel("What's happening?").fill("Weekly aarti");
   await member.getByLabel("Date").fill(nextWeek());
   await member.getByLabel("Starts").fill("19:00");
-  await member.getByText("Happens every day, week or month?").click();
-  await member
-    .getByRole("combobox", { name: /^Repeats/ })
-    .selectOption("weekly");
+  // It repeats: one tick and "Every week", listed for a year.
+  await member.getByLabel(/^It repeats/).check();
+  await member.getByLabel("How often?").selectOption("weekly");
+  // With an end time too.
+  await member.getByLabel("Ends (optional)").fill("20:00");
   await member.getByRole("button", { name: "Add event", exact: true }).click();
   await expect(member.getByText("Added.")).toBeVisible();
   await expect(
@@ -259,9 +260,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
     "Weekly aarti",
   );
   await expect(form.getByLabel("Starts")).toHaveValue("19:00");
-  await expect(form.getByRole("combobox", { name: /^Repeats/ })).toHaveValue(
-    "weekly",
-  );
+  await expect(form.getByLabel(/^It repeats/)).toBeChecked();
+  await expect(form.getByLabel("How often?")).toHaveValue("weekly");
+  await expect(form.getByLabel("Ends (optional)")).toHaveValue("20:00");
   await form.getByLabel("What's happening?").fill("Weekly sandhya aarti");
   await form.getByLabel("Starts").fill("19:30");
   // It moves to a hired hall while the mandir is being repaired.
@@ -284,6 +285,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   const weeklyId = (await edited.getAttribute("id"))!.replace(/^event-/, "");
   await member.goto(`/mandirs/${SLUG}/events/${weeklyId}`);
   await expect(member.getByText(/^Not at the mandir/)).toBeVisible();
+  // When it ends, as well as when it starts.
+  await expect(
+    member
+      .getByText(/7:30pm – 8pm/)
+      .filter({ visible: true })
+      .first(),
+  ).toBeVisible();
   await expect(
     member.getByRole("link", { name: "Directions" }),
   ).toHaveAttribute("href", /Leicester%20Town%20Hall%20LE1%209BG/);

@@ -309,7 +309,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     ? await supabase!
         .from("events")
         .select(
-          "title, summary, title_gu, summary_gu, kind, starts_at, all_day, recurrence",
+          "title, summary, title_gu, summary_gu, kind, starts_at, ends_at, all_day, recurrence",
         )
         .eq("id", copyId)
         .eq("mandir_id", mandir.id)

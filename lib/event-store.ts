@@ -44,6 +44,7 @@ export async function saveEvent(
       kind: event.kind,
       origin,
       starts_at: event.startsAt.toISOString(),
+      ends_at: event.endsAt?.toISOString() ?? null,
       all_day: event.allDay,
       recurrence: event.rule,
       status: "published",
@@ -66,6 +67,7 @@ export async function saveEvent(
       event.occurrences.map((at) => ({
         event_id: data.id,
         starts_at: at.toISOString(),
+        ends_at: endOf(event, at),
       })),
     );
     if (datesError) {
@@ -95,6 +97,9 @@ export async function updateEvent(
       summary_gu: event.summaryGu ?? "",
       kind: event.kind,
       starts_at: event.startsAt.toISOString(),
+      // Empty clears it; each date's end is its start plus the same
+      // length (the edit_event database function).
+      ends_at: event.endsAt?.toISOString() ?? "",
       all_day: event.allDay,
       recurrence: event.rule ?? "",
       cost_note: event.costNote ?? "",
@@ -108,4 +113,12 @@ export async function updateEvent(
     today: `${londonDate()}T00:00:00Z`,
   });
   return error ? { ok: false, duplicate: duplicateFrom(error) } : { ok: true };
+}
+
+// When one date of a repeating event ends: its start plus the first
+// date's length, so a 7pm–9pm aarti ends at 9pm every time.
+function endOf(event: CheckedEvent, at: Date): string | null {
+  if (!event.endsAt) return null;
+  const length = event.endsAt.getTime() - event.startsAt.getTime();
+  return new Date(at.getTime() + length).toISOString();
 }
