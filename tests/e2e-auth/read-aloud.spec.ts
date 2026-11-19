@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { sql } from "./helpers";
 
 // "Read aloud" uses the phone's own voice. Test browsers have none, so a
-// stand-in records what would be said. Uses a mandir no other test looks
+// stand-in gives the page one. Uses a mandir no other test looks
 // at; the event is added straight to the database.
 const SLUG = "luton-hindu-mandir-shree-sanatan-seva-samaj";
 
@@ -23,9 +23,10 @@ function standInVoice(langs: string[]) {
   })()`;
 }
 
-test("an event's page can be read aloud, in English or Gujarati", async ({
-  browser,
-}) => {
+// Switched off for now (READ_ALOUD_ON in lib/read-aloud.ts): phones' own
+// voices sound too robotic. Even with a voice for the page's language,
+// there's no button on an event's page or a mandir's.
+test("read aloud is switched off for now", async ({ browser }) => {
   const title = `Hanuman Jayanti ${Date.now()}`;
   const id = sql(
     `insert into public.events (mandir_id, title, title_gu, summary, starts_at, status)
@@ -37,39 +38,17 @@ test("an event's page can be read aloud, in English or Gujarati", async ({
   );
   const path = `/mandirs/${SLUG}/events/${id}`;
 
-  const english = await browser.newContext();
-  await english.addInitScript(standInVoice(["en-GB", "gu-IN"]));
-  const page = await english.newPage();
-  await page.goto(path);
-  await page.getByRole("button", { name: "Read aloud" }).click();
-  const spoken = await page.evaluate(
-    () => (window as unknown as { __spoken: { text: string }[] }).__spoken,
-  );
-  const said = spoken.map((s) => s.text).join(" ");
-  expect(said).toContain(`${title}.`);
-  expect(said).toMatch(
-    /(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday) \d+ \w+, 6pm/,
-  );
-  expect(said).toContain("Sundarkand path and prasad.");
-
-  await page.goto(`/gu${path}`);
-  await page.getByRole("button", { name: "મોટેથી વાંચો" }).click();
-  const gujarati = await page.evaluate(
-    () =>
-      (window as unknown as { __spoken: { text: string; lang: string }[] })
-        .__spoken,
-  );
-  expect(gujarati[0]).toEqual({ text: "હનુમાન જયંતી.", lang: "gu-IN" });
-  await english.close();
-
-  // No voice for the page's language: no button.
-  const noGujarati = await browser.newContext();
-  await noGujarati.addInitScript(standInVoice(["en-GB"]));
-  const other = await noGujarati.newPage();
-  await other.goto(`/gu${path}`);
-  await expect(other.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(other.getByRole("button", { name: "મોટેથી વાંચો" })).toHaveCount(
-    0,
-  );
-  await noGujarati.close();
+  const context = await browser.newContext();
+  await context.addInitScript(standInVoice(["en-GB", "gu-IN"]));
+  const page = await context.newPage();
+  for (const [address, button] of [
+    [path, "Read aloud"],
+    [`/gu${path}`, "મોટેથી વાંચો"],
+    [`/mandirs/${SLUG}`, "Read aloud"],
+  ]) {
+    await page.goto(address);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("button", { name: button })).toHaveCount(0);
+  }
+  await context.close();
 });

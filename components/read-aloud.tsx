@@ -4,7 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { actionPillClass } from "@/components/ui";
 import { useLocale, useT } from "@/components/use-t";
 import { enRead } from "@/lib/i18n/client/read";
-import { pickVoice, sentences } from "@/lib/read-aloud";
+import { pickVoice, READ_ALOUD_ON, sentences } from "@/lib/read-aloud";
 
 const SPEECH_LANGS = { en: "en-GB", gu: "gu-IN", hi: "hi-IN" } as const;
 
@@ -21,7 +21,8 @@ function subscribe(update: () => void) {
 }
 
 // "Read aloud": the page's main details, spoken by the phone in the
-// page's language. Shown only when the phone has a voice for it.
+// page's language. Shown only when the phone has a voice for it, and
+// while it's switched on (READ_ALOUD_ON, off for now).
 export function ReadAloud({ text }: { text: string }) {
   const t = useT(enRead);
   const lang = SPEECH_LANGS[useLocale()];
@@ -35,7 +36,7 @@ export function ReadAloud({ text }: { text: string }) {
   // Stop when leaving the page.
   useEffect(() => () => speech()?.cancel(), []);
 
-  if (!hasVoice) return null;
+  if (!READ_ALOUD_ON || !hasVoice) return null;
 
   function start() {
     const synth = speech();
