@@ -53,10 +53,12 @@ export async function latestLoginCode(email: string): Promise<string> {
 }
 
 // Opens a login email's link, then presses "Log in" on the page it leads
-// to (the link alone logs nobody in: app/(public)/login/confirm).
+// to (the link alone logs nobody in: app/(public)/login/confirm), and waits
+// until it's done: logged in and on the next page, or turned back.
 export async function followLoginLink(page: Page, link: string) {
   await page.goto(link);
   await page.getByRole("button", { name: "Log in", exact: true }).click();
+  await page.waitForURL((url) => url.pathname !== "/login/confirm");
 }
 
 export function sql(query: string): string {
