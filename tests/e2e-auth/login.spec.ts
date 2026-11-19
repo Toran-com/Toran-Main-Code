@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { latestLoginLink, logIn, sql, totp } from "./helpers";
+import {
+  followLoginLink,
+  latestLoginCode,
+  latestLoginLink,
+  logIn,
+  sql,
+  totp,
+} from "./helpers";
 
 // Runs against a real local Supabase (see the Database workflow): real login
 // emails, real sessions, real second factor.
@@ -25,9 +32,54 @@ test("a login link only works once", async ({ page, browser }) => {
   await expect(page).toHaveURL(/\/account$/);
   const link = await latestLoginLink(email);
   const other = await browser.newPage();
-  await other.goto(link);
+  await followLoginLink(other, link);
   await expect(other).toHaveURL(/\/login\?error=link/);
   await other.close();
+});
+
+// Email programs and their virus checkers often open links before the
+// person does. Opening the link only shows a "Log in" button, so it still
+// works when the person gets to it.
+test("opening the link alone doesn't log in or use it up", async ({
+  browser,
+}) => {
+  const email = `scanned-${Date.now()}@example.com`;
+  const page = await browser.newPage();
+  await page.goto("/login");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByRole("button", { name: "Email me a login link" }).click();
+  await expect(page.getByText("Check your email")).toBeVisible();
+  const link = await latestLoginLink(email);
+
+  const scanner = await browser.newPage();
+  await scanner.goto(link);
+  await expect(scanner).toHaveURL(/\/login\/confirm\?/);
+  await scanner.goto("/account");
+  await expect(scanner).toHaveURL(/\/login\?next=%2Faccount/);
+  await scanner.close();
+
+  await followLoginLink(page, link);
+  await expect(page).toHaveURL(/\/account$/);
+  await expect(page.getByText(email)).toBeVisible();
+  await page.close();
+});
+
+test("the code in the email logs in too", async ({ page }) => {
+  const email = `code-${Date.now()}@example.com`;
+  await page.goto("/login?next=%2Faccount");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByRole("button", { name: "Email me a login link" }).click();
+  await expect(page.getByText("Check your email")).toBeVisible();
+  const code = await latestLoginCode(email);
+  const box = page.getByLabel("Or type the 6-digit code from the email");
+  // A wrong code is turned back.
+  await box.fill(code === "000000" ? "111111" : "000000");
+  await page.getByRole("button", { name: "Log in with the code" }).click();
+  await expect(page.getByText("That code didn't work.")).toBeVisible();
+  await page.getByLabel("Or type the 6-digit code from the email").fill(code);
+  await page.getByRole("button", { name: "Log in with the code" }).click();
+  await expect(page).toHaveURL(/\/account$/);
+  await expect(page.getByText(email)).toBeVisible();
 });
 
 test("a non-admin can't see that the admin area exists", async ({ page }) => {

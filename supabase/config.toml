@@ -232,7 +232,9 @@ max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+# Toran's login emails work for 24 hours, the most Supabase allows: people
+# often open them later. Set the same in the live project (supabase/README.md).
+otp_expiry = 86400
 
 # Use a production-ready SMTP server
 # [auth.email.smtp]
@@ -253,11 +255,11 @@ otp_expiry = 3600
 # The live project's templates are set in the Supabase dashboard; see
 # supabase/README.md.
 [auth.email.template.magic_link]
-subject = "Your Toran login link"
+subject = "Log in to Toran"
 content_path = "./supabase/templates/login.html"
 
 [auth.email.template.confirmation]
-subject = "Your Toran login link"
+subject = "Log in to Toran"
 content_path = "./supabase/templates/login.html"
 
 # Uncomment to customize notification email template

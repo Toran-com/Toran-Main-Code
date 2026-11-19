@@ -9,6 +9,7 @@ import {
   Notice,
   quietButtonClass,
 } from "@/components/ui";
+import { LoginCode } from "@/components/login-code";
 import { PageShell } from "@/components/page-shell";
 import { getCurrentUser } from "@/lib/auth";
 import { listMandirs } from "@/lib/directory";
@@ -34,7 +35,10 @@ const ERRORS: Record<string, string> = {
   email:
     "That doesn't look like an email address. Please check it and try again.",
   send: "We couldn't send the email just now. Please try again in a minute.",
-  "slow-down": "Too many emails were requested. Please wait a few minutes.",
+  "slow-down":
+    "We've just sent an email to that address. Look for it in your inbox and your junk or spam folder, or ask again in a minute.",
+  "code-expired":
+    "That code has run out, or was asked for on another device. Enter your email again for a new one.",
   unavailable: "Creating accounts isn't switched on yet.",
 };
 
@@ -76,15 +80,13 @@ async function Join({ searchParams }: PageProps<"/join">) {
     return (
       <Card>
         <Notice tone="success">
-          Check your email. Press the link in it to carry on.
-        </Notice>
-        <p className="text-muted">
-          It can take a minute to arrive; check your spam folder too. The link
-          works once and expires after an hour. Then you&apos;ll{" "}
+          Check your email. Press the link in it, or type its code below, to
+          carry on. Then you&apos;ll{" "}
           {chosen
             ? `say what you do at ${chosen.name}.`
             : "choose your mandir."}
-        </p>
+        </Notice>
+        <LoginCode next={next} from="join" wrong={query.error === "code"} />
         <Link href={here} className="text-peacock font-semibold underline">
           Use a different email
         </Link>

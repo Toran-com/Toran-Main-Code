@@ -27,13 +27,30 @@ them in `.env.local` to point the app at the local database.
 
 ## Login emails
 
-`templates/login.html` is the email with the login link, in Toran's look.
-`config.toml` uses it for the local stack. The hosted projects keep their
-email templates in the Supabase dashboard, so after changing it, paste it in
-by hand for each project: **Authentication → Email Templates**, for both
-**Magic link** and **Confirm signup**, with the subject "Your Toran login
-link". Keep the button the first link in the email: the end-to-end tests
-follow the first link.
+`templates/login.html` is the email with the login link and code, in
+Toran's look. `config.toml` uses it for the local stack. The hosted projects
+keep their email settings in the Supabase dashboard, so set them by hand for
+each project:
+
+1. **Authentication → Emails → SMTP Settings**: turn on custom SMTP, so the
+   emails come from Toran's own address through Resend rather than
+   Supabase's shared one (which often lands in junk, and only sends a few
+   emails an hour). Host `smtp.resend.com`, port `465`, username `resend`,
+   password a Resend API key (resend.com → API Keys, typed in yourself),
+   sender email `login@toran.org.uk`, sender name `Toran`. toran.org.uk is
+   already verified in Resend.
+2. **Authentication → Email Templates**: paste `templates/login.html` into
+   both **Magic link** and **Confirm signup**, with the subject "Log in to
+   Toran". Keep the button the first link in the email: the end-to-end
+   tests follow the first link. Its link leads to `/auth/confirm` with a
+   `token_hash`, then to a page with a "Log in" button, so email programs
+   that open links to check them can't use it up; its code can be typed in
+   instead.
+3. **Authentication → Sign In / Providers → Email**: **Email OTP
+   Expiration** `86400` (24 hours, the most allowed), as the email says.
+4. **Authentication → Rate Limits**: emails sent per hour about `100`
+   (only possible once custom SMTP is on). It's for the whole site, so a
+   small number stops people logging in on a busy day.
 
 ## How changes reach the real database
 

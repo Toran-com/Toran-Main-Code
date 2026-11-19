@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { latestLoginLink, logInAsAdmin, sql } from "./helpers";
+import { followLoginLink, latestLoginLink, logInAsAdmin, sql } from "./helpers";
 
 // Creating a committee account: log in, choose your mandir by searching,
 // and ask to look after its page. Uses a mandir no other test looks at.
@@ -21,7 +21,7 @@ test("a new committee member finds their mandir and asks to look after it", asyn
   await expect(page).toHaveURL(/\/join\?sent=1/);
   await expect(page.getByText("Check your email.")).toBeVisible();
   // The link in the email creates the account and carries on.
-  await page.goto(await latestLoginLink(email));
+  await followLoginLink(page, await latestLoginLink(email));
   await expect(page).toHaveURL(/\/join\/mandir$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Choose your mandir",
@@ -98,7 +98,7 @@ test("a join link for one mandir skips choosing it", async ({
     phone.getByText(/say what you do at Chelmsford Hindu Society/),
   ).toBeVisible();
   // The email's link goes straight to asking for that mandir's page.
-  await phone.goto(await latestLoginLink(email));
+  await followLoginLink(phone, await latestLoginLink(email));
   await expect(phone).toHaveURL(new RegExp(`/mandirs/${slug}/claim$`));
   await phone.close();
 

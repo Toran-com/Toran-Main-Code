@@ -31,6 +31,34 @@ export async function latestLoginLink(email: string): Promise<string> {
   throw new Error(`No login email arrived for ${email}`);
 }
 
+// The 6-digit code in the newest login email to an address.
+export async function latestLoginCode(email: string): Promise<string> {
+  for (let i = 0; i < 30; i++) {
+    const list = await (
+      await fetch(
+        `${MAILPIT}/api/v1/search?query=to:${encodeURIComponent(email)}`,
+      )
+    ).json();
+    const first = list.messages?.[0];
+    if (first) {
+      const message = await (
+        await fetch(`${MAILPIT}/api/v1/message/${first.ID}`)
+      ).json();
+      const match = String(message.HTML ?? "").match(/>\s*(\d{6,10})\s*</);
+      if (match) return match[1];
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(`No login code arrived for ${email}`);
+}
+
+// Opens a login email's link, then presses "Log in" on the page it leads
+// to (the link alone logs nobody in: app/(public)/login/confirm).
+export async function followLoginLink(page: Page, link: string) {
+  await page.goto(link);
+  await page.getByRole("button", { name: "Log in", exact: true }).click();
+}
+
 export function sql(query: string): string {
   return execFileSync("psql", [DB_URL, "-qtA", "-c", query]).toString().trim();
 }
@@ -59,7 +87,7 @@ export async function logIn(page: Page, email: string, next = "/account") {
   await expect(
     page.getByText("Check your email for a login link"),
   ).toBeVisible();
-  await page.goto(await latestLoginLink(email));
+  await followLoginLink(page, await latestLoginLink(email));
 }
 
 // Makes a fresh login a Toran admin with an authenticator app, unlocked.

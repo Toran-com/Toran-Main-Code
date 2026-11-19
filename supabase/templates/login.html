@@ -3,22 +3,46 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Your Toran login link</title>
+    <meta name="color-scheme" content="light only" />
+    <title>Log in to Toran</title>
   </head>
   <!--
     Toran's login email: the one people get when they log in, or join, with
     their email address. Used for both Supabase templates ("Magic link" and
-    "Confirm signup"). Email apps ignore most CSS, so everything is inline
-    styles in tables, with no pictures or web fonts. The login button must
-    stay the first link in the email: the end-to-end tests read it.
+    "Confirm signup"); see supabase/README.md for pasting it into the live
+    project. Email apps ignore most CSS, so everything is inline styles in
+    tables, with one small picture (the logo, from the site) and no web
+    fonts.
+
+    Two ways in, both good for 24 hours (the project's OTP expiry):
+    - The button leads to Toran's own page (/auth/confirm, then
+      /login/confirm), which asks for one more press before logging in, so
+      email programs that open links to check them can't use it up.
+    - The 6-digit code, typed into the page that asked for the email.
+
+    The login button must stay the first link in the email: the end-to-end
+    tests follow it.
   -->
-  <body style="margin: 0; padding: 0; background: #faf8f4">
+  <body style="margin: 0; padding: 0; background: #f6f4ef">
+    <!-- The preview line email apps show under the subject. -->
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        font-size: 1px;
+        line-height: 1px;
+        color: #f6f4ef;
+      "
+    >
+      Your login link and code for Toran. They work for 24 hours.
+    </div>
     <table
       role="presentation"
       width="100%"
       cellpadding="0"
       cellspacing="0"
-      style="background: #faf8f4"
+      style="background: #f6f4ef"
     >
       <tr>
         <td align="center" style="padding: 32px 16px">
@@ -34,12 +58,47 @@
               border-radius: 24px;
             "
           >
+            <!-- The header: midnight, with the gold mark and name. -->
             <tr>
               <td
                 style="
-                  height: 10px;
-                  background: #0a3b3a;
+                  background: #14213d;
                   border-radius: 24px 24px 0 0;
+                  padding: 24px 36px;
+                "
+              >
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="padding-right: 14px; vertical-align: middle">
+                      <img
+                        src="https://toran.org.uk/icons/icon-192.png"
+                        width="44"
+                        height="44"
+                        alt=""
+                        style="display: block; border: 0; border-radius: 10px"
+                      />
+                    </td>
+                    <td
+                      style="
+                        vertical-align: middle;
+                        font-family:
+                          Georgia, &quot;Times New Roman&quot;, serif;
+                        font-size: 28px;
+                        letter-spacing: 4px;
+                        color: #f6f4ef;
+                      "
+                    >
+                      TORAN
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td
+                style="
+                  height: 4px;
+                  background: #d9a441;
                   font-size: 0;
                   line-height: 0;
                 "
@@ -52,39 +111,12 @@
                 style="
                   padding: 32px 36px 8px;
                   font-family: Georgia, &quot;Times New Roman&quot;, serif;
-                  font-size: 32px;
-                  line-height: 1;
-                  color: #1b1a2c;
-                "
-              >
-                Toran
-              </td>
-            </tr>
-            <tr>
-              <td
-                style="
-                  padding: 0 36px;
-                  font-family: Arial, Helvetica, sans-serif;
-                  font-size: 18px;
-                  line-height: 1.5;
-                  color: #8a5a00;
-                  font-weight: bold;
-                "
-              >
-                What&rsquo;s on at mandirs near you
-              </td>
-            </tr>
-            <tr>
-              <td
-                style="
-                  padding: 28px 36px 8px;
-                  font-family: Georgia, &quot;Times New Roman&quot;, serif;
                   font-size: 30px;
                   line-height: 1.2;
-                  color: #1b1a2c;
+                  color: #1a1a22;
                 "
               >
-                Your login link
+                Log in to Toran
               </td>
             </tr>
             <tr>
@@ -94,20 +126,22 @@
                   font-family: Arial, Helvetica, sans-serif;
                   font-size: 18px;
                   line-height: 1.6;
-                  color: #1b1a2c;
+                  color: #1a1a22;
                 "
               >
-                Press the button to log in to Toran. No password needed.
+                Namaste. You asked to log in to Toran with this email address.
+                Press the button and you&rsquo;re in: there&rsquo;s no password
+                to remember.
               </td>
             </tr>
             <tr>
               <td style="padding: 0 36px 28px">
                 <a
-                  href="{{ .ConfirmationURL }}"
+                  href="{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email"
                   style="
                     display: inline-block;
-                    padding: 16px 32px;
-                    background: #0b6b68;
+                    padding: 16px 36px;
+                    background: #1f3a8a;
                     color: #ffffff;
                     border-radius: 999px;
                     font-family: Arial, Helvetica, sans-serif;
@@ -122,16 +156,78 @@
             <tr>
               <td
                 style="
-                  padding: 0 36px 32px;
+                  padding: 0 36px 8px;
                   font-family: Arial, Helvetica, sans-serif;
                   font-size: 18px;
                   line-height: 1.6;
-                  color: #5d5a6e;
+                  color: #55566a;
                 "
               >
-                The link works once and stops working after an hour. If you
+                Or type this code on the page you came from:
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0 36px 28px">
+                <div
+                  style="
+                    display: inline-block;
+                    padding: 12px 24px;
+                    background: #f6f4ef;
+                    border: 1px solid #e6e2d9;
+                    border-radius: 14px;
+                    font-family: &quot;Courier New&quot;, Courier, monospace;
+                    font-size: 32px;
+                    font-weight: bold;
+                    letter-spacing: 8px;
+                    color: #1a1a22;
+                  "
+                >
+                  {{ .Token }}
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td
+                style="
+                  padding: 0 36px 28px;
+                  font-family: Arial, Helvetica, sans-serif;
+                  font-size: 18px;
+                  line-height: 1.6;
+                  color: #55566a;
+                "
+              >
+                The link and the code work once, for 24 hours. If you
                 didn&rsquo;t ask to log in, you can ignore this email: nobody
                 can log in without it.
+              </td>
+            </tr>
+            <!-- What Toran is, for anyone who's forgotten. -->
+            <tr>
+              <td style="padding: 0 36px 32px">
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="background: #f6f4ef; border-radius: 16px"
+                >
+                  <tr>
+                    <td
+                      style="
+                        padding: 20px 24px;
+                        font-family: Arial, Helvetica, sans-serif;
+                        font-size: 17px;
+                        line-height: 1.6;
+                        color: #1a1a22;
+                      "
+                    >
+                      <strong>What&rsquo;s on at mandirs near you.</strong>
+                      Toran puts UK mandirs&rsquo; festivals, aartis, classes
+                      and seva in one place, so families can find them and share
+                      them on WhatsApp. It&rsquo;s free for mandirs.
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>
@@ -147,13 +243,18 @@
                 style="
                   padding: 20px 36px 0;
                   font-family: Arial, Helvetica, sans-serif;
-                  font-size: 18px;
+                  font-size: 17px;
                   line-height: 1.5;
-                  color: #5d5a6e;
+                  color: #55566a;
                 "
               >
-                Toran helps families find what&rsquo;s on at mandirs across the
-                UK, and helps mandir committees share their events.
+                You&rsquo;re getting this email because someone asked to log in
+                to Toran (toran.org.uk) with this address. Questions? Use the
+                <a
+                  href="https://toran.org.uk/contact"
+                  style="color: #1f3a8a; text-decoration: underline"
+                  >contact page</a
+                >.
               </td>
             </tr>
           </table>
