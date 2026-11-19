@@ -2,6 +2,11 @@
 // synthesis): nothing is sent anywhere. Long text is read a sentence at a
 // time, as some browsers stop part-way through a long one.
 
+// Switched off for now: phones' own voices sound too robotic for mandir
+// and event pages. Everything else here is kept, so turning this back on
+// (components/read-aloud.tsx shows the button again) is all it takes.
+export const READ_ALOUD_ON = false;
+
 export function sentences(text: string): string[] {
   return text
     .split(/(?<=[.!?।])\s+|\n+/)
