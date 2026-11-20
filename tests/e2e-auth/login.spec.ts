@@ -71,12 +71,12 @@ test("the code in the email logs in too", async ({ page }) => {
   await page.getByRole("button", { name: "Email me a login link" }).click();
   await expect(page.getByText("Check your email")).toBeVisible();
   const code = await latestLoginCode(email);
-  const box = page.getByLabel("Or type the 6-digit code from the email");
+  const box = page.getByLabel("Or type the code from the email");
   // A wrong code is turned back.
   await box.fill(code === "000000" ? "111111" : "000000");
   await page.getByRole("button", { name: "Log in with the code" }).click();
   await expect(page.getByText("That code didn't work.")).toBeVisible();
-  await page.getByLabel("Or type the 6-digit code from the email").fill(code);
+  await page.getByLabel("Or type the code from the email").fill(code);
   await page.getByRole("button", { name: "Log in with the code" }).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(page.getByText(email)).toBeVisible();

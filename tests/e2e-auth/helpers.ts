@@ -31,7 +31,7 @@ export async function latestLoginLink(email: string): Promise<string> {
   throw new Error(`No login email arrived for ${email}`);
 }
 
-// The 6-digit code in the newest login email to an address.
+// The code in the newest login email to an address.
 export async function latestLoginCode(email: string): Promise<string> {
   for (let i = 0; i < 30; i++) {
     const list = await (

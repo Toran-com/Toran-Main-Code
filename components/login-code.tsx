@@ -2,7 +2,7 @@ import { logInWithCode } from "@/app/(public)/login/actions";
 import { buttonClass, inputClass, Notice } from "@/components/ui";
 
 // After the login email is sent: what to do with it, and a box for the
-// 6-digit code in it, for anyone who'd rather type the code than press
+// code in it (6 to 10 digits, as the project is set up), for anyone who'd rather type the code than press
 // the link (or reads email on another device). On "Log in" and "Create
 // an account" (/join).
 export function LoginCode({
@@ -18,8 +18,13 @@ export function LoginCode({
   return (
     <div className="flex flex-col gap-4">
       <p className="text-muted">
-        It can take a minute to arrive. If it isn&apos;t in your inbox, look in
-        your junk or spam folder. The email works for 24 hours.
+        It comes from <strong>Toran</strong> (hello@toran.org.uk) and can take a
+        minute to arrive. The email works for 24 hours.
+      </p>
+      <p className="border-marigold/40 bg-marigold/10 rounded-2xl border px-4 py-3">
+        <strong>Not in your inbox?</strong> Look in your junk or spam folder. If
+        it&apos;s there, mark it <strong>Not spam</strong> (or{" "}
+        <strong>Not junk</strong>), so the next one comes to your inbox.
       </p>
       <form action={logInWithCode} className="flex flex-col gap-3">
         <input type="hidden" name="next" value={next} />
@@ -31,7 +36,7 @@ export function LoginCode({
           </Notice>
         )}
         <label className="flex flex-col gap-2 font-semibold">
-          Or type the 6-digit code from the email
+          Or type the code from the email
           <input
             className={`${inputClass} max-w-[14rem] text-2xl tracking-[0.3em]`}
             name="code"
