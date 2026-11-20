@@ -223,12 +223,41 @@ export type SevaShift = Pick<
 >;
 export type SevaRole = Pick<
   Row<"seva_roles">,
-  "id" | "name" | "description" | "needs_dbs"
+  "id" | "name" | "description" | "needs_dbs" | "open"
 > & { shifts: SevaShift[] };
+// `open`: whether any of it can be taken on Toran.
 export type EventSeva = { open: boolean; roles: SevaRole[] };
 
-// An event's seva rota, with how many places are taken, for its public
-// seva page. Refreshed with the mandir's other pages when the committee
+const SEVA_COLUMNS =
+  "id, name, description, needs_dbs, open, created_at, mandir:mandirs!inner (slug), seva_shifts (id, starts_at, ends_at, needed, filled_offline, taken_online)";
+
+function sevaRoles(
+  rows: {
+    id: string;
+    name: string;
+    description: string | null;
+    needs_dbs: boolean;
+    open: boolean;
+    created_at: string;
+    seva_shifts: SevaShift[];
+  }[],
+): SevaRole[] {
+  return [...rows]
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      needs_dbs: r.needs_dbs,
+      open: r.open,
+      shifts: [...r.seva_shifts].sort((a, b) =>
+        a.starts_at.localeCompare(b.starts_at),
+      ),
+    }));
+}
+
+// An event's seva, with how many places are taken, for its public seva
+// page. Refreshed with the mandir's other pages when the committee
 // changes it or a volunteer takes a slot.
 export async function getEventSeva(
   slug: string,
@@ -241,27 +270,74 @@ export async function getEventSeva(
   if (db === null) return settle<never>(notConnected);
   if (db === "misconfigured") return settle<never>(unavailable);
   const { data, error } = await db
-    .from("events")
-    .select(
-      "seva_open, mandir:mandirs!inner (slug), seva_roles (id, name, description, needs_dbs, created_at, seva_shifts (id, starts_at, ends_at, needed, filled_offline, taken_online))",
-    )
-    .eq("id", eventId)
+    .from("seva_roles")
+    .select(SEVA_COLUMNS)
+    .eq("event_id", eventId)
+    .eq("mandir.slug", slug);
+  if (error) return settle<never>(unavailable);
+  const roles = sevaRoles(data);
+  return settle({
+    state: "ok",
+    data: { open: roles.some((r) => r.open), roles },
+  });
+}
+
+// A seva that isn't for an event, for its own public page. `eventId` is
+// set when it has since been linked to an event, whose seva page it's on;
+// `upcoming` is false once every shift has ended.
+export async function getOwnSeva(
+  slug: string,
+  sevaId: string,
+): Promise<
+  Loaded<{ role: SevaRole; eventId: string | null; upcoming: boolean } | null>
+> {
+  "use cache";
+  cacheTag("mandirs", `mandir:${slug}`);
+  if (!UUID.test(sevaId)) return settle({ state: "ok", data: null });
+  const db = connect();
+  if (db === null) return settle<never>(notConnected);
+  if (db === "misconfigured") return settle<never>(unavailable);
+  const { data, error } = await db
+    .from("seva_roles")
+    .select(`event_id, ${SEVA_COLUMNS}`)
+    .eq("id", sevaId)
     .eq("mandir.slug", slug)
     .maybeSingle();
   if (error) return settle<never>(unavailable);
   if (!data) return settle({ state: "ok", data: null });
-  const roles = [...data.seva_roles]
-    .sort((a, b) => a.created_at.localeCompare(b.created_at))
-    .map((r) => ({
-      id: r.id,
-      name: r.name,
-      description: r.description,
-      needs_dbs: r.needs_dbs,
-      shifts: [...r.seva_shifts].sort((a, b) =>
-        a.starts_at.localeCompare(b.starts_at),
-      ),
-    }));
-  return settle({ state: "ok", data: { open: data.seva_open, roles } });
+  const [role] = sevaRoles([data]);
+  const now = new Date().toISOString();
+  return settle({
+    state: "ok",
+    data: {
+      role,
+      eventId: data.event_id,
+      upcoming: role.shifts.some((s) => s.ends_at > now),
+    },
+  });
+}
+
+// Seva on its own that volunteers can take, at every mandir, for its
+// pages' static params.
+export async function listOwnSeva(): Promise<
+  Loaded<{ id: string; slug: string }[]>
+> {
+  "use cache";
+  cacheTag("mandirs", "seva");
+  const db = connect();
+  if (db === null) return settle<never>(notConnected);
+  if (db === "misconfigured") return settle<never>(unavailable);
+  const { data, error } = await db
+    .from("seva_roles")
+    .select("id, mandir:mandirs!inner (slug)")
+    .is("event_id", null)
+    .eq("open", true)
+    .limit(1000);
+  if (error) return settle<never>(unavailable);
+  return settle({
+    state: "ok",
+    data: data.map((r) => ({ id: r.id, slug: r.mandir.slug })),
+  });
 }
 
 export async function listFestivalDates(): Promise<Loaded<FestivalDate[]>> {

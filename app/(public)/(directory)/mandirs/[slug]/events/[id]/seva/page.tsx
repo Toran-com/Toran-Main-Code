@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Badge, LoadProblem } from "@/components/public-shell";
+import { LoadProblem } from "@/components/public-shell";
+import { SevaRoleCard } from "@/components/seva-rota";
 import { ShareButtons } from "@/components/share-buttons";
-import { Card } from "@/components/ui";
 import {
   getEventSeva,
   getMandir,
@@ -11,15 +11,15 @@ import {
   listMandirs,
 } from "@/lib/directory";
 import { formatEventStart } from "@/lib/format";
-import { placesTaken, shiftLabel } from "@/lib/seva";
+import { placesTaken } from "@/lib/seva";
 import { eventPath, sevaPath } from "@/lib/share";
 import { pageMetadata, pageTitle } from "@/lib/site";
-import { MySlots, TakeSlot } from "@/components/seva-slots";
+import { MySlots } from "@/components/seva-slots";
 import { localePath, pageT } from "@/lib/i18n/page";
 
-// An event's seva rota for volunteers: what's needed, how many places are
-// taken, and (if the committee has turned it on) "Take this slot", with no
-// name asked (decision 0013). Static like the event page; refreshed when
+// An event's seva for volunteers: what's needed, how many places are
+// taken, and (for each seva the committee has opened) "Take this slot",
+// with no name asked (decision 0013). Static like the event page; refreshed when
 // the committee changes the rota or someone takes a slot.
 export const ensureStatic = "navigation";
 
@@ -79,11 +79,14 @@ export default async function SevaPage({
   const { mandir, event, upcoming } = result.data;
   const roles = seva.data.roles.filter((r) => r.shifts.length);
   if (!roles.length) notFound();
-  const open = seva.data.open && upcoming && event.status !== "cancelled";
+  // Places can be taken while the event is still to come and on, for
+  // each seva the committee has opened.
+  const live = upcoming && event.status !== "cancelled";
+  const open = live && roles.some((r) => r.open);
   const place = [mandir.name, mandir.town, mandir.postcode]
     .filter(Boolean)
     .join(", ");
-  const shifts = roles.flatMap((r) => (r.needs_dbs ? [] : r.shifts));
+  const shifts = roles.flatMap((r) => (r.needs_dbs || !r.open ? [] : r.shifts));
   const taken = shifts.reduce((n, s) => n + placesTaken(s), 0);
   const needed = shifts.reduce((n, s) => n + s.needed, 0);
 
@@ -118,66 +121,16 @@ export default async function SevaPage({
       <MySlots slug={mandir.slug} event={event.id} />
 
       {roles.map((role) => (
-        <Card key={role.id}>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-2xl font-bold">{role.name}</h2>
-            {role.needs_dbs && (
-              <Badge tone="marigold">{t("seva.dbsNeeded")}</Badge>
-            )}
-          </div>
-          {role.description && <p className="text-muted">{role.description}</p>}
-          <ul className="flex flex-col gap-3">
-            {role.shifts.map((shift) => {
-              const done = placesTaken(shift);
-              const full = done >= shift.needed;
-              const label = shiftLabel(shift.starts_at, shift.ends_at);
-              return (
-                <li
-                  key={shift.id}
-                  className="border-line flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3"
-                >
-                  <div className="flex min-w-48 flex-1 flex-col gap-1">
-                    <span className="font-semibold">{label}</span>
-                    <span
-                      className="bg-sunk h-2.5 overflow-hidden rounded-full"
-                      aria-hidden="true"
-                    >
-                      <span
-                        className={`block h-full rounded-full ${full ? "bg-peacock" : "bg-marigold"}`}
-                        style={{ width: `${(done / shift.needed) * 100}%` }}
-                      />
-                    </span>
-                    <span className="text-muted text-base">
-                      {t("seva.shiftTaken", { done, needed: shift.needed })}
-                    </span>
-                  </div>
-                  {open && !role.needs_dbs && (
-                    <TakeSlot
-                      slug={mandir.slug}
-                      full={full}
-                      details={{
-                        shift: shift.id,
-                        event: event.id,
-                        role: role.name,
-                        label,
-                        starts_at: shift.starts_at,
-                        ends_at: shift.ends_at,
-                        title: event.title,
-                        place,
-                        path: localePath(sevaPath(mandir.slug, event.id)),
-                      }}
-                    />
-                  )}
-                  {open && role.needs_dbs && (
-                    <p className="text-muted text-base">
-                      {t("seva.askCommittee")}
-                    </p>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </Card>
+        <SevaRoleCard
+          key={role.id}
+          role={role}
+          open={live && role.open}
+          slug={mandir.slug}
+          group={event.id}
+          title={event.title}
+          place={place}
+          path={localePath(sevaPath(mandir.slug, event.id))}
+        />
       ))}
 
       {open && (

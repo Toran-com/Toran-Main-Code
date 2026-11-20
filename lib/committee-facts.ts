@@ -10,44 +10,42 @@ import { placesTaken } from "@/lib/seva";
 type Db = SupabaseClient<Database>;
 
 // Seva shifts in the next fortnight with places still free, for the
-// committee's to-do list. Shifts that need a DBS check are left out:
-// those are filled by the mandir, not shared.
+// committee's to-do list, soonest first. Shifts that need a DBS check are
+// left out: those are filled by the mandir, not shared.
 export const SEVA_WITHIN_DAYS = 14;
 
 export async function shortSevaShifts(
   db: Db,
-  events: { id: string; title: string }[],
+  mandirId: string,
   now: Date = new Date(),
 ): Promise<CommitteeFacts["shortShifts"]> {
-  if (!events.length) return [];
   const until = new Date(now.getTime() + SEVA_WITHIN_DAYS * 86_400_000);
   const { data } = await db
     .from("seva_shifts")
     .select(
-      "starts_at, needed, filled_offline, taken_online, role:seva_roles!inner (event_id, needs_dbs)",
+      "starts_at, needed, filled_offline, taken_online, role:seva_roles!inner (id, name, mandir_id, needs_dbs, event:events (id, title, status))",
     )
-    .in(
-      "role.event_id",
-      events.map((e) => e.id),
-    )
+    .eq("role.mandir_id", mandirId)
     .eq("role.needs_dbs", false)
     .gte("starts_at", now.toISOString())
     .lte("starts_at", until.toISOString())
     .order("starts_at");
-  const titles = new Map(events.map((e) => [e.id, e.title]));
   return (data ?? []).flatMap((s) => {
     const free = s.needed - placesTaken(s);
-    const eventId = s.role?.event_id;
-    return free > 0 && eventId && titles.has(eventId)
-      ? [
-          {
-            eventId,
-            eventTitle: titles.get(eventId)!,
-            starts_at: s.starts_at,
-            free,
-          },
-        ]
-      : [];
+    const role = s.role;
+    if (free <= 0 || !role) return [];
+    // Seva for an event that's been removed or cancelled isn't asked for.
+    if (role.event && !["published", "draft"].includes(role.event.status)) {
+      return [];
+    }
+    return [
+      {
+        group: role.event?.id ?? role.id,
+        title: role.event?.title ?? role.name,
+        starts_at: s.starts_at,
+        free,
+      },
+    ];
   });
 }
 
@@ -121,7 +119,7 @@ export async function loadCommitteeFacts(
     festivals: festivalPicks(dates ?? [], mandir.calendar, events, today).map(
       (p) => ({ title: p.title, date: p.date }),
     ),
-    shortShifts: await shortSevaShifts(db, events, now),
+    shortShifts: await shortSevaShifts(db, mandir.id, now),
     eventsEver: Math.max(eventsEver ?? 0, events.length),
     members: members?.length ?? 1,
     invites: invites?.length ?? 0,

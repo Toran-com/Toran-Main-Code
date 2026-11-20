@@ -61,6 +61,13 @@ test("the seva rota of an event at an unknown mandir is not found", async ({
   expect(response?.status()).toBe(404);
 });
 
+test("seva on its own at an unknown mandir is not found", async ({ page }) => {
+  const response = await page.goto(
+    "/mandirs/no-such-mandir/seva/00000000-0000-0000-0000-000000000000",
+  );
+  expect(response?.status()).toBe(404);
+});
+
 test("the home page links to the directory", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Browse mandirs" }).click();

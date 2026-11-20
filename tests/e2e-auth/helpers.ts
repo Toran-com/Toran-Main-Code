@@ -168,7 +168,7 @@ export async function addEventsBy(page: Page, way: string) {
 }
 
 // On a committee's page: opens the sheet of things to do with one of the
-// events coming up (Still on, Cancel, Duplicate, Seva rota, Remove).
+// events coming up (Still on, Cancel, Duplicate, Add seva, Remove).
 export async function eventMenu(page: Page, title: string) {
   await page
     .getByRole("button", { name: new RegExp(`^More for ${escape(title)}`) })

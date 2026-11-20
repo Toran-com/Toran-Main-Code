@@ -78,23 +78,25 @@ test("a committee's pages are accessible", async ({ page }) => {
       .getByRole("link", { name: /Accessibility check/ }),
   ).toBeVisible();
   await expectAccessible(page);
-  await page.goto(`/manage/${slug}/seva/${event}`);
+  // The seva page, with the add form open for this event.
+  await page.goto(`/manage/${slug}/seva?event=${event}`);
+  await expect(page.getByRole("dialog", { name: "Add seva" })).toBeVisible();
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/events/${event}`);
   await expectAccessible(page);
   await page.goto(`/manage/${slug}/numbers`);
   await expectAccessible(page);
-  // Give it a seva rota open for volunteers (before its pages are first
-  // seen, as they are saved).
+  // Give it seva open for volunteers (before its pages are first seen, as
+  // they are saved).
   sql(
     `with role as (
-       insert into public.seva_roles (event_id, name)
-         values ('${event}', 'Kitchen') returning id)
+       insert into public.seva_roles (mandir_id, event_id, name, open)
+         select mandir_id, id, 'Kitchen', true from public.events
+         where id = '${event}' returning id)
      insert into public.seva_shifts (role_id, starts_at, ends_at, needed, filled_offline)
        select id, now() + interval '3 days', now() + interval '3 days 3 hours', 4, 1
        from role`,
   );
-  sql(`update public.events set seva_open = true where id = '${event}'`);
   // The event's own public page.
   await page.goto(`/mandirs/${slug}/events/${event}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(

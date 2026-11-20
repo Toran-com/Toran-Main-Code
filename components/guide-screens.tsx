@@ -403,9 +403,9 @@ export function RepeatsScreen() {
 
 // An event's ⋯ menu.
 export function MenuScreen() {
-  const rows = ["Edit", "Still on", "Cancel", "Duplicate", "Seva rota"];
+  const rows = ["Edit", "Still on", "Cancel", "Duplicate", "Add seva"];
   return (
-    <Screen label="An event in Coming up, and its menu: Edit, Still on, Cancel, Duplicate, Seva rota and Remove.">
+    <Screen label="An event in Coming up, and its menu: Edit, Still on, Cancel, Duplicate, Add seva and Remove.">
       <Card className="px-2 pb-2">
         <span className="px-3 pt-3 pb-1 text-lg font-bold">Coming up</span>
         <EventRow when="Sat 21 Nov, 7pm" title="Bhajan sandhya" more />
