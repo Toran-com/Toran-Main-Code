@@ -106,7 +106,16 @@ export async function confirmLogin(formData: FormData) {
     token_hash: tokenHash,
     type,
   });
-  if (error) failed();
+  if (error) {
+    // Pressed twice (a double tap, or a press while the page was still
+    // loading): the first press used the link and logged them in, so the
+    // second finds it used. They're in; carry on rather than say the
+    // link didn't work.
+    const {
+      data: { user },
+    } = await supabase!.auth.getUser();
+    if (!user) failed();
+  }
 
   (await cookies()).delete(SENT_TO);
   redirect(next);
