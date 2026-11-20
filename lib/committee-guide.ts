@@ -28,6 +28,6 @@ export const HANDOUT_STEPS = [
   },
   {
     title: "Bring in a colleague",
-    body: "Invite another committee member by email, under “Your mandir”, so you’re not the only one. Plan seva with a rota for your volunteers’ group.",
+    body: "Invite another committee member by email, under “Your mandir”, so you’re not the only one. Ask for seva on the Seva tab, for an event or on its own.",
   },
 ] as const;

@@ -92,7 +92,8 @@ select is((select all_day::text || ' ' || starts_at::text from public.events
 select is((select event_id from public.event_claims where proposed ->> 'title' = 'Annakut'),
   'e1000000-0000-0000-0000-000000000002'::uuid, 'claims point at the one kept');
 
-insert into public.seva_roles (event_id, name) values ('e1000000-0000-0000-0000-000000000003', 'Kitchen');
+insert into public.seva_roles (mandir_id, event_id, name)
+  select mandir_id, id, 'Kitchen' from public.events where id = 'e1000000-0000-0000-0000-000000000003';
 select throws_ok(
   $$select public.merge_events('e1000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000003')$$,
   '55000', null, 'an event with a seva rota isn''t merged away');

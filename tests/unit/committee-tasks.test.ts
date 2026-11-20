@@ -97,25 +97,25 @@ describe("committeeTasks", () => {
     ).toBe("Are 2 events coming up still on?");
   });
 
-  it("points to the rota with the most places still free", () => {
+  it("points to seva with places still free, soonest first", () => {
     const tasks = committeeTasks({
       ...settled,
       shortShifts: [
         {
-          eventId: "e1",
-          eventTitle: "Diwali",
+          group: "e1",
+          title: "Diwali",
           starts_at: "2026-10-30T16:00:00Z",
           free: 3,
         },
         {
-          eventId: "e1",
-          eventTitle: "Diwali",
+          group: "e1",
+          title: "Diwali",
           starts_at: "2026-10-30T19:00:00Z",
           free: 2,
         },
         {
-          eventId: "e9",
-          eventTitle: "Annakut",
+          group: "e9",
+          title: "Annakut",
           starts_at: "2026-10-31T10:00:00Z",
           free: 1,
         },
@@ -123,8 +123,8 @@ describe("committeeTasks", () => {
     });
     expect(tasks[0]).toMatchObject({
       key: "seva",
-      title: "5 seva places still free for Diwali (and 1 other event)",
-      href: "/manage/reading-hindu-temple/seva/e1",
+      title: "5 seva places still free for Diwali (and 1 more)",
+      href: "/manage/reading-hindu-temple/seva",
     });
   });
 

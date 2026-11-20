@@ -31,7 +31,7 @@ export async function GET(
     supabase
       .from("events")
       .select(
-        "id, title, title_gu, kind, starts_at, ends_at, all_day, recurrence, status, seva_open",
+        "id, title, title_gu, kind, starts_at, ends_at, all_day, recurrence, status, seva_roles (open)",
       )
       .eq("mandir_id", mandir.id)
       .neq("status", "removed")
@@ -48,7 +48,11 @@ export async function GET(
   }
 
   const rows = exportRows({
-    events: events.data ?? [],
+    // Open when volunteers can take a place in any of its seva.
+    events: (events.data ?? []).map(({ seva_roles, ...e }) => ({
+      ...e,
+      seva_open: seva_roles.some((r) => r.open),
+    })),
     numbers: mandirNumbers(readSummary(summary.data), mandir.slug),
     since,
     slug: mandir.slug,

@@ -25,10 +25,11 @@ export type CommitteeFacts = {
   posters: number;
   // Festivals coming up that the mandir hasn't added an event for.
   festivals: { title: string; date: string }[];
-  // Seva shifts in the next fortnight with places still free.
+  // Seva shifts in the next fortnight with places still free, by the
+  // event they're for (or the seva itself, when it's on its own).
   shortShifts: {
-    eventId: string;
-    eventTitle: string;
+    group: string;
+    title: string;
     starts_at: string;
     free: number;
   }[];
@@ -137,21 +138,21 @@ export function committeeTasks(f: CommitteeFacts): CommitteeTask[] {
   }
 
   if (f.shortShifts.length) {
-    const byEvent = new Map<string, { title: string; free: number }>();
+    const byGroup = new Map<string, { title: string; free: number }>();
     for (const s of f.shortShifts) {
-      const e = byEvent.get(s.eventId) ?? { title: s.eventTitle, free: 0 };
+      const e = byGroup.get(s.group) ?? { title: s.title, free: 0 };
       e.free += s.free;
-      byEvent.set(s.eventId, e);
+      byGroup.set(s.group, e);
     }
-    const [firstId, first] = [...byEvent.entries()][0];
-    const others = byEvent.size - 1;
+    const [first] = byGroup.values();
+    const others = byGroup.size - 1;
     tasks.push({
       key: "seva",
-      title: `${plural(first.free, "seva place", "seva places")} still free for ${first.title}${others ? ` (and ${plural(others, "other event", "other events")})` : ""}`,
+      title: `${plural(first.free, "seva place", "seva places")} still free for ${first.title}${others ? ` (and ${others} more)` : ""}`,
       detail:
-        "Share the rota in your volunteers' group, or count in people who said yes.",
-      href: `/manage/${f.slug}/seva/${firstId}`,
-      action: "Open the rota",
+        "Share it in your volunteers' group, or count in people who said yes.",
+      href: `/manage/${f.slug}/seva`,
+      action: "Open seva",
     });
   }
 

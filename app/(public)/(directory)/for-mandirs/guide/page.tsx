@@ -39,7 +39,7 @@ const SECTIONS = [
   { id: "keep-right", title: "Keeping it right" },
   { id: "posters", title: "Posters waiting for you" },
   { id: "details", title: "Your details and daily aarti" },
-  { id: "seva", title: "Seva rotas" },
+  { id: "seva", title: "Asking for seva" },
   { id: "colleagues", title: "Inviting a colleague" },
   { id: "share", title: "Sharing your events" },
   { id: "numbers", title: "Your numbers" },
@@ -316,7 +316,8 @@ export default function CommitteeGuidePage() {
               posters to check and everything coming up.
             </Step>
             <Step>
-              <Ui>Seva</Ui>: your rotas, and which events still need volunteers.
+              <Ui>Seva</Ui>: the seva you&apos;ve asked for, and where
+              volunteers are still needed.
             </Step>
             <Step>
               <Ui>Numbers</Ui>: how many people looked at and shared your
@@ -483,23 +484,25 @@ export default function CommitteeGuidePage() {
         <Section id="seva" picture={<SevaScreen />}>
           <Steps>
             <Step>
-              Press <Ui>⋯</Ui> next to an event and choose <Ui>Seva rota</Ui>.
-              Add the roles it needs (kitchen, car park, shoes) and the times
-              for each.
+              On the <Ui>Seva</Ui> tab, press <Ui>Add seva</Ui>. Say what it is
+              (kitchen, car park, shoes, cleaning), when, and how many people.
             </Step>
             <Step>
-              Under <Ui>Send the rota</Ui>, Toran writes the message for your
-              volunteers&apos; WhatsApp group. When people say yes there, count
-              them in.
+              If it&apos;s for one of your events, choose the event: its day and
+              start time go in for you, and you can still change them. Seva can
+              also be on its own, such as Sunday cleaning.
             </Step>
             <Step>
-              Or let volunteers take a place on Toran from the rota&apos;s link,
-              in one tap. You see how many are coming, not who.
+              Press <Ui>Send to volunteers</Ui> and Toran writes the message for
+              your WhatsApp group. Volunteers take a place from its link in one
+              tap; you see how many are coming, not who. People who say yes in
+              the group, you count in.
             </Step>
           </Steps>
           <p className="text-muted leading-relaxed">
-            The <Ui>Seva</Ui> tab shows all your rotas, and your to-do list
-            tells you when places are still free.
+            You can also press <Ui>⋯</Ui> next to an event and choose{" "}
+            <Ui>Add seva</Ui>. Your to-do list tells you when places are still
+            free.
           </p>
         </Section>
 

@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/cache", () => ({ cacheLife: () => {}, cacheTag: () => {} }));
 
-import { type SevaRow, sevaNeeds, sevaTotals } from "@/lib/seva-needs";
+import {
+  type SevaRoleRow,
+  type SevaRow,
+  sevaNeeds,
+  sevaRows,
+  sevaTotals,
+} from "@/lib/seva-needs";
 
 const mandir = {
   slug: "m",
@@ -31,6 +37,7 @@ const row = (id: string, roles: SevaRow["seva_roles"]): SevaRow => ({
   id,
   title: id,
   title_gu: null,
+  path: `/mandirs/m/events/${id}/seva`,
   mandir,
   seva_roles: roles,
 });
@@ -178,5 +185,62 @@ describe("sevaTotals", () => {
       now,
     );
     expect(totals).toEqual({ places: 5, mandirs: 1, taken: 2 });
+  });
+});
+
+describe("sevaRows", () => {
+  const event = (id: string, status = "published") => ({
+    id,
+    title: `Event ${id}`,
+    title_gu: null,
+    status,
+  });
+  const seva = (
+    id: string,
+    event: SevaRoleRow["event"],
+    eventId = event?.id ?? null,
+  ): SevaRoleRow => ({
+    id,
+    name: `Seva ${id}`,
+    needs_dbs: false,
+    event_id: eventId,
+    event,
+    mandir,
+    seva_shifts: [
+      shift(`${id}1`, "2026-11-08T15:00:00Z", "2026-11-08T18:00:00Z", 2),
+    ],
+  });
+
+  const rows = sevaRows([
+    seva("kitchen", event("diwali")),
+    seva("cleaning", null),
+    seva("parking", event("diwali")),
+    // A draft visitors can't see, and a cancelled event.
+    seva("shoes", null, "draft-event"),
+    seva("flowers", event("annakut", "cancelled")),
+  ]);
+
+  it("puts an event's seva together, under the event, with its rota page", () => {
+    expect(rows[0]).toMatchObject({
+      id: "diwali",
+      title: "Event diwali",
+      path: "/mandirs/m/events/diwali/seva",
+    });
+    expect(rows[0].seva_roles.map((r) => r.name)).toEqual([
+      "Seva kitchen",
+      "Seva parking",
+    ]);
+  });
+
+  it("gives seva on its own its own page, under its own name", () => {
+    expect(rows[1]).toMatchObject({
+      id: "cleaning",
+      title: "Seva cleaning",
+      path: "/mandirs/m/seva/cleaning",
+    });
+  });
+
+  it("leaves out seva for events that aren't on or can't be seen", () => {
+    expect(rows).toHaveLength(2);
   });
 });

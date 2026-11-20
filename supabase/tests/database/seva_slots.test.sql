@@ -1,27 +1,41 @@
 -- Taking a seva slot without a name: when it's allowed, that the count
--- follows, and that nobody but the committee can see or clear slots.
+-- follows, and that nobody but the committee can see or clear slots. A
+-- seva belongs to a mandir; its event is optional.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(17);
+select plan(25);
 
 insert into auth.users (id, email) values
   ('aaaaaaaa-0000-0000-0000-000000000001', 'a@example.com'),
   ('cccccccc-0000-0000-0000-000000000003', 'c@example.com');
 insert into public.mandirs (id, slug, name, town, region, status) values
-  ('10000000-0000-0000-0000-000000000001', 'mandir-one', 'Mandir One', 'Harrow', 'London', 'claimed');
+  ('10000000-0000-0000-0000-000000000001', 'mandir-one', 'Mandir One', 'Harrow', 'London', 'claimed'),
+  ('20000000-0000-0000-0000-000000000002', 'mandir-two', 'Mandir Two', 'Leicester', 'East Midlands', 'claimed');
 insert into public.mandir_admins (mandir_id, user_id) values
   ('10000000-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000001');
 
--- An event open for sign-up, and one that isn't.
-insert into public.events (id, mandir_id, title, starts_at, status, seva_open) values
+-- Two events, and a draft; seva for them, one not open for sign-up, and
+-- seva on its own.
+insert into public.events (id, mandir_id, title, starts_at, status) values
   ('e1000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001',
-   'Diwali', now() + interval '7 days', 'published', true),
+   'Diwali', now() + interval '7 days', 'published'),
   ('e2000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001',
-   'Annakut', now() + interval '8 days', 'published', false);
-insert into public.seva_roles (id, event_id, name, needs_dbs) values
-  ('b1000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'Kitchen', false),
-  ('b2000000-0000-0000-0000-000000000002', 'e1000000-0000-0000-0000-000000000001', 'Children''s corner', true),
-  ('b3000000-0000-0000-0000-000000000003', 'e2000000-0000-0000-0000-000000000002', 'Shoes', false);
+   'Annakut', now() + interval '8 days', 'published'),
+  ('e3000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001',
+   'Not ready yet', now() + interval '9 days', 'draft'),
+  ('e4000000-0000-0000-0000-000000000004', '20000000-0000-0000-0000-000000000002',
+   'Elsewhere', now() + interval '9 days', 'published');
+insert into public.seva_roles (id, mandir_id, event_id, name, needs_dbs, open) values
+  ('b1000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001',
+   'e1000000-0000-0000-0000-000000000001', 'Kitchen', false, true),
+  ('b2000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001',
+   'e1000000-0000-0000-0000-000000000001', 'Children''s corner', true, true),
+  ('b3000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001',
+   'e2000000-0000-0000-0000-000000000002', 'Shoes', false, false),
+  ('b4000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000001',
+   null, 'Sunday cleaning', false, true),
+  ('b5000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001',
+   'e3000000-0000-0000-0000-000000000003', 'Parking', false, true);
 insert into public.seva_shifts (id, role_id, starts_at, ends_at, needed, filled_offline) values
   -- Kitchen needs 3; the committee already has 1 from WhatsApp.
   ('51000000-0000-0000-0000-000000000001', 'b1000000-0000-0000-0000-000000000001',
@@ -29,7 +43,16 @@ insert into public.seva_shifts (id, role_id, starts_at, ends_at, needed, filled_
   ('52000000-0000-0000-0000-000000000002', 'b2000000-0000-0000-0000-000000000002',
    now() + interval '7 days', now() + interval '7 days 4 hours', 2, 0),
   ('53000000-0000-0000-0000-000000000003', 'b3000000-0000-0000-0000-000000000003',
-   now() + interval '8 days', now() + interval '8 days 4 hours', 2, 0);
+   now() + interval '8 days', now() + interval '8 days 4 hours', 2, 0),
+  ('54000000-0000-0000-0000-000000000004', 'b4000000-0000-0000-0000-000000000004',
+   now() + interval '3 days', now() + interval '3 days 2 hours', 4, 0),
+  ('55000000-0000-0000-0000-000000000005', 'b5000000-0000-0000-0000-000000000005',
+   now() + interval '9 days', now() + interval '9 days 2 hours', 4, 0);
+
+select throws_ok($$insert into public.seva_roles (mandir_id, event_id, name)
+    values ('10000000-0000-0000-0000-000000000001', 'e4000000-0000-0000-0000-000000000004', 'Shoes')$$,
+  '23514', 'That event is at another mandir',
+  'a seva can''t be linked to another mandir''s event');
 
 -- A visitor --------------------------------------------------------------------------------
 set local role anon;
@@ -46,7 +69,14 @@ select throws_ok($$select public.take_seva_slot('51000000-0000-0000-0000-0000000
 select throws_ok($$select public.take_seva_slot('52000000-0000-0000-0000-000000000002')$$,
   'P0001', 'closed', 'a role needing a DBS check can''t be taken online');
 select throws_ok($$select public.take_seva_slot('53000000-0000-0000-0000-000000000003')$$,
-  'P0001', 'closed', 'an event without sign-up turned on can''t be taken');
+  'P0001', 'closed', 'a seva without sign-up turned on can''t be taken');
+select isnt(public.take_seva_slot('54000000-0000-0000-0000-000000000004'), null,
+  'a seva on its own can be taken');
+select throws_ok($$select public.take_seva_slot('55000000-0000-0000-0000-000000000005')$$,
+  'P0001', 'closed', 'a seva for an event that isn''t published can''t be taken');
+select is((select array_agg(name order by name) from public.seva_roles),
+  array['Children''s corner', 'Kitchen', 'Shoes', 'Sunday cleaning'],
+  'visitors see seva on its own and for published events, not for drafts');
 select throws_ok($$select public.take_seva_slot('59999999-0000-0000-0000-000000000000')$$,
   'P0001', 'closed', 'an unknown shift can''t be taken');
 select throws_ok($$select * from public.seva_slots$$, '42501', null,
@@ -72,11 +102,20 @@ set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"cccccccc-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', true);
 select is((select count(*)::int from public.seva_slots), 0, 'others see no slots');
+select throws_ok($$insert into public.seva_roles (mandir_id, name)
+    values ('10000000-0000-0000-0000-000000000001', 'Shoes')$$, '42501', null,
+  'others can''t add seva to the mandir');
 
 -- The committee ----------------------------------------------------------------------------
 select set_config('request.jwt.claims',
   '{"sub":"aaaaaaaa-0000-0000-0000-000000000001","role":"authenticated","aal":"aal1"}', true);
-select is((select count(*)::int from public.seva_slots), 1, 'the committee sees its slots');
+select is((select count(*)::int from public.seva_slots), 2, 'the committee sees its slots');
+select lives_ok($$insert into public.seva_roles (mandir_id, name, open)
+    values ('10000000-0000-0000-0000-000000000001', 'Flowers', true)$$,
+  'the committee adds seva on its own');
+select lives_ok($$update public.seva_roles set event_id = 'e2000000-0000-0000-0000-000000000002'
+    where name = 'Flowers'$$,
+  'and links it to one of its events');
 select throws_ok($$update public.seva_shifts set taken_online = 9
     where id = '51000000-0000-0000-0000-000000000001'$$, '42501', null,
   'the committee can''t change the online count directly');
@@ -86,6 +125,12 @@ select lives_ok($$update public.seva_shifts set filled_offline = 2
 delete from public.seva_slots where shift_id = '51000000-0000-0000-0000-000000000001';
 select is((select taken_online from public.seva_shifts where id = '51000000-0000-0000-0000-000000000001'),
   0, 'clearing the slots resets the online count');
+
+-- If the event goes, its seva stays, on its own.
+reset role;
+delete from public.events where id = 'e2000000-0000-0000-0000-000000000002';
+select is((select count(*)::int from public.seva_roles where event_id is null and mandir_id = '10000000-0000-0000-0000-000000000001'),
+  3, 'removing an event keeps its seva, on its own');
 
 select * from finish();
 rollback;

@@ -1,6 +1,6 @@
-// Seva across mandirs, for the Seva page (/seva): every event whose
-// committee has turned online sign-up on and still needs people, soonest
-// first. Built from the rotas' numbers only; no volunteer is named anywhere
+// Seva across mandirs, for the Seva page (/seva): every seva its
+// committee has opened for sign-up that still needs people, soonest first,
+// grouped by event (seva on its own stands alone). Built from the rotas' numbers only; no volunteer is named anywhere
 // (decision 0013). Pure helpers first, so the rules are tested on their
 // own; the loader below reads public data as a visitor, cached and shared.
 
@@ -8,6 +8,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { Loaded } from "@/lib/directory";
 import { londonDate } from "@/lib/format";
 import { placesTaken } from "@/lib/seva";
+import { ownSevaPath, sevaPath } from "@/lib/share";
 import { createPublicServerClient } from "@/lib/supabase/server";
 
 export type SevaShiftNeed = {
@@ -21,7 +22,10 @@ export type SevaShiftNeed = {
 };
 
 export type SevaNeed = {
+  // The event, or the seva itself when it's on its own.
   event: { id: string; title: string; title_gu: string | null };
+  // Where volunteers take a place: the event's rota or the seva's page.
+  path: string;
   mandir: {
     slug: string;
     name: string;
@@ -45,6 +49,7 @@ export type SevaRow = {
   id: string;
   title: string;
   title_gu: string | null;
+  path: string;
   mandir: SevaNeed["mandir"];
   seva_roles: {
     name: string;
@@ -91,6 +96,7 @@ export function sevaNeeds(rows: readonly SevaRow[], now: Date): SevaNeed[] {
       return [
         {
           event: { id: row.id, title: row.title, title_gu: row.title_gu },
+          path: row.path,
           mandir: row.mandir,
           next_starts_at: shifts[0].startsAt,
           shifts,
@@ -121,6 +127,66 @@ export function sevaTotals(
   };
 }
 
+// One open seva as read from the database, with its event if it's for
+// one.
+export type SevaRoleRow = {
+  id: string;
+  name: string;
+  needs_dbs: boolean;
+  event_id: string | null;
+  event: {
+    id: string;
+    title: string;
+    title_gu: string | null;
+    status: string;
+  } | null;
+  mandir: SevaNeed["mandir"];
+  seva_shifts: SevaRow["seva_roles"][number]["seva_shifts"];
+};
+
+// Seva grouped as the Seva page shows it: an event's seva together, under
+// the event; seva on its own by itself, under its own name. Seva for an
+// event visitors can't see (a draft) or that isn't on is left out.
+export function sevaRows(roles: readonly SevaRoleRow[]): SevaRow[] {
+  const byEvent = new Map<string, SevaRow>();
+  const rows: SevaRow[] = [];
+  for (const r of roles) {
+    const role = {
+      name: r.name,
+      needs_dbs: r.needs_dbs,
+      seva_shifts: r.seva_shifts,
+    };
+    if (!r.event_id) {
+      rows.push({
+        id: r.id,
+        title: r.name,
+        title_gu: null,
+        path: ownSevaPath(r.mandir.slug, r.id),
+        mandir: r.mandir,
+        seva_roles: [role],
+      });
+      continue;
+    }
+    if (!r.event || r.event.status !== "published") continue;
+    const known = byEvent.get(r.event.id);
+    if (known) {
+      known.seva_roles.push(role);
+      continue;
+    }
+    const row = {
+      id: r.event.id,
+      title: r.event.title,
+      title_gu: r.event.title_gu,
+      path: sevaPath(r.mandir.slug, r.event.id),
+      mandir: r.mandir,
+      seva_roles: [role],
+    };
+    byEvent.set(r.event.id, row);
+    rows.push(row);
+  }
+  return rows;
+}
+
 // Seva is asked for up to this far ahead.
 const WEEKS_AHEAD = 12;
 
@@ -146,21 +212,20 @@ export async function listSevaRotas(): Promise<Loaded<SevaRow[]>> {
     Date.parse(from) + WEEKS_AHEAD * 7 * 86_400_000,
   ).toISOString();
   const { data, error } = await db
-    .from("events")
+    .from("seva_roles")
     .select(
-      "id, title, title_gu, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), seva_roles!inner (name, needs_dbs, seva_shifts!inner (id, starts_at, ends_at, needed, filled_offline, taken_online))",
+      "id, name, needs_dbs, event_id, event:events (id, title, title_gu, status), mandir:mandirs!inner (slug, name, town, region, latitude, longitude), seva_shifts!inner (id, starts_at, ends_at, needed, filled_offline, taken_online)",
     )
-    .eq("seva_open", true)
-    .eq("status", "published")
-    .gte("seva_roles.seva_shifts.ends_at", from)
-    .lte("seva_roles.seva_shifts.starts_at", to)
-    .limit(500);
+    .eq("open", true)
+    .gte("seva_shifts.ends_at", from)
+    .lte("seva_shifts.starts_at", to)
+    .limit(1000);
   if (error) {
     cacheLife("minutes");
     return { state: "unavailable" };
   }
   cacheLife("hours");
-  return { state: "ok", data };
+  return { state: "ok", data: sevaRows(data) };
 }
 
 // How much seva is being asked for, for the home page: saved with the

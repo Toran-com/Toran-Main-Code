@@ -1,5 +1,6 @@
-// The seva rota a committee plans for an event: roles (Kitchen, Parking,
-// Shoes) and shifts with how many people each needs. No volunteers' names
+// The seva a committee asks for: each seva (Kitchen, Parking, Shoes) has
+// its times (shifts) and how many people each needs, and may be for one of
+// the mandir's events. No volunteers' names
 // are kept (decisions 0006 and 0013): the committee counts people who say
 // yes in WhatsApp, and if it turns sign-up on, volunteers can take a slot
 // on Toran without giving a name.
@@ -95,10 +96,12 @@ export type Rota = {
 
 // The rota as a message for the committee's volunteers' WhatsApp group.
 // When volunteers can take slots on Toran (`open`), it says how many are
-// taken so far and points to the link sent with it.
+// taken so far and points to the link sent with it. For an event, `title`
+// and `when` are the event's; for seva on its own, `title` is the mandir's
+// name and `when` is null (each shift has its day).
 export function rotaMessage(
-  eventTitle: string,
-  when: string,
+  title: string,
+  when: string | null,
   rota: Rota,
   open = false,
 ) {
@@ -120,7 +123,7 @@ export function rotaMessage(
       ].join("\n");
     });
   return [
-    `Seva for ${eventTitle} (${when})`,
+    when === null ? `Seva at ${title}` : `Seva for ${title} (${when})`,
     ...roles,
     open
       ? "Take a slot at the link below, no sign-up needed. 🙏"
@@ -160,13 +163,14 @@ export function stillShort(
     );
 }
 
-// Every event's seva still needed, as one message for the volunteers'
-// WhatsApp group: each event with its short shifts, and where to take a
-// slot when online sign-up is on.
+// Every seva still needed, as one message for the volunteers' WhatsApp
+// group: each event with its short shifts (seva on its own has no
+// heading: `title` null), and where to take a slot when online sign-up is
+// on.
 export function sevaRoundup(
   mandirName: string,
   events: {
-    title: string;
+    title: string | null;
     when: string;
     // The event's seva page, when volunteers can take slots on Toran.
     link: string | null;
@@ -177,7 +181,7 @@ export function sevaRoundup(
     .filter((e) => e.short.length)
     .map((e) =>
       [
-        `*${e.title}* (${e.when})`,
+        e.title ? `*${e.title}* (${e.when})` : null,
         ...e.short.map(
           (s) =>
             `• ${s.role}${s.needsDbs ? " (DBS check needed)" : ""}, ${shiftLabel(s.startsAt, s.endsAt)}: ${s.short} still needed`,

@@ -48,8 +48,8 @@ const HELPS: { title: string; body: string; icon: ReactNode }[] = [
     ),
   },
   {
-    title: "A seva rota for your volunteers",
-    body: "List the roles and shifts. Toran writes the WhatsApp message.",
+    title: "Seva for your volunteers",
+    body: "Say what's needed, when and how many. Toran writes the WhatsApp message.",
     icon: (
       <svg {...icon}>
         <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
@@ -168,7 +168,7 @@ export default function ForMandirsPage() {
                       3 seva places still free
                     </span>
                     <span className="text-peacock font-semibold">
-                      Open the rota
+                      Open seva
                     </span>
                   </li>
                 </ul>
