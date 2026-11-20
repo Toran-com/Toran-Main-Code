@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { latestLoginLink, sql } from "./helpers";
+import { followLoginLink, latestLoginLink, sql } from "./helpers";
 
 // "Log in" on every page, and the two doors it opens (decision 0020).
 // Family accounts are switched on for this test build
@@ -45,7 +45,7 @@ test("a family's mandirs and plan follow them to another device", async ({
   await phone.getByLabel("Your email").fill(email);
   await phone.getByRole("button", { name: "Email me a link" }).click();
   await expect(phone.getByText("Check your email")).toBeVisible();
-  await phone.goto(await latestLoginLink(email));
+  await followLoginLink(phone, await latestLoginLink(email));
   await expect(phone).toHaveURL(/\/my$/);
   // Nothing goes on the account until the family agrees, with a box of
   // its own that starts unticked.
@@ -88,7 +88,7 @@ test("a family's mandirs and plan follow them to another device", async ({
       timeout: 20_000,
     })
     .not.toBe(first);
-  await laptop.goto(second);
+  await followLoginLink(laptop, second);
   await expect(laptop).toHaveURL(/\/my$/);
   // Agreed already, so no need to ask again.
   await expect(

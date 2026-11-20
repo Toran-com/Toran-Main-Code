@@ -14,6 +14,7 @@ import { readSupabaseEnv } from "@/lib/env";
 import { FAMILY_ACCOUNTS } from "@/lib/family-accounts";
 import { safeNextPath } from "@/lib/redirect";
 import { pageTitle } from "@/lib/site";
+import { LoginCode } from "@/components/login-code";
 import { requestLoginLink } from "./actions";
 
 // The way in, from "Log in" in every page's header: two doors, side by
@@ -21,7 +22,8 @@ import { requestLoginLink } from "./actions";
 // mandirs and plan, kept on this phone, or on their account once family
 // accounts are switched on (decision 0020). Mandir committees: create the
 // mandir's free account (/join), or log in. Everyone logs in with an
-// emailed link (decision 0010); the same link creates the account.
+// emailed link or code (decision 0010); the same email creates the
+// account.
 
 export const metadata: Metadata = {
   title: pageTitle("Log in"),
@@ -34,8 +36,10 @@ const errors: Record<string, string> = {
     "That doesn't look like an email address. Please check it and try again.",
   send: "We couldn't send the email just now. Please try again in a minute.",
   "slow-down":
-    "Too many login emails were requested. Please wait a few minutes.",
+    "We've just sent a login email to that address. Look for it in your inbox and your junk or spam folder, or ask again in a minute.",
   link: "That login link has expired or was already used. Ask for a new one below.",
+  "code-expired":
+    "That code has run out, or was asked for on another device. Ask for a new email below.",
   unavailable: "Logging in isn't switched on yet.",
 };
 
@@ -90,11 +94,10 @@ async function LoginDoors({
   if (one(params.sent)) {
     return (
       <div className={doorClass}>
-        <Notice tone="success">Check your email for a login link.</Notice>
-        <p className="text-muted">
-          It can take a minute to arrive; check your spam folder too. The link
-          works once and expires after an hour.
-        </p>
+        <Notice tone="success">
+          Check your email for a login link and code.
+        </Notice>
+        <LoginCode next={next} from="login" wrong={error === "code"} />
         <a
           href={`/login?next=${encodeURIComponent(next)}`}
           className="text-peacock font-semibold underline"

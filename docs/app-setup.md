@@ -202,15 +202,16 @@ the mandirs table in pull request 6.
 
    Then open `/ops` and set up your authenticator app.
 
-4. Before the pilot: **Authentication → Emails → SMTP Settings**, connect a
-   proper email sender (Resend or Postmark). The built-in sender only sends
-   a few emails an hour and isn't meant for real use.
+4. Before the pilot: the login email's settings, in `supabase/README.md`
+   ("Login emails"): Toran's own sender through Resend (the built-in one
+   lands in junk and only sends a few emails an hour), Toran's email
+   template, 24 hours for the link and code, and a higher rate limit.
 5. **Authentication → Sign In / Providers → Email**: make sure **Confirm
    email** is on (it is unless someone turned it off). With it off, anyone
    can make an account for someone else's address (docs/security-review.md,
    finding 1).
 6. Before the pilot: **Authentication → Rate Limits**, once the email sender
-   is connected, raise emails sent per hour to about 30. The limit is for
+   is connected, raise emails sent per hour to about 100. The limit is for
    the whole site, so at a few an hour anyone could use it up and stop
    committee members logging in. Also consider **Attack Protection →
    CAPTCHA** (Cloudflare Turnstile, free) on the login page, which needs a
