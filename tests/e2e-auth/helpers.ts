@@ -59,6 +59,10 @@ export async function followLoginLink(page: Page, link: string) {
   await page.goto(link);
   await page.getByRole("button", { name: "Log in", exact: true }).click();
   await page.waitForURL((url) => url.pathname !== "/login/confirm");
+  // The address changes as soon as the next page starts drawing; its
+  // title comes a moment later. Wait for it, so checks that follow (such
+  // as accessibility, which needs the title) see the whole page.
+  await expect(page).toHaveTitle(/\S/);
 }
 
 export function sql(query: string): string {
