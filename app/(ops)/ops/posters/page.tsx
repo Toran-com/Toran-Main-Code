@@ -35,6 +35,7 @@ import {
   addPoster,
   discardAll,
   discardPast,
+  publishAllReady,
   importWebsiteEvents,
   publishTicked,
   readMessageAsToran,
@@ -51,6 +52,9 @@ import {
 // is set apart, to discard in one go. Toran publishes for mandirs with no
 // committee on Toran; for the rest, the committee publishes from its own
 // page.
+
+// Publishing everything ready in one go checks each item in turn.
+export const maxDuration = 120;
 
 export const metadata: Metadata = {
   title: pageTitle("Review queue · Admin"),
@@ -156,8 +160,8 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
     : [{ data: [] }, { data: [] }];
   const query = await searchParams;
   const error =
-    query.published === "0"
-      ? "None of the ticked ones could be published: someone else dealt with them, or they need a closer look."
+    query.published === "0" && query.left !== "0"
+      ? "None of them could be published: someone else dealt with them, or they need a closer look."
       : ERRORS[String(query.error ?? "")];
   const read =
     query.read === undefined
@@ -172,20 +176,22 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
       ? emptied
         ? `Discarded all ${emptied}. The queue is empty: new posters, messages and website finds will start it afresh.`
         : "Nothing was waiting."
-      : query.added
-        ? "Added to the queue. Add another below, or check it in the list."
-        : cleared !== null
-          ? cleared
-            ? `Discarded ${cleared} ${cleared === 1 ? "event" : "events"} whose date had passed.`
-            : "Nothing to discard: none of them have passed."
-          : read
-            ? readMessage(read, query["from-message"] === "1")
-            : query.published !== undefined && query.published !== "0"
-              ? tickedMessage(
-                  Number(query.published) || 0,
-                  Number(query.left) || 0,
-                )
-              : DONE[String(query.done ?? "")];
+      : query.published === "0" && query.left === "0"
+        ? "Nothing was ready to publish."
+        : query.added
+          ? "Added to the queue. Add another below, or check it in the list."
+          : cleared !== null
+            ? cleared
+              ? `Discarded ${cleared} ${cleared === 1 ? "event" : "events"} whose date had passed.`
+              : "Nothing to discard: none of them have passed."
+            : read
+              ? readMessage(read, query["from-message"] === "1")
+              : query.published !== undefined && query.published !== "0"
+                ? tickedMessage(
+                    Number(query.published) || 0,
+                    Number(query.left) || 0,
+                  )
+                : DONE[String(query.done ?? "")];
   const chosen = String(query.mandir ?? "");
   const reading = posterReadingOn();
   const ways = (Object.keys(WAYS) as Way[]).filter(
@@ -248,7 +254,8 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
   // waiting, so several can go together.
   const tickable = (c: (typeof waiting)[number]) =>
     c.mandir.status !== "claimed" && c.duplicates.length === 0;
-  const canTick = waiting.filter(tickable).length > 1 && fixing === "";
+  const ready = waiting.filter(tickable);
+  const canTick = ready.length > 1 && fixing === "";
   const mandirOptions = (mandirs ?? []).map((m) => (
     <option key={m.slug} value={m.slug}>
       {m.name}, {m.town}
@@ -595,6 +602,35 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
             </ul>
           </nav>
         </div>
+        {/* Everything ready, published with one press: the same items
+            that get a tick box, each checked as if published alone. */}
+        {ready.length > 0 && fixing === "" && (
+          <form
+            action={publishAllReady}
+            className="border-peacock/30 bg-peacock/5 flex flex-wrap items-center gap-4 rounded-2xl border p-5"
+          >
+            {group && <input type="hidden" name="group" value={group} />}
+            {ready.map((c) => (
+              <input key={c.id} type="hidden" name="poster" value={c.id} />
+            ))}
+            <p className="grow basis-64">
+              <strong>
+                {ready.length === 1
+                  ? "1 event is ready"
+                  : `${ready.length} events are ready`}{" "}
+                to go on the site.
+              </strong>{" "}
+              Ones waiting for a committee, or that look like something already
+              listed, stay here for you to check.
+            </p>
+            <ConfirmButton
+              question={`Publish all ${ready.length} ready ${ready.length === 1 ? "event" : "events"} ${group ? "shown " : ""}now? They go on the mandirs' pages straight away.`}
+              className={`${buttonClass} sm:w-auto`}
+            >
+              Publish all ready ({ready.length})
+            </ConfirmButton>
+          </form>
+        )}
         {/* Starting afresh: everything shown here, waiting or past, is
             discarded in one go (none of it is published). */}
         {shown.length > 0 && (
