@@ -10,7 +10,7 @@ import {
   loadFamilySaved,
   saveFamilySaved,
 } from "@/app/(public)/(directory)/my/actions";
-import { combineSaved } from "@/lib/family-accounts";
+import { combineSaved, keepChangesSince } from "@/lib/family-accounts";
 import {
   clearFollowing,
   followingSnapshot,
@@ -87,8 +87,16 @@ export function start(): () => void {
       unwait = () => clearTimeout(wait);
     }
   };
-  const begin = () => void loadFamilySaved().then(apply, loadAgain);
-  const apply = (loaded: Awaited<ReturnType<typeof loadFamilySaved>>) => {
+  // What the phone held when it asked, so a change made while the
+  // account was loading isn't lost to it.
+  const begin = () => {
+    const before = device();
+    void loadFamilySaved().then((loaded) => apply(loaded, before), loadAgain);
+  };
+  const apply = (
+    loaded: Awaited<ReturnType<typeof loadFamilySaved>>,
+    before: ReturnType<typeof device>,
+  ) => {
     if (cancelled || !loaded) return;
     if (!loaded.saved) {
       // Not agreed (or agreed and later deleted it): keep nothing, and
@@ -108,7 +116,10 @@ export function start(): () => void {
       // Storage blocked: treat as the first time, which loses nothing.
     }
     const here = device();
-    const next = combineSaved(here, loaded.saved, synced !== loaded.userId);
+    const first = synced !== loaded.userId;
+    const combined = combineSaved(here, loaded.saved, first);
+    // The first time, the phone's lists are all kept anyway.
+    const next = first ? combined : keepChangesSince(before, here, combined);
     if (JSON.stringify(next) !== JSON.stringify(here)) {
       applying = true;
       clearFollowing();
