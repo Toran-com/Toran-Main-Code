@@ -262,6 +262,71 @@ test("Toran publishes several ticked events at once", async ({ page }) => {
   }
 });
 
+test("Toran publishes everything ready with one press", async ({ page }) => {
+  test.setTimeout(120_000);
+  const stamp = Date.now();
+  const poster = (title: string) =>
+    JSON.stringify({
+      title,
+      date: nextWeek(),
+      time: "18:00",
+      summary: "",
+      repeat: "none",
+      until: "",
+      from: "whatsapp",
+      link: "",
+    });
+  // Two for mandirs with no committee (ready), and one for a mandir whose
+  // committee publishes its own (not Toran's to publish).
+  const ready = [
+    { slug: "colchester-hindu-society", title: `Gita jayanti ${stamp}` },
+    { slug: "dharma-mandir-newport", title: `Dev diwali ${stamp}` },
+  ];
+  const committee = "sanatan-mandir-crawley-apple-tree-centre";
+  sql(
+    `update public.mandirs set status = 'claimed' where slug = '${committee}'`,
+  );
+  sql(
+    `insert into public.event_claims (mandir_id, proposed)
+       ${[...ready, { slug: committee, title: `For the committee ${stamp}` }]
+         .map(
+           ({ slug, title }) =>
+             `select id, '${poster(title)}'::jsonb from public.mandirs where slug = '${slug}'`,
+         )
+         .join(" union all ")}`,
+  );
+  await logInAsAdmin(page, `publish-all-${stamp}@example.com`);
+  await page.goto("/ops/posters");
+  // It asks first.
+  let asked = "";
+  page.once("dialog", (dialog) => {
+    asked = dialog.message();
+    void dialog.accept();
+  });
+  await page
+    .getByRole("button", { name: /^Publish all ready \(\d+\)$/ })
+    .click();
+  await expect(page.getByText(/^Published \d+ events?\./)).toBeVisible();
+  expect(asked).toContain("go on the mandirs' pages straight away");
+  for (const { slug, title } of ready) {
+    await expect(page.getByText(title)).toHaveCount(0);
+    await page.goto(`/mandirs/${slug}`);
+    await expect(
+      page.getByRole("article").filter({ hasText: title }),
+    ).toContainText("6pm");
+  }
+  // The committee's one is still waiting for them.
+  await page.goto("/ops/posters");
+  await expect(page.getByText(`For the committee ${stamp}`)).toBeVisible();
+  // Tidy up, so the queue and the mandir are as they were.
+  sql(
+    `update public.event_claims set status = 'rejected' where proposed->>'title' = 'For the committee ${stamp}'`,
+  );
+  sql(
+    `update public.mandirs set status = 'listed' where slug = '${committee}'`,
+  );
+});
+
 test("Toran clears the events whose date has passed in one go", async ({
   page,
 }) => {
