@@ -7,7 +7,7 @@ import { requestOrigin } from "@/lib/origin";
 import { looksLikeEmail, safeNextPath } from "@/lib/redirect";
 import { createSessionClient } from "@/lib/supabase/session";
 
-// Logging in by email: no passwords. The email has a link and a 6-digit
+// Logging in by email: no passwords. The email has a link and a
 // code (supabase/templates/login.html); either logs in, for 24 hours.
 
 // The address the last email went to, on this device only, so the code
@@ -53,7 +53,8 @@ export async function requestLoginLink(formData: FormData) {
   back("sent=1");
 }
 
-// The 6-digit code from the email, typed in on the page that asked for it.
+// The code from the email (6 to 10 digits, as the project is set up),
+// typed in on the page that asked for it.
 export async function logInWithCode(formData: FormData) {
   const next = safeNextPath(String(formData.get("next") ?? ""));
   const page = formData.get("from") === "join" ? "/join" : "/login";
@@ -105,7 +106,16 @@ export async function confirmLogin(formData: FormData) {
     token_hash: tokenHash,
     type,
   });
-  if (error) failed();
+  if (error) {
+    // Pressed twice (a double tap, or a press while the page was still
+    // loading): the first press used the link and logged them in, so the
+    // second finds it used. They're in; carry on rather than say the
+    // link didn't work.
+    const {
+      data: { user },
+    } = await supabase!.auth.getUser();
+    if (!user) failed();
+  }
 
   (await cookies()).delete(SENT_TO);
   redirect(next);

@@ -64,6 +64,31 @@ test("opening the link alone doesn't log in or use it up", async ({
   await page.close();
 });
 
+// A double tap, or a press while the page is still loading, sends the
+// form twice; the second finds the link used. They're logged in all the
+// same, and stay on the page they were going to.
+test("pressing Log in twice still logs in", async ({ page }) => {
+  const email = `twice-${Date.now()}@example.com`;
+  await page.goto("/login");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByRole("button", { name: "Email me a login link" }).click();
+  await expect(page.getByText("Check your email")).toBeVisible();
+  await page.goto(await latestLoginLink(email));
+  const button = page.getByRole("button", { name: "Log in", exact: true });
+  await expect(button).toBeVisible();
+  await page
+    .locator("form", { has: button })
+    .evaluate((form: HTMLFormElement) => {
+      form.requestSubmit();
+      form.requestSubmit();
+    });
+  await expect(page).toHaveURL(/\/account$/);
+  await expect(page.getByText(email)).toBeVisible();
+  // Nothing comes along afterwards to say the link didn't work.
+  await page.waitForTimeout(2000);
+  await expect(page).toHaveURL(/\/account$/);
+});
+
 test("the code in the email logs in too", async ({ page }) => {
   const email = `code-${Date.now()}@example.com`;
   await page.goto("/login?next=%2Faccount");
@@ -71,12 +96,12 @@ test("the code in the email logs in too", async ({ page }) => {
   await page.getByRole("button", { name: "Email me a login link" }).click();
   await expect(page.getByText("Check your email")).toBeVisible();
   const code = await latestLoginCode(email);
-  const box = page.getByLabel("Or type the 6-digit code from the email");
+  const box = page.getByLabel("Or type the code from the email");
   // A wrong code is turned back.
   await box.fill(code === "000000" ? "111111" : "000000");
   await page.getByRole("button", { name: "Log in with the code" }).click();
   await expect(page.getByText("That code didn't work.")).toBeVisible();
-  await page.getByLabel("Or type the 6-digit code from the email").fill(code);
+  await page.getByLabel("Or type the code from the email").fill(code);
   await page.getByRole("button", { name: "Log in with the code" }).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(page.getByText(email)).toBeVisible();

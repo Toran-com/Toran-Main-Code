@@ -12,31 +12,20 @@
     "Confirm signup"); see supabase/README.md for pasting it into the live
     project. Email apps ignore most CSS, so everything is inline styles in
     tables, with one small picture (the logo, from the site) and no web
-    fonts.
+    fonts. No hidden text (such as a hidden preview line): spam filters
+    count text people can't see against an email.
 
     Two ways in, both good for 24 hours (the project's OTP expiry):
     - The button leads to Toran's own page (/auth/confirm, then
       /login/confirm), which asks for one more press before logging in, so
       email programs that open links to check them can't use it up.
-    - The 6-digit code, typed into the page that asked for the email.
+    - The code (as long as the project's OTP length), typed into the page
+      that asked for the email.
 
     The login button must stay the first link in the email: the end-to-end
     tests follow it.
   -->
   <body style="margin: 0; padding: 0; background: #f6f4ef">
-    <!-- The preview line email apps show under the subject. -->
-    <div
-      style="
-        display: none;
-        max-height: 0;
-        overflow: hidden;
-        font-size: 1px;
-        line-height: 1px;
-        color: #f6f4ef;
-      "
-    >
-      Your login link and code for Toran. They work for 24 hours.
-    </div>
     <table
       role="presentation"
       width="100%"

@@ -31,7 +31,7 @@ export async function latestLoginLink(email: string): Promise<string> {
   throw new Error(`No login email arrived for ${email}`);
 }
 
-// The 6-digit code in the newest login email to an address.
+// The code in the newest login email to an address.
 export async function latestLoginCode(email: string): Promise<string> {
   for (let i = 0; i < 30; i++) {
     const list = await (
@@ -59,6 +59,12 @@ export async function followLoginLink(page: Page, link: string) {
   await page.goto(link);
   await page.getByRole("button", { name: "Log in", exact: true }).click();
   await page.waitForURL((url) => url.pathname !== "/login/confirm");
+  // The address changes as soon as the next page starts drawing; its
+  // title comes a moment later, and a second send of the form (a press
+  // while the page was loading) can still be on its way. Wait for all of
+  // it, so checks that follow (such as accessibility) see the page still.
+  await expect(page).toHaveTitle(/\S/);
+  await page.waitForLoadState("networkidle");
 }
 
 export function sql(query: string): string {
