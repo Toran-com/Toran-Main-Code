@@ -396,7 +396,9 @@ export default async function EventPage({
 
 // "Help with seva" when the committee lets volunteers take slots here.
 function Seva({ path, seva }: { path: string; seva: EventSeva }) {
-  const shifts = seva.roles.flatMap((r) => (r.needs_dbs ? [] : r.shifts));
+  const shifts = seva.roles.flatMap((r) =>
+    r.needs_dbs || !r.open ? [] : r.shifts,
+  );
   if (!shifts.length) return null;
   const taken = shifts.reduce((n, s) => n + placesTaken(s), 0);
   const needed = shifts.reduce((n, s) => n + s.needed, 0);

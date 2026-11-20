@@ -315,14 +315,14 @@ isOneToOne: false
                   ]
                 },"seva_roles": {
                   Row: {
-                    "created_at": string,"description": string | null,"event_id": string,"id": string,"name": string,"needs_dbs": boolean
+                    "created_at": string,"description": string | null,"event_id": string | null,"id": string,"mandir_id": string,"name": string,"needs_dbs": boolean,"open": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"description"?: string | null,"event_id": string,"id"?: string,"name": string,"needs_dbs"?: boolean
+                    "created_at"?: string,"description"?: string | null,"event_id"?: string | null,"id"?: string,"mandir_id": string,"name": string,"needs_dbs"?: boolean,"open"?: boolean
                   }
                   Update: {
-                    "created_at"?: string,"description"?: string | null,"event_id"?: string,"id"?: string,"name"?: string,"needs_dbs"?: boolean
+                    "created_at"?: string,"description"?: string | null,"event_id"?: string | null,"id"?: string,"mandir_id"?: string,"name"?: string,"needs_dbs"?: boolean,"open"?: boolean
                   }
                   Relationships: [
                     {
@@ -330,6 +330,12 @@ isOneToOne: false
       columns: ["event_id"]
 isOneToOne: false
       referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "seva_roles_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
       referencedColumns: ["id"]
     }
                   ]

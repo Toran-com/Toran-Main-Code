@@ -25,10 +25,10 @@ test("committees can read the guide and print the handout", async ({
   );
   // The contents jump to each section.
   const contents = page.getByRole("navigation", { name: "In this guide" });
-  await contents.getByRole("link", { name: "Seva rotas" }).click();
+  await contents.getByRole("link", { name: "Asking for seva" }).click();
   await expect(page).toHaveURL(/#seva$/);
   await expect(
-    page.getByRole("heading", { level: 2, name: /Seva rotas/ }),
+    page.getByRole("heading", { level: 2, name: /Asking for seva/ }),
   ).toBeInViewport();
 
   await page.getByRole("link", { name: "Print a one-page handout" }).click();

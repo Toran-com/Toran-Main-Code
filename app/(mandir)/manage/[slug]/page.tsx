@@ -303,7 +303,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     events,
     posters: posters.length,
     festivals: festivals.map((p) => ({ title: p.title, date: p.date })),
-    shortShifts: await shortSevaShifts(supabase!, events),
+    shortShifts: await shortSevaShifts(supabase!, mandir.id),
     eventsEver: Math.max(
       (await eventCount(supabase!, mandir.id)).count ?? 0,
       events.length,
@@ -672,10 +672,10 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           </Link>
           {event.status !== "cancelled" && (
             <Link
-              href={`/manage/${mandir.slug}/seva/${event.id}`}
+              href={`/manage/${mandir.slug}/seva?event=${event.id}`}
               className={menuRowClass}
             >
-              Seva rota
+              Add seva
             </Link>
           )}
           <ConfirmButton

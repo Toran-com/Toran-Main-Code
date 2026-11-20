@@ -460,17 +460,25 @@ the item.
 The database records who published or discarded each item and when, and a
 decision can't be changed afterwards.
 
-### Seva rota (committees)
+### Seva (committees)
 
-On their manage page, each event has **Seva rota**. The committee adds
-roles (Kitchen, Parking, Shoes; tick "Needs a DBS check" where it applies)
-and shifts with how many people each needs. **Send the rota** turns it into
-a WhatsApp message for the volunteers' own group, where people reply as
-they do now.
+On the **Seva** tab (`/manage/<mandir>/seva`) the committee presses **Add
+seva**: what it is (Kitchen, Parking, Shoes; tick "Needs a DBS check" where
+it applies), its day and times, and how many people. It can be for one of
+the mandir's events, or on its own (Sunday cleaning, say). Choosing an
+event puts in its day and start time (and end time, if it has one), which
+the committee can still change. Each event's "⋯" has **Add seva**, which
+opens the same form with the event chosen. More times can be added to a
+seva, and **Change** renames it or links it to another event (its times
+stay as they are). **Send to volunteers** turns it into a WhatsApp message
+for the volunteers' own group, where people reply as they do now.
 
-The committee can count people in (**+ / −**) and turn on **Let volunteers
-take slots on Toran**: the rota's public page then has "Take this slot",
-with no sign-up and no name (decision 0013). Toran keeps **no volunteer
+Each seva is open on Toran or not (ticked when adding it; **Stop taking
+places on Toran** turns it off). Open seva has a public page with "Take
+this slot", with no sign-up and no name (decision 0013): an event's seva is
+on the event's seva page (`/mandirs/<mandir>/events/<id>/seva`), and seva
+on its own on its own page (`/mandirs/<mandir>/seva/<id>`). Both show on
+the Seva page. The committee can count people in (**+ / −**). Toran keeps **no volunteer
 names or numbers**, only how many places are taken. Named sign-up waits for
 ICO registration and the DPIA (decision 0006).
 
@@ -494,7 +502,7 @@ many things need doing and a link to the first.
 
 Every form on the page waits in a sheet until it's wanted
 (`components/sheet.tsx`): **Add events** asks how, then shows that way's
-form; each event's "⋯" has Still on, Cancel, Duplicate, Seva rota and
+form; each event's "⋯" has Still on, Cancel, Duplicate, Add seva and
 Remove; **Your mandir** has Committee, Photo, Details, Your calendar and
 Recent changes.
 

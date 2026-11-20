@@ -29,7 +29,6 @@ import {
   sevaNeeds,
   sevaTotals,
 } from "@/lib/seva-needs";
-import { sevaPath } from "@/lib/share";
 import { pageMetadata } from "@/lib/site";
 import { positionForSearch } from "@/lib/whats-on";
 import {
@@ -289,7 +288,7 @@ function finderNeeds(needs: SevaNeed[]): FinderNeed[] {
     place: [need.mandir.name, need.mandir.town].join(", "),
     latitude: need.mandir.latitude,
     longitude: need.mandir.longitude,
-    path: localePath(sevaPath(need.mandir.slug, need.event.id)),
+    path: localePath(need.path),
     tile: dateTileParts(need.next_starts_at),
     dateLabel: formatEventStart(need.next_starts_at, true),
     shifts: need.shifts.map((s) => {

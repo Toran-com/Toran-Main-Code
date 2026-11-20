@@ -120,6 +120,27 @@ describe("rotaMessage", () => {
   });
 });
 
+describe("rotaMessage for seva on its own", () => {
+  it("names the mandir, with each time's day", () => {
+    const message = rotaMessage("Shree Ram Mandir", null, [
+      {
+        name: "Sunday cleaning",
+        description: null,
+        needs_dbs: false,
+        shifts: [
+          {
+            starts_at: "2026-11-08T10:00:00Z",
+            ends_at: "2026-11-08T12:00:00Z",
+            needed: 3,
+          },
+        ],
+      },
+    ]);
+    expect(message.split("\n\n")[0]).toBe("Seva at Shree Ram Mandir");
+    expect(message).toContain("• Sun 8 Nov, 10am–12pm: 3 people");
+  });
+});
+
 describe("placesTaken", () => {
   it("adds the committee's count to slots taken on Toran", () => {
     expect(placesTaken({ needed: 7, filled_offline: 2, taken_online: 1 })).toBe(
@@ -249,6 +270,12 @@ describe("the committee's seva overview", () => {
         },
         { title: "Annakut", when: "Tue 10 Nov", link: null, short },
         { title: "Full up", when: "Wed 11 Nov", link: null, short: [] },
+        {
+          title: null,
+          when: "",
+          link: "https://toran.example/cleaning",
+          short: short.slice(1),
+        },
       ]),
     ).toBe(
       [
@@ -263,6 +290,10 @@ describe("the committee's seva overview", () => {
           "*Annakut* (Tue 10 Nov)",
           "• Children's corner (DBS check needed), Sun 8 Nov, 5pm–8pm: 1 still needed",
           "• Kitchen, Sun 8 Nov, 6:30pm–9pm: 2 still needed",
+        ].join("\n"),
+        [
+          "• Kitchen, Sun 8 Nov, 6:30pm–9pm: 2 still needed",
+          "Take a slot, no sign-up needed: https://toran.example/cleaning",
         ].join("\n"),
         "Reply here if you can help.",
       ].join("\n\n"),

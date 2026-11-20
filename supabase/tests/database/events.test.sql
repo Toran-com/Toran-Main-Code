@@ -26,9 +26,9 @@ insert into public.event_occurrences (event_id, starts_at) values
   ('e2000000-0000-0000-0000-000000000002', '2026-10-12 19:00+01');
 insert into public.festivals (id, slug, name) values
   ('f0000000-0000-0000-0000-000000000001', 'test-festival', 'Test festival');
-insert into public.seva_roles (id, event_id, name) values
-  ('51000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'Kitchen'),
-  ('52000000-0000-0000-0000-000000000002', 'e2000000-0000-0000-0000-000000000002', 'Parking');
+insert into public.seva_roles (id, mandir_id, event_id, name) values
+  ('51000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'Kitchen'),
+  ('52000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'e2000000-0000-0000-0000-000000000002', 'Parking');
 
 -- Visitors ---------------------------------------------------------------------
 set local role anon;
@@ -58,7 +58,7 @@ select throws_ok(
   $$insert into public.festivals (slug, name) values ('fake', 'Fake festival')$$,
   '42501', null, 'members cannot add festivals');
 select throws_ok(
-  $$insert into public.seva_roles (event_id, name) values ('e1000000-0000-0000-0000-000000000001', 'Spam')$$,
+  $$insert into public.seva_roles (mandir_id, event_id, name) values ('10000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'Spam')$$,
   '42501', null, 'members cannot add rota roles');
 
 -- Mandir 1's admin --------------------------------------------------------------------
@@ -89,10 +89,10 @@ select is(
   'confirming records who actually did it, whatever was typed');
 
 select lives_ok(
-  $$insert into public.seva_roles (event_id, name) values ('e1000000-0000-0000-0000-000000000001', 'Shoes')$$,
+  $$insert into public.seva_roles (mandir_id, event_id, name) values ('10000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'Shoes')$$,
   'a mandir admin can add rota roles to their events');
 select throws_ok(
-  $$insert into public.seva_roles (event_id, name) values ('e4000000-0000-0000-0000-000000000004', 'Shoes')$$,
+  $$insert into public.seva_roles (mandir_id, event_id, name) values ('20000000-0000-0000-0000-000000000002', 'e4000000-0000-0000-0000-000000000004', 'Shoes')$$,
   '42501', null, 'a mandir admin cannot add rota roles to another mandir''s event');
 select lives_ok(
   $$insert into public.event_claims (mandir_id, proposed, confidence) values

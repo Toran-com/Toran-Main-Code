@@ -43,6 +43,21 @@ export function sevaPath(mandirSlug: string, eventId: string): string {
   return `${eventPath(mandirSlug, eventId)}/seva`;
 }
 
+// Seva that isn't for an event has its own page.
+export function ownSevaPath(mandirSlug: string, sevaId: string): string {
+  return `/mandirs/${mandirSlug}/seva/${sevaId}`;
+}
+
+// Where volunteers go for a seva: its event's rota, or its own page.
+export function sevaPagePath(
+  mandirSlug: string,
+  seva: { id: string; event_id: string | null },
+): string {
+  return seva.event_id
+    ? sevaPath(mandirSlug, seva.event_id)
+    : ownSevaPath(mandirSlug, seva.id);
+}
+
 // What a committee member sends a colleague they've invited: Toran sends
 // no email itself.
 export function inviteShareText(
