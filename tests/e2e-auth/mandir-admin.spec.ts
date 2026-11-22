@@ -399,8 +399,11 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByRole("link", { name: "Watch on YouTube" }),
   ).toHaveAttribute("href", "https://www.youtube.com/@krishnatemple/live");
-  // The aartis, with the days of any that aren't every day.
+  // The aartis, with the days of any that aren't every day. Only in the
+  // opening times: an event called "Weekly sandhya aarti" on a Sunday is
+  // also on the page, first in the list when it's next.
   const aartiTimes = member
+    .getByRole("region", { name: "Opening times" })
     .getByRole("listitem")
     .filter({ hasText: "Sandhya" });
   await expect(aartiTimes.filter({ hasText: "Mon – Sat" })).toContainText(

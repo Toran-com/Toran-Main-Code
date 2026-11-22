@@ -620,6 +620,25 @@ until it has a key:
 3. Redeploy. The "Read a poster" card in the review queue then shows the
    form instead of "Not switched on yet".
 
+### An email when a mandir claim is waiting
+
+When someone asks to look after a mandir's page, Toran emails its admins
+that one is waiting, with a link to **Mandir claims to check** on `/ops`.
+The email names the mandir, not the person (being on a committee can show
+someone's religion, DPIA section 5); who asked is in the admin area. Family
+sign-ups don't need approval, so they send nothing.
+
+To switch it on, in Vercel → Settings → Environment Variables (Production
+only), then redeploy:
+
+1. `RESEND_API_KEY`: from resend.com → API Keys, typed in yourself (the
+   weekly email uses the same one).
+2. `DIGEST_FROM`: who it's from, such as `Toran <hello@toran.org.uk>`.
+3. `ADMIN_ALERTS_TO`: who gets it: one email address, or several separated
+   by commas (up to 5).
+
+Without them nothing is sent, and claims still wait on `/ops` as before.
+
 ### Weekly digest preview (`/ops` → Digest)
 
 Shows what the weekly email would say: every event in the next seven days,

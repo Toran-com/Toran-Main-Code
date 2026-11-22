@@ -1,10 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import { alertAdmins, claimAlertEmail } from "@/lib/admin-alerts";
+import { siteUrl } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 
 // A logged-in person asks to look after a mandir's page. A Toran admin
-// checks with the mandir (usually by phone) before approving it.
+// checks with the mandir (usually by phone) before approving it, and is
+// emailed that one is waiting (lib/admin-alerts.ts).
 export async function submitClaim(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
   const role = String(formData.get("role") ?? "").trim();
@@ -23,7 +27,7 @@ export async function submitClaim(formData: FormData) {
   if (!supabase) back("error=failed");
   const { data: mandir } = await supabase!
     .from("mandirs")
-    .select("id")
+    .select("id, name, town")
     .eq("slug", slug)
     .maybeSingle();
   if (!mandir) back("error=failed");
@@ -36,5 +40,8 @@ export async function submitClaim(formData: FormData) {
     consented_at: new Date().toISOString(),
   });
   if (error) back(error.code === "23505" ? "error=duplicate" : "error=failed");
+  // After the page has answered, so the email never slows the person down.
+  const email = claimAlertEmail(mandir!, siteUrl());
+  after(() => alertAdmins(email));
   back("sent=1");
 }
