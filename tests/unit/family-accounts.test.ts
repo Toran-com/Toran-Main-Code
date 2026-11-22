@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { cleanPlanned, cleanSaved, combineSaved } from "@/lib/family-accounts";
+import {
+  cleanPlanned,
+  cleanSaved,
+  combineSaved,
+  keepChangesSince,
+} from "@/lib/family-accounts";
 
 const A = "18e01f23-0b51-4b19-bcea-8e68457f7a50";
 const B = "6ae51ec8-703c-4255-a7d4-40de6ef8718c";
@@ -58,5 +63,36 @@ describe("family accounts' saved lists", () => {
       following: [],
       plan: [],
     });
+  });
+});
+
+describe("keepChangesSince", () => {
+  const at = "2026-11-21T18:00:00.000Z";
+  const account = {
+    following: ["geeta-bhavan-leicester"],
+    plan: [{ id: "11111111-1111-4111-8111-111111111111", at }],
+  };
+
+  it("keeps what was followed or planned on the phone while the account loaded", () => {
+    const before = { following: [], plan: [] };
+    const now = {
+      following: ["shree-ram-mandir"],
+      plan: [{ id: "22222222-2222-4222-8222-222222222222", at }],
+    };
+    expect(keepChangesSince(before, now, account)).toEqual({
+      following: ["geeta-bhavan-leicester", "shree-ram-mandir"],
+      plan: [...account.plan, ...now.plan],
+    });
+  });
+
+  it("keeps what was unfollowed on the phone meanwhile", () => {
+    const before = { following: ["geeta-bhavan-leicester"], plan: [] };
+    const now = { following: [], plan: [] };
+    expect(keepChangesSince(before, now, account).following).toEqual([]);
+  });
+
+  it("goes by the account when nothing changed on the phone", () => {
+    const same = { following: ["old-mandir"], plan: [] };
+    expect(keepChangesSince(same, same, account)).toBe(account);
   });
 });

@@ -51,3 +51,38 @@ export function combineSaved(
     plan: [...device.plan, ...account.plan],
   });
 }
+
+// Changes made on this device while the account was loading (say, Follow
+// pressed as the page opened) are newer than what the account sent back,
+// so they're kept: whatever was added on the device since `before` is
+// added to `next`, and whatever was taken off is taken off.
+export function keepChangesSince(
+  before: FamilySaved,
+  now: FamilySaved,
+  next: FamilySaved,
+): FamilySaved {
+  const followed = now.following.filter((s) => !before.following.includes(s));
+  const unfollowed = before.following.filter((s) => !now.following.includes(s));
+  const ids = (list: Planned[]) => new Set(list.map((p) => p.id));
+  const had = ids(before.plan);
+  const has = ids(now.plan);
+  const planned = now.plan.filter((p) => !had.has(p.id));
+  const unplanned = new Set(
+    before.plan.filter((p) => !has.has(p.id)).map((p) => p.id),
+  );
+  if (
+    !followed.length &&
+    !unfollowed.length &&
+    !planned.length &&
+    !unplanned.size
+  ) {
+    return next;
+  }
+  return cleanSaved({
+    following: [
+      ...next.following.filter((s) => !unfollowed.includes(s)),
+      ...followed,
+    ],
+    plan: [...next.plan.filter((p) => !unplanned.has(p.id)), ...planned],
+  });
+}
