@@ -946,7 +946,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                     />
                   </div>
                   <details>
-                    <summary className="text-peacock w-fit cursor-pointer text-base font-semibold">
+                    <summary className="text-peacock w-fit cursor-pointer py-2.5 text-base font-semibold">
                       See the message
                     </summary>
                     <p className="bg-sunk mt-2 rounded-2xl p-4 text-base break-words whitespace-pre-line">
@@ -1417,7 +1417,7 @@ function CalendarFields({
           />
         </label>
         <details className="text-base">
-          <summary className="text-peacock cursor-pointer font-semibold">
+          <summary className="text-peacock cursor-pointer py-2.5 font-semibold">
             Where do I find it?
           </summary>
           <ul className="text-muted mt-2 flex list-disc flex-col gap-2 pl-6">

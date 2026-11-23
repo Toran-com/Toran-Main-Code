@@ -180,7 +180,7 @@ async function SevaNeeds({ searchParams }: PageProps<"/seva">) {
       {position && <p className="text-muted text-base">{POSTCODE_CREDIT}</p>}
 
       <details className="group border-line border-t pt-4">
-        <summary className="text-peacock w-fit cursor-pointer text-lg font-semibold">
+        <summary className="text-peacock w-fit cursor-pointer py-2 text-lg font-semibold">
           {t("sevaList.howTitle")}
         </summary>
         <ol className="mt-3 flex list-decimal flex-col gap-2 pl-6">

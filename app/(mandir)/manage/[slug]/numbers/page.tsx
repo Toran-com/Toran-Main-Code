@@ -66,7 +66,7 @@ async function Numbers({
       <CommitteeBar slug={mandir.slug} current="numbers" />
       <Link
         href={`/manage/${mandir.slug}`}
-        className="text-peacock self-start font-semibold"
+        className="text-peacock inline-flex min-h-11 items-center self-start font-semibold"
       >
         ← {mandir.name}
       </Link>
