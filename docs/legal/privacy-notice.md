@@ -91,6 +91,15 @@ within one month.
   stays on your phone. Your phone also keeps their pages, so they open
   without signal. Clearing the site's data in your browser forgets who
   you follow, and those pages.
+- **Notifications.** If you turn on notifications, your browser gives us
+  a push address (a long random web address at Apple, Google, Mozilla or
+  Microsoft, which your browser makes up for Toran, with keys to encrypt
+  messages to it) and we keep it with the web addresses of the mandirs you
+  follow, to send you their notices and, once a day, their new events. We
+  don't know your name, email or phone number. We send through those
+  companies' push services, which see only the encrypted message. Turning
+  notifications off deletes it at once; it's also deleted if your browser
+  stops using it, and after a year without use.
 - **Making a plan.** If you press "Add to our plan" on an event, your phone
   remembers it; nothing is sent to us. When you open the plan, or send it
   to someone on WhatsApp, the events' codes go in the page's address so
