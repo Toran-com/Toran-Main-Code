@@ -35,6 +35,7 @@ describe("parseMandirDetails", () => {
         postcode: "UB2 4DA",
         website: "https://shreerammandir.co.uk",
         live_url: null,
+        request_types: [],
         donate_url: null,
         phone: "020 8574 1234",
         tradition: null,
@@ -72,6 +73,7 @@ describe("parsePracticalDetails", () => {
         postcode: null,
         website: null,
         live_url: null,
+        request_types: [],
         donate_url: null,
         phone: null,
         getting_there: null,
@@ -91,6 +93,28 @@ describe("parsePracticalDetails", () => {
       ok: false,
       error: "phone",
     });
+  });
+  it("lists what families can ask for, one per line", () => {
+    const parsed = parsePracticalDetails(
+      form({ request_types: " Havan \n\nNaming   ceremony\nhavan\nHall hire" }),
+    );
+    expect(parsed.ok && parsed.values.request_types).toEqual([
+      "Havan",
+      "Naming ceremony",
+      "Hall hire",
+    ]);
+    expect(
+      parsePracticalDetails(
+        form({
+          request_types: Array.from({ length: 9 }, (_, i) => `Puja ${i}`).join(
+            "\n",
+          ),
+        }),
+      ),
+    ).toEqual({ ok: false, error: "request_types" });
+    expect(
+      parsePracticalDetails(form({ request_types: "x".repeat(41) })),
+    ).toEqual({ ok: false, error: "request_types" });
   });
   it("takes a secure donation page, and nothing else", () => {
     const parsed = parsePracticalDetails(

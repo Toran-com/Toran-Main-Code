@@ -30,6 +30,8 @@ export const REGIONS = [
   "Yorkshire",
 ] as const;
 
+export const REQUEST_TYPES_MAX = 8;
+
 export const CALENDARS = [
   "gujarati",
   "north_indian",
@@ -47,6 +49,9 @@ export type PracticalDetails = {
   // Its YouTube channel, or where it streams aarti and katha: shown as
   // "Watch on YouTube" (or "Watch live" for anywhere else).
   live_url: string | null;
+  // What families can ask the committee for (pujas, ceremonies, hall
+  // hire), one per line: up to REQUEST_TYPES_MAX. Empty: no requests.
+  request_types: string[];
   // Its own donation page (website, JustGiving, PayPal): shown as "Give to
   // the mandir". Toran only links to it.
   donate_url: string | null;
@@ -108,6 +113,21 @@ export function parsePracticalDetails(
     }
   }
 
+  const requestTypes = text(form, "request_types")
+    .split("\n")
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  // The same thing twice ("Hall hire", "hall hire") is kept once.
+  const request_types = requestTypes.filter(
+    (r, i) =>
+      requestTypes.findIndex((o) => o.toLowerCase() === r.toLowerCase()) === i,
+  );
+  if (
+    request_types.length > REQUEST_TYPES_MAX ||
+    request_types.some((r) => r.length < 2 || r.length > 40)
+  ) {
+    return { ok: false, error: "request_types" };
+  }
   let donate_url: string | null = text(form, "donate_url") || null;
   if (donate_url && !/^https?:\/\//i.test(donate_url)) {
     donate_url = `https://${donate_url}`;
@@ -159,6 +179,7 @@ export function parsePracticalDetails(
       postcode,
       website,
       live_url,
+      request_types,
       donate_url,
       phone,
       getting_there,
@@ -233,6 +254,7 @@ export const FORM_ERRORS: Record<string, string> = {
   website: "That doesn't look like a website address.",
   live_url:
     "That doesn't look like a web address for YouTube or the livestream (for example the mandir's YouTube channel).",
+  request_types: `Please list up to ${REQUEST_TYPES_MAX} things families can ask for, one per line, each 2 to 40 characters.`,
   donate_url:
     "That doesn't look like a secure web address (starting https://) for your donation page.",
   phone: "Please use only numbers, spaces and + ( ) in the phone number.",

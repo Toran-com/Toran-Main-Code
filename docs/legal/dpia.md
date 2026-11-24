@@ -33,6 +33,7 @@ This DPIA covers what is built now and what is planned. Sections marked
 | Weekly email subscribers    | Email and an optional area (such as "London")                                                                                                 | Built, switched off until ICO registration |
 | Families with an account    | Email, login history, the mandirs they follow (web addresses) and their plan (event codes and dates), 30 of each                              | From the pilot (decision 0020)             |
 | Committee members (email)   | A monthly summary of their page, sent to their login email; each member can stop it, and whether they have is kept with their committee place | Built; sent once `COMMITTEE_EMAIL` is on   |
+| Families asking a mandir    | Name, email or phone, what and when, a message: passed to the committee by email, not kept by Toran                                           | Now (decision 0025)                        |
 | Seva volunteers by name     | Name, one contact detail, age band; for under-16s a parent's or guardian's details                                                            | Planned, not built                         |
 | People forwarding posters   | Phone number or email, the message and images                                                                                                 | Pilot by hand; planned automation          |
 
@@ -52,6 +53,12 @@ This DPIA covers what is built now and what is planned. Sections marked
 - **When switched on:** weekly emails go out through Resend. Sign-ups are
   readable only by the sending job's secret key, not by any person
   through the site.
+- **Requests to a mandir (decision 0025):** a family asks a committee
+  that takes requests about a puja, a ceremony or the hall. The server
+  looks up the committee's login emails (`request_recipients`, readable
+  only with the secret key) and emails the request to them through
+  Resend, with the family's email as the reply address. Nothing is saved
+  in Toran's database; Resend keeps its delivery log for its usual time.
 - **Family accounts:** a family logs in by emailed link
   from the family door on /login. What My Toran already keeps on their
   phone (mandirs followed, their plan) is then also saved to their

@@ -18,6 +18,7 @@ describe("Gujarati and Hindi addresses", () => {
       "/mandirs",
       "/mandirs/reading-hindu-temple",
       "/mandirs/reading-hindu-temple/tell-us",
+      "/mandirs/reading-hindu-temple/request",
       "/mandirs/x/events/abc",
       "/mandirs/x/events/abc/seva",
       "/festivals",

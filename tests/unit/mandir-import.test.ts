@@ -26,6 +26,7 @@ const row = (
   postcode: more.postcode ?? null,
   website: more.website ?? null,
   live_url: null,
+  request_types: [],
   donate_url: null,
   phone: more.phone ?? null,
   getting_there: null,
