@@ -319,6 +319,9 @@ export const hiClient: Record<ClientKey, string> = {
   "hub.mandirs.events": "उनके सभी कार्यक्रम",
   "hub.mandirs.unfollow": "फ़ॉलो करना बंद करें",
   "hub.mandirs.unfollowLabel": "{name} को फ़ॉलो करना बंद करें",
+  "hub.calendar.title": "आपके सभी मंदिर आपके कैलेंडर में",
+  "hub.calendar.body":
+    "आप जिन मंदिरों को फ़ॉलो करते हैं उनका हर कार्यक्रम, आपके फ़ोन के कैलेंडर में, हमेशा अपडेट। बाद में और मंदिर फ़ॉलो करें तो इसे फिर से जोड़ें।",
   "hub.seva.coming": "आने वाली सेवा",
   "hub.seva.done": "आपकी की हुई सेवा",
   "hub.seva.empty":
@@ -395,4 +398,16 @@ export const hiClient: Record<ClientKey, string> = {
   "request.error.slow": "आपने अभी कुछ अनुरोध भेजे हैं। कृपया दस मिनट रुकें।",
   "request.error.failed":
     "अभी भेजा नहीं जा सका। कृपया फिर कोशिश करें, या मंदिर को फ़ोन करें।",
+  "live.now": "अभी चल रहा है",
+  "live.later": "आज बाद में",
+  "live.started": "{time} पर शुरू हुआ",
+  "live.until": "{time} तक",
+  "live.from": "{time} से",
+  "live.allDay": "पूरे दिन",
+  "live.watch": "लाइव देखें",
+  "live.nothingNow": "अभी किसी मंदिर में कुछ चल रहा होने की जानकारी नहीं है।",
+  "live.nothingLater": "आज बाद में और कुछ दर्ज नहीं है।",
+  "live.stripLabel": "अभी चल रहा है",
+  "live.stripMore": "और {count} अन्य",
+  "live.stripOpen": "देखें अभी क्या चल रहा है",
 };

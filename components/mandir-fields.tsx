@@ -22,6 +22,7 @@ type Values = {
   website?: string | null;
   live_url?: string | null;
   request_types?: string[] | null;
+  donate_url?: string | null;
   phone?: string | null;
   tradition?: string | null;
   calendar?: string | null;
@@ -137,6 +138,17 @@ export function MandirFields({ values = {} }: { values?: Values }) {
           name="request_types"
           rows={3}
           defaultValue={(values.request_types ?? []).join("\n")}
+          className={inputClass}
+        />
+      </Field>
+      <Field
+        label="Donation page"
+        hint="The mandir's own page for giving: JustGiving, PayPal or a page on its own site. Shown as “Give to the mandir”. Toran only links to it."
+      >
+        <input
+          name="donate_url"
+          inputMode="url"
+          defaultValue={values.donate_url ?? ""}
           className={inputClass}
         />
       </Field>

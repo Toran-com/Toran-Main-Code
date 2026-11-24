@@ -53,6 +53,9 @@ export const enHub = {
   "hub.mandirs.events": "All their events",
   "hub.mandirs.unfollow": "Unfollow",
   "hub.mandirs.unfollowLabel": "Stop following {name}",
+  "hub.calendar.title": "All your mandirs in your calendar",
+  "hub.calendar.body":
+    "Every event at the mandirs you follow, in your phone's calendar and kept up to date. If you follow more mandirs later, add it again.",
 
   "hub.seva.coming": "Seva coming up",
   "hub.seva.done": "Seva you've done",

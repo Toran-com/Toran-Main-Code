@@ -52,6 +52,9 @@ export type PracticalDetails = {
   // What families can ask the committee for (pujas, ceremonies, hall
   // hire), one per line: up to REQUEST_TYPES_MAX. Empty: no requests.
   request_types: string[];
+  // Its own donation page (website, JustGiving, PayPal): shown as "Give to
+  // the mandir". Toran only links to it.
+  donate_url: string | null;
   // Parking, entrance, nearest station: shown with directions.
   getting_there: string | null;
   // Step-free access, chairs, food and so on (lib/visiting.ts), and a
@@ -125,6 +128,24 @@ export function parsePracticalDetails(
   ) {
     return { ok: false, error: "request_types" };
   }
+  let donate_url: string | null = text(form, "donate_url") || null;
+  if (donate_url && !/^https?:\/\//i.test(donate_url)) {
+    donate_url = `https://${donate_url}`;
+  }
+  if (donate_url) {
+    try {
+      const url = new URL(donate_url);
+      if (
+        url.protocol !== "https:" ||
+        !url.hostname.includes(".") ||
+        donate_url.length > 300
+      ) {
+        return { ok: false, error: "donate_url" };
+      }
+    } catch {
+      return { ok: false, error: "donate_url" };
+    }
+  }
 
   const phone = text(form, "phone") || null;
   if (phone && !/^[0-9+() -]{6,40}$/.test(phone)) {
@@ -159,6 +180,7 @@ export function parsePracticalDetails(
       website,
       live_url,
       request_types,
+      donate_url,
       phone,
       getting_there,
       facilities,
@@ -233,6 +255,8 @@ export const FORM_ERRORS: Record<string, string> = {
   live_url:
     "That doesn't look like a web address for YouTube or the livestream (for example the mandir's YouTube channel).",
   request_types: `Please list up to ${REQUEST_TYPES_MAX} things families can ask for, one per line, each 2 to 40 characters.`,
+  donate_url:
+    "That doesn't look like a secure web address (starting https://) for your donation page.",
   phone: "Please use only numbers, spaces and + ( ) in the phone number.",
   getting_there: 'Please keep "Getting there" under 400 characters.',
   getting_there_contact:

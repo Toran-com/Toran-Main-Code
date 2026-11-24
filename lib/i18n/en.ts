@@ -12,6 +12,7 @@ export const en = {
   "shell.mandirs": "Mandirs",
   "shell.festivals": "Festivals",
   "shell.search": "Search",
+  "shell.live": "Live now",
   "shell.forMandirs": "For mandir committees",
   "shell.find": "Find",
   "shell.toran": "Toran",
@@ -118,6 +119,13 @@ export const en = {
   "regular.intro":
     "Bal vihar, bhajan mandal, yoga, language classes and more: everything that happens every week or month, by the day it's on.",
   "regular.what": "classes and regular groups",
+  "live.title": "Live now",
+  "live.description":
+    "What's happening at mandirs across the UK right now, and later today, with live streams where a mandir has one.",
+  "live.intro":
+    "What's on at mandirs right now and later today, as the mandirs list it. Where a mandir streams, Watch live opens its stream.",
+  "live.what": "what's on now",
+  "live.seeAll": "See everything coming up on What's on",
   "regular.areas": "Area",
   "regular.everywhere": "Everywhere",
   "regular.none": "No regular classes or groups are listed here yet.",
@@ -231,6 +239,7 @@ export const en = {
   "request.privacy":
     "Toran passes this to the committee by email and doesn't keep a copy.",
   "request.send": "Send to the committee",
+  "mandir.give": "Give to the mandir",
   "mandir.watchYouTube": "Watch on YouTube",
   "mandir.photoAlt": "Photo of {name}",
   "mandir.phone": "Phone",

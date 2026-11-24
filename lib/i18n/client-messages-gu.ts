@@ -318,6 +318,9 @@ export const guClient: Record<ClientKey, string> = {
   "hub.mandirs.events": "તેમના બધા કાર્યક્રમો",
   "hub.mandirs.unfollow": "ફોલો બંધ કરો",
   "hub.mandirs.unfollowLabel": "{name} ને ફોલો કરવાનું બંધ કરો",
+  "hub.calendar.title": "તમારાં બધાં મંદિરો તમારા કેલેન્ડરમાં",
+  "hub.calendar.body":
+    "તમે ફોલો કરો છો તે મંદિરોનો દરેક કાર્યક્રમ, તમારા ફોનના કેલેન્ડરમાં, હંમેશાં અપ ટુ ડેટ. પછી વધુ મંદિરો ફોલો કરો તો ફરી ઉમેરો.",
   "hub.seva.coming": "આવનારી સેવા",
   "hub.seva.done": "તમે કરેલી સેવા",
   "hub.seva.empty":
@@ -394,4 +397,17 @@ export const guClient: Record<ClientKey, string> = {
     "તમે હમણાં થોડી વિનંતીઓ મોકલી છે. કૃપા કરીને દસ મિનિટ રાહ જુઓ.",
   "request.error.failed":
     "અત્યારે મોકલી શકાયું નહીં. ફરી પ્રયાસ કરો, અથવા મંદિરને ફોન કરો.",
+  "live.now": "અત્યારે ચાલી રહ્યું છે",
+  "live.later": "આજે પછીથી",
+  "live.started": "{time} એ શરૂ થયું",
+  "live.until": "{time} સુધી",
+  "live.from": "{time} થી",
+  "live.allDay": "આખો દિવસ",
+  "live.watch": "લાઇવ જુઓ",
+  "live.nothingNow":
+    "અત્યારે કોઈ મંદિરમાં કંઈ ચાલી રહ્યું હોવાનું નોંધાયેલું નથી.",
+  "live.nothingLater": "આજે પછીથી બીજું કંઈ નોંધાયેલું નથી.",
+  "live.stripLabel": "અત્યારે ચાલી રહ્યું છે",
+  "live.stripMore": "અને બીજા {count}",
+  "live.stripOpen": "અત્યારે શું ચાલે છે તે જુઓ",
 };

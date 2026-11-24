@@ -27,6 +27,7 @@ const row = (
   website: more.website ?? null,
   live_url: null,
   request_types: [],
+  donate_url: null,
   phone: more.phone ?? null,
   getting_there: null,
   facilities: [],

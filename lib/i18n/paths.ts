@@ -13,6 +13,7 @@ const TRANSLATED_PATHS = [
   /^\/$/,
   /^\/whats-on$/,
   /^\/regular$/,
+  /^\/live$/,
   /^\/seva$/,
   /^\/plan$/,
   /^\/my$/,
