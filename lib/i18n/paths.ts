@@ -14,6 +14,7 @@ const TRANSLATED_PATHS = [
   /^\/whats-on$/,
   /^\/regular$/,
   /^\/first-visit$/,
+  /^\/live$/,
   /^\/seva$/,
   /^\/plan$/,
   /^\/my$/,
