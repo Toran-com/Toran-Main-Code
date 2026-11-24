@@ -16,14 +16,14 @@
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^1.6.0",
+    "@anthropic-ai/sdk": "^1.12.0",
     "@maplibre/maplibre-gl-leaflet": "0.1.4",
-    "@sentry/nextjs": "^11.11.0",
+    "@sentry/nextjs": "^11.16.0",
     "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.119.0",
+    "@supabase/supabase-js": "^2.119.2",
     "leaflet": "1.9.4",
     "maplibre-gl": "5.24.0",
-    "next": "16.4.5",
+    "next": "16.4.6",
     "qrcode-generator": "2.0.4",
     "react": "19.3.1",
     "react-dom": "19.3.1",
@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "^4",
     "@types/leaflet": "1.9.22",
     "@types/node": "^26",
@@ -39,12 +39,12 @@
     "@types/react-dom": "^19",
     "@types/web-push": "3.6.4",
     "eslint": "^9",
-    "eslint-config-next": "16.4.5",
-    "prettier": "^3.9.10",
+    "eslint-config-next": "16.4.6",
+    "prettier": "^3.10.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
     "typescript": "^6",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   },
   "packageManager": "pnpm@10.28.0",
   "engines": {
