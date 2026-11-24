@@ -29,7 +29,7 @@ export function CommitteeBar({
             <Link
               href={href}
               aria-current={here ? "page" : undefined}
-              className={`flex justify-center rounded-full px-3 py-2 text-base font-semibold no-underline transition ${
+              className={`flex min-h-11 items-center justify-center rounded-full px-3 py-2 text-base font-semibold no-underline transition ${
                 here
                   ? "bg-surface text-ink shadow-card"
                   : "text-muted hover:text-ink"
@@ -46,7 +46,7 @@ export function CommitteeBar({
             rel="noopener"
             aria-label="Committee guide (opens in a new tab)"
             title="Committee guide"
-            className="text-muted hover:text-ink hover:bg-surface grid size-10 place-items-center rounded-full font-bold no-underline transition"
+            className="text-muted hover:text-ink hover:bg-surface grid size-11 place-items-center rounded-full font-bold no-underline transition"
           >
             <svg
               aria-hidden="true"

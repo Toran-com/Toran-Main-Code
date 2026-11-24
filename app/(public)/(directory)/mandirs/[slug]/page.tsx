@@ -236,7 +236,7 @@ export default async function MandirPage({
           <Link
             prefetch={false}
             href={`/corrections?page=${encodeURIComponent(`/mandirs/${mandir.slug}`)}`}
-            className="text-muted self-center text-base"
+            className="text-muted inline-flex min-h-11 items-center self-center text-base"
           >
             {t("page.somethingWrong")}
           </Link>

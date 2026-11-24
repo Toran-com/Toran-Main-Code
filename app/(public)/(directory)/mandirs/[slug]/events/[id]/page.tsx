@@ -157,7 +157,7 @@ export default async function EventPage({
         <Link
           href={mandirPath}
           lang={storedLang()}
-          className="text-peacock self-start font-semibold hover:underline"
+          className="text-peacock inline-flex min-h-11 items-center self-start font-semibold hover:underline"
         >
           ← {mandir.name}
         </Link>
@@ -254,16 +254,7 @@ export default async function EventPage({
         <aside className="flex min-w-0 flex-[1_1_20rem] flex-col gap-4 lg:sticky lg:top-28 lg:order-2">
           <div className={`${cardClass} flex flex-col gap-6 p-6 sm:p-7`}>
             <ReadAloud text={spokenEvent(result.data)} />
-            <Details page={result.data} />
-            <CallAndDirections mandir={mandir} place={venueOf(event)} />
-            {confirmedOn ? (
-              <Badge tone="leaf">
-                <span aria-hidden="true">✓ </span>
-                {confirmedOn}
-              </Badge>
-            ) : (
-              source && <p className="text-muted text-base">{source}</p>
-            )}
+            <Details page={result.data} part="key" />
             {upcoming && !cancelled && (
               <div className="flex flex-col gap-3">
                 {event.tickets_url && (
@@ -289,11 +280,21 @@ export default async function EventPage({
                 <IWent id={event.id} at={event.next_starts_at} />
               </div>
             )}
+            <CallAndDirections mandir={mandir} place={venueOf(event)} />
+            {confirmedOn ? (
+              <Badge tone="leaf">
+                <span aria-hidden="true">✓ </span>
+                {confirmedOn}
+              </Badge>
+            ) : (
+              source && <p className="text-muted text-base">{source}</p>
+            )}
+            <Details page={result.data} part="more" />
           </div>
           <Link
             prefetch={false}
             href={`/corrections?page=${encodeURIComponent(path)}`}
-            className="text-muted self-center text-base"
+            className="text-muted inline-flex min-h-11 items-center self-center text-base"
           >
             {t("page.somethingWrong")}
           </Link>
@@ -494,7 +495,17 @@ function Dates({ event }: { event: MandirEventPage["event"] }) {
   );
 }
 
-function Details({ page }: { page: MandirEventPage }) {
+// The event's details in two parts: "key" (when, where, cost, tickets),
+// shown before the buttons so adding it to a calendar or sharing it is
+// near the top of a phone's screen, and "more" (getting there, visiting,
+// the mandir's own page about it), after them.
+function Details({
+  page,
+  part,
+}: {
+  page: MandirEventPage;
+  part: "key" | "more";
+}) {
   const { mandir, event } = page;
   const t = pageT();
   const rule = event.recurrence && describeRule(event.recurrence);
@@ -554,10 +565,11 @@ function Details({ page }: { page: MandirEventPage }) {
       ),
     },
   ];
+  const more: typeof rows = [];
   // Getting there and visiting are about the mandir itself.
   const atMandir = !event.venue_name;
   if (atMandir && mandir.getting_there)
-    rows.push({
+    more.push({
       label: t("mandir.gettingThere"),
       icon: null,
       value: (
@@ -566,7 +578,7 @@ function Details({ page }: { page: MandirEventPage }) {
     });
   const visiting = visitingItems(mandir.facilities);
   if (atMandir && (visiting.length || mandir.visiting_note))
-    rows.push({
+    more.push({
       label: t("visit.title"),
       icon: null,
       value: (
@@ -595,7 +607,7 @@ function Details({ page }: { page: MandirEventPage }) {
       value: t(event.tickets_url ? "event.bookFirst" : "event.bookWithMandir"),
     });
   if (event.link) {
-    rows.push({
+    more.push({
       label: t("event.moreDetails"),
       icon: null,
       value: (
@@ -609,9 +621,11 @@ function Details({ page }: { page: MandirEventPage }) {
       ),
     });
   }
+  const shown = part === "key" ? rows : more;
+  if (!shown.length) return null;
   return (
     <dl className="flex flex-col gap-5">
-      {rows.map(({ label, icon, value }) => (
+      {shown.map(({ label, icon, value }) => (
         <div key={label} className="relative pl-[2.375rem]">
           <dt className="text-muted text-base">
             <span className="text-peacock absolute top-1 left-0 [&_svg]:size-6">
