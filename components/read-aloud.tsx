@@ -6,7 +6,12 @@ import { useLocale, useT } from "@/components/use-t";
 import { enRead } from "@/lib/i18n/client/read";
 import { pickVoice, READ_ALOUD_ON, sentences } from "@/lib/read-aloud";
 
-const SPEECH_LANGS = { en: "en-GB", gu: "gu-IN", hi: "hi-IN" } as const;
+const SPEECH_LANGS = {
+  en: "en-GB",
+  gu: "gu-IN",
+  hi: "hi-IN",
+  ta: "ta-IN",
+} as const;
 
 const speech = () =>
   typeof window !== "undefined" && "speechSynthesis" in window
