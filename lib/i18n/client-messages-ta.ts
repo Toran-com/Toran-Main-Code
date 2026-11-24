@@ -415,4 +415,6 @@ export const taClient: Record<ClientKey, string> = {
   "live.stripLabel": "இப்போது நடக்கிறது",
   "live.stripMore": "மேலும் {count}",
   "live.stripOpen": "இப்போது என்ன நடக்கிறது என்று பாருங்கள்",
+  "report.error.languages":
+    "பட்டியலிலிருந்து அதிகபட்சம் 4 மொழிகளைத் தேர்ந்தெடுக்கவும்.",
 };

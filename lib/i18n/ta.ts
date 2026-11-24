@@ -551,4 +551,7 @@ export const ta: Record<MessageKey, string> = {
   "notice.until": "{day} வரை",
   "notice.today": "இன்று",
   "mandir.give": "கோயிலுக்கு நன்கொடை அளியுங்கள்",
+  "whatsOn.language": "மொழி",
+  "whatsOn.anyLanguage": "எந்த மொழியும்",
+  "event.language": "மொழி",
 };
