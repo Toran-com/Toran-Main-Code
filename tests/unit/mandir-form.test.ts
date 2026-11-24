@@ -35,6 +35,7 @@ describe("parseMandirDetails", () => {
         postcode: "UB2 4DA",
         website: "https://shreerammandir.co.uk",
         live_url: null,
+        donate_url: null,
         phone: "020 8574 1234",
         tradition: null,
         calendar: "north_indian",
@@ -71,6 +72,7 @@ describe("parsePracticalDetails", () => {
         postcode: null,
         website: null,
         live_url: null,
+        donate_url: null,
         phone: null,
         getting_there: null,
         facilities: [],
@@ -89,6 +91,24 @@ describe("parsePracticalDetails", () => {
       ok: false,
       error: "phone",
     });
+  });
+  it("takes a secure donation page, and nothing else", () => {
+    const parsed = parsePracticalDetails(
+      form({ donate_url: " justgiving.com/campaign/annakut " }),
+    );
+    expect(parsed.ok && parsed.values.donate_url).toBe(
+      "https://justgiving.com/campaign/annakut",
+    );
+    for (const bad of [
+      "http://example.org/give",
+      "our bank details",
+      `https://example.org/${"x".repeat(300)}`,
+    ]) {
+      expect(parsePracticalDetails(form({ donate_url: bad }))).toEqual({
+        ok: false,
+        error: "donate_url",
+      });
+    }
   });
   it("tidies a live stream link", () => {
     const parsed = parsePracticalDetails(

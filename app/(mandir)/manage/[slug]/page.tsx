@@ -168,7 +168,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     ? await supabase
         .from("mandirs")
         .select(
-          "id, slug, name, town, postcode, website, live_url, phone, photo_path, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
+          "id, slug, name, town, postcode, website, live_url, donate_url, phone, photo_path, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
         )
         .eq("slug", slug)
         .maybeSingle()
@@ -1233,6 +1233,21 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                         name="live_url"
                         inputMode="url"
                         defaultValue={mandir.live_url ?? ""}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Donation page</span>
+                      <span className="text-muted -mt-1 text-base">
+                        Your own page for giving: JustGiving, PayPal or a page
+                        on your own site. Shown on your page as &ldquo;Give to
+                        the mandir&rdquo;. Toran only links to it: no money goes
+                        through Toran.
+                      </span>
+                      <input
+                        name="donate_url"
+                        inputMode="url"
+                        defaultValue={mandir.donate_url ?? ""}
                         className={inputClass}
                       />
                     </label>
