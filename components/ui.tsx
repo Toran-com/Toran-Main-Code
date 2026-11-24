@@ -55,15 +55,15 @@ export const buttonClass = `${press} bg-peacock text-on-peacock hover:bg-peacock
 // Small pill buttons for actions on an item in a list (Edit, Cancel…),
 // so a row of them fits on a phone.
 export const pillButtonClass =
-  "border-line-strong bg-surface text-ink hover:border-peacock/60 hover:text-peacock inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-1.5 text-base font-semibold no-underline transition duration-200 active:scale-95";
+  "border-line-strong bg-surface text-ink hover:border-peacock/60 hover:text-peacock inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border px-4 py-1.5 text-base font-semibold no-underline transition duration-200 active:scale-95";
 
 export const pillPrimaryClass =
-  "bg-peacock text-on-peacock hover:bg-peacock-deep inline-flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-1.5 text-base font-semibold no-underline transition duration-200 active:scale-95";
+  "bg-peacock text-on-peacock hover:bg-peacock-deep inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-4 py-1.5 text-base font-semibold no-underline transition duration-200 active:scale-95";
 
 // Things to do with a page or event (directions, share, add to
 // calendar): outlined pills with a peacock icon.
 export const actionPillClass =
-  "border-line-strong bg-surface text-ink hover:border-peacock/60 inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-base font-semibold no-underline transition duration-200 active:scale-95 [&_svg]:text-peacock";
+  "border-line-strong bg-surface text-ink hover:border-peacock/60 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-base font-semibold no-underline transition duration-200 active:scale-95 [&_svg]:text-peacock";
 
 // Everything else you press: an outlined pill.
 export const quietButtonClass = `${press} border-peacock bg-surface text-peacock hover:bg-peacock/8 rounded-full border-2 px-6 py-[0.625rem] text-lg font-semibold`;

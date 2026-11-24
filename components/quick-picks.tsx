@@ -58,7 +58,7 @@ export function QuickPicks({
               </label>
             </div>
             <details className="pl-8">
-              <summary className="text-peacock w-fit cursor-pointer text-base font-semibold">
+              <summary className="text-peacock w-fit cursor-pointer py-2.5 text-base font-semibold">
                 Change the name or day
               </summary>
               <div className="mt-2 grid gap-3 sm:grid-cols-[2fr_1fr]">

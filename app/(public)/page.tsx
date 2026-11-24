@@ -118,8 +118,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
             <Followed />
           </Suspense>
 
-          <HomeStory />
-
+          {/* What's on comes first: most people open Toran to find
+              something to go to. The six steps of how it works follow,
+              for anyone new. */}
           <Suspense fallback={null}>
             <FestivalsSoon />
           </Suspense>
@@ -132,6 +133,8 @@ export default function Home({ searchParams }: PageProps<"/">) {
               <Mandirs />
             </Suspense>
           </div>
+
+          <HomeStory />
 
           <Suspense fallback={null}>
             <SevaSoon />

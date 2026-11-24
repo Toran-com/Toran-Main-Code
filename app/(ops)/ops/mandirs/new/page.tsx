@@ -29,7 +29,10 @@ async function NewMandir({ searchParams }: PageProps<"/ops/mandirs/new">) {
   const error = FORM_ERRORS[String((await searchParams).error ?? "")];
   return (
     <>
-      <Link href="/ops/mandirs" className="text-peacock font-semibold">
+      <Link
+        href="/ops/mandirs"
+        className="text-peacock inline-flex min-h-11 items-center font-semibold"
+      >
         ← All mandirs
       </Link>
       {error && <Notice tone="error">{error}</Notice>}

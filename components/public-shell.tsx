@@ -38,7 +38,8 @@ export function PublicShell({ children }: { children: ReactNode }) {
 // The page width for headers, footers and wide pages.
 export const wideClass = "mx-auto w-full max-w-[88rem] px-4 sm:px-8 lg:px-12";
 
-// One calm row: the name, the four main places (from tablet size up),
+// One calm row: the name, the four main places (from 1024px, a sideways
+// tablet, up),
 // Search, My Toran and "Menu", which holds everything else: text size,
 // language, the way in for committees. On a phone the four places and My
 // Toran sit in a bar along the bottom of the screen instead
@@ -79,7 +80,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
           <Link
             href={localePath("/")}
             aria-label={t("shell.home")}
-            className="text-on-night shrink-0 no-underline"
+            className="text-on-night inline-flex min-h-[44px] shrink-0 items-center no-underline"
           >
             <Logo night />
           </Link>
@@ -93,7 +94,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               href={localePath("/search")}
               aria-label={t("shell.search")}
               title={t("shell.search")}
-              className="text-on-night hover:bg-on-night/10 inline-flex size-[44px] items-center justify-center rounded-full no-underline transition-colors max-[429px]:hidden"
+              className="text-on-night hover:bg-on-night/10 inline-flex size-[44px] shrink-0 items-center justify-center rounded-full no-underline transition-colors max-[429px]:hidden"
             >
               <svg
                 aria-hidden="true"
@@ -234,7 +235,7 @@ export function SiteFooter() {
           {columns.map(({ heading, links }) => (
             <div key={heading} className="flex flex-col gap-2.5">
               <p className="text-on-night font-semibold">{heading}</p>
-              <ul className="flex flex-col gap-2.5">
+              <ul className="flex flex-col">
                 {links.map(({ href, label }) => (
                   <li key={href}>
                     {/* Rarely opened from here, so not fetched ahead
@@ -242,7 +243,7 @@ export function SiteFooter() {
                     <Link
                       href={href}
                       prefetch={false}
-                      className="hover:text-night-accent no-underline hover:underline"
+                      className="hover:text-night-accent inline-flex min-h-[44px] items-center no-underline hover:underline"
                     >
                       {label}
                     </Link>

@@ -130,7 +130,7 @@ export function EventFields({
             remove it any time.
           </p>
           <details open={!!values?.until}>
-            <summary className="text-peacock w-fit cursor-pointer text-base font-semibold">
+            <summary className="text-peacock w-fit cursor-pointer py-2.5 text-base font-semibold">
               Stops sooner? (optional)
             </summary>
             <label className="mt-2 flex flex-col gap-2">
@@ -146,7 +146,7 @@ export function EventFields({
         </div>
       </div>
       <details className="flex flex-col gap-2" open={!!values?.summary}>
-        <summary className="cursor-pointer font-semibold">
+        <summary className="cursor-pointer py-2.5 font-semibold">
           Add a short description (optional)
         </summary>
         <textarea
@@ -170,7 +170,7 @@ export function EventFields({
             )
           }
         >
-          <summary className="cursor-pointer font-semibold">
+          <summary className="cursor-pointer py-2.5 font-semibold">
             Add a room, or a place away from the mandir (optional)
           </summary>
           <div className="mt-2 flex flex-col gap-4">
@@ -218,7 +218,7 @@ export function EventFields({
           className="flex flex-col gap-2"
           open={!!(values?.cost_note || values?.tickets || values?.tickets_url)}
         >
-          <summary className="cursor-pointer font-semibold">
+          <summary className="cursor-pointer py-2.5 font-semibold">
             Add the cost or tickets (optional)
           </summary>
           <div className="mt-2 flex flex-col gap-4">
@@ -264,7 +264,7 @@ export function EventFields({
           className="flex flex-col gap-2"
           open={!!(values?.title_gu || values?.summary_gu)}
         >
-          <summary className="cursor-pointer font-semibold">
+          <summary className="cursor-pointer py-2.5 font-semibold">
             Add the name and description in Gujarati (optional)
           </summary>
           <div className="mt-2 flex flex-col gap-3">

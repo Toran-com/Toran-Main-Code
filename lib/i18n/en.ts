@@ -207,6 +207,9 @@ export const en = {
   "mandir.calendarBody":
     "{name}'s events, kept up to date in your phone's calendar.",
   "mandir.committeeTitle": "Are you on this mandir's committee?",
+  "notice.label": "Notice from the mandir",
+  "notice.until": "Until {day}",
+  "notice.today": "Today",
   "mandir.claimedBefore": "This page is looked after by the committee.",
   "mandir.logIn": "Log in",
   "mandir.claimedAfter": "to update it, or ask to join them.",

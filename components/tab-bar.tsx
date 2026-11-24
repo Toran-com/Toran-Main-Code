@@ -6,8 +6,9 @@ import type { ReactNode } from "react";
 
 export type TabIcon = "events" | "mandirs" | "festivals" | "my";
 
-// On a phone, the main places sit along the bottom of the screen, where a
-// thumb reaches, each with a picture and its name, as in most phone apps.
+// On a phone and an upright tablet (under 1024px), the main places sit
+// along the bottom of the screen, where a thumb reaches, each with a
+// picture and its name, as in most phone apps.
 // The labels stay at 18px whatever the text size, so four always fit
 // side by side; everything else on the page grows with "Text size". The
 // bar is a little see-through, with the page blurred behind it, and the
@@ -23,7 +24,7 @@ export function TabBar({
   return (
     <nav
       aria-label="Main"
-      className="tab-bar border-line bg-surface/90 fixed inset-x-0 bottom-0 z-30 border-t pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur-lg backdrop-saturate-150 md:hidden"
+      className="tab-bar border-line bg-surface/90 fixed inset-x-0 bottom-0 z-30 border-t pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur-lg backdrop-saturate-150 lg:hidden"
     >
       <ul className="relative mx-auto grid max-w-lg grid-cols-4">
         {/* The pill behind the place you're in: it slides to the next. */}
@@ -41,7 +42,7 @@ export function TabBar({
               <Link
                 href={href}
                 aria-current={here ? "page" : undefined}
-                className={`group relative flex flex-col items-center gap-0.5 px-1 pt-2 pb-2.5 text-center text-[18px] leading-tight no-underline transition-colors ${
+                className={`group relative flex flex-col items-center gap-0.5 px-0.5 pt-2 pb-2.5 text-center text-[18px] leading-tight whitespace-nowrap no-underline transition-colors max-[389px]:text-[17px] max-[389px]:tracking-tight ${
                   here
                     ? "text-peacock font-semibold"
                     : "text-muted hover:text-ink font-medium"
