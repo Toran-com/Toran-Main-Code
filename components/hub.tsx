@@ -26,6 +26,7 @@ import {
   pillButtonClass,
   quietButtonClass,
 } from "@/components/ui";
+import { PushToggle } from "@/components/push-toggle";
 import { useOrigin } from "@/components/use-origin";
 import { type Locale, useLocale, useT } from "@/components/use-t";
 import { withLocale } from "@/lib/i18n/paths";
@@ -51,6 +52,7 @@ import {
   yearTotals,
 } from "@/lib/hub";
 import { enHub } from "@/lib/i18n/client/hub";
+import { syncPushMandirs, turnOff } from "@/lib/push-client";
 import { londonDate } from "@/lib/london";
 import { readSaved, savePlace } from "@/lib/place-memory";
 import { clearPlan, mergePlan, planHref } from "@/lib/plan";
@@ -448,6 +450,7 @@ export function Hub() {
         <Section id="mandirs" title={t("hub.tile.mandirs")} t={t}>
           {following.length ? (
             <>
+              <PushToggle />
               <ul className="grid gap-3 sm:grid-cols-2">
                 {following.map((slug) => {
                   const m = loaded?.mandirs[slug];
@@ -500,7 +503,10 @@ export function Hub() {
                         </Link>
                         <button
                           type="button"
-                          onClick={() => setFollowing(slug, false)}
+                          onClick={() => {
+                            setFollowing(slug, false);
+                            void syncPushMandirs();
+                          }}
                           aria-label={t("hub.mandirs.unfollowLabel", { name })}
                           className={pillButtonClass}
                         >
@@ -869,6 +875,7 @@ function Settings({ t, data }: { t: T; data: MoveData }) {
   }
 
   function clearAll() {
+    void turnOff();
     clearFollowing();
     clearPlan();
     clearVisits();

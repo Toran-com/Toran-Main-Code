@@ -91,6 +91,12 @@ plan on every device.
 - **Seva needs no names**: Toran counts places taken and nothing else.
 - **The weekly email needs only an email address**, with an optional
   area, not a postcode, name, or which mandir someone attends.
+- **Notifications are opt-in and pseudonymous** (decision 0024): a
+  browser's push address and the mandirs it follows, with no name, email or
+  account, readable only by the site's server code, deleted when turned
+  off, when the push service says it's gone, or after a year unused. Push
+  services (Apple, Google, Mozilla, Microsoft) carry only encrypted
+  messages.
 - We don't store which mandir anyone "belongs to". Following a mandir
   stays on the visitor's phone, unless a family chooses an account to
   have it on every device; then only the list itself is kept (no names,

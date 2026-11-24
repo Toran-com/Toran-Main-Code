@@ -691,6 +691,32 @@ To switch it off again, set `DIGEST_SIGNUPS` to `off` and redeploy: the
 sign-up page goes and nothing more is sent, but unsubscribe links still
 work.
 
+### Phone notifications
+
+Families who follow mandirs can turn on notifications (My Toran, or under
+Follow on a mandir's page): a committee's notice comes at once, and new
+events once a day in the early evening (`/api/cron/push`, in
+`vercel.json`). No app or account (decision 0024). On iPhone it works once
+Toran is on the Home Screen.
+
+It's off until Toran has its own push keys ("VAPID" keys). To switch it on:
+
+1. On your own computer, in a terminal, run `npx web-push generate-vapid-keys`.
+   It prints a public key and a private key. Don't paste either into a chat
+   or commit them.
+2. In Vercel → Settings → Environment Variables (Production), add:
+   - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`: the public key,
+   - `VAPID_PRIVATE_KEY`: the private key,
+   - `VAPID_SUBJECT`: `mailto:` and an email address Toran reads, such as
+     `mailto:hello@your-domain` (push services contact it if something's
+     wrong).
+3. Redeploy. The "Turn on notifications" button appears.
+
+**Keep the keys.** Changing them stops every phone's notifications until
+each turns them on again. To switch notifications off, remove the three
+variables and redeploy; existing push addresses are deleted after a year,
+or delete the rows in `push_subscriptions`.
+
 ### Log in, and family accounts (built, switched off)
 
 Every page's header has a gold **Log in** button (a person in a circle

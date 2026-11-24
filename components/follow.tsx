@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
+import { PushToggle } from "@/components/push-toggle";
 import { actionPillClass } from "@/components/ui";
 import { type Locale, useLocale, useT } from "@/components/use-t";
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/lib/family-state";
 import { enFollow } from "@/lib/i18n/client/follow";
 import { withLocale } from "@/lib/i18n/paths";
+import { syncPushMandirs } from "@/lib/push-client";
 
 // Following mandirs on this phone (lib/follow.ts): a button on a mandir's
 // page, and on What's on a way to show only the mandirs followed.
@@ -100,6 +102,7 @@ export function FollowButton({
         onClick={() => {
           setFollowing(slug, !on);
           keepOffline(locale);
+          void syncPushMandirs();
         }}
         className={`${actionPillClass} self-start ${on ? "border-peacock" : ""}`}
       >
@@ -119,6 +122,11 @@ export function FollowButton({
             {t("follow.see")}
           </Link>
         </p>
+      )}
+      {on && (
+        <div className={beside ? "basis-full" : ""}>
+          <PushToggle compact />
+        </div>
       )}
     </div>
   );

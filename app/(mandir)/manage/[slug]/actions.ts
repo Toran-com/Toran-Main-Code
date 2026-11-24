@@ -1,6 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
@@ -17,6 +18,9 @@ import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
 import { londonDate } from "@/lib/london";
 import { cleanNotice, noticeUntil } from "@/lib/notices";
+import { notifyFollowers } from "@/lib/push";
+import { noticeMessage } from "@/lib/push-digest";
+import { createRobotClient } from "@/lib/supabase/robot";
 import {
   isJpeg,
   MAX_PHOTO_BYTES,
@@ -657,7 +661,7 @@ export async function postNotice(formData: FormData) {
   if (!supabase) back("error=failed");
   const { data: mandir } = await supabase
     .from("mandirs")
-    .select("id")
+    .select("id, slug, name")
     .eq("slug", slug)
     .maybeSingle();
   if (!mandir) back("error=failed");
@@ -667,6 +671,14 @@ export async function postNotice(formData: FormData) {
   if (error)
     back(error.code === "23514" ? "error=notice-many" : "error=failed");
   updateTag(`mandir:${slug}`);
+  // At once, to everyone who follows the mandir with notifications on
+  // (decision 0024), after the page has answered.
+  after(async () => {
+    const robot = createRobotClient();
+    if (robot) {
+      await notifyFollowers(robot, mandir.slug, noticeMessage(mandir, body));
+    }
+  });
   back("done=notice");
 }
 

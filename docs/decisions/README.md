@@ -36,3 +36,4 @@ that replaces it and mark the old one Superseded.
 | 0019 | [A real street map from OpenFreeMap, and a mandir finder like a shop finder](0019-street-map.md)               | Proposed           |
 | 0020 | [A Log in for everyone, and family accounts built but switched off](0020-family-accounts.md)                   | Proposed           |
 | 0021 | [Toran is run by Milan Patel as a sole trader](0021-sole-trader.md)                                            | Accepted           |
+| 0024 | [Phone notifications from followed mandirs, without an account](0024-phone-notifications.md)                   | Proposed           |
