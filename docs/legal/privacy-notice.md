@@ -101,6 +101,9 @@ within one month.
   kept on it: see below.) To
   show their names, the page sends Toran the mandirs' web addresses and
   the events' codes, with nothing about you, and we don't keep them.
+  "All your mandirs in your calendar" gives your calendar app a link
+  with the web addresses of the mandirs you follow in it, so it can fetch
+  their events; your calendar app keeps that link, and Toran doesn't.
   "Moving to a new phone" makes a link with all of it inside, in the part
   of the address that browsers never send to a website, so it goes from
   your phone to your new one without reaching us. "Clear everything" on

@@ -308,6 +308,9 @@ export const guClient: Record<ClientKey, string> = {
   "hub.mandirs.events": "તેમના બધા કાર્યક્રમો",
   "hub.mandirs.unfollow": "ફોલો બંધ કરો",
   "hub.mandirs.unfollowLabel": "{name} ને ફોલો કરવાનું બંધ કરો",
+  "hub.calendar.title": "તમારાં બધાં મંદિરો તમારા કેલેન્ડરમાં",
+  "hub.calendar.body":
+    "તમે ફોલો કરો છો તે મંદિરોનો દરેક કાર્યક્રમ, તમારા ફોનના કેલેન્ડરમાં, હંમેશાં અપ ટુ ડેટ. પછી વધુ મંદિરો ફોલો કરો તો ફરી ઉમેરો.",
   "hub.seva.coming": "આવનારી સેવા",
   "hub.seva.done": "તમે કરેલી સેવા",
   "hub.seva.empty":
