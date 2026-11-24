@@ -7,6 +7,7 @@ import { HeroDiya, HeroLight } from "@/components/hero-diya";
 import { HomeStory } from "@/components/home-story";
 import { JsonLd } from "@/components/json-ld";
 import { LineIcon } from "@/components/line-icons";
+import { LiveStrip } from "@/components/live-now";
 import { NearMeLink } from "@/components/near-me-link";
 import { Toran } from "@/components/ornaments";
 import { RememberPlace } from "@/components/remember-place";
@@ -16,6 +17,7 @@ import { buttonClass, quietButtonClass } from "@/components/ui";
 import { listFestivalDates, listMandirs } from "@/lib/directory";
 import { formatDateRange, formatEventStart } from "@/lib/format";
 import { regionKey } from "@/lib/i18n/client/mandirs";
+import { listLiveSoon } from "@/lib/live";
 import { getSeasonBanner } from "@/lib/season-banner";
 import {
   listUpcomingEvents,
@@ -108,6 +110,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
         <div
           className={`${wideClass} flex flex-col gap-24 pt-16 sm:gap-32 sm:pt-24`}
         >
+          <Suspense fallback={null}>
+            <HappeningNow />
+          </Suspense>
+
           <Suspense fallback={null}>
             <Followed />
           </Suspense>
@@ -383,6 +389,14 @@ async function ComingUp({
 
 // "Your mandirs": every mandir's name and next event, for the browser to
 // show the ones this phone follows (components/your-mandirs.tsx).
+// "Happening now", while something is (decision 0026): worked out on the
+// visitor's phone, so it shows nothing at all on a quiet evening.
+async function HappeningNow() {
+  const result = await listLiveSoon();
+  if (result.state !== "ok" || result.data.length === 0) return null;
+  return <LiveStrip events={result.data} href={localePath("/live")} />;
+}
+
 async function Followed() {
   const [mandirs, events] = await Promise.all([
     listMandirs(),

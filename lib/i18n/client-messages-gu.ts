@@ -371,4 +371,17 @@ export const guClient: Record<ClientKey, string> = {
   "hub.iWent": "હું ગયો/ગઈ હતી",
   "hub.iWentDone": "તમે ગયા હતા · મારા Toran માં",
   "hub.iWentUndo": "પાછું કરો",
+  "live.now": "અત્યારે ચાલી રહ્યું છે",
+  "live.later": "આજે પછીથી",
+  "live.started": "{time} એ શરૂ થયું",
+  "live.until": "{time} સુધી",
+  "live.from": "{time} થી",
+  "live.allDay": "આખો દિવસ",
+  "live.watch": "લાઇવ જુઓ",
+  "live.nothingNow":
+    "અત્યારે કોઈ મંદિરમાં કંઈ ચાલી રહ્યું હોવાનું નોંધાયેલું નથી.",
+  "live.nothingLater": "આજે પછીથી બીજું કંઈ નોંધાયેલું નથી.",
+  "live.stripLabel": "અત્યારે ચાલી રહ્યું છે",
+  "live.stripMore": "અને બીજા {count}",
+  "live.stripOpen": "અત્યારે શું ચાલે છે તે જુઓ",
 };

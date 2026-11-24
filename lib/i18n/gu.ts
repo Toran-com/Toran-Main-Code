@@ -14,6 +14,7 @@ export const gu: Record<MessageKey, string> = {
   "shell.mandirs": "મંદિરો",
   "shell.festivals": "તહેવારો",
   "shell.search": "શોધો",
+  "shell.live": "અત્યારે લાઇવ",
   "shell.forMandirs": "મંદિર સમિતિઓ માટે",
   "shell.find": "શોધો",
   "shell.toran": "Toran",
@@ -120,6 +121,13 @@ export const gu: Record<MessageKey, string> = {
   "regular.intro":
     "બાલ વિહાર, ભજન મંડળ, યોગ, ભાષાના વર્ગો અને વધુ: દર અઠવાડિયે કે દર મહિને થતું બધું, જે દિવસે થાય તે પ્રમાણે.",
   "regular.what": "વર્ગો અને નિયમિત મંડળો",
+  "live.title": "અત્યારે લાઇવ",
+  "live.description":
+    "યુકેભરના મંદિરોમાં અત્યારે અને આજે પછીથી શું ચાલી રહ્યું છે, અને જ્યાં મંદિર લાઇવ પ્રસારણ કરે છે ત્યાં તે.",
+  "live.intro":
+    "મંદિરો જે નોંધે છે તે પ્રમાણે, અત્યારે અને આજે પછીથી મંદિરોમાં શું છે. જ્યાં મંદિર પ્રસારણ કરે છે, ત્યાં લાઇવ જુઓ તેનું પ્રસારણ ખોલે છે.",
+  "live.what": "અત્યારે શું ચાલે છે",
+  "live.seeAll": "આગળ આવતું બધું શું છે માં જુઓ",
   "regular.areas": "વિસ્તાર",
   "regular.everywhere": "બધે",
   "regular.none": "અહીં હજી કોઈ નિયમિત વર્ગ કે મંડળ નથી.",

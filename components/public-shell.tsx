@@ -120,6 +120,7 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
               <MenuSection heading={t("shell.find")}>
                 {[
                   ...places,
+                  { href: localePath("/live"), label: t("shell.live") },
                   { href: localePath("/my"), label: t("shell.my") },
                   { href: localePath("/search"), label: t("shell.search") },
                 ].map(({ href, label }) => (
