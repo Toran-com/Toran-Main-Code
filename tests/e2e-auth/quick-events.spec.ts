@@ -70,9 +70,14 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   await addEventsBy(page, "Again this year?");
   const again = page.getByRole("checkbox", { name: /^Utsav eve bhajans/ });
   await expect(again).toBeVisible();
-  await expect(page.getByLabel("Day for Utsav eve bhajans")).toHaveValue(
-    inDays(20),
+  // The evening before this year's festival, as the database has it (not
+  // worked out again here: across midnight, "today" would have moved on).
+  const eve = sql(
+    `select (d.starts_on - 1)::text from public.festival_dates d
+       join public.festivals f on f.id = d.festival_id
+       where f.slug = 'e2e-utsav' and d.starts_on >= current_date`,
   );
+  await expect(page.getByLabel("Day for Utsav eve bhajans")).toHaveValue(eve);
   await expect(page.getByLabel("Time for Utsav eve bhajans")).toHaveValue(
     "19:00",
   );
@@ -107,7 +112,7 @@ test("tick festivals, bring back last year's events, duplicate", async ({
   const addAgain = async (title: string, time: string) => {
     await page.goto(`/manage/${SLUG}#add-event`);
     await page.getByLabel("What's happening?").fill(title);
-    await page.getByLabel("Date").fill(inDays(20));
+    await page.getByLabel("Date").fill(eve);
     await page.getByLabel("Starts").fill(time);
     await page.getByRole("button", { name: "Add event", exact: true }).click();
   };
