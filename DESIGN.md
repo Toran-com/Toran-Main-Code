@@ -77,13 +77,30 @@ as decoration.
   little see-through with the page blurred behind it; on a phone it slides
   away while you scroll down and comes back the moment you scroll up, so
   the page has the screen. A thin gold line along its foot shows how far
-  down the page you are. On a phone, four labelled tabs sit along the
-  bottom and never move; the pill behind the current one slides across.
+  down the page you are. On a phone and an upright tablet (under 1024px),
+  four labelled tabs sit along the bottom and never move; the pill behind
+  the current one slides across. From 1024px (a sideways tablet, a
+  laptop) the four places are in the header instead. The header row needs
+  about 950px, so "My Toran" is just its icon below 1180px (a sideways
+  iPad Air shows its name) and "Your account" below 1280px, each named
+  for screen readers and on hover. Nothing in the header ever wraps onto
+  a second line.
+- **The four tabs** are What's on, Mandirs, Festivals and My Toran. Seva
+  isn't a fifth: five labels at the 17px minimum don't fit a 375px phone.
+  It's in the menu, on the home page, in My Toran and on every event that
+  needs volunteers. Tab labels stay on one line (17px under 390px).
 - Footer: a midnight band under its own garland, so a page ends as it
   began.
 - **First screen on a phone:** what the page is for and its main action
   are both above the bar along the bottom. On the home page that's the
-  headline and "Find events near me"; on What's on it's the first event.
+  headline and "Find events near me"; on What's on it's the first event;
+  on an event, "Add to calendar" (its time and place, then the buttons,
+  then getting there and visiting).
+- **Content before explanations:** the home page shows festivals and
+  what's coming up before "See how Toran works"; Festivals shows the
+  season pages as a row to swipe on a phone, so the dates come next.
+- **Everything you can tap is at least 44px tall** (chips, back links,
+  footer links, the logo, "Log in"), with text no smaller than 17px.
 - **Things that follow you:** a day's heading stays under the header
   while its events scroll past (`.sticks`), as does the committee page's
   section bar. On a phone, What's on has one floating button above the
@@ -195,7 +212,7 @@ waits until it's wanted and nothing is wider than the screen.
   of 3"), then what needs doing now. A row opens the part it's about.
 - **Posters waiting for you**, when there are any.
 - **Coming up:** one line per event (date and name; tap to edit) and a
-  "⋯" button for a sheet with Still on, Cancel, Duplicate, Seva rota and
+  "⋯" button for a sheet with Still on, Cancel, Duplicate, Add seva and
   Remove. The first six, then "Show more".
 - **Share:** this week's message to send on WhatsApp or copy (the message
   itself a tap away), and the festival's picture and sheet.

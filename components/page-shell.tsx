@@ -48,15 +48,27 @@ export function PageShell({
         {children}
         <nav
           aria-label="About Toran"
-          className="text-muted mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-6 text-base"
+          className="text-muted mt-auto flex flex-wrap gap-x-4 pt-6 text-base"
         >
-          <Link href="/privacy" prefetch={false} className="underline">
+          <Link
+            href="/privacy"
+            prefetch={false}
+            className="inline-flex min-h-11 items-center underline"
+          >
             Privacy
           </Link>
-          <Link href="/terms" prefetch={false} className="underline">
+          <Link
+            href="/terms"
+            prefetch={false}
+            className="inline-flex min-h-11 items-center underline"
+          >
             Terms
           </Link>
-          <Link href="/contact" prefetch={false} className="underline">
+          <Link
+            href="/contact"
+            prefetch={false}
+            className="inline-flex min-h-11 items-center underline"
+          >
             Contact
           </Link>
         </nav>

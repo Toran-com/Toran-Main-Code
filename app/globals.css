@@ -183,10 +183,11 @@ body {
   font-family: var(--font-marcellus), Georgia, serif;
 }
 
-/* On a phone the main places sit in a bar fixed along the bottom of the
-   screen (components/tab-bar.tsx): leave room for it at the end of the
-   page, so the footer isn't hidden behind it. */
-@media (width < 48rem) {
+/* On a phone and an upright tablet (under 1024px) the main places sit in
+   a bar fixed along the bottom of the screen (components/tab-bar.tsx):
+   leave room for it at the end of the page, so the footer isn't hidden
+   behind it. */
+@media (width < 64rem) {
   body:has(.tab-bar) {
     padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
   }
@@ -412,7 +413,7 @@ html[data-scrolled] .site-header {
 html[data-scrolled] .site-header::before {
   opacity: 1;
 }
-@media (width < 48rem) {
+@media (width < 64rem) {
   html[data-scroll="down"]:not(:has(.site-menu[open]))
     .site-header:not(:focus-within) {
     translate: 0 -105%;

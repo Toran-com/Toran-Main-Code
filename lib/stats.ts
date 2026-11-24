@@ -16,6 +16,47 @@ export function isMetric(value: unknown): value is Metric {
   );
 }
 
+// Presses counted the same way, with nothing about who pressed (decision
+// 0022): Follow, Unfollow and "Ask them to post" on a mandir's page, and
+// "I went" on an event's. A committee sees its own totals.
+export const PRESSES = ["follow", "unfollow", "ask", "went"] as const;
+export type Press = (typeof PRESSES)[number];
+export type Counted = Metric | Press;
+
+export function isCounted(value: unknown): value is Counted {
+  return (
+    isMetric(value) ||
+    (typeof value === "string" &&
+      (PRESSES as readonly string[]).includes(value))
+  );
+}
+
+// What a mandir's page brings, for its committee (mandir_supporters).
+export type Supporters = {
+  followers: number;
+  newFollowers: number;
+  asks: number;
+  newAsks: number;
+  went: number;
+  sevaTaken: number;
+};
+
+export function readSupporters(value: unknown): Supporters {
+  const v = (value ?? {}) as Record<string, unknown>;
+  const n = (key: string) => {
+    const x = Number(v[key]);
+    return Number.isFinite(x) ? Math.trunc(x) : 0;
+  };
+  return {
+    followers: Math.max(0, n("followers")),
+    newFollowers: n("new_followers"),
+    asks: Math.max(0, n("asks")),
+    newAsks: Math.max(0, n("new_asks")),
+    went: Math.max(0, n("went")),
+    sevaTaken: Math.max(0, n("seva_taken")),
+  };
+}
+
 const SLUG = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const ID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 

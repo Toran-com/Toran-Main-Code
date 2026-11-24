@@ -79,8 +79,11 @@ within one month.
   your calendar or give them back; clearing the site's data in your
   browser forgets them.
 - **Following a mandir.** If you press "Follow" on a mandir's page, your
-  phone remembers that mandir; nothing is sent to us and you need no
-  account. When you choose "Only mandirs I follow" on What's on, the
+  phone remembers that mandir and you need no account. Toran adds one to
+  that mandir's number of followers (and takes one off if you press
+  "Following" again), so its committee can see how many people follow it;
+  nothing about you is sent or kept, so nobody, Toran included, can tell
+  who follows a mandir. When you choose "Only mandirs I follow" on What's on, the
   mandirs' web addresses go in the page's address so Toran can show their
   events, like any other choice on that page; we don't keep them.
   The home page shows their next events: it comes with every mandir's
@@ -122,8 +125,14 @@ within one month.
   database. From then on it's between you and the mandir, and the mandir's
   own privacy notice applies to what it keeps. The same spam counter as
   the other forms applies.
+- **Asking a mandir to post.** If you press "Ask them to post on Toran" on
+  a mandir's page, Toran adds one to the number of people who asked that
+  mandir, and your phone remembers you asked. Nothing about you is sent or
+  kept. If you then send the ready-made WhatsApp message, it goes from your
+  WhatsApp to whoever you choose; Toran doesn't see it.
 - **Visitor numbers.** Toran counts how many times each public page is
-  seen each day, and how often events are added to calendars or shared,
+  seen each day, how often events are added to calendars or shared, and
+  how many times "Follow", "Ask them to post" and "I went" are pressed,
   with its own simple counter. It uses no cookies and keeps nothing about
   you: no IP address, browser or device, only the page's address and a
   running total. If your browser asks sites not to track you ("Do Not
@@ -210,9 +219,14 @@ doesn't keep the picture or the message, only the event details it
 finds, which are checked before anything is published. Anthropic doesn't use what we send to train its models and
 deletes it within 30 days.
 
-**A monthly email to committees** (switched off until our ICO
-registration is done): a summary of how your page did and anything worth
-doing. You'll be able to stop it at any time.
+**A monthly email to committees.** Once a month we email each member of a
+mandir's committee on Toran, at their login email, a summary of how the
+mandir's page did (visits, calendar adds, shares, how many people follow
+it, seva places taken), what's coming up and anything worth doing. It
+says nothing about who visited or follows. We use Resend to send it. Every
+email has a link to stop it, for you and that mandir only; other members
+still get theirs. We keep only which mandirs' committees have had each
+month's email, not who.
 
 ## Mandirs' own details
 

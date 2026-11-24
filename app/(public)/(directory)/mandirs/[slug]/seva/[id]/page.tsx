@@ -82,7 +82,7 @@ export default async function OwnSevaPage({
     <>
       <Link
         href={localePath(`/mandirs/${mandir.slug}`)}
-        className="text-peacock self-start font-semibold hover:underline"
+        className="text-peacock inline-flex min-h-11 items-center self-start font-semibold hover:underline"
       >
         ← {mandir.name}
       </Link>

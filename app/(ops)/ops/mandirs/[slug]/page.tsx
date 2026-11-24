@@ -71,7 +71,10 @@ async function EditMandir({
   return (
     <>
       <div className="flex flex-wrap gap-4">
-        <Link href="/ops/mandirs" className="text-peacock font-semibold">
+        <Link
+          href="/ops/mandirs"
+          className="text-peacock inline-flex min-h-11 items-center font-semibold"
+        >
           ← All mandirs
         </Link>
         {mandir.status !== "hidden" && (

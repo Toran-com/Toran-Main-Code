@@ -691,6 +691,28 @@ To switch it off again, set `DIGEST_SIGNUPS` to `off` and redeploy: the
 sign-up page goes and nothing more is sent, but unsubscribe links still
 work.
 
+### The monthly email to committees
+
+Once a month, each member of a mandir's committee gets an email about the
+mandir's page: visits, calendar adds and shares over four weeks, how many
+follow it and how many new, "I went" and seva places taken on Toran, what's
+coming up and anything worth doing (`lib/committee-monthly.ts`). The
+weekly job sends it every Thursday to committees that haven't had this
+month's, so it goes out on the first Thursday of the month and any left
+over go the week after. A committee whose first member joined in the last
+two weeks waits for the next month.
+
+Check the wording first: `/ops/committee-email` shows any mandir's email,
+and **Send this to me** emails it to your own address.
+
+To switch it on: the email sender must be set up (`RESEND_API_KEY` and
+`DIGEST_FROM`, as for the weekly email above), then in Vercel → Settings
+→ Environment Variables (Production only) add `COMMITTEE_EMAIL` with the
+value `on`, and redeploy. Each email's "To stop it" link is made from
+`CRON_SECRET`, so **don't change that afterwards** or old links stop
+working. To switch it off, set `COMMITTEE_EMAIL` to `off` and redeploy;
+stop links keep working.
+
 ### Log in, and family accounts (built, switched off)
 
 Every page's header has a gold **Log in** button (a person in a circle

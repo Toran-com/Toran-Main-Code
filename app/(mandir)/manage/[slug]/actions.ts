@@ -16,6 +16,7 @@ import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
 import { lookupPostcode } from "@/lib/geo";
 import { londonDate } from "@/lib/london";
+import { cleanNotice, noticeUntil } from "@/lib/notices";
 import {
   isJpeg,
   MAX_PHOTO_BYTES,
@@ -635,4 +636,51 @@ export async function removePhoto(formData: FormData) {
   updateTag(`mandir:${slug}`);
   updateTag("mandirs");
   back("done=photo-removed");
+}
+
+// A notice to visitors ("Closed today"), shown at the top of the mandir's
+// page and its events' pages until its last day (mandir_notices). The
+// database checks the committee, the dates and the three-at-once limit.
+export async function postNotice(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#notices`);
+  const body = cleanNotice(String(formData.get("body") ?? ""));
+  if (!body) back("error=notice-text");
+  const until = noticeUntil(
+    String(formData.get("length") ?? ""),
+    String(formData.get("until") ?? ""),
+    londonDate(),
+  );
+  if (!until) back("error=notice-date");
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=failed");
+  const { error } = await supabase
+    .from("mandir_notices")
+    .insert({ mandir_id: mandir.id, body, until_on: until });
+  if (error)
+    back(error.code === "23514" ? "error=notice-many" : "error=failed");
+  updateTag(`mandir:${slug}`);
+  back("done=notice");
+}
+
+export async function removeNotice(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#notices`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=failed");
+  const { error } = await supabase
+    .from("mandir_notices")
+    .delete()
+    .eq("id", String(formData.get("notice") ?? ""));
+  if (error) back("error=failed");
+  updateTag(`mandir:${slug}`);
+  back("done=notice-removed");
 }
