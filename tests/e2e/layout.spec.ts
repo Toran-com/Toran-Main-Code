@@ -22,6 +22,7 @@ for (const path of [
   "/contact",
   "/gu",
   "/hi/whats-on",
+  "/ta/whats-on",
 ]) {
   test(`${path} fits the screen`, async ({ page }) => {
     await page.goto(path);
@@ -115,6 +116,9 @@ test.describe("on a small phone with the largest text", () => {
     "/hi",
     "/hi/whats-on",
     "/hi/festivals",
+    "/ta",
+    "/ta/whats-on",
+    "/ta/festivals",
   ]) {
     test(`${path} fits the screen`, async ({ page }) => {
       await page.goto(path);

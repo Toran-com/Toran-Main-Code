@@ -1,13 +1,14 @@
 import { en, type MessageKey } from "@/lib/i18n/en";
 import { gu } from "@/lib/i18n/gu";
 import { hi } from "@/lib/i18n/hi";
+import { ta } from "@/lib/i18n/ta";
 import { fill, type Values } from "@/lib/i18n/core";
 
 // A small translation layer: typed keys, "{name}" values, and English
 // whenever a translation is missing. The site uses English only until a
 // translation has been checked by a native speaker ("ready").
 
-export type Locale = "en" | "gu" | "hi";
+export type Locale = "en" | "gu" | "hi" | "ta";
 export type { MessageKey };
 
 export const LOCALES: Record<
@@ -17,12 +18,14 @@ export const LOCALES: Record<
   en: { name: "English", lang: "en-GB", ready: true },
   gu: { name: "ગુજરાતી", lang: "gu", ready: false },
   hi: { name: "हिन्दी", lang: "hi", ready: false },
+  ta: { name: "தமிழ்", lang: "ta", ready: false },
 };
 
 export const MESSAGES: Record<Locale, Partial<Record<MessageKey, string>>> = {
   en,
   gu,
   hi,
+  ta,
 };
 
 export const DEFAULT_LOCALE: Locale = "en";

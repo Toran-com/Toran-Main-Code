@@ -155,11 +155,25 @@ export function SiteHeader({ toran = true }: { toran?: boolean }) {
         </div>
       </header>
       {toran && <Toran className="site-toran" />}
+      {/* Tab names of their own: in some languages (Tamil) the page
+          names are too long for a quarter of a small phone. */}
       <TabBar
         tabs={[
-          { href: places[0].href, label: places[0].label, icon: "events" },
-          { href: places[2].href, label: places[2].label, icon: "mandirs" },
-          { href: places[3].href, label: places[3].label, icon: "festivals" },
+          {
+            href: places[0].href,
+            label: t("shell.tab.whatsOn"),
+            icon: "events",
+          },
+          {
+            href: places[2].href,
+            label: t("shell.tab.mandirs"),
+            icon: "mandirs",
+          },
+          {
+            href: places[3].href,
+            label: t("shell.tab.festivals"),
+            icon: "festivals",
+          },
           { href: localePath("/my"), label: t("shell.my"), icon: "my" },
         ]}
       />

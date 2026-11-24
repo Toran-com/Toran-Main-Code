@@ -144,7 +144,7 @@ function soon(at: string, now: Date, t: T): string | null {
 
 // A date when the names couldn't be loaded.
 function plainDate(at: string, locale: string): string {
-  return new Intl.DateTimeFormat(locale === "gu" ? "gu-IN" : "en-GB", {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-IN`, {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -434,10 +434,10 @@ export function Hub() {
               text={t("hub.coming.empty")}
               links={[
                 [
-                  locale === "gu" ? "/gu/whats-on" : "/whats-on",
+                  withLocale("/whats-on", locale as Locale),
                   t("hub.findEvents"),
                 ],
-                [locale === "gu" ? "/gu/seva" : "/seva", t("hub.findSeva")],
+                [withLocale("/seva", locale as Locale), t("hub.findSeva")],
               ]}
             />
           )}
@@ -461,7 +461,7 @@ export function Hub() {
                         <Link
                           href={
                             m?.path ??
-                            `${locale === "gu" ? "/gu" : ""}/mandirs/${slug}`
+                            withLocale(`/mandirs/${slug}`, locale as Locale)
                           }
                           className="text-ink text-xl font-semibold"
                         >
@@ -493,7 +493,7 @@ export function Hub() {
                         ))}
                       <p className="mt-auto flex flex-wrap gap-2">
                         <Link
-                          href={`${locale === "gu" ? "/gu" : ""}/whats-on?mandirs=${slug}`}
+                          href={`${withLocale("/whats-on", locale as Locale)}?mandirs=${slug}`}
                           className={pillButtonClass}
                         >
                           {t("hub.mandirs.events")}
@@ -512,7 +512,7 @@ export function Hub() {
                 })}
               </ul>
               <Link
-                href={`${locale === "gu" ? "/gu" : ""}/whats-on?mandirs=${following.join(",")}`}
+                href={`${withLocale("/whats-on", locale as Locale)}?mandirs=${following.join(",")}`}
                 className={`${actionPillClass} self-start`}
               >
                 <Star filled />
@@ -524,7 +524,7 @@ export function Hub() {
               text={t("hub.mandirs.empty")}
               links={[
                 [
-                  locale === "gu" ? "/gu/mandirs" : "/mandirs",
+                  withLocale("/mandirs", locale as Locale),
                   t("hub.findMandirs"),
                 ],
               ]}
@@ -605,7 +605,7 @@ export function Hub() {
             <Empty
               text={t("hub.seva.empty")}
               links={[
-                [locale === "gu" ? "/gu/seva" : "/seva", t("hub.findSeva")],
+                [withLocale("/seva", locale as Locale), t("hub.findSeva")],
               ]}
             />
           )}

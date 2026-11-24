@@ -112,7 +112,8 @@ export function parseRule(rule: string): Parsed | null {
 
 // "Sat 10 Oct", for the end of a festival's run.
 function untilDay(until: string): string {
-  return new Intl.DateTimeFormat(pageLocale() === "gu" ? "gu-IN" : "en-GB", {
+  const locale = pageLocale();
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-IN`, {
     weekday: "short",
     day: "numeric",
     month: "short",
