@@ -319,6 +319,9 @@ export const hiClient: Record<ClientKey, string> = {
   "hub.mandirs.events": "उनके सभी कार्यक्रम",
   "hub.mandirs.unfollow": "फ़ॉलो करना बंद करें",
   "hub.mandirs.unfollowLabel": "{name} को फ़ॉलो करना बंद करें",
+  "hub.calendar.title": "आपके सभी मंदिर आपके कैलेंडर में",
+  "hub.calendar.body":
+    "आप जिन मंदिरों को फ़ॉलो करते हैं उनका हर कार्यक्रम, आपके फ़ोन के कैलेंडर में, हमेशा अपडेट। बाद में और मंदिर फ़ॉलो करें तो इसे फिर से जोड़ें।",
   "hub.seva.coming": "आने वाली सेवा",
   "hub.seva.done": "आपकी की हुई सेवा",
   "hub.seva.empty":
