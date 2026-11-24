@@ -353,6 +353,20 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"push_subscriptions": {
+                  Row: {
+                    "auth": string,"created_at": string,"endpoint": string,"id": string,"last_digest_at": string,"mandirs": (string)[],"p256dh": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auth": string,"created_at"?: string,"endpoint": string,"id"?: string,"last_digest_at"?: string,"mandirs"?: (string)[],"p256dh": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "auth"?: string,"created_at"?: string,"endpoint"?: string,"id"?: string,"last_digest_at"?: string,"mandirs"?: (string)[],"p256dh"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"seva_roles": {
                   Row: {
                     "created_at": string,"description": string | null,"event_id": string | null,"id": string,"mandir_id": string,"name": string,"needs_dbs": boolean,"open": boolean
@@ -519,6 +533,9 @@ isOneToOne: false
 "drop_committee_invite":
 { Args: { "invite": string }; Returns: boolean
                            },
+"drop_push_subscription":
+{ Args: { "target_endpoint": string }; Returns: undefined
+                           },
 "edit_event":
 { Args: { "dates": (string)[],"details": Json,"target": string,"today": string }; Returns: undefined
                            },
@@ -605,6 +622,9 @@ isOneToOne: false
                            },
 "run_retention":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"save_push_subscription":
+{ Args: { "key_auth": string,"key_p256dh": string,"slugs": (string)[],"target_endpoint": string }; Returns: boolean
                            },
 "set_committee_email":
 { Args: { "member": string,"target": string,"wanted": boolean }; Returns: boolean

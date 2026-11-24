@@ -254,6 +254,12 @@ export default async function MandirPage({
                 </Link>
               </section>
             )}
+          <Link
+            href={localePath("/first-visit")}
+            className="text-peacock inline-flex min-h-11 items-center self-start font-semibold"
+          >
+            {t("firstVisit.link")} →
+          </Link>
           {/* Events found on its website, but no committee on Toran yet:
               families can ask it to join (with nothing coming up, the ask
               is in "No events listed yet" instead). */}

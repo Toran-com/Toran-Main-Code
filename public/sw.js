@@ -147,3 +147,40 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(asset(request));
   }
 });
+
+// Phone notifications (decision 0024): a notice from a followed mandir,
+// or the day's new events. The server sends a title, the words and the
+// page to open; only same-site pages are opened.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : "" };
+  }
+  const url =
+    typeof data.url === "string" && data.url.startsWith("/") ? data.url : "/my";
+  event.waitUntil(
+    self.registration.showNotification(data.title || "Toran", {
+      body: data.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: data.tag || undefined,
+      data: { url },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || "/my";
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windows) => {
+        const open = windows.find((w) => "focus" in w);
+        if (open) return open.navigate(url).then((w) => (w ?? open).focus());
+        return self.clients.openWindow(url);
+      }),
+  );
+});
