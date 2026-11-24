@@ -5,7 +5,27 @@ export type Database = {
   
   "public": {
           Tables: {
-            "daily_counts": {
+            "committee_emails_sent": {
+                  Row: {
+                    "mandir_id": string,"month": string,"recipients": number,"sent_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "mandir_id": string,"month": string,"recipients": number,"sent_at"?: string
+                  }
+                  Update: {
+                    "mandir_id"?: string,"month"?: string,"recipients"?: number,"sent_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "committee_emails_sent_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"daily_counts": {
                   Row: {
                     "count": number,"day": string,"metric": string,"path": string
                   }
@@ -201,14 +221,14 @@ isOneToOne: false
                   ]
                 },"mandir_admins": {
                   Row: {
-                    "added_at": string,"added_by": string | null,"consented_at": string | null,"mandir_id": string,"user_id": string
+                    "added_at": string,"added_by": string | null,"consented_at": string | null,"mandir_id": string,"monthly_email": boolean,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id": string,"user_id": string
+                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id": string,"monthly_email"?: boolean,"user_id": string
                   }
                   Update: {
-                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id"?: string,"user_id"?: string
+                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id"?: string,"monthly_email"?: boolean,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -487,6 +507,9 @@ isOneToOne: false
 "can_edit_mandir_photo":
 { Args: { "object_name": string }; Returns: boolean
                            },
+"committee_emails_due":
+{ Args: { "for_month": string,"since": string }; Returns: Json
+                           },
 "committee_members":
 { Args: { "target": string }; Returns: {
               "added_at": string,"added_by_me": boolean,"email": string,"user_id": string
@@ -551,11 +574,17 @@ isOneToOne: false
               "added_at": string,"email": string,"user_id": string
             }[]
                            },
+"mandir_count_paths":
+{ Args: { "base": string,"since": string }; Returns: Json
+                           },
 "mandir_count_summary":
 { Args: { "since": string,"target": string }; Returns: Json
                            },
 "mandir_supporters":
 { Args: { "since": string,"target": string }; Returns: Json
+                           },
+"mandir_supporters_of":
+{ Args: { "base": string,"since": string,"target": string }; Returns: Json
                            },
 "may_decide_events":
 { Args: { "a": string,"b": string }; Returns: boolean
@@ -591,6 +620,9 @@ isOneToOne: false
                            },
 "save_push_subscription":
 { Args: { "key_auth": string,"key_p256dh": string,"slugs": (string)[],"target_endpoint": string }; Returns: boolean
+                           },
+"set_committee_email":
+{ Args: { "member": string,"target": string,"wanted": boolean }; Returns: boolean
                            },
 "subscribe_digest":
 { Args: { "address": string,"area": string,"confirm": string,"leave": string }; Returns: undefined
