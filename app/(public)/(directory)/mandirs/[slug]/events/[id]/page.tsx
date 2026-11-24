@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { AddToCalendar } from "@/components/add-to-calendar";
+import { MandirNotices } from "@/components/mandir-notices";
 import { CallAndDirections } from "@/components/call-directions";
 import { DateTile } from "@/components/date-tile";
 import { Morph, morphName } from "@/components/morph";
@@ -161,6 +162,8 @@ export default async function EventPage({
         >
           ← {mandir.name}
         </Link>
+
+        <MandirNotices notices={mandir.notices} />
 
         {/* The page's bold moment: the date and name under a toran. */}
         <header className="own-toran bg-night text-on-night rise relative overflow-hidden rounded-[2rem]">

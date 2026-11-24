@@ -73,6 +73,11 @@ export function formatDateRange(startsOn: string, endsOn: string): string {
   return `${dayLabel(start, "UTC", !sameYear)} – ${dayLabel(end, "UTC", true)}`;
 }
 
+// "Sat 28 Nov" for a YYYY-MM-DD date, in the page's language.
+export function formatDay(value: string): string {
+  return dayLabel(dateOnly(value), "UTC");
+}
+
 // "November 2026" for a YYYY-MM-DD date.
 export function monthOf(value: string): string {
   return new Intl.DateTimeFormat(dateLocale(), {

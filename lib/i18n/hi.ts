@@ -201,6 +201,9 @@ export const hi: Record<MessageKey, string> = {
   "mandir.calendarBody":
     "{name} के कार्यक्रम, आपके फ़ोन के कैलेंडर में हमेशा ताज़ा।",
   "mandir.committeeTitle": "क्या आप इस मंदिर की समिति में हैं?",
+  "notice.label": "मंदिर की ओर से सूचना",
+  "notice.until": "{day} तक",
+  "notice.today": "आज",
   "mandir.claimedBefore": "इस पेज की देखभाल समिति करती है।",
   "mandir.logIn": "लॉग इन करें",
   "mandir.claimedAfter": "इसे अपडेट करने के लिए, या उनसे जुड़ने के लिए कहें।",

@@ -419,6 +419,13 @@ export default function CommitteeGuidePage() {
             Changes show on your public page straight away. Your to-do list
             reminds you to check events coming up soon.
           </p>
+          <p className="leading-relaxed">
+            Something families need to know today, like &ldquo;Closed because of
+            the snow&rdquo; or &ldquo;Aarti at 7pm tonight&rdquo;? Press{" "}
+            <Ui>Post a notice</Ui> under <Ui>Notice for visitors</Ui>. It shows
+            at the top of your page and your events&apos; pages for as long as
+            you choose, up to a month.
+          </p>
         </Section>
 
         <Section id="posters" picture={<PosterScreen />}>

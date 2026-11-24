@@ -319,6 +319,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"mandir_notices": {
+                  Row: {
+                    "body": string,"created_at": string,"id": string,"mandir_id": string,"until_on": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "body": string,"created_at"?: string,"id"?: string,"mandir_id": string,"until_on": string
+                  }
+                  Update: {
+                    "body"?: string,"created_at"?: string,"id"?: string,"mandir_id"?: string,"until_on"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mandir_notices_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"mandirs": {
                   Row: {
                     "aarti_times": Json | null,"calendar": Database["public"]['Enums']["calendar_tradition"] | null,"charity_number": string | null,"created_at": string,"facilities": (string)[],"getting_there": string | null,"id": string,"latitude": number | null,"live_url": string | null,"longitude": number | null,"name": string,"opening_hours": Json | null,"phone": string | null,"photo_path": string | null,"postcode": string | null,"region": string,"slug": string,"status": string,"town": string,"tradition": string | null,"updated_at": string,"visiting_note": string | null,"website": string | null
