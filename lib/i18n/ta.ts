@@ -1,0 +1,542 @@
+import { taShared } from "@/lib/i18n/shared-messages";
+import { taClient } from "@/lib/i18n/client-messages-ta";
+import type { MessageKey } from "@/lib/i18n/en";
+
+// Tamil. A DRAFT, not yet checked by a native Tamil speaker: not shown to
+// the public until it has been (see /ops/translations). "Toran" is the
+// brand name and stays in Latin letters, as do UK place names in examples.
+// A mandir is a கோயில் (koyil), as Tamil speakers say.
+export const ta: Record<MessageKey, string> = {
+  ...taClient,
+  ...taShared,
+  "shell.loading": "ஏற்றுகிறோம்…",
+  "shell.home": "Toran முகப்பு",
+  "shell.whatsOn": "என்ன நடக்கிறது",
+  "shell.mandirs": "கோயில்கள்",
+  "shell.festivals": "பண்டிகைகள்",
+  "shell.tab.whatsOn": "நிகழ்வு",
+  "shell.tab.mandirs": "கோயில்",
+  "shell.tab.festivals": "விழா",
+  "shell.search": "தேடு",
+  "shell.forMandirs": "கோயில் குழுக்களுக்கு",
+  "shell.find": "கண்டறி",
+  "shell.toran": "Toran",
+  "shell.yourData": "உங்கள் தரவு",
+  "shell.footerLinks": "Toran பற்றிய பக்கங்கள்",
+  "shell.about": "எங்களைப் பற்றி",
+  "shell.contact": "தொடர்பு",
+  "shell.corrections": "எதையாவது திருத்தவும் அல்லது நீக்கவும்",
+  "shell.privacy": "தனியுரிமை",
+  "shell.terms": "விதிமுறைகள்",
+  "shell.built": "இது எப்படி உருவாக்கப்பட்டது",
+  "shell.accessibility": "அணுகல்தன்மை",
+  "page.somethingWrong": "இங்கே ஏதாவது தவறா? எங்களிடம் சொல்லுங்கள்",
+  "page.privacyNotice": "தனியுரிமை அறிவிப்பு",
+  "shell.footer":
+    "Toran கோயில் குழுக்களுடன் சோதிக்கப்படுகிறது, 2027 இல் திறக்கப்படும்.",
+  "home.tagline": "உங்களுக்கு அருகிலுள்ள கோயில்களில் என்ன நடக்கிறது",
+  "home.findNear": "எனக்கு அருகிலுள்ள நிகழ்வுகளைக் கண்டறி",
+  "home.intro": "UK கோயில்களின் நிகழ்வுகளும் சேவையும், அனைத்தும் ஒரே இடத்தில்.",
+  "home.mandirs": "கோயில்களைப் பாருங்கள்",
+  "home.comingUp": "வரவிருப்பவை",
+  "home.comingUpNear": "{place} அருகில் வரவிருப்பவை",
+  "home.seeAll": "நடக்கும் அனைத்தையும் பாருங்கள்",
+  "home.festivalsSoon": "வரவிருக்கும் பண்டிகைகள்",
+  "home.allFestivals": "எல்லாப் பண்டிகைத் தேதிகளும்",
+  "home.committeesCta":
+    "கோயிலை நடத்துகிறீர்களா? உங்கள் நிகழ்வுகளை Toran இல் சேருங்கள்",
+  "story.eyebrow": "ஆறு படிகளில்",
+  "story.title": "Toran எப்படி வேலை செய்கிறது என்று பாருங்கள்",
+  "story.intro":
+    "நீங்கள் என்ன செய்யலாம் என்று உருட்டிப் பாருங்கள். தங்க நிறக் கோட்டுடன் உள்ள பொத்தான்களைத்தான் நீங்கள் தட்டுவீர்கள்.",
+  "story.step": "{total} இல் படி {n}",
+  "story.skip": "படிகளைத் தவிர்",
+  "story.findTitle": "உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்",
+  "story.findBody":
+    "எனக்கு அருகில் கண்டறி என்பதை அழுத்துங்கள், அல்லது அஞ்சல் குறியீட்டைத் தட்டச்சு செய்யுங்கள். உங்களுக்கு மிக அருகிலுள்ள கோயில்களின் நிகழ்வுகள், கோயில்களிடமிருந்தே நேரடியாக, முதலில் வரும்.",
+  "story.findTry": "என்ன நடக்கிறது என்பதை முயற்சிக்கவும்",
+  "story.calendarTitle": "உங்கள் நாட்காட்டியில் சேருங்கள்",
+  "story.calendarBody":
+    "நாட்காட்டியில் சேர் என்பது நிகழ்வை நேரத்துடனும் கோயிலின் முகவரியுடனும் உங்கள் ஃபோனின் நாட்காட்டியில் சேர்க்கும், அதனால் யாரும் மறக்க மாட்டார்கள்.",
+  "story.shareTitle": "குடும்பத்தினருக்கு அனுப்புங்கள்",
+  "story.shareBody":
+    "WhatsApp ஒரே தட்டலில் நிகழ்வை உங்கள் குடும்பக் குழுவுக்கு, எந்த ஃபோனிலும் திறக்கும் இணைப்புடன் அனுப்பும்.",
+  "story.shareTry": "என்ன நடக்கிறது என்று பாருங்கள்",
+  "story.followTitle": "உங்கள் கோயில்களைப் பின்தொடருங்கள்",
+  "story.followBody":
+    "பின்தொடர் உங்கள் கோயில்களை முகப்புப் பக்கத்தின் மேலே வைத்திருக்கும். இது உங்கள் ஃபோனில் சேமிக்கப்படும்: கணக்கு இல்லை, பதிவு இல்லை, கண்காணிப்பு இல்லை.",
+  "story.followTry": "உங்கள் கோயிலைக் கண்டறியுங்கள்",
+  "story.planTitle": "பண்டிகையை ஒன்றாகத் திட்டமிடுங்கள்",
+  "story.planBody":
+    "எங்கள் திட்டத்தில் சேர் நீங்கள் செல்ல விரும்பும் நிகழ்வுகளைச் சேகரித்து, முழுத் திட்டத்தையும் ஒரே செய்தியில் குடும்பத்தினருக்கு அனுப்பும்.",
+  "story.planTry": "பண்டிகைகளைப் பாருங்கள்",
+  "story.sevaTitle": "சேவை செய்யுங்கள்",
+  "story.sevaBody":
+    "கோயில்கள் சமையலறையிலோ, வாகன நிறுத்தத்திலோ, சுத்தம் செய்வதிலோ உதவி கேட்கின்றன. இந்த இடத்தை எடு உங்களை ஒரு நேரத்துக்குப் பதிவு செய்யும், குழு அதைப் பார்க்கும்.",
+  "story.sevaTry": "எங்கே உதவி தேவை என்று பாருங்கள்",
+  "story.mockNear": "LE4 அருகில்",
+  "story.mockFind": "எனக்கு அருகில் கண்டறி",
+  "story.mockMiles": "{miles} மைல்",
+  "story.mockCalendar": "நாட்காட்டியில் சேர்",
+  "story.mockSent": "குடும்பத்தினருக்கு அனுப்பப்பட்டது 🙏",
+  "story.mockFollow": "பின்தொடர்",
+  "story.mockYours": "உங்கள் கோயில்கள்",
+  "story.mockPlanAdd": "எங்கள் திட்டத்தில் சேர்",
+  "story.mockInPlan": "எங்கள் திட்டத்தில் உள்ளது",
+  "story.mockPlan": "எங்கள் திட்டம் · {count}",
+  "story.mockTaken": "{places} இல் {taken} எடுக்கப்பட்டது",
+  "story.mockTake": "இந்த இடத்தை எடு",
+  "story.mockKitchen": "சமையலறைச் சேவை",
+  "home.comingSoon": "விரைவில் வருகிறது",
+  "home.committeesTitle": "குழுக்களுக்கு இது எப்படி வேலை செய்கிறது",
+  "home.committeesHeading":
+    "மக்கள் ஏற்கனவே பார்க்கும் இடத்தில், உங்கள் நிகழ்வுகள்.",
+  "home.mandirCount": "UK முழுவதும் {count} கோயில்கள்",
+  "home.mandirsIntro":
+    "என்ன நடக்கிறது என்று பார்க்க உங்கள் கோயிலைக் கண்டறியுங்கள்.",
+  "home.regionCount.one": "{count} கோயில்",
+  "home.regionCount.other": "{count} கோயில்கள்",
+  "home.step1Title": "ஏற்கனவே உள்ளதை அனுப்புங்கள்",
+  "home.step2Title": "ஒரு நிமிடத்தில் சரிபாருங்கள்",
+  "home.step3Title": "மக்கள் அதைக் கண்டறிகிறார்கள்",
+  "home.committeesBody":
+    "நீங்கள் ஏற்கனவே பகிரும் சுவரொட்டியை அனுப்புங்கள். கோயில்களுக்கு இது இலவசம்.",
+  "search.title": "தேடு",
+  "search.description":
+    "UK முழுவதும் நிகழ்வுகள், கோயில்கள், ஊர்கள் மற்றும் பண்டிகைகளைத் தேடுங்கள்.",
+  "search.label": "நிகழ்வுகள், கோயில்கள், ஊர்கள் அல்லது பண்டிகைகள்",
+  "search.example": "எ.கா. Diwali Leicester, Garba, BAPS",
+  "search.button": "தேடு",
+  "search.count.one": "{count} முடிவு",
+  "search.count.other": "{count} முடிவுகள்",
+  "search.none":
+    "“{q}” க்கு எதுவும் கிடைக்கவில்லை. ஒரு ஊர், கோயிலின் பெயர் அல்லது பண்டிகையை முயற்சிக்கவும்.",
+  "search.close":
+    "தட்டச்சு செய்தபடி “{q}” க்கு எதுவும் இல்லை, எனவே இவை நெருக்கமான எழுத்துக்கூட்டல்கள்.",
+  "search.keys": "முடிவுகளில் நகர ↓ ஐ அழுத்தவும், திரும்ப Esc.",
+  "search.searching": "தேடுகிறோம்…",
+  "search.events": "நிகழ்வுகள்",
+  "search.allMandirs": "எல்லாக் கோயில்களையும் பாருங்கள்",
+  "search.allEvents": "நடக்கும் அனைத்தையும் பாருங்கள்",
+  "whatsOn.title": "என்ன நடக்கிறது",
+  "whatsOn.intro": "அடுத்த எட்டு வாரங்களில் UK கோயில்களில் நிகழ்வுகள்.",
+  "regular.title": "வகுப்புகளும் வழக்கமான குழுக்களும்",
+  "regular.description":
+    "UK கோயில்களில் வகுப்புகள், பஜனைக் குழுக்கள் மற்றும் பிற வழக்கமான கூடுகைகள், வாரத்தின் நாள் வாரியாக.",
+  "regular.intro":
+    "பால விகார், பஜனை மண்டலி, யோகா, மொழி வகுப்புகள் மற்றும் பல: ஒவ்வொரு வாரமும் மாதமும் நடக்கும் அனைத்தும், நடக்கும் நாள் வாரியாக.",
+  "regular.what": "வகுப்புகளும் வழக்கமான குழுக்களும்",
+  "regular.areas": "பகுதி",
+  "regular.everywhere": "எல்லா இடங்களிலும்",
+  "regular.none":
+    "இங்கே இன்னும் வழக்கமான வகுப்புகளோ குழுக்களோ பட்டியலிடப்படவில்லை.",
+  "regular.seeAll": "நடக்கும் அனைத்தையும் பாருங்கள்",
+  "whatsOn.regular": "வகுப்புகளும் வழக்கமான குழுக்களும்",
+  "whatsOn.filter": "வடிகட்டு",
+  "whatsOn.showAs": "இப்படிக் காட்டு",
+  "whatsOn.list": "பட்டியல்",
+  "whatsOn.map": "வரைபடம்",
+  "whatsOn.when": "எப்போது",
+  "whatsOn.today": "இன்று",
+  "whatsOn.weekend": "இந்த வார இறுதி",
+  "whatsOn.followed": "நீங்கள் பின்தொடரும் கோயில்கள்",
+  "whatsOn.chosen": "தேர்ந்தெடுத்த வடிகட்டிகள்",
+  "whatsOn.removeFilter": "{filter} ஐ நீக்கு",
+  "whatsOn.nearExample": "எ.கா. HA9 அல்லது LE4 6AR",
+  "whatsOn.region": "பகுதி",
+  "whatsOn.anywhere": "எங்கும்",
+  "whatsOn.type": "நிகழ்வின் வகை",
+  "whatsOn.anyType": "அனைத்தும்",
+  "whatsOn.show": "காட்டு",
+  "whatsOn.count.one": "{count} நிகழ்வு",
+  "whatsOn.count.other": "{count} நிகழ்வுகள்",
+  "whatsOn.countRegion": " {region} இல்",
+  "whatsOn.nearestFirst": " · அருகிலுள்ளவை முதலில்",
+  "whatsOn.onDay": " {day} அன்று",
+  "whatsOn.everyDay": "எல்லா நாட்களையும் பாருங்கள்",
+  "whatsOn.moreOnDay": "{day} அன்று உள்ள {count} ஐயும் பாருங்கள் →",
+  "whatsOn.chooseArea": "உங்கள் பகுதியைத் தேர்ந்தெடுக்கவும்",
+  "whatsOn.allAreas": "எல்லாப் பகுதிகளும்",
+  "whatsOn.lookupFailed":
+    "இப்போது அந்த அஞ்சல் குறியீட்டைத் தேட முடியவில்லை, எனவே எல்லா நிகழ்வுகளும் காட்டப்படுகின்றன.",
+  "whatsOn.notFound":
+    '"{place}" ஐக் கண்டறிய முடியவில்லை. LE4 6AR போன்ற முழு அஞ்சல் குறியீட்டையோ, LE4 போன்ற முதல் பகுதியையோ முயற்சிக்கவும்.',
+  "whatsOn.noneThere":
+    "அடுத்த எட்டு வாரங்களில் அங்கே நிகழ்வுகள் எதுவும் பட்டியலிடப்படவில்லை.",
+  "whatsOn.noneYet": "இன்னும் நிகழ்வுகள் எதுவும் பட்டியலிடப்படவில்லை.",
+  "whatsOn.wider": "{miles} மைலுக்குள் பாருங்கள்",
+  "whatsOn.everything": "எல்லா வகை நிகழ்வுகளையும், எந்த நாளையும் காட்டு",
+  "whatsOn.allUk": "UK முழுவதையும் காட்டு",
+  "whatsOn.emptyBefore":
+    "கோயில்கள் Toran இல் சேரும்போது தங்கள் நிகழ்வுகளைச் சேர்க்கின்றன. இதற்கிடையில், உங்களுக்கு அருகிலுள்ள கோயிலைக் கண்டறிய ",
+  "whatsOn.emptyLink": "கோயில் பட்டியல்",
+  "whatsOn.emptyAfter": " பாருங்கள்.",
+  "event.cancelled": "ரத்து செய்யப்பட்டது",
+  "festival.all": "← எல்லாப் பண்டிகைகளும்",
+  "festival.dateNotChecked": "தேதி மாறலாம்: உங்கள் கோயிலிடம் சரிபாருங்கள்",
+  "festival.noDate": "வரவிருக்கும் தேதி எதுவும் இன்னும் பட்டியலிடப்படவில்லை.",
+  "festival.atMandirs": "கோயில்களில் {name}",
+  "festival.noEvents":
+    "எந்தக் கோயிலும் இன்னும் {name} நிகழ்வுகளைப் பட்டியலிடவில்லை.",
+  "load.notConnected":
+    "{what} இன்னும் இணைக்கப்படவில்லை. விரைவில் மீண்டும் பாருங்கள்.",
+  "load.failed":
+    "இப்போது {what} ஐ ஏற்ற முடியவில்லை. ஒரு நிமிடத்தில் மீண்டும் முயற்சிக்கவும்.",
+  "calendar.add": "நாட்காட்டியில் சேர்",
+  "calendar.addLabel": "நாட்காட்டியில் சேர்: {title}",
+  "calendar.file": "Apple, Outlook அல்லது வேறு நாட்காட்டி",
+  "calendar.reminder": "தொடங்குவதற்கு முன் ஒரு நினைவூட்டலுடன் வருகிறது.",
+  "whatsOn.description":
+    "அடுத்த எட்டு வாரங்களில் UK முழுவதும் இந்துக் கோயில்களில் நிகழ்வுகள்: பண்டிகைகள், ஆரத்தி, பஜனைகள், வகுப்புகள் மற்றும் பல.",
+  "load.eventList": "நிகழ்வுப் பட்டியல்",
+  "mandirs.description":
+    "UK முழுவதும் இந்துக் கோயில்கள், பகுதி மற்றும் ஊர் வாரியாக.",
+  "mandirs.intro":
+    "UK முழுவதும் இந்துக் கோயில்கள். என்ன நடக்கிறது என்று பார்க்க உங்கள் கோயிலைக் கண்டறியுங்கள்.",
+  "mandirs.none": "இன்னும் கோயில்கள் எதுவும் பட்டியலிடப்படவில்லை.",
+  "load.mandirList": "கோயில் பட்டியல்",
+  "mandir.description":
+    "{town} இல் உள்ள {name} இல் என்ன நடக்கிறது: நிகழ்வுகள், பண்டிகைகள் மற்றும் அதை எப்படிக் கண்டறிவது.",
+  "load.mandirPage": "கோயிலின் பக்கம்",
+  "mandir.all": "← எல்லாக் கோயில்களும்",
+  "mandir.runByCommittee": "கோயிலின் குழுவால் நடத்தப்படுகிறது",
+  "mandir.tellUs":
+    "இங்கே ஒரு நிகழ்வைப் பற்றித் தெரியுமா? எங்களிடம் சொல்லுங்கள் →",
+  "mandir.festivalDates": "UK க்கான பண்டிகைத் தேதிகள் →",
+  "mandir.print": "அறிவிப்புப் பலகைக்காக அச்சிடு →",
+  "mandir.kit": "{period} பகிருங்கள்: ஒரு படமும் அறிவிப்புப் பலகைத் தாளும் →",
+  "mandir.calendarTitle": "இந்த நிகழ்வுகளை உங்கள் நாட்காட்டியில் பெறுங்கள்",
+  "mandir.calendarBody":
+    "{name} இன் நிகழ்வுகள், உங்கள் ஃபோனின் நாட்காட்டியில் புதுப்பித்த நிலையில்.",
+  "mandir.committeeTitle": "நீங்கள் இந்தக் கோயிலின் குழுவில் இருக்கிறீர்களா?",
+  "mandir.claimedBefore": "இந்தப் பக்கத்தைக் குழு பார்த்துக்கொள்கிறது.",
+  "mandir.logIn": "உள்நுழைந்து",
+  "mandir.claimedAfter":
+    "அதைப் புதுப்பிக்கவும், அல்லது அவர்களுடன் சேரக் கேளுங்கள்.",
+  "mandir.lookAfterBody":
+    "இந்தப் பக்கத்தைப் பார்த்துக்கொள்ளுங்கள்: ஒரு நிமிடத்தில் நிகழ்வுகளைச் சேர்த்து, எந்த விவரத்தையும் திருத்துங்கள்.",
+  "mandir.lookAfter": "இந்தப் பக்கத்தைப் பார்த்துக்கொள்ளுங்கள்",
+  "mandir.more": "மேலும்",
+  "mandir.tradition": "சம்பிரதாயம்",
+  "mandir.postcode": "அஞ்சல் குறியீடு",
+  "mandir.directions": "வழிகாட்டல்",
+  "mandir.gettingThere": "அங்கே செல்வது",
+  "mandir.website": "இணையதளம்",
+  "mandir.watchLive": "நேரலையில் பாருங்கள்",
+  "mandir.watchYouTube": "YouTube இல் பாருங்கள்",
+  "mandir.photoAlt": "{name} இன் புகைப்படம்",
+  "mandir.phone": "தொலைபேசி",
+  "mandir.call": "அழை",
+  "mandir.callNumber": "{name} ஐ {phone} இல் அழைக்கவும்",
+  "mandir.charity": "பதிவுசெய்யப்பட்ட அறக்கட்டளை",
+  "mandir.about": "கோயிலைப் பற்றி",
+  "mandir.share": "இந்தக் கோயிலைப் பகிருங்கள்",
+  "mandir.shareText": "{name}, {town}: என்ன நடக்கிறது",
+  "mandir.confirmedOn": "கோயில் உறுதிப்படுத்தியது, {date}",
+  "event.repeatNext": "{rule} · அடுத்தது ",
+  "event.moreDetails": "மேலும் விவரங்கள்",
+  "mandir.asking":
+    "தங்கள் நிகழ்வுகளைச் சேர்க்குமாறு கோயில்களைக் கேட்டுக்கொண்டிருக்கிறோம்.",
+  "mandir.untilThenCheck": "அதுவரை, பாருங்கள்",
+  "mandir.orNoticeboard": "அல்லது கோயிலின் அறிவிப்புப் பலகை.",
+  "mandir.untilThenNoticeboard":
+    "அதுவரை, கோயிலின் அறிவிப்புப் பலகையைப் பாருங்கள்.",
+  "plan.title": "எங்கள் திட்டம்",
+  "plan.description":
+    "நீங்கள் தேர்ந்தெடுத்த நிகழ்வுகள், ஒரே WhatsApp செய்தியில் குடும்பத்தினருக்கு அனுப்ப.",
+  "plan.intro":
+    "இந்த ஃபோனில் தேர்ந்தெடுத்த நிகழ்வுகள். அவற்றை ஒரே WhatsApp செய்தியில் குடும்பத்தினருக்கு அனுப்புங்கள்; இணைப்பு உள்ள எவரும் அதே திட்டத்தைப் பார்ப்பார்கள்.",
+  "plan.send": "WhatsApp இல் குடும்பத்தினருக்கு அனுப்பு",
+  "plan.messageTitle": "எங்கள் திட்டம்:",
+  "plan.messageLink": "முழுவதும் Toran இல்:",
+  "plan.notShown":
+    "காட்டப்படவில்லை: முடிந்துவிட்ட அல்லது இனி Toran இல் இல்லாத இன்னும் {count}.",
+  "visit.title": "வருகை",
+  "visit.more": "வருகை பற்றி மேலும் →",
+  "visit.access": "உள்ளே செல்வதும் சுற்றி வருவதும்",
+  "visit.food": "உணவு",
+  "visit.step_free": "படிகள் இல்லாத நுழைவு",
+  "visit.lift": "பிரதான மண்டபத்திற்கு லிஃப்ட்",
+  "visit.chairs": "தரையில் உட்கார முடியாதவர்களுக்கு நாற்காலிகள்",
+  "visit.accessible_toilet": "அணுகக்கூடிய கழிப்பறை",
+  "visit.hearing_loop": "கேட்கும் வளையம் (hearing loop)",
+  "visit.parking": "வளாகத்தில் வாகன நிறுத்தம்",
+  "visit.blue_badge": "Blue Badge வாகன நிறுத்தம்",
+  "visit.shoe_racks": "காலணி அடுக்குகள்",
+  "visit.baby_change": "குழந்தை உடை மாற்றும் இடம்",
+  "visit.food_served": "வருகையாளர்களுக்கு உணவு வழங்கப்படும்",
+  "visit.jain_food": "ஜைன உணவு",
+  "visit.no_onion_garlic": "வெங்காயம், பூண்டு இல்லாத உணவு",
+  "visit.askFirst": "ஏதாவது சந்தேகமா? செல்வதற்கு முன் கோயிலை அழையுங்கள்.",
+  "hours.title": "திறந்திருக்கும் நேரம்",
+  "hours.closed": "மூடப்பட்டது",
+  "hours.aartis": "ஆரத்தி நேரங்கள்",
+  "hours.festivals": "பண்டிகை நாட்களில் நேரங்கள் மாறலாம்.",
+  "event.repeats": "மீண்டும் நடக்கும்",
+  "event.whenAt": "{when}, {name}, {town} இல்.",
+  "load.event": "நிகழ்வு",
+  "event.finished": "முடிந்தது",
+  "event.finishedNote": "இந்த நிகழ்வு முடிந்துவிட்டது.",
+  "event.seeWhatsOnAt": "{name} இல் என்ன நடக்கிறது என்று பாருங்கள்",
+  "event.cancelledNote": "கோயில் இந்த நிகழ்வை ரத்து செய்துள்ளது.",
+  "event.seeElseAt": "{name} இல் வேறு என்ன நடக்கிறது என்று பாருங்கள்",
+  "event.about": "இந்த நிகழ்வைப் பற்றி",
+  "event.alsoAt": "{name} இல் மேலும்",
+  "event.everythingAt": "{name} இல் அனைத்தும் →",
+  "event.whatsOnNear": "உங்களுக்கு அருகில் என்ன நடக்கிறது →",
+  "event.when": "எப்போது",
+  "event.dates": "ஒவ்வொரு தேதியும்",
+  "event.moreDates": "இவற்றுக்குப் பிறகு இன்னும் {count}.",
+  "event.next": "அடுத்தது: {when}",
+  "event.where": "எங்கே",
+  "event.cost": "கட்டணம்",
+  "event.tickets": "டிக்கெட்டுகள்",
+  "event.bookFirst": "செல்வதற்கு முன் முன்பதிவு செய்யுங்கள்.",
+  "event.bookTickets": "டிக்கெட் முன்பதிவு",
+  "event.bookWithMandir": "செல்வதற்கு முன் கோயிலிடம் முன்பதிவு செய்யுங்கள்.",
+  "event.bookFirstBadge": "முதலில் முன்பதிவு",
+  "event.awayFrom": "கோயிலில் இல்லை: {name} நடத்துகிறது.",
+  "event.atVenue": "{venue} இல்",
+  "event.fromMandir": "கோயிலிடமிருந்து",
+  "shell.menu": "பட்டி",
+  "shell.closeMenu": "மூடு",
+  "shell.language": "மொழி",
+  "shell.my": "என் Toran",
+  "shell.logIn": "உள்நுழையவும் அல்லது கணக்கை உருவாக்கவும்",
+  "shell.logInShort": "உள்நுழை",
+  "shell.account": "உங்கள் கணக்கு",
+  "my.title": "என் Toran",
+  "my.description":
+    "நீங்கள் பின்தொடரும் கோயில்கள், உங்கள் திட்டம், சேவை மற்றும் கடந்த நிகழ்வுகள், உங்கள் ஃபோனில் ஒன்றாக.",
+  "my.intro":
+    "உங்கள் கோயில்கள், திட்டம், சேவை மற்றும் கடந்த நிகழ்வுகள், ஒரே இடத்தில்.",
+  "shell.seva": "சேவை",
+  "sevaList.title": "சேவை",
+  "sevaList.intro":
+    "உங்களுக்கு அருகிலுள்ள கோயிலில் உதவுங்கள். பதிவு இல்லை, பெயர் தேவையில்லை.",
+  "sevaList.description":
+    "தன்னார்வலர்கள் தேவைப்படும் UK கோயில்கள். ஒரே தட்டலில் ஒரு சேவை இடத்தை எடுங்கள், பதிவு தேவையில்லை.",
+  "sevaList.count.one": "{count} நிகழ்வுக்கு உதவி தேவை",
+  "sevaList.count.other": "{count} நிகழ்வுகளுக்கு உதவி தேவை",
+  "sevaList.free.one": "{count} இடம் காலியாக உள்ளது",
+  "sevaList.free.other": "{count} இடங்கள் காலியாக உள்ளன",
+  "sevaList.seeWhatsOn": "அதற்குப் பதிலாக என்ன நடக்கிறது என்று பாருங்கள்",
+  "sevaList.none":
+    "இப்போது எந்தக் கோயிலும் சேவை கேட்கவில்லை. விரைவில் மீண்டும் பாருங்கள்.",
+  "sevaList.places.one": "இடம் இன்னும் தேவை",
+  "sevaList.places.other": "இடங்கள் இன்னும் தேவை",
+  "sevaList.atMandirs.one": "{count} கோயிலில்",
+  "sevaList.atMandirs.other": "{count} கோயில்களில்",
+  "sevaList.taken.one": "இதுவரை Toran இல் {count} இடம் எடுக்கப்பட்டது",
+  "sevaList.taken.other": "இதுவரை Toran இல் {count} இடங்கள் எடுக்கப்பட்டன",
+  "sevaList.postcode": "அல்லது அஞ்சல் குறியீட்டைத் தட்டச்சு செய்யுங்கள்",
+  "sevaList.howTitle": "இது எப்படி வேலை செய்கிறது",
+  "sevaList.how1":
+    "உங்களுக்கு ஏற்ற நேரத்தைத் தேர்ந்தெடுத்து “இந்த இடத்தை எடு” என்பதை அழுத்துங்கள்.",
+  "sevaList.how2":
+    "பெயர் தேவையில்லை. உங்கள் இடங்களை உங்கள் ஃபோன் நினைவில் வைத்திருக்கும்.",
+  "sevaList.how3": "சில பணிகளுக்கு DBS சோதனை தேவை: கோயிலிடம் கேளுங்கள்.",
+  "sevaList.committee": "கோயில் குழுவில் இருக்கிறீர்களா?",
+  "sevaList.committeeLink": "குழுக்களுக்கு இது எப்படி வேலை செய்கிறது →",
+  "home.sevaTitle": "உங்களுக்கு அருகில் சேவை",
+  "home.sevaLink": "எங்கே உதவி தேவை என்று பாருங்கள் →",
+  "seva.help": "சேவையில் உதவுங்கள்",
+  "seva.takenOf": "{needed} இல் {taken}",
+  "seva.placesTaken": "இடங்கள் எடுக்கப்பட்டன. பதிவு தேவையில்லை.",
+  "seva.take": "ஒரு சேவை இடத்தை எடு",
+  "seva.seeRota": "சேவை அட்டவணையைப் பாருங்கள்",
+  "festivals.description":
+    "UK இல் நவராத்திரி, தீபாவளி, ஹோலி மற்றும் பிற இந்துப் பண்டிகைகளின் தேதிகள்.",
+  "festivals.intro":
+    "UK க்கான பண்டிகைத் தேதிகள். உங்கள் கோயிலிடமும் சரிபாருங்கள்.",
+  "festivals.seasons": "கோயில்களில் பண்டிகைக் காலங்கள்",
+  "festivals.seasonsIntro":
+    "பெரிய பண்டிகைகளுக்கான எல்லாக் கோயில்களின் நிகழ்வுகளும், ஒரே இடத்தில்.",
+  "festivals.calendarTitle": "உங்கள் நாட்காட்டியில் பண்டிகைத் தேதிகள்",
+  "festivals.calendarBody":
+    "உங்கள் ஃபோனின் நாட்காட்டியில் புதுப்பித்த நிலையில்.",
+  "festivals.none": "இன்னும் பண்டிகைத் தேதிகள் எதுவும் பட்டியலிடப்படவில்லை.",
+  "load.festivalDates": "பண்டிகைத் தேதிகள்",
+  "load.festivalPage": "பண்டிகைப் பக்கம்",
+  "festival.title": "UK இல் {name}",
+  "festival.titleYear": "UK இல் {name} {year}",
+  "festival.description":
+    "UK க்கான {name} தேதிகளும் உங்களுக்கு அருகிலுள்ள கோயில்களின் நிகழ்வுகளும்.",
+  "festival.share": "இந்தப் பண்டிகையைப் பகிருங்கள்",
+  "festival.shareText": "UK இல் {name}: தேதிகளும் கோயில்களின் நிகழ்வுகளும்",
+  "festival.appearBefore":
+    "கோயில்கள் அவற்றைச் சேர்க்கும்போது இங்கே தோன்றும். பாருங்கள்:",
+  "festival.whatsOnLink": "என்ன நடக்கிறது",
+  "festival.orFind": "அல்லது கண்டறியுங்கள்:",
+  "festival.nearestMandir": "அருகிலுள்ள கோயில்",
+  "festival.appearAfter": ".",
+  "festival.name.navratri": "நவராத்திரி",
+  "festival.summary.navratri":
+    "ஒன்பது இரவுகள் கர்பா மற்றும் ராஸ், தேவியை அவளுடைய ஒன்பது வடிவங்களில் வழிபடுதல்.",
+  "festival.name.dussehra": "தசரா",
+  "festival.summary.dussehra":
+    "விஜயதசமி: தீமையை நன்மை வென்ற நாள், நவராத்திரி முடிந்த மறுநாள்.",
+  "festival.name.dhanteras": "தந்தேரஸ்",
+  "festival.summary.dhanteras":
+    "தீபாவளியின் முதல் நாள், லட்சுமி பூஜைக்கும் புதிய தொடக்கங்களுக்கும்.",
+  "festival.name.diwali": "தீபாவளி",
+  "festival.summary.diwali": "தீபங்களின் பண்டிகை.",
+  "festival.name.annakut": "அன்னகூட் மற்றும் புத்தாண்டு",
+  "festival.summary.annakut":
+    "குஜராத்திப் புத்தாண்டு (பெஸ்து வரஸ்), கோயிலில் படைக்கப்படும் உணவு மலையுடன்.",
+  "festival.name.bhai-dooj": "பாய் தூஜ்",
+  "festival.summary.bhai-dooj":
+    "சகோதரர்களும் சகோதரிகளும், தீபாவளிக்கு இரண்டு நாட்களுக்குப் பிறகு.",
+  "festival.name.maha-shivaratri": "மகா சிவராத்திரி",
+  "festival.summary.maha-shivaratri":
+    "சிவனின் மகா இரவு, இரவு முழுவதும் வழிபாட்டுடன்.",
+  "festival.name.holi": "ஹோலி",
+  "festival.summary.holi":
+    "வண்ணங்களின் பண்டிகை, முந்தைய இரவு ஹோலிகா தகனத்திற்குப் பிறகு.",
+  "festival.name.sharad-purnima": "சரத் பௌர்ணமி",
+  "festival.summary.sharad-purnima":
+    "நவராத்திரிக்குப் பிறகு வரும் பௌர்ணமி: நிலவொளியில் ராஸ் கர்பா, மற்றும் தூத் பௌவா.",
+  "festival.name.labh-pancham": "லாப் பஞ்சம்",
+  "festival.summary.labh-pancham":
+    "குஜராத்திப் புத்தாண்டின் ஐந்தாம் நாள், வேலையிலும் தொழிலிலும் புதிய தொடக்கங்களுக்கு.",
+  "festival.name.dev-diwali": "தேவ் தீபாவளி",
+  "festival.summary.dev-diwali":
+    "கார்த்திகை பௌர்ணமி, தீபாவளிக்குப் பிறகு வரும் பௌர்ணமி, தெய்வங்களுக்காக விளக்குகள் ஏற்றப்படும் நாள்.",
+  "festival.name.uttarayan": "உத்தராயணம் (மகர சங்கராந்தி)",
+  "festival.summary.uttarayan":
+    "சூரியன் வடக்கு நோக்கித் திரும்புகிறது: பட்டங்கள், எள்ளும் வெல்லமும், கிச்சடி.",
+  "festival.name.vasant-panchami": "வசந்த பஞ்சமி",
+  "festival.summary.vasant-panchami":
+    "வசந்தத்தின் முதல் நாள், சரஸ்வதி பூஜையுடன்.",
+  "festival.name.holika-dahan": "ஹோலிகா தகனம்",
+  "festival.summary.holika-dahan": "ஹோலிக்கு முந்தைய இரவின் தீ.",
+  "festival.name.ram-navami": "ராம நவமி",
+  "festival.summary.ram-navami": "ஸ்ரீ ராமரின் அவதார நாள்.",
+  "festival.name.hanuman-jayanti": "அனுமன் ஜெயந்தி",
+  "festival.summary.hanuman-jayanti": "அனுமனின் அவதார நாள்.",
+  "festival.name.guru-purnima": "குரு பௌர்ணமி",
+  "festival.summary.guru-purnima": "உங்கள் குருவைப் போற்றும் பௌர்ணமி.",
+  "festival.name.raksha-bandhan": "ரக்ஷா பந்தன்",
+  "festival.summary.raksha-bandhan":
+    "சகோதரிகள் தங்கள் சகோதரர்களின் மணிக்கட்டில் ராக்கி கட்டுகிறார்கள்.",
+  "festival.name.janmashtami": "ஜன்மாஷ்டமி (கோகுலாஷ்டமி)",
+  "festival.summary.janmashtami":
+    "ஸ்ரீ கிருஷ்ணரின் அவதார நாள், நள்ளிரவில் கொண்டாடப்படுகிறது.",
+  "festival.name.ganesh-chaturthi": "விநாயகர் சதுர்த்தி",
+  "festival.summary.ganesh-chaturthi":
+    "விநாயகரின் அவதார நாள், பூஜை மற்றும் விசர்ஜனத்துடன்.",
+  "season.isOn": "{name} {dates} அன்று நடைபெறுகிறது",
+  "season.notListed":
+    "அடுத்த ஆண்டின் {name} தேதிகள் இன்னும் பட்டியலிடப்படவில்லை. எல்லாவற்றையும் பாருங்கள்:",
+  "season.festivalDates": "பண்டிகைத் தேதிகள்",
+  "season.loadDates": "{name} தேதிகள்",
+  "season.none": "இன்னும் {name} நிகழ்வுகள் எதுவும் பட்டியலிடப்படவில்லை.",
+  "season.noneNear":
+    "அங்கே அருகில் இன்னும் {name} நிகழ்வுகள் எதுவும் பட்டியலிடப்படவில்லை.",
+  "season.adding":
+    "கோயில்கள் தங்கள் {name} நிகழ்ச்சிகளைச் சேர்த்து வருகின்றன. விரைவில் மீண்டும் பாருங்கள், அல்லது கண்டறியுங்கள்:",
+  "season.committee": "கோயில் குழுவில் இருக்கிறீர்களா?",
+  "season.addProgramme": "சில நிமிடங்களில் உங்கள் நிகழ்ச்சியைச் சேருங்கள்",
+  "season.calendarTitle": "{name} நிகழ்வுகளை உங்கள் நாட்காட்டியில் சேருங்கள்",
+  "season.calendarBody":
+    "எல்லாக் கோயில்களின் {name} நிகழ்வுகளும், உங்கள் ஃபோனின் நாட்காட்டியில் புதுப்பித்த நிலையில்.",
+  "season.tellFamily": "குடும்பத்தினருக்கும் நண்பர்களுக்கும் சொல்லுங்கள்",
+  "season.share": "{name} பக்கத்தைப் பகிருங்கள்",
+  "season.allOf": "கோயில்களில் {period} முழுவதும், ஒரே இடத்தில்",
+  "season.inTown": "{town} இல் {name}",
+  "season.townDescription":
+    "{town} கோயில்களில் {name} நிகழ்வுகள்: என்ன, எப்போது, எங்கே, கோயில்களிடமிருந்தே.",
+  "season.acrossUk": "UK முழுவதும் {name}",
+  "season.townEvents": "{town} இல் {name} நிகழ்வுகள்",
+  "season.noneInTown":
+    "{town} இல் இன்னும் {name} நிகழ்வுகள் எதுவும் பட்டியலிடப்படவில்லை.",
+  "season.townMandirs": "{town} இல் உள்ள கோயில்கள்",
+  "season.townShareText": "{town} கோயில்களில் {name} நிகழ்வுகள்:",
+  "season.byTown": "ஊர் வாரியாக {name}",
+  "season.diwali.period": "தீபாவளி வாரம்",
+  "season.diwali.title": "UK கோயில்களில் தீபாவளி",
+  "season.diwali.description":
+    "UK முழுவதும் இந்துக் கோயில்களில் தீபாவளி வாரம்: தந்தேரஸ், லட்சுமி பூஜை, அன்னகூட் மற்றும் புத்தாண்டு, பாய் தூஜ். உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்.",
+  "season.diwali.intro":
+    "UK கோயில்களில் லட்சுமி பூஜை, வாணவேடிக்கை, அன்னகூட் மற்றும் புத்தாண்டு.",
+  "season.diwali.shareText":
+    "UK முழுவதும் கோயில்களில் தீபாவளி: உங்களுக்கு அருகில் என்ன நடக்கிறது",
+  "season.navratri.period": "நவராத்திரி",
+  "season.navratri.title": "UK கோயில்களில் நவராத்திரி",
+  "season.navratri.description":
+    "UK முழுவதும் இந்துக் கோயில்களில் நவராத்திரி: ஒன்பது இரவுகள் கர்பா மற்றும் ராஸ், தசரா மற்றும் சரத் பௌர்ணமி. உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்.",
+  "season.navratri.intro":
+    "UK கோயில்களில் ஒன்பது இரவுகள் கர்பா மற்றும் ராஸ், பிறகு தசரா மற்றும் சரத் பௌர்ணமி.",
+  "season.navratri.shareText":
+    "UK முழுவதும் கோயில்களில் நவராத்திரி கர்பா: உங்களுக்கு அருகில் என்ன நடக்கிறது",
+  "season.maha-shivaratri.period": "மகா சிவராத்திரி",
+  "season.maha-shivaratri.title": "UK கோயில்களில் மகா சிவராத்திரி",
+  "season.maha-shivaratri.description":
+    "UK முழுவதும் இந்துக் கோயில்களில் மகா சிவராத்திரி: அபிஷேகம், பஜனைகள் மற்றும் இரவு முழுவதும் சிவ வழிபாடு. உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்.",
+  "season.maha-shivaratri.intro":
+    "UK கோயில்களில் அபிஷேகம், பஜனைகள் மற்றும் இரவு முழுவதும் ஜாகரணம்.",
+  "season.maha-shivaratri.shareText":
+    "UK முழுவதும் கோயில்களில் மகா சிவராத்திரி: உங்களுக்கு அருகில் என்ன நடக்கிறது",
+  "season.holi.period": "ஹோலி",
+  "season.holi.title": "UK கோயில்களில் ஹோலி",
+  "season.holi.description":
+    "UK முழுவதும் இந்துக் கோயில்களில் ஹோலி: ஹோலிகா தகனத் தீயும் வண்ணங்களின் பண்டிகையும். உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்.",
+  "season.holi.intro":
+    "UK கோயில்களில் ஹோலிகா தகனத் தீ, பிறகு வண்ணங்களின் நாள்.",
+  "season.holi.shareText":
+    "UK முழுவதும் கோயில்களில் ஹோலி: உங்களுக்கு அருகில் என்ன நடக்கிறது",
+  "season.ram-navami.period": "ராம நவமி",
+  "season.ram-navami.title": "UK கோயில்களில் ராம நவமி",
+  "season.ram-navami.description":
+    "UK முழுவதும் இந்துக் கோயில்களில் ராம நவமி மற்றும் அனுமன் ஜெயந்தி: பூஜை, கதா மற்றும் பஜனைகளுடன் ஸ்ரீ ராமரின் அவதார நாள். உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்.",
+  "season.ram-navami.intro":
+    "UK கோயில்களில் ஸ்ரீ ராமரின் அவதார நாளும் அனுமன் ஜெயந்தியும்.",
+  "season.ram-navami.shareText":
+    "UK முழுவதும் கோயில்களில் ராம நவமி: உங்களுக்கு அருகில் என்ன நடக்கிறது",
+  "season.janmashtami.period": "ஜன்மாஷ்டமி",
+  "season.janmashtami.title": "UK கோயில்களில் ஜன்மாஷ்டமி",
+  "season.janmashtami.description":
+    "UK முழுவதும் இந்துக் கோயில்களில் ஜன்மாஷ்டமி: பஜனைகள், நள்ளிரவு ஆரத்தி மற்றும் தொட்டிலுடன் ஸ்ரீ கிருஷ்ணரின் அவதார நாள். உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்.",
+  "season.janmashtami.intro":
+    "UK கோயில்களில் பஜனைகள், தொட்டில் மற்றும் நள்ளிரவு ஆரத்தி.",
+  "season.janmashtami.shareText":
+    "UK முழுவதும் கோயில்களில் ஜன்மாஷ்டமி: உங்களுக்கு அருகில் என்ன நடக்கிறது",
+  "season.ganesh-chaturthi.period": "விநாயகர் சதுர்த்தி",
+  "season.ganesh-chaturthi.title": "UK கோயில்களில் விநாயகர் சதுர்த்தி",
+  "season.ganesh-chaturthi.description":
+    "UK முழுவதும் இந்துக் கோயில்களில் விநாயகர் சதுர்த்தி: விநாயகர் பூஜை, ஆரத்தி மற்றும் விசர்ஜனம். உங்களுக்கு அருகில் என்ன நடக்கிறது என்று கண்டறியுங்கள்.",
+  "season.ganesh-chaturthi.intro":
+    "UK கோயில்களில் விநாயகர் பூஜை, மோதகம் மற்றும் விசர்ஜனம்.",
+  "season.ganesh-chaturthi.shareText":
+    "UK முழுவதும் கோயில்களில் விநாயகர் சதுர்த்தி: உங்களுக்கு அருகில் என்ன நடக்கிறது",
+  "seva.pageTitle": "{title} க்கான சேவை, {name}",
+  "seva.pageDescription":
+    "{name}, {town} இல் {title} க்குச் சேவையில் உதவுங்கள். ஒரு இடத்தை எடுங்கள், பதிவு தேவையில்லை.",
+  "load.sevaRota": "சேவை அட்டவணை",
+  "seva.pickBelow":
+    "இடங்கள் எடுக்கப்பட்டன. கீழே ஒரு இடத்தைத் தேர்ந்தெடுங்கள்: பதிவு இல்லை, Toran உங்கள் பெயரைக் கேட்பதில்லை.",
+  "seva.closedNote":
+    "{name} க்குத் தேவையானவை இவை. உதவ, கோயிலின் தன்னார்வலர் குழுவில் பதிலளியுங்கள் அல்லது கோயிலில் கேளுங்கள்.",
+  "seva.dbsNeeded": "DBS சோதனை தேவை",
+  "seva.shiftTaken": "{needed} இல் {done} எடுக்கப்பட்டது",
+  "seva.askCommittee": "குழுவிடம் கேளுங்கள்: கோயில் DBS ஐச் சரிபார்க்கும்",
+  "seva.share": "இந்த அட்டவணையைப் பகிருங்கள்",
+  "seva.shareText":
+    "{name} இல் {title} க்கான சேவை: இன்னும் {free} இடங்கள் காலியாக உள்ளன. ஒரு இடத்தை எடுங்கள், பதிவு தேவையில்லை:",
+  "report.title": "ஒரு நிகழ்வைப் பற்றி எங்களிடம் சொல்லுங்கள்",
+  "report.intro":
+    "{name}, {town} இல். வரவிருக்கும் ஒன்றைப் பற்றிய சுவரொட்டியையோ WhatsApp செய்தியையோ பார்த்தீர்களா? எங்களிடம் சொல்லுங்கள், பக்கத்தில் சேர்ப்பதற்கு முன் கோயிலிடம் சரிபார்ப்போம்.",
+  "report.what": "என்ன நடக்கிறது?",
+  "report.whatExample": "எ.கா. தீபாவளிக் கொண்டாட்டம்",
+  "report.date": "தேதி",
+  "report.starts": "தொடங்கும் நேரம் (விருப்பத்திற்குரியது)",
+  "report.more":
+    "மக்கள் தெரிந்துகொள்ள வேண்டிய வேறு ஏதாவது? (விருப்பத்திற்குரியது)",
+  "report.moreExample":
+    "எ.கா. இரவு 8 மணி முதல் கர்பா, ஆரத்திக்குப் பிறகு பிரசாதம்.",
+  "report.where": "இதை எங்கே பார்த்தீர்கள்? (விருப்பத்திற்குரியது)",
+  "report.whereHint": "சுவரொட்டி அல்லது பதிவுக்கான இணைப்பு, இருந்தால்.",
+  "report.privacy":
+    "நீங்கள் யார் என்று நாங்கள் கேட்பதில்லை, உங்களைப் பற்றி எதையும் வைத்திருப்பதில்லை. யாருடைய தொலைபேசி எண்ணையோ பிற தனிப்பட்ட விவரங்களையோ சேர்க்க வேண்டாம்.",
+  "report.send": "அனுப்பு",
+};
