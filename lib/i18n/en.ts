@@ -215,6 +215,7 @@ export const en = {
   "mandir.gettingThere": "Getting there",
   "mandir.website": "Website",
   "mandir.watchLive": "Watch live",
+  "mandir.give": "Give to the mandir",
   "mandir.watchYouTube": "Watch on YouTube",
   "mandir.photoAlt": "Photo of {name}",
   "mandir.phone": "Phone",

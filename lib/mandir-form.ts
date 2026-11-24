@@ -47,6 +47,9 @@ export type PracticalDetails = {
   // Its YouTube channel, or where it streams aarti and katha: shown as
   // "Watch on YouTube" (or "Watch live" for anywhere else).
   live_url: string | null;
+  // Its own donation page (website, JustGiving, PayPal): shown as "Give to
+  // the mandir". Toran only links to it.
+  donate_url: string | null;
   // Parking, entrance, nearest station: shown with directions.
   getting_there: string | null;
   // Step-free access, chairs, food and so on (lib/visiting.ts), and a
@@ -105,6 +108,25 @@ export function parsePracticalDetails(
     }
   }
 
+  let donate_url: string | null = text(form, "donate_url") || null;
+  if (donate_url && !/^https?:\/\//i.test(donate_url)) {
+    donate_url = `https://${donate_url}`;
+  }
+  if (donate_url) {
+    try {
+      const url = new URL(donate_url);
+      if (
+        url.protocol !== "https:" ||
+        !url.hostname.includes(".") ||
+        donate_url.length > 300
+      ) {
+        return { ok: false, error: "donate_url" };
+      }
+    } catch {
+      return { ok: false, error: "donate_url" };
+    }
+  }
+
   const phone = text(form, "phone") || null;
   if (phone && !/^[0-9+() -]{6,40}$/.test(phone)) {
     return { ok: false, error: "phone" };
@@ -137,6 +159,7 @@ export function parsePracticalDetails(
       postcode,
       website,
       live_url,
+      donate_url,
       phone,
       getting_there,
       facilities,
@@ -210,6 +233,8 @@ export const FORM_ERRORS: Record<string, string> = {
   website: "That doesn't look like a website address.",
   live_url:
     "That doesn't look like a web address for YouTube or the livestream (for example the mandir's YouTube channel).",
+  donate_url:
+    "That doesn't look like a secure web address (starting https://) for your donation page.",
   phone: "Please use only numbers, spaces and + ( ) in the phone number.",
   getting_there: 'Please keep "Getting there" under 400 characters.',
   getting_there_contact:

@@ -219,6 +219,7 @@ export const gu: Record<MessageKey, string> = {
   "mandir.gettingThere": "કેવી રીતે પહોંચવું",
   "mandir.website": "વેબસાઇટ",
   "mandir.watchLive": "લાઇવ જુઓ",
+  "mandir.give": "મંદિરને દાન આપો",
   "mandir.watchYouTube": "YouTube પર જુઓ",
   "mandir.photoAlt": "{name}નો ફોટો",
   "mandir.phone": "ફોન",

@@ -389,6 +389,26 @@ function QuickLinks({ mandir }: { mandir: MandirDetails }) {
               : t("mandir.watchLive")}
           </a>
         )}
+        {mandir.donate_url && (
+          <a
+            href={mandir.donate_url}
+            rel="noopener"
+            className={actionPillClass}
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="size-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            >
+              <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
+            </svg>
+            {t("mandir.give")}
+          </a>
+        )}
         <ShareButtons
           label={t("mandir.share")}
           text={t("mandir.shareText", { name: mandir.name, town: mandir.town })}
