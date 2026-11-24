@@ -97,12 +97,19 @@ async function Festivals() {
             <p className="text-night-muted max-w-prose">
               {t("festivals.seasonsIntro")}
             </p>
-            <ul className="grid gap-2 pt-2 sm:grid-cols-2 lg:grid-cols-3">
+            {/* On a phone, a row to swipe (the next season peeks in at the
+                edge), so the festival dates below are on the first screen
+                or two rather than under seven cards; from tablet size up,
+                a grid. */}
+            <ul className="-mx-5 flex snap-x snap-mandatory scroll-px-5 [scrollbar-width:none] gap-2 overflow-x-auto overscroll-x-contain px-5 pt-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
               {seasons.map(({ season, main }) => (
-                <li key={season.slug}>
+                <li
+                  key={season.slug}
+                  className="w-[15.5rem] flex-none snap-start sm:w-auto"
+                >
                   <Link
                     href={localePath(`/${season.slug}`)}
-                    className="bg-on-night/5 hover:bg-on-night/10 text-on-night flex flex-col rounded-2xl px-5 py-4 no-underline transition-colors"
+                    className="bg-on-night/5 hover:bg-on-night/10 text-on-night flex h-full flex-col rounded-2xl px-5 py-4 no-underline transition-colors"
                   >
                     <span className="text-lg font-semibold">
                       {t("festival.atMandirs", {

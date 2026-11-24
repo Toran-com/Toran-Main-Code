@@ -548,7 +548,7 @@ async function Queue({ searchParams }: PageProps<"/ops/posters">) {
             </form>
           </div>
           <details>
-            <summary className="cursor-pointer font-semibold">
+            <summary className="cursor-pointer py-2.5 font-semibold">
               See {past.length === 1 ? "it" : "them"}
             </summary>
             <ul className="divide-line mt-3 flex flex-col divide-y">

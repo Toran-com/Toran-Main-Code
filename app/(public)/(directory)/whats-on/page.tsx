@@ -230,7 +230,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
         <div className="relative flex flex-wrap items-center gap-x-2 gap-y-3">
           <nav
             aria-label={t("whatsOn.showAs")}
-            className="lg:border-line-strong lg:bg-surface fixed right-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-20 flex rounded-full md:bottom-6 lg:static lg:order-1 lg:border lg:p-1"
+            className="lg:border-line-strong lg:bg-surface fixed right-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-20 flex rounded-full lg:static lg:order-1 lg:border lg:p-1"
           >
             {(["list", "map"] as const).map((v) => (
               <Link
@@ -290,7 +290,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
                 key={w}
                 href={here({ when: when === w ? "" : w })}
                 aria-current={when === w ? "page" : undefined}
-                className={`inline-flex rounded-full border px-3 py-1.5 text-base no-underline transition-colors sm:px-4 ${
+                className={`inline-flex min-h-11 items-center rounded-full border px-3 py-1.5 text-base no-underline transition-colors sm:px-4 ${
                   when === w
                     ? "border-ink bg-ink text-bg font-semibold"
                     : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"
@@ -325,7 +325,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
                 <Link
                   href={f.href}
                   aria-label={t("whatsOn.removeFilter", { filter: f.label })}
-                  className="bg-ink text-bg inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-base font-semibold no-underline"
+                  className="bg-ink text-bg inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-1.5 text-base font-semibold no-underline"
                 >
                   {f.label}
                   <span aria-hidden="true">✕</span>
@@ -510,7 +510,7 @@ function Choices({
               <Link
                 href={href(o.value)}
                 aria-current={here ? "page" : undefined}
-                className={`inline-block rounded-full border px-4 py-1.5 text-base no-underline transition-colors ${
+                className={`inline-flex min-h-11 items-center rounded-full border px-4 py-1.5 text-base no-underline transition-colors ${
                   here
                     ? "border-ink bg-ink text-bg font-semibold"
                     : "border-line-strong bg-surface text-ink hover:border-peacock/60 font-medium"

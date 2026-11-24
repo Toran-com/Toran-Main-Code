@@ -10,18 +10,19 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { requireToranAdmin } from "@/lib/auth";
-import { loadCommitteeFacts } from "@/lib/committee-facts";
-import { committeeMonthly, MONTHLY_DAYS } from "@/lib/committee-monthly";
-import { committeeTasks } from "@/lib/committee-tasks";
+import { committeeEmailOn } from "@/lib/committee-monthly-send";
 import { londonDate } from "@/lib/london";
-import { pageTitle, siteUrl } from "@/lib/site";
-import { mandirNumbers, periodDays, readSummary } from "@/lib/stats";
+import { mailerReady } from "@/lib/mailer";
+import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
+import { sendPreviewToMe } from "./actions";
+import { previewEmail } from "./monthly";
 
-// A preview of the monthly email to each mandir's committee: how its page
-// did, what's coming up and anything to do. Nothing sends it, here or
-// anywhere: emails to committees wait for the ICO registration and DPIA
-// (decision 0006). Toran admins only.
+// The monthly email to each mandir's committee: how its page did, who
+// follows it, what's coming up and anything to do. The weekly job sends it
+// once a month when COMMITTEE_EMAIL is "on" (lib/committee-monthly-send.ts).
+// Here a Toran admin sees what it says for any mandir, sends it to
+// themselves, and sees which committees have had this month's.
 
 export const metadata: Metadata = {
   title: pageTitle("Committee email · Admin"),
@@ -58,32 +59,46 @@ async function Preview({ searchParams }: PageProps<"/ops/committee-email">) {
     .order("name");
   const chosen = (mandirs ?? []).find((m) => m.slug === query.mandir);
 
-  let email: { subject: string; text: string } | null = null;
-  let problem = false;
-  if (chosen) {
-    const since = periodDays(londonDate(), MONTHLY_DAYS)[0];
-    const [facts, counts] = await Promise.all([
-      loadCommitteeFacts(supabase, chosen),
-      supabase.rpc("mandir_count_summary", { target: chosen.id, since }),
-    ]);
-    problem = !!counts.error;
-    email = committeeMonthly({
-      mandir: chosen,
-      numbers: mandirNumbers(readSummary(counts.data), chosen.slug),
-      events: facts.events.filter((e) => e.status === "published"),
-      tasks: committeeTasks(facts),
-      siteUrl: siteUrl(),
-    });
-  }
+  const preview = chosen ? await previewEmail(supabase, chosen) : null;
+  const email = preview?.email ?? null;
+  const problem = preview?.problem ?? false;
+  const month = londonDate().slice(0, 7);
+  const { data: sentRows } = await supabase
+    .from("committee_emails_sent")
+    .select("mandir_id, recipients")
+    .eq("month", month);
+  const sentTo = new Map(
+    (sentRows ?? []).map((r) => [r.mandir_id, r.recipients]),
+  );
+  const on = committeeEmailOn() && mailerReady();
 
   return (
     <>
-      <Notice>
-        <strong>Not sent.</strong> Emails to committees are off until the ICO
-        registration and DPIA are done (decision 0006), and nothing on Toran
-        sends this one yet. This page shows what it would say, to check the
-        wording.
-      </Notice>
+      {on ? (
+        <Notice tone="success">
+          <strong>On.</strong> Every Thursday, committees that haven&apos;t had
+          this month&apos;s email get it: so on the first Thursday of the month,
+          and any left over the week after. Committees that joined in the last
+          two weeks wait for next month. Each member can stop it from the email.
+        </Notice>
+      ) : (
+        <Notice>
+          <strong>Not sending yet.</strong> To start, set COMMITTEE_EMAIL to
+          &ldquo;on&rdquo; in Vercel
+          {mailerReady()
+            ? ""
+            : ", with the email sender (RESEND_API_KEY and DIGEST_FROM)"}
+          . Check the wording here first, and send one to yourself.
+        </Notice>
+      )}
+      {query.sent === "1" && (
+        <Notice tone="success">Sent to your email address.</Notice>
+      )}
+      {query.sent === "0" && (
+        <Notice tone="error">
+          It couldn&apos;t be sent: check the email sender is set up in Vercel.
+        </Notice>
+      )}
 
       <Card>
         <form className="flex flex-wrap items-end gap-3">
@@ -101,6 +116,9 @@ async function Preview({ searchParams }: PageProps<"/ops/committee-email">) {
               {(mandirs ?? []).map((m) => (
                 <option key={m.slug} value={m.slug}>
                   {m.name}, {m.town}
+                  {sentTo.has(m.id)
+                    ? ` · sent this month to ${sentTo.get(m.id)}`
+                    : ""}
                 </option>
               ))}
             </select>
@@ -130,7 +148,15 @@ async function Preview({ searchParams }: PageProps<"/ops/committee-email">) {
           <pre className="border-line bg-surface rounded-2xl border p-5 font-sans text-lg whitespace-pre-wrap">
             {email.text}
           </pre>
-          <CopyText text={email.text} label="Copy the text" />
+          <div className="flex flex-wrap items-center gap-3">
+            <form action={sendPreviewToMe}>
+              <input type="hidden" name="mandir" value={chosen!.slug} />
+              <button type="submit" className={quietButtonClass}>
+                Send this to me
+              </button>
+            </form>
+            <CopyText text={email.text} label="Copy the text" />
+          </div>
         </section>
       )}
     </>

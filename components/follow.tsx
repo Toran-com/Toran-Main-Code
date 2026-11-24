@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
+import { sendCount } from "@/components/count-visits";
 import { actionPillClass } from "@/components/ui";
 import { type Locale, useLocale, useT } from "@/components/use-t";
 import {
@@ -59,6 +60,13 @@ export function Star({ filled }: { filled: boolean }) {
   );
 }
 
+// Tells Toran's counter that someone followed (or stopped following) a
+// mandir: one more, or one fewer, on its total, with nothing about who
+// (decision 0022). Who follows whom stays on the phone.
+export function countFollow(slug: string, on: boolean) {
+  sendCount(on ? "follow" : "unfollow", `/mandirs/${slug}`);
+}
+
 // Asks the service worker (public/sw.js) to keep the followed mandirs'
 // pages for offline use, and to forget ones no longer followed. Just the
 // addresses go to the phone's own service worker; nothing reaches Toran.
@@ -99,6 +107,7 @@ export function FollowButton({
         aria-pressed={on}
         onClick={() => {
           setFollowing(slug, !on);
+          countFollow(slug, !on);
           keepOffline(locale);
         }}
         className={`${actionPillClass} self-start ${on ? "border-peacock" : ""}`}

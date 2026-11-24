@@ -101,7 +101,36 @@ export type MandirDetails = Pick<
   | "visiting_note"
   | "opening_hours"
   | "aarti_times"
-> & { events: MandirEvent[] };
+> & {
+  events: MandirEvent[];
+  // Notices from the committee to visitors, until their last day.
+  notices?: MandirNotice[];
+};
+
+export type MandirNotice = Pick<
+  Row<"mandir_notices">,
+  "id" | "body" | "until_on"
+> & {
+  // Its last day is today (worked out with the page's data, as pages
+  // can't read the clock while they're drawn).
+  endsToday?: boolean;
+};
+
+// A mandir's current notices, newest first (at most three can be current).
+async function currentNotices(
+  db: Exclude<ReturnType<typeof connect>, null | "misconfigured">,
+  mandirId: string,
+): Promise<MandirNotice[]> {
+  const today = londonDate();
+  const { data } = await db
+    .from("mandir_notices")
+    .select("id, body, until_on")
+    .eq("mandir_id", mandirId)
+    .gte("until_on", today)
+    .order("created_at", { ascending: false })
+    .limit(3);
+  return (data ?? []).map((n) => ({ ...n, endsToday: n.until_on === today }));
+}
 
 export type FestivalDate = Pick<
   Row<"festival_dates">,
@@ -165,7 +194,8 @@ export async function getMandir(
     rows.filter((e) => e.origin !== "aarti"),
     from,
   ).slice(0, 50);
-  return settle({ state: "ok", data: { ...mandir, events } });
+  const notices = await currentNotices(db, mandir.id);
+  return settle({ state: "ok", data: { ...mandir, events, notices } });
 }
 
 export type MandirEventPage = {
@@ -212,9 +242,10 @@ export async function getMandirEvent(
 
   const [next] = withNextStart([row], from);
   const event = next ?? { ...row, next_starts_at: row.starts_at };
+  const notices = await currentNotices(db, mandir.id);
   return settle({
     state: "ok",
-    data: { mandir, event, upcoming: Boolean(next) },
+    data: { mandir: { ...mandir, notices }, event, upcoming: Boolean(next) },
   });
 }
 
