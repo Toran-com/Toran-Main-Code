@@ -23,6 +23,7 @@ describe("Gujarati and Hindi addresses", () => {
       "/festivals",
       "/festivals/diwali",
       "/whats-on?near=LE4",
+      "/first-visit",
     ]) {
       expect(hasTranslation(path), path).toBe(true);
     }

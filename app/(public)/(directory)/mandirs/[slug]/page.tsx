@@ -208,6 +208,12 @@ export default async function MandirPage({
             note={mandir.visiting_note}
             phone={mandir.phone}
           />
+          <Link
+            href={localePath("/first-visit")}
+            className="text-peacock inline-flex min-h-11 items-center self-start font-semibold"
+          >
+            {t("firstVisit.link")} →
+          </Link>
           <section
             aria-labelledby="committee"
             className="bg-sunk flex flex-col gap-3 rounded-3xl p-6"
