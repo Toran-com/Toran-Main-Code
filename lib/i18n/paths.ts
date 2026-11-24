@@ -5,7 +5,7 @@ import type { Locale } from "@/lib/i18n";
 // browser's language switch can use it without loading them.
 
 // The languages other than English, each with its own address prefix.
-export const TRANSLATED_LOCALES = ["gu", "hi"] as const;
+export const TRANSLATED_LOCALES = ["gu", "hi", "ta"] as const;
 
 // The public pages that have them: families' pages, not committees' or
 // admins'.

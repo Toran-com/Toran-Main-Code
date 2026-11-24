@@ -815,6 +815,14 @@ on, follow the same steps with a native Hindi speaker, then set
 `ready: true` for `hi`. With more than one language switched on, the
 header offers each of them.
 
+**Tamil** is the same again: a first draft in `lib/i18n/ta.ts` (and
+`lib/i18n/client-messages-ta.ts`), every page also at `/ta`, marked as a
+draft and left out of search engines, with its own review pack under
+Translations. A mandir is called a கோயில் (koyil), as Tamil speakers say.
+The bottom tabs use one-word names (நிகழ்வு, கோயில், விழா) so they fit a
+small phone; the pages keep their full names. To switch it on, have a
+native Tamil speaker check the pack, then set `ready: true` for `ta`.
+
 ### Pages about Toran (footer)
 
 Every public page's footer links to **About**, **Contact**, **Correct or
