@@ -185,6 +185,7 @@ function event(title: string, region: string): ListedEvent {
     status: "published",
     recurrence: null,
     link: null,
+    languages: [],
     next_starts_at: "2026-10-31T18:00:00Z",
     mandir: {
       slug: "a-mandir",

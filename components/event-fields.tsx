@@ -1,25 +1,32 @@
 import { inputClass } from "@/components/ui";
 import type { EventInput } from "@/lib/event-form";
 import { EVENT_KINDS } from "@/lib/event-kinds";
+import {
+  EVENT_LANGUAGES,
+  languageLabel,
+  MAX_EVENT_LANGUAGES,
+} from "@/lib/event-languages";
 import { londonDate } from "@/lib/format";
 
 // The details of an event: used by a committee adding or editing an event
 // and by Toran typing up a forwarded poster. Committees can also give the
 // name and description in Gujarati, say what kind of event it is, and
 // give its cost and whether to book first (`tickets`), and where it's
-// held if not in the usual hall (`place`). "values" fills the fields in,
-// when editing.
+// held if not in the usual hall (`place`), and the languages it's in
+// (`languages`). "values" fills the fields in, when editing.
 export function EventFields({
   gujarati = false,
   kinds = false,
   tickets = false,
   place = false,
+  languages = false,
   values,
 }: {
   gujarati?: boolean;
   kinds?: boolean;
   tickets?: boolean;
   place?: boolean;
+  languages?: boolean;
   values?: EventInput;
 }) {
   return (
@@ -257,6 +264,36 @@ export function EventFields({
               Leave the link empty if people book by phone or at the mandir.
             </p>
           </div>
+        </details>
+      )}
+      {languages && (
+        <details
+          className="flex flex-col gap-2"
+          open={!!values?.languages?.length}
+        >
+          <summary className="cursor-pointer font-semibold">
+            Say what language it&apos;s in (optional)
+          </summary>
+          <fieldset className="mt-2 flex flex-col gap-3">
+            <legend className="text-muted mb-2 text-base">
+              Families can look for events in their language. Tick up to{" "}
+              {MAX_EVENT_LANGUAGES}.
+            </legend>
+            <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2">
+              {EVENT_LANGUAGES.map((code) => (
+                <label key={code} className="flex min-h-11 items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="languages"
+                    value={code}
+                    defaultChecked={values?.languages?.includes(code)}
+                    className="accent-peacock size-6"
+                  />
+                  {languageLabel(code)}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </details>
       )}
       {gujarati && (

@@ -193,6 +193,7 @@ describe("eventInputFrom", () => {
       location_note: "",
       venue_name: "",
       venue_postcode: "",
+      languages: [],
     });
   });
 
@@ -271,6 +272,7 @@ describe("eventInputFromEvent", () => {
       location_note: "",
       venue_name: "",
       venue_postcode: "",
+      languages: [],
     });
   });
 
@@ -429,5 +431,36 @@ describe("an end time", () => {
         next_starts_at: "2026-10-24T18:30:00Z",
       }).end_time,
     ).toBe("21:00");
+  });
+});
+
+describe("checkEvent languages", () => {
+  const at = new Date("2026-10-01T12:00:00Z");
+
+  it("keeps the languages ticked, each once", () => {
+    const r = checkEvent({ ...base, languages: ["gu", "en", "gu"] }, at);
+    expect(r.ok && r.event.languages).toEqual(["gu", "en"]);
+  });
+
+  it("says nothing when none are ticked", () => {
+    const r = checkEvent(base, at);
+    expect(r.ok && r.event.languages).toEqual([]);
+  });
+
+  it("turns away a language not on the list, or too many", () => {
+    expect(checkEvent({ ...base, languages: ["xx"] }, at)).toEqual({
+      ok: false,
+      error: "languages",
+    });
+    expect(
+      checkEvent({ ...base, languages: ["en", "gu", "hi", "ta", "pa"] }, at),
+    ).toEqual({ ok: false, error: "languages" });
+  });
+
+  it("reads every box ticked on the form", () => {
+    const form = new FormData();
+    form.append("languages", "ta");
+    form.append("languages", "en");
+    expect(eventInputFrom(form).languages).toEqual(["ta", "en"]);
   });
 });

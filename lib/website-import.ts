@@ -146,4 +146,5 @@ export const IMPORT_PROBLEMS: Record<ImportProblem["problem"], string> = {
   repeated: "the same event is already in this paste",
   toomany: `only the first ${MAX_IMPORT_ROWS} rows were read; send the rest separately`,
   failed: "it couldn't be saved; try again",
+  languages: "the languages aren't from the list",
 };

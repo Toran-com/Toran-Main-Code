@@ -283,6 +283,13 @@ export function draftFrom(value: unknown): EventInput | null {
         const v = (parsed as Record<string, unknown>)?.[name];
         return typeof v === "string" ? v.slice(0, 1000) : "";
       },
+      // Lists (the languages ticked) come back as they were.
+      getAll: (name: string) => {
+        const v = (parsed as Record<string, unknown>)?.[name];
+        return Array.isArray(v)
+          ? v.filter((x): x is string => typeof x === "string").slice(0, 20)
+          : [];
+      },
     });
   } catch {
     return null;

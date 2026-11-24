@@ -14,6 +14,7 @@ const event = (over: Partial<ListedEvent>): ListedEvent => ({
   status: "published",
   recurrence: "RRULE:FREQ=WEEKLY;BYDAY=SU;UNTIL=20270301",
   link: null,
+  languages: [],
   next_starts_at: "2026-11-08T10:00:00Z",
   mandir: {
     slug: "ram",

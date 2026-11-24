@@ -1,3 +1,4 @@
+import { isEventLanguage, languageLabel } from "@/lib/event-languages";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -584,6 +585,13 @@ function Details({ page }: { page: MandirEventPage }) {
           </Link>
         </div>
       ),
+    });
+  const languages = (event.languages ?? []).filter(isEventLanguage);
+  if (languages.length)
+    rows.push({
+      label: t("event.language"),
+      icon: null,
+      value: languages.map(languageLabel).join(", "),
     });
   if (event.cost_note)
     rows.push({ label: t("event.cost"), icon: null, value: event.cost_note });

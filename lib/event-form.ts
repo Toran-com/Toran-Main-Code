@@ -4,6 +4,11 @@
 
 import { type EventKind, isEventKind } from "@/lib/event-kinds";
 import { londonDate, londonTime, londonToUtc } from "@/lib/format";
+import {
+  type EventLanguage,
+  isEventLanguage,
+  MAX_EVENT_LANGUAGES,
+} from "@/lib/event-languages";
 import { normalisePostcode } from "@/lib/geo";
 import {
   occurrenceDates,
@@ -43,6 +48,8 @@ export type EventInput = {
   location_note?: string;
   venue_name?: string;
   venue_postcode?: string;
+  // The languages it's held in (lib/event-languages.ts); none when not said.
+  languages?: string[];
 };
 
 export type EventError =
@@ -60,7 +67,8 @@ export type EventError =
   | "ticketsUrl"
   | "locationNote"
   | "venue"
-  | "venuePostcode";
+  | "venuePostcode"
+  | "languages";
 
 export type CheckedEvent = {
   title: string;
@@ -84,6 +92,7 @@ export type CheckedEvent = {
   locationNote: string | null;
   venueName: string | null;
   venuePostcode: string | null;
+  languages: EventLanguage[];
 };
 
 export const EVENT_FIELDS = [
@@ -123,6 +132,7 @@ export function eventInputFrom(source: {
     location_note: text("location_note"),
     venue_name: text("venue_name"),
     venue_postcode: text("venue_postcode"),
+    languages: source.getAll?.("languages").map(String) ?? [],
   };
 }
 
@@ -146,6 +156,7 @@ export function eventInputFromEvent(event: {
   location_note?: string | null;
   venue_name?: string | null;
   venue_postcode?: string | null;
+  languages?: string[] | null;
 }): EventInput {
   const at = new Date(event.next_starts_at);
   const parsed = event.recurrence ? parseRule(event.recurrence) : null;
@@ -175,6 +186,7 @@ export function eventInputFromEvent(event: {
     location_note: event.location_note ?? "",
     venue_name: event.venue_name ?? "",
     venue_postcode: event.venue_postcode ?? "",
+    languages: event.languages ?? [],
   };
 }
 
@@ -224,6 +236,14 @@ export function checkEvent(
     (venueName && (venueName.length < 2 || venueName.length > 120))
   ) {
     return fail("venue");
+  }
+  // Each language once, from the list, and only a few.
+  const languages = [...new Set(input.languages ?? [])];
+  if (
+    languages.length > MAX_EVENT_LANGUAGES ||
+    !languages.every(isEventLanguage)
+  ) {
+    return fail("languages");
   }
   const today = londonDate(now);
   const latest = londonDate(new Date(now.getTime() + 2 * 366 * DAY_MS));
@@ -283,6 +303,7 @@ export function checkEvent(
       locationNote: locationNote || null,
       venueName: venueName || null,
       venuePostcode,
+      languages: languages as EventLanguage[],
     },
   };
 }
@@ -338,4 +359,5 @@ export const EVENT_ERRORS: Record<EventError, string> = {
   venue:
     "For an event away from the mandir, please give both the place's name and its postcode.",
   venuePostcode: "That doesn't look like a UK postcode for the place.",
+  languages: `Please choose up to ${MAX_EVENT_LANGUAGES} languages from the list.`,
 };

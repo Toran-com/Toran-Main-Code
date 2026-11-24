@@ -15,6 +15,12 @@ import { EVENT_KINDS, isEventKind, kindLabel } from "@/lib/event-kinds";
 import { londonDate } from "@/lib/format";
 import { cleanSlugs } from "@/lib/follow";
 import { regionKey } from "@/lib/i18n/client/mandirs";
+import {
+  EVENT_LANGUAGES,
+  type EventLanguage,
+  isEventLanguage,
+  languageLabel,
+} from "@/lib/event-languages";
 import { REGIONS } from "@/lib/mandir-form";
 import { pageMetadata } from "@/lib/site";
 import { listUpcomingEvents, positionForSearch } from "@/lib/whats-on";
@@ -70,6 +76,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   const within = radiusFrom(query.within);
   const region = String(query.region ?? "");
   const type = String(query.type ?? "");
+  const asked = String(query.lang ?? "");
+  const lang = isEventLanguage(asked) ? asked : "";
   const kind = isEventKind(type) ? type : "";
   const day = dayFrom(query.day);
   // "Today" or "This weekend" (a single day, from "more on this day", wins).
@@ -86,6 +94,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
   // Links that change one choice and keep the others.
   const here = (change: {
     type?: string;
+    lang?: string;
     region?: string;
     day?: string;
     when?: When;
@@ -106,6 +115,8 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     const w = change.when ?? (change.day === undefined ? when : "");
     if (r) params.set("region", r);
     if (k) params.set("type", k);
+    const l = change.lang ?? lang;
+    if (l) params.set("lang", l);
     if (d) params.set("day", d);
     if (w) params.set("when", w);
     if ((change.view ?? view) === "map") params.set("view", "map");
@@ -117,6 +128,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
 
   const keep = new URLSearchParams();
   if (kind) keep.set("type", kind);
+  if (lang) keep.set("lang", lang);
   if (day) keep.set("day", day);
   if (when) keep.set("when", when);
   if (view === "map") keep.set("view", "map");
@@ -166,6 +178,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
       (e) =>
         (!region || e.mandir.region === region) &&
         (!kind || e.kind === kind) &&
+        (!lang || e.languages.includes(lang)) &&
         (!mandirs.length || mandirs.includes(e.mandir.slug)),
     ),
     day ? [day] : datesFor(when, londonDate()),
@@ -177,6 +190,7 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     !position &&
     !region &&
     !kind &&
+    !lang &&
     !day &&
     !when &&
     !mandirs.length &&
@@ -191,6 +205,10 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
     region && {
       label: regionKey(region) ? t(regionKey(region)!) : region,
       href: here({ region: "" }),
+    },
+    lang && {
+      label: languageLabel(lang),
+      href: here({ lang: "" }),
     },
     day && { label: longDayHeading(day), href: here({ day: "" }) },
     mandirs.length > 0 && {
@@ -252,10 +270,14 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
           </nav>
           <div className="lg:order-2 lg:ml-auto">
             <Filters
-              key={`${kind}|${region}`}
+              key={`${kind}|${region}|${lang}`}
               kind={kind}
               region={region}
-              count={(kind ? 1 : 0) + (region ? 1 : 0)}
+              lang={lang}
+              languages={EVENT_LANGUAGES.filter((code) =>
+                result.data.some((e) => e.languages.includes(code)),
+              )}
+              count={(kind ? 1 : 0) + (region ? 1 : 0) + (lang ? 1 : 0)}
               here={here}
             />
           </div>
@@ -388,13 +410,18 @@ async function WhatsOn({ searchParams }: PageProps<"/whats-on">) {
 function Filters({
   kind,
   region,
+  lang,
+  languages,
   count,
   here,
 }: {
   kind: string;
   region: string;
+  lang: string;
+  // The languages events are listed in: only those are offered.
+  languages: readonly EventLanguage[];
   count: number;
-  here: (change: { type?: string; region?: string }) => string;
+  here: (change: { type?: string; region?: string; lang?: string }) => string;
 }) {
   const t = pageT();
   const kinds = Object.entries(EVENT_KINDS)
@@ -442,6 +469,18 @@ function Filters({
           chosen={region}
           href={(value) => here({ region: value })}
         />
+        {(languages.length > 0 || lang) && (
+          <Choices
+            title={t("whatsOn.language")}
+            all={t("whatsOn.anyLanguage")}
+            options={languages.map((code) => ({
+              value: code,
+              label: languageLabel(code),
+            }))}
+            chosen={lang}
+            href={(value) => here({ lang: value })}
+          />
+        )}
       </div>
     </details>
   );
