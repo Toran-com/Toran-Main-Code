@@ -550,6 +550,14 @@ html:has(.site-menu[open]) .site-header {
   transform-origin: top;
   animation: pop-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+/* Only while it's open. The browser doesn't draw a closed menu or panel,
+   so an animation that starts in one (as when the header is drawn afresh
+   on the way from logging in) never properly ends, and anything waiting
+   for animations to end waits for ever (the accessibility checks did).
+   Opening starts it afresh, as before. */
+details:not([open]) :is(.menu-panel, .menu-backdrop, .pop-in) {
+  animation: none;
+}
 
 /* Date and time boxes on an iPhone: Safari gives them a width of their
    own that ignores the box they're in, so they ran off the side of the
