@@ -122,6 +122,57 @@ export const en = {
   "regular.intro":
     "Bal vihar, bhajan mandal, yoga, language classes and more: everything that happens every week or month, by the day it's on.",
   "regular.what": "classes and regular groups",
+  "firstVisit.title": "Your first visit to a mandir",
+  "firstVisit.description":
+    "What to expect when you visit a Hindu mandir in the UK for the first time: shoes, dress, darshan, aarti, prasad and more.",
+  "firstVisit.intro":
+    "Everyone is welcome at a mandir, whatever your background, and nobody expects you to know everything. Customs differ from mandir to mandir, so if you're unsure, ask a volunteer: they're glad to help.",
+  "firstVisit.arriveTitle": "When you arrive",
+  "firstVisit.arrive1":
+    "Take off your shoes before you go in. There are racks near the door.",
+  "firstVisit.arrive2":
+    "Some mandirs ask you to wash your hands, or have a place to do so.",
+  "firstVisit.arrive3": "Turn your phone to silent.",
+  "firstVisit.dressTitle": "What to wear",
+  "firstVisit.dress1":
+    "Modest, comfortable clothes: shoulders and knees covered.",
+  "firstVisit.dress2":
+    "Some mandirs ask visitors not to wear leather (belts, bags) inside.",
+  "firstVisit.dress3":
+    "A few ask women to cover their head, or have separate areas for men and women. You'll see others doing it, or a sign will say.",
+  "firstVisit.darshanTitle": "Darshan: seeing the deities",
+  "firstVisit.darshan1":
+    "The murtis (sacred images) are the heart of the mandir. People come to see them and be seen by them: this is darshan.",
+  "firstVisit.darshan2":
+    "You can stand or sit quietly, fold your hands, or simply look. There's no right way to pray.",
+  "firstVisit.darshan3":
+    "Try not to point your feet towards the murtis when you sit.",
+  "firstVisit.darshan4":
+    "The shrines may be closed at certain times of day; the mandir's opening times say when.",
+  "firstVisit.aartiTitle": "Aarti",
+  "firstVisit.aarti1":
+    "Aarti is a short prayer with lamps, singing and bells, held at set times each day. Anyone can join in, or just watch.",
+  "firstVisit.aarti2":
+    "Afterwards the lamp may be brought round: people pass their hands over the flame and then over their eyes and head.",
+  "firstVisit.prasadTitle": "Prasad and food",
+  "firstVisit.prasad1":
+    "Prasad is food that has been offered to the deities, shared with everyone. Accept it with your right hand, or both hands.",
+  "firstVisit.prasad2":
+    "Many mandirs serve free vegetarian meals on festival days or Sundays. Mandirs don't allow meat, fish or eggs on the premises, and many ask that no onion or garlic is brought in.",
+  "firstVisit.photosTitle": "Photos",
+  "firstVisit.photos1":
+    "Many mandirs don't allow photos of the murtis. Look for a sign, or ask before you take any.",
+  "firstVisit.givingTitle": "Giving",
+  "firstVisit.giving1":
+    "There's no charge to visit. Giving is welcome but never expected: there are usually donation boxes, and some mandirs take cards.",
+  "firstVisit.childrenTitle": "Children",
+  "firstVisit.children1":
+    "Children are welcome. Mandirs can be busy and lively, especially at festivals.",
+  "firstVisit.checkTitle": "Before you go",
+  "firstVisit.check1":
+    "Each mandir's page on Toran shows its opening and aarti times, how to get there, parking and step-free access where the committee has added them.",
+  "firstVisit.findMandir": "Find a mandir",
+  "firstVisit.link": "First time? What to expect",
   "live.title": "Live now",
   "live.description":
     "What's happening at mandirs across the UK right now, and later today, with live streams where a mandir has one.",
