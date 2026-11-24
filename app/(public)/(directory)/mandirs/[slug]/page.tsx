@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
 import { FollowButton } from "@/components/follow";
+import { MandirNotices } from "@/components/mandir-notices";
 import { CallAndDirections, directionsTo } from "@/components/call-directions";
 import { GlobeIcon, PlayIcon } from "@/components/icons";
 import { photoUrl } from "@/lib/mandir-photo";
@@ -141,6 +142,8 @@ export default async function MandirPage({
             )}
           </p>
           <OpenNowBadge hours={mandir.opening_hours} />
+          {/* Before the buttons: "Closed today" matters before Directions. */}
+          <MandirNotices notices={mandir.notices} />
           <QuickLinks mandir={mandir} />
         </div>
       </header>
