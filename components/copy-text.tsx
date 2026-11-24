@@ -25,7 +25,7 @@ export function CopyText({
       <button
         type="button"
         onClick={copy}
-        className="text-peacock cursor-pointer underline"
+        className="text-peacock inline-flex min-h-11 cursor-pointer items-center underline"
       >
         {label}
       </button>

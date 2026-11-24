@@ -79,8 +79,11 @@ within one month.
   your calendar or give them back; clearing the site's data in your
   browser forgets them.
 - **Following a mandir.** If you press "Follow" on a mandir's page, your
-  phone remembers that mandir; nothing is sent to us and you need no
-  account. When you choose "Only mandirs I follow" on What's on, the
+  phone remembers that mandir and you need no account. Toran adds one to
+  that mandir's number of followers (and takes one off if you press
+  "Following" again), so its committee can see how many people follow it;
+  nothing about you is sent or kept, so nobody, Toran included, can tell
+  who follows a mandir. When you choose "Only mandirs I follow" on What's on, the
   mandirs' web addresses go in the page's address so Toran can show their
   events, like any other choice on that page; we don't keep them.
   The home page shows their next events: it comes with every mandir's
@@ -122,8 +125,14 @@ within one month.
   ten minutes, in a scrambled form and in its working memory only; it is
   never saved. Correction and removal requests are deleted 90 days after
   we've dealt with them.
+- **Asking a mandir to post.** If you press "Ask them to post on Toran" on
+  a mandir's page, Toran adds one to the number of people who asked that
+  mandir, and your phone remembers you asked. Nothing about you is sent or
+  kept. If you then send the ready-made WhatsApp message, it goes from your
+  WhatsApp to whoever you choose; Toran doesn't see it.
 - **Visitor numbers.** Toran counts how many times each public page is
-  seen each day, and how often events are added to calendars or shared,
+  seen each day, how often events are added to calendars or shared, and
+  how many times "Follow", "Ask them to post" and "I went" are pressed,
   with its own simple counter. It uses no cookies and keeps nothing about
   you: no IP address, browser or device, only the page's address and a
   running total. If your browser asks sites not to track you ("Do Not

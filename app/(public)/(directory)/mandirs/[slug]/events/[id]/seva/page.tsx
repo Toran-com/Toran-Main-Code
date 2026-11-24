@@ -94,7 +94,7 @@ export default async function SevaPage({
     <>
       <Link
         href={localePath(eventPath(mandir.slug, event.id))}
-        className="text-peacock self-start font-semibold hover:underline"
+        className="text-peacock inline-flex min-h-11 items-center self-start font-semibold hover:underline"
       >
         ← {event.title}
       </Link>

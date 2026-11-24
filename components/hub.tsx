@@ -8,7 +8,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Star, useFollowing } from "@/components/follow";
+import { countFollow, Star, useFollowing } from "@/components/follow";
+import { sendCount } from "@/components/count-visits";
 import { CalendarIcon, ClockIcon, WhatsAppIcon } from "@/components/icons";
 import { OpenNow } from "@/components/open-now";
 import { usePlan } from "@/components/plan";
@@ -41,7 +42,13 @@ import {
   setWent,
   visitsSnapshot,
 } from "@/lib/event-history";
-import { clearFollowing, mergeFollowing, setFollowing } from "@/lib/follow";
+import {
+  clearFollowing,
+  followingSnapshot,
+  mergeFollowing,
+  parseFollowing,
+  setFollowing,
+} from "@/lib/follow";
 import { loadHub, type HubDetails } from "@/lib/hub-actions";
 import {
   comingUp,
@@ -506,6 +513,7 @@ export function Hub() {
                           onClick={() => {
                             setFollowing(slug, false);
                             void syncPushMandirs();
+                            countFollow(slug, false);
                           }}
                           aria-label={t("hub.mandirs.unfollowLabel", { name })}
                           className={pillButtonClass}
@@ -639,7 +647,10 @@ export function Hub() {
                       <p className="flex flex-wrap gap-2">
                         <button
                           type="button"
-                          onClick={() => setWent(v.id, v.at, true)}
+                          onClick={() => {
+                            setWent(v.id, v.at, true);
+                            if (e) sendCount("went", e.path);
+                          }}
                           aria-label={t("hub.past.yesLabel", { title })}
                           className={`${quietButtonClass} border-peacock px-5 py-2`}
                         >
@@ -876,6 +887,9 @@ function Settings({ t, data }: { t: T; data: MoveData }) {
 
   function clearAll() {
     void turnOff();
+    for (const slug of parseFollowing(followingSnapshot())) {
+      countFollow(slug, false);
+    }
     clearFollowing();
     clearPlan();
     clearVisits();

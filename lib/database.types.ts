@@ -554,6 +554,9 @@ isOneToOne: false
 "mandir_count_summary":
 { Args: { "since": string,"target": string }; Returns: Json
                            },
+"mandir_supporters":
+{ Args: { "since": string,"target": string }; Returns: Json
+                           },
 "may_decide_events":
 { Args: { "a": string,"b": string }; Returns: boolean
                            },
@@ -591,6 +594,11 @@ isOneToOne: false
                            },
 "subscribe_digest":
 { Args: { "address": string,"area": string,"confirm": string,"leave": string }; Returns: undefined
+                           },
+"supporters_by_mandir":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "asks": number,"followers": number,"name": string,"slug": string,"status": string,"town": string
+            }[]
                            },
 "take_seva_slot":
 { Args: { "target_shift": string }; Returns: string

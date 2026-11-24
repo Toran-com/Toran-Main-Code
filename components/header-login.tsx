@@ -41,17 +41,17 @@ export function HeaderLogin({
         href="/account"
         aria-label={account}
         title={account}
-        className="border-night-accent/70 text-night-accent hover:bg-on-night/10 inline-flex h-[44px] min-w-[44px] items-center justify-center gap-[8px] rounded-full border-2 px-[10px] text-[18px] font-semibold no-underline transition-colors"
+        className="border-night-accent/70 text-night-accent hover:bg-on-night/10 inline-flex h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-[8px] rounded-full border-2 px-[10px] text-[18px] font-semibold no-underline transition-colors"
       >
         {PERSON}
-        <span className="hidden whitespace-nowrap lg:inline">{account}</span>
+        <span className="hidden whitespace-nowrap xl:inline">{account}</span>
       </Link>
     );
   return (
     <Link
       href="/login"
       title={logIn}
-      className="bg-night-accent text-night inline-flex h-[40px] min-w-[40px] items-center justify-center gap-[6px] rounded-full px-[14px] text-[18px] font-bold whitespace-nowrap no-underline shadow-[0_6px_18px_rgba(0,0,0,0.25)] transition hover:brightness-105 active:scale-[0.97] max-[359px]:px-[9px]"
+      className="bg-night-accent text-night inline-flex h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-[6px] rounded-full px-[14px] text-[18px] font-bold whitespace-nowrap no-underline shadow-[0_6px_18px_rgba(0,0,0,0.25)] transition hover:brightness-105 active:scale-[0.97] max-[359px]:px-[9px]"
     >
       <span className="hidden max-[359px]:inline-flex">{PERSON}</span>
       <span className="max-[359px]:sr-only">{logIn}</span>

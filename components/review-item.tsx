@@ -129,7 +129,7 @@ export function ReviewItem({
           </form>
           <Link
             href={fixHref}
-            className="text-peacock self-start font-semibold underline"
+            className="text-peacock inline-flex min-h-11 items-center self-start font-semibold underline"
           >
             Fix something first
           </Link>

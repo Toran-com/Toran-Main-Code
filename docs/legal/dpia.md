@@ -87,7 +87,10 @@ plan on every device.
 ## 4. Necessity and proportionality
 
 - **Browsing needs no account**, and we don't track visitors. Visit
-  numbers are page totals only.
+  numbers are page totals only. So are presses of Follow, "Ask them to
+  post" and "I went" (decision 0022): each adds one to a mandir's or
+  event's total, with nothing about who pressed, so a committee can see
+  how many follow its mandir but nobody can see who.
 - **Seva needs no names**: Toran counts places taken and nothing else.
 - **The weekly email needs only an email address**, with an optional
   area, not a postcode, name, or which mandir someone attends.
