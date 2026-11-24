@@ -93,5 +93,15 @@ test("a committee takes requests, and a family asks about the hall", async ({
   await expect(
     family.getByRole("button", { name: "સમિતિને મોકલો" }),
   ).toBeVisible();
+
+  // And in Tamil.
+  await family.goto(`/ta/mandirs/${SLUG}`);
+  await family
+    .getByRole("link", { name: "பூஜை அல்லது முன்பதிவு பற்றிக் கேளுங்கள்" })
+    .click();
+  await expect(family).toHaveURL(new RegExp(`/ta/mandirs/${SLUG}/request$`));
+  await expect(
+    family.getByRole("button", { name: "குழுவுக்கு அனுப்பு" }),
+  ).toBeVisible();
   await family.close();
 });
