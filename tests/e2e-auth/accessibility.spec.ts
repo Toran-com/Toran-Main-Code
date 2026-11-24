@@ -55,7 +55,9 @@ test("public pages are accessible", async ({ page }) => {
 });
 
 test("a committee's pages are accessible", async ({ page }) => {
-  test.setTimeout(90_000);
+  // Fourteen full scans (seven pages, in light and dark). As the hub has
+  // grown, 90 seconds has run out on CI's machines.
+  test.setTimeout(240_000);
   const slug = "bedford-hindu-temple-and-community-trust";
   const email = `a11y-committee-${Date.now()}@example.com`;
   await logIn(page, email);
