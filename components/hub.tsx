@@ -28,6 +28,7 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { PushToggle } from "@/components/push-toggle";
+import { SubscribeCalendar } from "@/components/subscribe-calendar";
 import { useOrigin } from "@/components/use-origin";
 import { type Locale, useLocale, useT } from "@/components/use-t";
 import { withLocale } from "@/lib/i18n/paths";
@@ -532,6 +533,11 @@ export function Hub() {
                 <Star filled />
                 {t("hub.mandirs.events")}
               </Link>
+              <SubscribeCalendar
+                path={`/my/calendar.ics?m=${following.join(",")}`}
+                title={t("hub.calendar.title")}
+                body={t("hub.calendar.body")}
+              />
             </>
           ) : (
             <Empty

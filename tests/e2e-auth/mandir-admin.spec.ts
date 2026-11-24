@@ -322,6 +322,9 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member
     .getByLabel("YouTube / Livestream")
     .fill("www.youtube.com/@krishnatemple/live");
+  await member
+    .getByLabel("Donation page")
+    .fill("www.justgiving.com/campaign/krishna-annakut");
   // What visitors need to know before they set off.
   await member.getByLabel("Step-free way in").check();
   await member.getByLabel("Jain food").check();
@@ -399,6 +402,13 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await expect(
     member.getByRole("link", { name: "Watch on YouTube" }),
   ).toHaveAttribute("href", "https://www.youtube.com/@krishnatemple/live");
+  // And their own donation page: Toran only links to it.
+  await expect(
+    member.getByRole("link", { name: "Give to the mandir" }),
+  ).toHaveAttribute(
+    "href",
+    "https://www.justgiving.com/campaign/krishna-annakut",
+  );
   // The aartis, with the days of any that aren't every day. Only in the
   // opening times: an event called "Weekly sandhya aarti" on a Sunday is
   // also on the page, first in the list when it's next.

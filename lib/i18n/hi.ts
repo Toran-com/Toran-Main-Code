@@ -14,6 +14,7 @@ export const hi: Record<MessageKey, string> = {
   "shell.mandirs": "मंदिर",
   "shell.festivals": "त्योहार",
   "shell.search": "खोजें",
+  "shell.live": "अभी लाइव",
   "shell.forMandirs": "मंदिर समितियों के लिए",
   "shell.find": "खोजें",
   "shell.toran": "Toran",
@@ -120,6 +121,13 @@ export const hi: Record<MessageKey, string> = {
   "regular.intro":
     "बाल विहार, भजन मंडल, योग, भाषा की कक्षाएँ और भी बहुत कुछ: हर हफ़्ते या हर महीने होने वाला सब कुछ, जिस दिन होता है उसके अनुसार।",
   "regular.what": "कक्षाएँ और नियमित मंडल",
+  "live.title": "अभी लाइव",
+  "live.description":
+    "पूरे यूके के मंदिरों में अभी और आज बाद में क्या हो रहा है, और जहाँ मंदिर लाइव प्रसारण करता है वहाँ वह।",
+  "live.intro":
+    "मंदिर जो दर्ज करते हैं उसके अनुसार, अभी और आज बाद में मंदिरों में क्या है। जहाँ मंदिर प्रसारण करता है, वहाँ लाइव देखें उसका प्रसारण खोलता है।",
+  "live.what": "अभी क्या चल रहा है",
+  "live.seeAll": "आने वाला सब कुछ देखें",
   "regular.areas": "क्षेत्र",
   "regular.everywhere": "हर जगह",
   "regular.none": "यहाँ अभी कोई नियमित कक्षा या मंडल नहीं है।",
@@ -217,6 +225,7 @@ export const hi: Record<MessageKey, string> = {
   "mandir.gettingThere": "वहाँ कैसे पहुँचें",
   "mandir.website": "वेबसाइट",
   "mandir.watchLive": "लाइव देखें",
+  "mandir.give": "मंदिर को दान दें",
   "mandir.watchYouTube": "YouTube पर देखें",
   "mandir.photoAlt": "{name} की तस्वीर",
   "mandir.phone": "फ़ोन",
