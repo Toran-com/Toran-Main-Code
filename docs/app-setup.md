@@ -800,7 +800,7 @@ committee and admin pages link to Privacy, Terms and Contact.
     kept once.
 
   If robots still get through, add a rate-limit rule in Vercel's
-  Firewall for POST requests to `/corrections` and `/mandirs/*/tell-us`.
+  Firewall for POST requests to `/corrections` and `/mandirs/*/tell-us`, `/mandirs/*/request`.
 
 - `/contact` points people to the right form. Once Toran has its own email
   address, put it in `CONTACT_EMAIL` in `lib/site.ts` and the page shows

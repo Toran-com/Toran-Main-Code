@@ -15,7 +15,11 @@ import { ShareButtons } from "@/components/share-buttons";
 import { SubscribeCalendar } from "@/components/subscribe-calendar";
 import { OpeningTimes, OpenNowBadge } from "@/components/opening-times";
 import { VisitingInfo } from "@/components/visiting-info";
-import { actionPillClass, quietButtonClass } from "@/components/ui";
+import {
+  actionPillClass,
+  buttonClass,
+  quietButtonClass,
+} from "@/components/ui";
 import {
   getMandir,
   listMandirs,
@@ -208,6 +212,34 @@ export default async function MandirPage({
             note={mandir.visiting_note}
             phone={mandir.phone}
           />
+          {mandir.status === "claimed" &&
+            (mandir.request_types ?? []).length > 0 && (
+              <section
+                aria-labelledby="requests"
+                className="bg-sunk flex flex-col gap-3 rounded-3xl p-6"
+              >
+                <h2 id="requests" className="text-xl font-semibold">
+                  {t("request.cardTitle")}
+                </h2>
+                <p className="text-muted">{t("request.cardBody")}</p>
+                <ul className="flex flex-wrap gap-2">
+                  {mandir.request_types.map((r) => (
+                    <li
+                      key={r}
+                      className="bg-surface rounded-full px-3 py-1 text-base"
+                    >
+                      {r}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={localePath(`/mandirs/${mandir.slug}/request`)}
+                  className={`${buttonClass} self-start`}
+                >
+                  {t("request.button")}
+                </Link>
+              </section>
+            )}
           <section
             aria-labelledby="committee"
             className="bg-sunk flex flex-col gap-3 rounded-3xl p-6"

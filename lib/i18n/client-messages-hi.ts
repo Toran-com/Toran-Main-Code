@@ -372,4 +372,17 @@ export const hiClient: Record<ClientKey, string> = {
   "hub.iWent": "मैं गया था",
   "hub.iWentDone": "आप गए थे · मेरा Toran में",
   "hub.iWentUndo": "वापस लें",
+  "request.sent": "भेज दिया गया। समिति सीधे आपको जवाब देगी।",
+  "request.error.what": "कृपया चुनें कि आप किस बारे में पूछना चाहते हैं।",
+  "request.error.date":
+    "कृपया आज या उसके बाद की तारीख़ चुनें, या ख़ाली छोड़ दें।",
+  "request.error.name": "कृपया अपना नाम दें।",
+  "request.error.email": "यह ईमेल पता सही नहीं लगता।",
+  "request.error.phone":
+    "फ़ोन नंबर में सिर्फ़ अंक, खाली जगह और + ( ) इस्तेमाल करें।",
+  "request.error.contact": "कृपया ईमेल या फ़ोन नंबर दें, ताकि वे जवाब दे सकें।",
+  "request.error.message": "कृपया संदेश 600 अक्षरों से कम रखें।",
+  "request.error.slow": "आपने अभी कुछ अनुरोध भेजे हैं। कृपया दस मिनट रुकें।",
+  "request.error.failed":
+    "अभी भेजा नहीं जा सका। कृपया फिर कोशिश करें, या मंदिर को फ़ोन करें।",
 };

@@ -168,7 +168,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     ? await supabase
         .from("mandirs")
         .select(
-          "id, slug, name, town, postcode, website, live_url, phone, photo_path, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
+          "id, slug, name, town, postcode, website, live_url, request_types, phone, photo_path, calendar, getting_there, facilities, visiting_note, opening_hours, aarti_times",
         )
         .eq("slug", slug)
         .maybeSingle()
@@ -1233,6 +1233,25 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                         name="live_url"
                         inputMode="url"
                         defaultValue={mandir.live_url ?? ""}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">
+                        Requests families can send
+                      </span>
+                      <span className="text-muted -mt-1 text-base">
+                        Pujas, ceremonies or hall hire families can ask you
+                        about through Toran, one per line (up to 8), such as
+                        &ldquo;Havan&rdquo;, &ldquo;Naming ceremony&rdquo; or
+                        &ldquo;Hall hire&rdquo;. Requests come to your committee
+                        by email; Toran doesn&apos;t keep them. Leave empty for
+                        none.
+                      </span>
+                      <textarea
+                        name="request_types"
+                        rows={3}
+                        defaultValue={(mandir.request_types ?? []).join("\n")}
                         className={inputClass}
                       />
                     </label>

@@ -21,6 +21,7 @@ type Values = {
   postcode?: string | null;
   website?: string | null;
   live_url?: string | null;
+  request_types?: string[] | null;
   phone?: string | null;
   tradition?: string | null;
   calendar?: string | null;
@@ -125,6 +126,17 @@ export function MandirFields({ values = {} }: { values?: Values }) {
           name="live_url"
           inputMode="url"
           defaultValue={values.live_url ?? ""}
+          className={inputClass}
+        />
+      </Field>
+      <Field
+        label="Requests families can send"
+        hint="Pujas, ceremonies or hall hire families can ask about through Toran, one per line (up to 8). Requests are emailed to the committee. Leave empty for none."
+      >
+        <textarea
+          name="request_types"
+          rows={3}
+          defaultValue={(values.request_types ?? []).join("\n")}
           className={inputClass}
         />
       </Field>

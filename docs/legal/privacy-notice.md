@@ -113,6 +113,15 @@ within one month.
   ten minutes, in a scrambled form and in its working memory only; it is
   never saved. Correction and removal requests are deleted 90 days after
   we've dealt with them.
+- **Asking a mandir about a puja or a booking.** If a mandir's committee
+  takes requests through Toran, you can ask it about a puja, a ceremony or
+  hiring its hall. What you type (what you're asking about, a date, your
+  name, your email or phone number and a message) is emailed straight to
+  that mandir's committee members, through Resend, with your email as the
+  address to reply to. Toran doesn't keep a copy: nothing is saved in our
+  database. From then on it's between you and the mandir, and the mandir's
+  own privacy notice applies to what it keeps. The same spam counter as
+  the other forms applies.
 - **Visitor numbers.** Toran counts how many times each public page is
   seen each day, and how often events are added to calendars or shared,
   with its own simple counter. It uses no cookies and keeps nothing about

@@ -9,6 +9,7 @@ import { enPlace } from "@/lib/i18n/client/place";
 import { enPlan } from "@/lib/i18n/client/plan";
 import { enRead } from "@/lib/i18n/client/read";
 import { enReport } from "@/lib/i18n/client/report";
+import { enRequest } from "@/lib/i18n/client/request";
 import { enSeva } from "@/lib/i18n/client/seva";
 import { enShare } from "@/lib/i18n/client/share";
 import { enSlots } from "@/lib/i18n/client/slots";
@@ -25,6 +26,7 @@ export const enClient = {
   ...enSlots,
   ...enSeva,
   ...enReport,
+  ...enRequest,
   ...enPlace,
   ...enEventsMap,
   ...enFollow,

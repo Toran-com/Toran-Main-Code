@@ -33,6 +33,7 @@ export async function sendEmail(
         text: email.text,
         html: email.html,
         headers: email.headers,
+        ...(email.replyTo && { reply_to: email.replyTo }),
       }),
     });
     return response.ok;

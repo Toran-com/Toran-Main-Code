@@ -371,4 +371,17 @@ export const guClient: Record<ClientKey, string> = {
   "hub.iWent": "હું ગયો/ગઈ હતી",
   "hub.iWentDone": "તમે ગયા હતા · મારા Toran માં",
   "hub.iWentUndo": "પાછું કરો",
+  "request.sent": "મોકલાઈ ગયું. સમિતિ તમને સીધો જવાબ આપશે.",
+  "request.error.what": "કૃપા કરીને પસંદ કરો કે શેના વિશે પૂછવું છે.",
+  "request.error.date": "કૃપા કરીને આજથી આગળની તારીખ પસંદ કરો, અથવા ખાલી છોડો.",
+  "request.error.name": "કૃપા કરીને તમારું નામ આપો.",
+  "request.error.email": "એ ઇમેઇલ સરનામું બરાબર લાગતું નથી.",
+  "request.error.phone": "ફોન નંબરમાં ફક્ત આંકડા, જગ્યા અને + ( ) વાપરો.",
+  "request.error.contact":
+    "કૃપા કરીને ઇમેઇલ કે ફોન નંબર આપો, જેથી તેઓ જવાબ આપી શકે.",
+  "request.error.message": "કૃપા કરીને સંદેશ 600 અક્ષરથી ઓછો રાખો.",
+  "request.error.slow":
+    "તમે હમણાં થોડી વિનંતીઓ મોકલી છે. કૃપા કરીને દસ મિનિટ રાહ જુઓ.",
+  "request.error.failed":
+    "અત્યારે મોકલી શકાયું નહીં. ફરી પ્રયાસ કરો, અથવા મંદિરને ફોન કરો.",
 };
