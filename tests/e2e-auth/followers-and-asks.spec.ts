@@ -6,7 +6,7 @@ import { logIn, sql } from "./helpers";
 // committee sees how many follow it and asked, never who. The press is
 // counted; more totals are added straight to the database. Uses a mandir
 // no other test looks at.
-const SLUG = "bharat-hindu-samaj-peterborough";
+const SLUG = "gloucester-pillaiyar-hindu-temple";
 
 test("a family asks a mandir to post; its committee sees followers and asks", async ({
   page,
@@ -21,7 +21,7 @@ test("a family asks a mandir to post; its committee sees followers and asks", as
   const whatsapp = page.getByRole("link", { name: "Send on WhatsApp" });
   const href = decodeURIComponent((await whatsapp.getAttribute("href")) ?? "");
   expect(href).toMatch(/^https:\/\/wa\.me\/\?text=/);
-  expect(href).toContain("Could Bharat Hindu Samaj");
+  expect(href).toContain("Could Gloucester Pillaiyar (Hindu) Temple");
   expect(href).toMatch(/\/for-mandirs$/);
   // The phone remembers it asked, so it isn't asked twice.
   await page.reload();
