@@ -16,7 +16,12 @@ import { pageLocale, sharedT } from "@/lib/i18n/locale";
 const LONDON = "Europe/London";
 
 // The page's language for dates: English (UK), Gujarati or Hindi.
-const DATE_LOCALES = { en: "en-GB", gu: "gu-IN", hi: "hi-IN" } as const;
+const DATE_LOCALES = {
+  en: "en-GB",
+  gu: "gu-IN",
+  hi: "hi-IN",
+  ta: "ta-IN",
+} as const;
 export const dateLocale = () => DATE_LOCALES[pageLocale()];
 
 // A date-only value (YYYY-MM-DD) as a Date at midnight UTC, so formatting in
