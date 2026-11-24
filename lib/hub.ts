@@ -1,6 +1,7 @@
 // My Toran (/my): what a visitor keeps on their phone, put together.
 // Plain functions, so they can be tested; components/hub.tsx draws them.
 
+import { TRANSLATED_LOCALES } from "@/lib/i18n/paths";
 import { parseVisits, type Visit } from "@/lib/event-history";
 import { cleanSlugs } from "@/lib/follow";
 import { londonDate } from "@/lib/london";
@@ -185,5 +186,7 @@ export function decodeMove(text: string): MoveData | null {
 }
 
 export function hubPath(locale: string): string {
-  return locale === "gu" ? "/gu/my" : "/my";
+  return (TRANSLATED_LOCALES as readonly string[]).includes(locale)
+    ? `/${locale}/my`
+    : "/my";
 }

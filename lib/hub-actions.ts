@@ -1,5 +1,7 @@
 "use server";
 
+import type { Locale } from "@/lib/i18n";
+import { TRANSLATED_LOCALES } from "@/lib/i18n/paths";
 import { cleanSlugs } from "@/lib/follow";
 import { formatClock, formatEventStart, formatWeekday } from "@/lib/format";
 import { eventsForHub, mandirsForHub } from "@/lib/hub-data";
@@ -72,7 +74,12 @@ export async function loadHub(
   eventValues: unknown,
 ): Promise<HubDetails> {
   const gujarati = locale === "gu";
-  setPageLocale(gujarati ? "gu" : "en");
+  // The page's language, for dates and times; only those Toran has.
+  setPageLocale(
+    (TRANSLATED_LOCALES as readonly string[]).includes(locale)
+      ? (locale as Locale)
+      : "en",
+  );
   // Sorted, so the same phone asks the same cached question.
   const slugs = cleanSlugs(slugValues).sort();
   const asked = cleanEvents(eventValues);

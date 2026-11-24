@@ -4,13 +4,14 @@ import {
   guShared,
   hiShared,
   type SharedKey,
+  taShared,
 } from "@/lib/i18n/shared-messages";
 import { fill, type Values } from "@/lib/i18n/core";
 
-export type Locale = "en" | "gu" | "hi";
+export type Locale = "en" | "gu" | "hi" | "ta";
 
-// The language of the page being rendered. Gujarati and Hindi pages
-// (/gu/…, /hi/…) set it
+// The language of the page being rendered. Gujarati, Hindi and Tamil
+// pages (/gu/…, /hi/…, /ta/…) set it
 // before rendering, in their layout and in each page (they can render in
 // either order); everything else is English. React's cache keeps it for
 // one request only, and in the browser it's always English (browser
@@ -30,8 +31,9 @@ export function pageLocale(): Locale {
 // lib/i18n/shared-messages.ts, not every translation.
 export function sharedT() {
   const locale = pageLocale();
-  const messages =
-    locale === "gu" ? guShared : locale === "hi" ? hiShared : enShared;
+  const messages = { en: enShared, gu: guShared, hi: hiShared, ta: taShared }[
+    locale
+  ];
   return (key: SharedKey, values?: Values) =>
     fill(messages, enShared, key, values);
 }

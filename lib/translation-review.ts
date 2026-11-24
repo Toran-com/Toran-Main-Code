@@ -15,10 +15,11 @@ export const REVIEW_LANGUAGES: Record<
 > = {
   gu: { english: "Gujarati", own: "ગુજરાતી" },
   hi: { english: "Hindi", own: "हिन्दी" },
+  ta: { english: "Tamil", own: "தமிழ்" },
 };
 
 export function reviewLocale(value: unknown): ReviewLocale {
-  return value === "hi" ? "hi" : "gu";
+  return value === "hi" || value === "ta" ? value : "gu";
 }
 
 export type LineStatus = "new" | "changed" | "checked";
