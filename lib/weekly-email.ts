@@ -87,6 +87,9 @@ export type Email = {
   text: string;
   html: string;
   headers?: Record<string, string>;
+  // Where a reply goes, if not back to Toran (a family's request to a
+  // committee: they reply to the family).
+  replyTo?: string;
 };
 
 const FONT =

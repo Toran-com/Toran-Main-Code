@@ -26,7 +26,7 @@ docs/app-setup.md.
    connected, raise emails per hour to about 30.
 4. **Optional, Vercel → Firewall:** if your plan includes it, add a
    rate-limit rule for form posts (for example, 10 a minute per visitor
-   to `/corrections`, `/mandirs/*/tell-us` and seva pages).
+   to `/corrections`, `/mandirs/*/tell-us`, `/mandirs/*/request` and seva pages).
 
 ## Findings
 
