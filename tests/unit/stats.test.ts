@@ -4,12 +4,14 @@ import { SEASONS } from "@/lib/seasons";
 import {
   countablePath,
   isBot,
+  isCounted,
   isMetric,
   mandirNumbers,
   mandirSlugOf,
   pageKind,
   periodDays,
   readSummary,
+  readSupporters,
   summarise,
 } from "@/lib/stats";
 
@@ -217,5 +219,67 @@ describe("mandirNumbers", () => {
       { id: B, views: 9, calendar: 0, share: 1 },
       { id: A, views: 7, calendar: 2, share: 0 },
     ]);
+  });
+});
+
+describe("presses (decision 0022)", () => {
+  it("counts Follow, Unfollow, Ask and I went, but they aren't page metrics", () => {
+    for (const press of ["follow", "unfollow", "ask", "went"]) {
+      expect(isCounted(press)).toBe(true);
+      expect(isMetric(press)).toBe(false);
+    }
+    expect(isCounted("view")).toBe(true);
+    expect(isCounted("like")).toBe(false);
+    expect(isCounted(1)).toBe(false);
+  });
+
+  it("leaves presses out of a mandir's page numbers", () => {
+    const numbers = mandirNumbers(
+      {
+        days: [],
+        paths: [
+          { path: "/mandirs/reading-hindu-temple", metric: "view", count: 3 },
+          { path: "/mandirs/reading-hindu-temple", metric: "follow", count: 9 },
+          { path: EVENT, metric: "went", count: 4 },
+        ],
+      },
+      "reading-hindu-temple",
+    );
+    expect(numbers.totals).toEqual({
+      view: 3,
+      calendar: 0,
+      subscribe: 0,
+      share: 0,
+    });
+    expect(numbers.events).toEqual([]);
+  });
+
+  it("reads what a mandir's page brings, safely", () => {
+    expect(
+      readSupporters({
+        followers: 47,
+        new_followers: -2,
+        asks: 6,
+        new_asks: 1,
+        went: 3,
+        seva_taken: "5",
+      }),
+    ).toEqual({
+      followers: 47,
+      newFollowers: -2,
+      asks: 6,
+      newAsks: 1,
+      went: 3,
+      sevaTaken: 5,
+    });
+    expect(readSupporters(null)).toEqual({
+      followers: 0,
+      newFollowers: 0,
+      asks: 0,
+      newAsks: 0,
+      went: 0,
+      sevaTaken: 0,
+    });
+    expect(readSupporters({ followers: -4, asks: "x" }).followers).toBe(0);
   });
 });

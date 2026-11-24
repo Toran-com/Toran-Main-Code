@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useMemo, useSyncExternalStore } from "react";
+import { sendCount } from "@/components/count-visits";
 import { actionPillClass } from "@/components/ui";
 import { useLocale, useT } from "@/components/use-t";
 import {
@@ -15,7 +17,8 @@ import { hubPath } from "@/lib/hub";
 import { enHub } from "@/lib/i18n/client/hub";
 
 // "I went" on an event's page, once it has started: it goes into Past
-// events in My Toran, on this phone only.
+// events in My Toran, on this phone only, and adds one to the event's "I
+// went" total for its committee, with nothing about who (decision 0022).
 
 function subscribeMinute(update: () => void) {
   const timer = setInterval(update, 60_000);
@@ -27,6 +30,7 @@ const notYet = () => null;
 export function IWent({ id, at }: { id: string; at: string }) {
   const t = useT(enHub);
   const locale = useLocale();
+  const path = usePathname();
   const minute = useSyncExternalStore(subscribeMinute, thisMinute, notYet);
   const snapshot = useSyncExternalStore(
     onVisitsChange,
@@ -57,7 +61,10 @@ export function IWent({ id, at }: { id: string; at: string }) {
   return (
     <button
       type="button"
-      onClick={() => setWent(id, at, true)}
+      onClick={() => {
+        setWent(id, at, true);
+        sendCount("went", path);
+      }}
       className={`${actionPillClass} self-start`}
     >
       <span aria-hidden="true">✓</span>

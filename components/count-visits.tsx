@@ -2,12 +2,13 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { countablePath, type Metric } from "@/lib/stats";
+import { countablePath, type Counted } from "@/lib/stats";
 
-// Tells Toran's own counter about a visit, a share or a calendar
-// subscription (lib/stats.ts): just the page's address, no cookies and
-// nothing about the visitor. Never gets in the way if it fails.
-export function sendCount(metric: Metric, path: string) {
+// Tells Toran's own counter about a visit, a share, a calendar
+// subscription or a press of Follow, Ask or I went (lib/stats.ts): just
+// the page's address, no cookies and nothing about the visitor. Never gets
+// in the way if it fails.
+export function sendCount(metric: Counted, path: string) {
   const page = countablePath(path);
   if (!page) return;
   try {

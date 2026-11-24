@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { countablePath, isBot, isMetric, type Metric } from "@/lib/stats";
+import { countablePath, type Counted, isBot, isCounted } from "@/lib/stats";
 import { createPublicServerClient } from "@/lib/supabase/server";
 
 // Whether to count this request at all: not when the browser asks not to
@@ -13,13 +13,14 @@ export function wantsCounting(request: NextRequest): boolean {
   );
 }
 
-// Adds one to today's count for a public page (lib/stats.ts).
+// Adds one to today's count for a public page (lib/stats.ts): a visit, a
+// calendar add or share, or a press of Follow, Unfollow, Ask or I went.
 export async function recordCount(metric: unknown, path: unknown) {
   const page = countablePath(path);
-  if (!isMetric(metric) || !page) return;
+  if (!isCounted(metric) || !page) return;
   try {
     const db = createPublicServerClient();
-    await db?.rpc("count_visit", { what: metric satisfies Metric, page });
+    await db?.rpc("count_visit", { what: metric satisfies Counted, page });
   } catch {
     // Counting never gets in the way of the page.
   }

@@ -19,6 +19,7 @@ import {
   mandirNumbers,
   periodDays,
   readSummary,
+  readSupporters,
 } from "@/lib/stats";
 
 // A committee's own numbers: how often its page and events were seen on
@@ -57,10 +58,10 @@ async function Numbers({
     PERIODS.find((p) => String(p.days) === query.days) ?? PERIODS[1];
   const since = periodDays(londonDate(), period.days)[0];
 
-  const { data, error } = await supabase.rpc("mandir_count_summary", {
-    target: mandir.id,
-    since,
-  });
+  const [{ data, error }, supporters] = await Promise.all([
+    supabase.rpc("mandir_count_summary", { target: mandir.id, since }),
+    supabase.rpc("mandir_supporters", { target: mandir.id, since }),
+  ]);
   const back = (
     <>
       <CommitteeBar slug={mandir.slug} current="numbers" />
@@ -84,6 +85,7 @@ async function Numbers({
     );
   }
   const numbers = mandirNumbers(readSummary(data), mandir.slug);
+  const brings = supporters.error ? null : readSupporters(supporters.data);
 
   // The events' names (only this mandir's).
   const ids = numbers.events.slice(0, 30).map((e) => e.id);
@@ -124,6 +126,43 @@ async function Numbers({
           </Link>
         ))}
       </nav>
+
+      {brings && (
+        <section aria-labelledby="following" className="flex flex-col gap-3">
+          <h2 id="following" className="text-xl font-bold sm:text-2xl">
+            People who follow your mandir
+          </h2>
+          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Tile
+              label="Following your mandir"
+              value={brings.followers}
+              note={
+                brings.newFollowers > 0
+                  ? `${brings.newFollowers.toLocaleString("en-GB")} new in the ${period.label.toLowerCase()}`
+                  : undefined
+              }
+            />
+            <Tile label="Said “I went”" value={brings.went} />
+            <Tile label="Seva places taken on Toran" value={brings.sevaTaken} />
+            <Tile
+              label="Asked you to post on Toran"
+              value={brings.asks}
+              note={
+                brings.newAsks > 0
+                  ? `${brings.newAsks.toLocaleString("en-GB")} in the ${period.label.toLowerCase()}`
+                  : undefined
+              }
+            />
+          </dl>
+          <p className="text-muted text-base">
+            Followers are everyone who has pressed Follow on your page, less
+            anyone who stopped. Toran never knows who they are: following stays
+            on their phone. “I went” and seva are for the{" "}
+            {period.label.toLowerCase()}; followers and asks are since your page
+            began.
+          </p>
+        </section>
+      )}
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile
@@ -226,13 +265,24 @@ async function Numbers({
   );
 }
 
-function Tile({ label, value }: { label: string; value: number }) {
+function Tile({
+  label,
+  value,
+  note,
+}: {
+  label: string;
+  value: number;
+  note?: string;
+}) {
   return (
     <div className={`${cardClass} flex flex-col gap-1 p-4`}>
       <dt className="text-muted text-base">{label}</dt>
       <dd className="font-display text-4xl tabular-nums">
         {value.toLocaleString("en-GB")}
       </dd>
+      {note && (
+        <dd className="text-leaf-ink text-base font-semibold">{note}</dd>
+      )}
     </div>
   );
 }

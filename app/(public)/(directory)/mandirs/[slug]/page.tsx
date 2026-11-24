@@ -4,6 +4,7 @@ import { Morph, morphName } from "@/components/morph";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
+import { AskToPost } from "@/components/ask-to-post";
 import { FollowButton } from "@/components/follow";
 import { CallAndDirections, directionsTo } from "@/components/call-directions";
 import { GlobeIcon, PlayIcon } from "@/components/icons";
@@ -165,7 +166,17 @@ export default async function MandirPage({
               ))}
             </ul>
           ) : (
-            <NoEvents website={mandir.website} />
+            <NoEvents
+              website={mandir.website}
+              ask={
+                <AskToPost
+                  slug={mandir.slug}
+                  name={mandir.name}
+                  url={`${siteUrl()}/for-mandirs`}
+                  quiet
+                />
+              }
+            />
           )}
           <More
             links={[
@@ -208,6 +219,16 @@ export default async function MandirPage({
             note={mandir.visiting_note}
             phone={mandir.phone}
           />
+          {/* Events found on its website, but no committee on Toran yet:
+              families can ask it to join (with nothing coming up, the ask
+              is in "No events listed yet" instead). */}
+          {mandir.status !== "claimed" && mandir.events.length > 0 && (
+            <AskToPost
+              slug={mandir.slug}
+              name={mandir.name}
+              url={`${siteUrl()}/for-mandirs`}
+            />
+          )}
           <section
             aria-labelledby="committee"
             className="bg-sunk flex flex-col gap-3 rounded-3xl p-6"
@@ -520,7 +541,14 @@ function More({
   );
 }
 
-function NoEvents({ website }: { website: string | null }) {
+function NoEvents({
+  website,
+  ask,
+}: {
+  website: string | null;
+  // "Ask them to post on Toran".
+  ask: ReactNode;
+}) {
   const t = pageT();
   return (
     <div className="bg-sunk mt-2 rounded-3xl p-6">
@@ -539,6 +567,7 @@ function NoEvents({ website }: { website: string | null }) {
           <>{t("mandir.untilThenNoticeboard")}</>
         )}
       </p>
+      <div className="mt-5">{ask}</div>
     </div>
   );
 }
