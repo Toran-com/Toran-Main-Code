@@ -201,3 +201,73 @@ test.describe("on a laptop", () => {
     await expect(menu).toBeHidden();
   });
 });
+
+// Each place along the bottom has its name on one line, inside its own
+// quarter of the bar, on the narrowest phone, in every language.
+test.describe("on the narrowest phone", () => {
+  test.use({ viewport: { width: 320, height: 640 } });
+
+  for (const path of ["/", "/gu", "/hi"]) {
+    test(`${path}: the names along the bottom fit on one line`, async ({
+      page,
+    }) => {
+      await page.goto(path);
+      const tabs = page.locator(".tab-bar:visible a");
+      await expect(tabs).toHaveCount(4);
+      const fits = await tabs.evaluateAll((links) =>
+        links.map((a) => {
+          const cell = a.parentElement!.getBoundingClientRect();
+          const text = document.createRange();
+          text.selectNodeContents(a);
+          const words = [...text.getClientRects()].filter((r) => r.width > 0);
+          const label = words.at(-1)!;
+          return {
+            name: a.textContent,
+            inside:
+              label.left >= cell.left - 1 && label.right <= cell.right + 1,
+            // The picture is one row, the name the other.
+            rows: new Set(words.map((r) => Math.round(r.top))).size,
+          };
+        }),
+      );
+      for (const tab of fits) {
+        expect(tab.inside, `${tab.name} spills out of its place`).toBe(true);
+        expect(tab.rows, `${tab.name} wraps`).toBeLessThanOrEqual(2);
+      }
+    });
+  }
+});
+
+// On a tablet held upright (768 to 1023px) the main places are along the
+// bottom, as on a phone, and the header is one slim row: four links in
+// the header wrapped into rows at this width. Held sideways (from
+// 1024px), the places move to the header, which is still one row, logged
+// in or not.
+test.describe("on a tablet", () => {
+  test("held upright, the places are along the bottom", async ({ page }) => {
+    await page.setViewportSize({ width: 820, height: 1180 });
+    await page.goto("/");
+    await expect(page.locator(".tab-bar:visible")).toBeVisible();
+    const header = page.locator("header");
+    await expect(header.getByRole("navigation", { name: "Main" })).toBeHidden();
+    expect((await header.boundingBox())!.height).toBeLessThan(90);
+  });
+
+  test("held sideways, the places are in a one-row header", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1180, height: 820 });
+    await page.goto("/");
+    await expect(page.locator(".tab-bar")).toBeHidden();
+    const header = page.locator("header");
+    const main = header.getByRole("navigation", { name: "Main" });
+    for (const name of ["What's on", "Seva", "Mandirs", "Festivals"]) {
+      await expect(main.getByRole("link", { name })).toBeVisible();
+    }
+    // My Toran shows its name from 1180px, a sideways iPad Air.
+    await expect(header.getByRole("link", { name: "My Toran" })).toHaveText(
+      "My Toran",
+    );
+    expect((await header.boundingBox())!.height).toBeLessThan(90);
+  });
+});

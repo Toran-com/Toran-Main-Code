@@ -109,7 +109,7 @@ export async function SeasonTownPage({
         <div className="relative flex flex-col gap-4 px-5 pt-2 pb-8 sm:px-10 sm:pb-10">
           <Link
             href={localePath(`/${season.slug}`)}
-            className="text-night-accent self-start font-semibold"
+            className="text-night-accent inline-flex min-h-11 items-center self-start font-semibold"
           >
             ← {t("season.acrossUk", { name: text.name })}
           </Link>

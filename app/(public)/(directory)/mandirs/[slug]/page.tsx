@@ -4,7 +4,9 @@ import { Morph, morphName } from "@/components/morph";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { DateTile } from "@/components/date-tile";
+import { AskToPost } from "@/components/ask-to-post";
 import { FollowButton } from "@/components/follow";
+import { MandirNotices } from "@/components/mandir-notices";
 import { CallAndDirections, directionsTo } from "@/components/call-directions";
 import { GlobeIcon, PlayIcon } from "@/components/icons";
 import { photoUrl } from "@/lib/mandir-photo";
@@ -141,6 +143,8 @@ export default async function MandirPage({
             )}
           </p>
           <OpenNowBadge hours={mandir.opening_hours} />
+          {/* Before the buttons: "Closed today" matters before Directions. */}
+          <MandirNotices notices={mandir.notices} />
           <QuickLinks mandir={mandir} />
         </div>
       </header>
@@ -165,7 +169,17 @@ export default async function MandirPage({
               ))}
             </ul>
           ) : (
-            <NoEvents website={mandir.website} />
+            <NoEvents
+              website={mandir.website}
+              ask={
+                <AskToPost
+                  slug={mandir.slug}
+                  name={mandir.name}
+                  url={`${siteUrl()}/for-mandirs`}
+                  quiet
+                />
+              }
+            />
           )}
           <More
             links={[
@@ -214,6 +228,16 @@ export default async function MandirPage({
           >
             {t("firstVisit.link")} →
           </Link>
+          {/* Events found on its website, but no committee on Toran yet:
+              families can ask it to join (with nothing coming up, the ask
+              is in "No events listed yet" instead). */}
+          {mandir.status !== "claimed" && mandir.events.length > 0 && (
+            <AskToPost
+              slug={mandir.slug}
+              name={mandir.name}
+              url={`${siteUrl()}/for-mandirs`}
+            />
+          )}
           <section
             aria-labelledby="committee"
             className="bg-sunk flex flex-col gap-3 rounded-3xl p-6"
@@ -242,7 +266,7 @@ export default async function MandirPage({
           <Link
             prefetch={false}
             href={`/corrections?page=${encodeURIComponent(`/mandirs/${mandir.slug}`)}`}
-            className="text-muted self-center text-base"
+            className="text-muted inline-flex min-h-11 items-center self-center text-base"
           >
             {t("page.somethingWrong")}
           </Link>
@@ -526,7 +550,14 @@ function More({
   );
 }
 
-function NoEvents({ website }: { website: string | null }) {
+function NoEvents({
+  website,
+  ask,
+}: {
+  website: string | null;
+  // "Ask them to post on Toran".
+  ask: ReactNode;
+}) {
   const t = pageT();
   return (
     <div className="bg-sunk mt-2 rounded-3xl p-6">
@@ -545,6 +576,7 @@ function NoEvents({ website }: { website: string | null }) {
           <>{t("mandir.untilThenNoticeboard")}</>
         )}
       </p>
+      <div className="mt-5">{ask}</div>
     </div>
   );
 }

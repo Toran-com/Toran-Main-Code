@@ -11,4 +11,14 @@ export const enFollow = {
   "follow.allEvents": "All their events",
   "follow.nothing": "Nothing listed yet.",
   "follow.myToran": "My Toran",
+  "ask.title": "Go to this mandir?",
+  "ask.body":
+    "Ask them to put their events and seva on Toran. We tell the committee how many people asked, never who.",
+  "ask.button": "Ask them to post on Toran",
+  "ask.thanks": "Thank you: we've added your ask.",
+  "ask.send":
+    "Know someone on the committee? Send them a message too, it helps the most.",
+  "ask.whatsapp": "Send on WhatsApp",
+  "ask.message":
+    "Namaste! Could {name} put its events and seva on Toran? It's free, and families can then see what's on and follow the mandir. Here's how:",
 } as const;

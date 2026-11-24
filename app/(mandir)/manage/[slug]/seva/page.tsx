@@ -72,7 +72,7 @@ const DONE: Record<string, string> = {
 };
 
 const linkButton =
-  "cursor-pointer text-base font-semibold underline underline-offset-2";
+  "inline-flex min-h-11 cursor-pointer items-center text-base font-semibold underline underline-offset-2";
 
 export default function SevaOverviewPage(
   props: PageProps<"/manage/[slug]/seva">,
@@ -224,7 +224,7 @@ async function Overview({
       <div className="flex flex-col gap-2">
         <Link
           href={`/manage/${mandir.slug}`}
-          className="text-peacock self-start font-semibold"
+          className="text-peacock inline-flex min-h-11 items-center self-start font-semibold"
         >
           ← {mandir.name}
         </Link>

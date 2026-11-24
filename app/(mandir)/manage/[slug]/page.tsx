@@ -22,6 +22,7 @@ import { CHANGES_DAYS, recentChanges } from "@/lib/committee-changes";
 import { weekEvents, weekMessage } from "@/lib/committee-week";
 import { MAX_MESSAGE_CHARS, posterReadingOn } from "@/lib/poster-reader";
 import { CommitteeTodo } from "@/components/committee-todo";
+import { NoticeForm } from "@/components/notice-form";
 import { AddEvents, Sheet, type AddWay } from "@/components/sheet";
 import { PhotoPicker } from "@/components/photo-picker";
 import { photoUrl } from "@/lib/mandir-photo";
@@ -35,10 +36,12 @@ import { upcomingFilter, withNextStart } from "@/lib/events";
 import { feedLabel } from "@/lib/calendar-feed";
 import {
   formatClock,
+  formatDay,
   formatDays,
   formatEventStart,
   londonDate,
 } from "@/lib/format";
+import { NOTICE_MAX, NOTICE_PICKS } from "@/lib/notices";
 import { describeRule } from "@/lib/recurrence";
 import { inviteShareText, whatsAppLink } from "@/lib/share";
 import { pageTitle, siteUrl } from "@/lib/site";
@@ -74,6 +77,8 @@ import {
   reviewPosterAsCommittee,
   saveCalendar,
   savePhoto,
+  postNotice,
+  removeNotice,
   updatePracticalDetails,
 } from "./actions";
 
@@ -119,6 +124,9 @@ const ERRORS: Record<string, string> = {
   "photo-size": "That photo is too big. Please try a smaller one.",
   "photo-failed": "The photo couldn't be saved just now. Please try again.",
   consent: "Please tick the box first.",
+  "notice-text": "Please write the notice: between 3 and 200 characters.",
+  "notice-date": "Please choose how long it shows: up to a month from today.",
+  "notice-many": "Three notices are showing already. Remove one first.",
   failed: "Something went wrong. Please try again.",
 };
 
@@ -146,6 +154,9 @@ const DONE: Record<string, string> = {
     "Saved. Toran reads your calendar tonight, and new events will wait here for you to check.",
   "calendar-removed": "Toran won't read your calendar any more.",
   consent: "Thanks. That's recorded.",
+  notice:
+    "Posted. It's at the top of your public page and your events' pages until its last day.",
+  "notice-removed": "Notice removed from your page.",
 };
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
@@ -248,6 +259,12 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     now,
   );
   const thisWeek = weekEvents(events, now);
+  const { data: notices } = await supabase!
+    .from("mandir_notices")
+    .select("id, body, until_on")
+    .eq("mandir_id", mandir.id)
+    .gte("until_on", londonDate())
+    .order("created_at", { ascending: false });
   const publicUrl = `${siteUrl()}/mandirs/${mandir.slug}`;
 
   // Festivals coming up and last year's events, ready to tick.
@@ -417,7 +434,10 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
           : ["calendar", "calendar-removed"].includes(doneKey) ||
               errorKey.startsWith("calendar-")
             ? "calendar"
-            : undefined);
+            : ["notice", "notice-removed"].includes(doneKey) ||
+                errorKey.startsWith("notice-")
+              ? "notices"
+              : undefined);
   const notice = error ? (
     <Notice tone="error">{error}</Notice>
   ) : done ? (
@@ -907,6 +927,80 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </div>
 
         <div className="flex min-w-0 flex-col gap-5">
+          <section
+            id="notices"
+            aria-labelledby="notices-title"
+            className="border-line bg-surface shadow-card flex scroll-mt-24 flex-col gap-3 rounded-3xl border p-5"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <h2 id="notices-title" className="text-xl font-bold">
+                Notice for visitors
+              </h2>
+              {(notices ?? []).length < 3 && (
+                <Sheet
+                  id="notice"
+                  title="Post a notice"
+                  open={focus === "notices" && !!error}
+                  stamp={stamp}
+                  triggerClass={pillButtonClass}
+                  trigger={
+                    <>
+                      <span aria-hidden="true">+</span> Post a notice
+                    </>
+                  }
+                >
+                  {focus === "notices" && error ? notice : null}
+                  <NoticeForm
+                    slug={mandir.slug}
+                    action={postNotice}
+                    picks={NOTICE_PICKS}
+                    max={NOTICE_MAX}
+                    today={londonDate()}
+                    lastDay={new Date(
+                      Date.parse(`${londonDate()}T00:00:00Z`) + 31 * 86_400_000,
+                    )
+                      .toISOString()
+                      .slice(0, 10)}
+                  />
+                </Sheet>
+              )}
+            </div>
+            {focus === "notices" && !error && notice}
+            {(notices ?? []).length ? (
+              <ul className="flex flex-col gap-3">
+                {(notices ?? []).map((n) => (
+                  <li
+                    key={n.id}
+                    className="border-marigold bg-marigold/10 flex flex-col gap-2 rounded-2xl border-l-4 px-4 py-3"
+                  >
+                    <p className="text-marigold-ink text-base font-semibold">
+                      {n.until_on === londonDate()
+                        ? "Showing today"
+                        : `Showing until ${formatDay(n.until_on)}`}
+                    </p>
+                    <p className="font-semibold break-words">{n.body}</p>
+                    <form action={removeNotice}>
+                      <input type="hidden" name="slug" value={mandir.slug} />
+                      <input type="hidden" name="notice" value={n.id} />
+                      <button
+                        type="submit"
+                        className="text-kumkum inline-flex min-h-11 cursor-pointer items-center text-base font-semibold underline"
+                      >
+                        Remove this notice
+                      </button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted">
+                Closed for the snow, or aarti at a different time? A notice goes
+                at the top of your page and your events&apos; pages, for as long
+                as you choose.
+              </p>
+            )}
+          </section>
+
           {(thisWeek.length > 0 || kit) && (
             <section
               id="share"
@@ -946,7 +1040,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                     />
                   </div>
                   <details>
-                    <summary className="text-peacock w-fit cursor-pointer text-base font-semibold">
+                    <summary className="text-peacock w-fit cursor-pointer py-2.5 text-base font-semibold">
                       See the message
                     </summary>
                     <p className="bg-sunk mt-2 rounded-2xl p-4 text-base break-words whitespace-pre-line">
@@ -1417,7 +1511,7 @@ function CalendarFields({
           />
         </label>
         <details className="text-base">
-          <summary className="text-peacock cursor-pointer font-semibold">
+          <summary className="text-peacock cursor-pointer py-2.5 font-semibold">
             Where do I find it?
           </summary>
           <ul className="text-muted mt-2 flex list-disc flex-col gap-2 pl-6">

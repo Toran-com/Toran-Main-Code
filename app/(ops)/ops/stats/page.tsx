@@ -38,15 +38,16 @@ async function Stats({ searchParams }: PageProps<"/ops/stats">) {
   const from = period[0];
 
   const supabase = await createSessionClient();
-  const [counts, slots] = supabase
+  const [counts, slots, supporters] = supabase
     ? await Promise.all([
         supabase.rpc("daily_count_summary", { since: from }),
         supabase
           .from("seva_slots")
           .select("id", { count: "exact", head: true })
           .gte("created_at", `${from}T00:00:00Z`),
+        supabase.rpc("supporters_by_mandir"),
       ])
-    : [null, null];
+    : [null, null, null];
   if (!counts || counts.error) {
     return <Notice tone="error">Couldn&apos;t load the counts.</Notice>;
   }
@@ -145,6 +146,24 @@ async function Stats({ searchParams }: PageProps<"/ops/stats">) {
           e.views,
         ])}
         empty="No event pages counted yet."
+      />
+
+      <Table
+        title="Followers and asks to post, since the start"
+        head={["Mandir", "Committee on Toran", "Followers", "Asked to post"]}
+        rows={(supporters?.data ?? []).slice(0, 50).map((m) => [
+          <Link
+            key={m.slug}
+            href={`/mandirs/${m.slug}`}
+            className="text-peacock underline"
+          >
+            {m.name}, {m.town}
+          </Link>,
+          m.status === "claimed" ? "Yes" : "Not yet",
+          m.followers,
+          m.asks,
+        ])}
+        empty="Nobody has followed a mandir or asked one to post yet."
       />
     </>
   );

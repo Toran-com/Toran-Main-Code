@@ -63,6 +63,9 @@ export async function loadCommitteeFacts(
     phone: string | null;
   },
   now: Date = new Date(),
+  // How many people are on the committee, if already known (the monthly
+  // email's job knows, and can't ask committee_members).
+  knownMembers?: number,
 ): Promise<CommitteeFacts> {
   const today = londonDate(now);
   const from = `${today}T00:00:00Z`;
@@ -90,7 +93,9 @@ export async function loadCommitteeFacts(
       .select("proposed")
       .eq("mandir_id", mandir.id)
       .eq("status", "pending"),
-    db.rpc("committee_members", { target: mandir.id }),
+    knownMembers === undefined
+      ? db.rpc("committee_members", { target: mandir.id })
+      : Promise.resolve({ data: null }),
     db
       .from("mandir_invites")
       .select("id")
@@ -121,7 +126,7 @@ export async function loadCommitteeFacts(
     ),
     shortShifts: await shortSevaShifts(db, mandir.id, now),
     eventsEver: Math.max(eventsEver ?? 0, events.length),
-    members: members?.length ?? 1,
+    members: knownMembers ?? members?.length ?? 1,
     invites: invites?.length ?? 0,
     details: {
       postcode: mandir.postcode,

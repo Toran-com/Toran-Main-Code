@@ -251,6 +251,9 @@ export const gu: Record<MessageKey, string> = {
   "mandir.calendarBody":
     "{name}ના કાર્યક્રમો, તમારા ફોનના કેલેન્ડરમાં હંમેશાં અદ્યતન.",
   "mandir.committeeTitle": "શું તમે આ મંદિરની સમિતિમાં છો?",
+  "notice.label": "મંદિર તરફથી સૂચના",
+  "notice.until": "{day} સુધી",
+  "notice.today": "આજે",
   "mandir.claimedBefore": "આ પાનું સમિતિ સંભાળે છે.",
   "mandir.logIn": "લૉગ ઇન કરો",
   "mandir.claimedAfter":

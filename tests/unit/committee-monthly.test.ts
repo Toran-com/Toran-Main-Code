@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { committeeMonthly } from "@/lib/committee-monthly";
+import { committeeMonthly, emailHtml } from "@/lib/committee-monthly";
 
 const base = {
   mandir: { name: "Shree Ram Mandir", slug: "shree-ram-mandir-leicester" },
@@ -53,7 +53,52 @@ describe("committeeMonthly", () => {
     expect(email.text).toContain(
       "Your page: https://toran.example/manage/shree-ram-mandir-leicester",
     );
-    expect(email.text).toContain('Reply "stop"');
+    // The preview has no link of its own; each email does.
+    expect(email.text).toContain(
+      "To stop it: (a link just for each committee member)",
+    );
+  });
+
+  it("says who follows the mandir, and gives each member their stop link", () => {
+    const { text } = committeeMonthly({
+      ...base,
+      events: [],
+      tasks: [],
+      supporters: {
+        followers: 47,
+        newFollowers: 7,
+        asks: 3,
+        newAsks: 0,
+        went: 1,
+        sevaTaken: 5,
+      },
+      stopUrl: "https://toran.example/committee-email/stop?u=a&m=b&c=c",
+    });
+    expect(text).toContain("- 47 people follow your mandir on Toran (7 new)");
+    expect(text).toContain("- 1 person said they went to your events");
+    expect(text).toContain("- 5 seva places taken on Toran");
+    expect(text).toContain(
+      "To stop it: https://toran.example/committee-email/stop?u=a&m=b&c=c",
+    );
+  });
+
+  it("asks a committee nobody follows yet to share its page", () => {
+    const { text } = committeeMonthly({
+      ...base,
+      events: [],
+      tasks: [],
+      supporters: {
+        followers: 0,
+        newFollowers: 0,
+        asks: 0,
+        newAsks: 0,
+        went: 0,
+        sevaTaken: 0,
+      },
+    });
+    expect(text).toContain("Nobody follows your mandir on Toran yet");
+    expect(text).not.toContain("said they went");
+    expect(text).not.toContain("seva place");
   });
 
   it("lists five events and counts the rest", () => {
@@ -82,5 +127,21 @@ describe("committeeMonthly", () => {
       "- 1 visit to your page, and 0 visits to your events",
     );
     expect(text).toContain("Nothing is coming up on your page.");
+  });
+});
+
+describe("emailHtml", () => {
+  it("makes paragraphs, lists and links, safely", () => {
+    const html = emailHtml(
+      "Namaste,\n\nHow it did:\n- 3 <visits>\n- 1 share\n\nYour page: https://toran.example/manage/x",
+    );
+    expect(html).toContain("<p>Namaste,</p>");
+    expect(html).toContain("<p>How it did:</p>");
+    expect(html).toContain(
+      "<ul><li>3 &lt;visits&gt;</li><li>1 share</li></ul>",
+    );
+    expect(html).toContain(
+      '<a href="https://toran.example/manage/x" style="color:#0b6b68">https://toran.example/manage/x</a>',
+    );
   });
 });
