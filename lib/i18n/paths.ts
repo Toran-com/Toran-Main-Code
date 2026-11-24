@@ -16,7 +16,7 @@ const TRANSLATED_PATHS = [
   /^\/seva$/,
   /^\/plan$/,
   /^\/my$/,
-  /^\/mandirs(\/[^/]+(\/events\/[^/]+(\/seva)?)?(\/tell-us)?)?$/,
+  /^\/mandirs(\/[^/]+(\/events\/[^/]+(\/seva)?)?(\/tell-us|\/request)?)?$/,
   /^\/festivals(\/[^/]+)?$/,
   // The festival season pages (lib/seasons.ts; a test checks they match).
   // And each in a town (/diwali/leicester).

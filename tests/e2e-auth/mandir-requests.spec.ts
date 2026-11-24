@@ -85,5 +85,13 @@ test("a committee takes requests, and a family asks about the hall", async ({
   await expect(
     family.getByText("That couldn't be sent just now"),
   ).toBeVisible();
+
+  // In Gujarati, the button and the form are in Gujarati.
+  await family.goto(`/gu/mandirs/${SLUG}`);
+  await family.getByRole("link", { name: "પૂજા કે બુકિંગ વિશે પૂછો" }).click();
+  await expect(family).toHaveURL(new RegExp(`/gu/mandirs/${SLUG}/request$`));
+  await expect(
+    family.getByRole("button", { name: "સમિતિને મોકલો" }),
+  ).toBeVisible();
   await family.close();
 });
