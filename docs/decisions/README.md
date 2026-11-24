@@ -36,6 +36,6 @@ that replaces it and mark the old one Superseded.
 | 0019 | [A real street map from OpenFreeMap, and a mandir finder like a shop finder](0019-street-map.md)                   | Proposed           |
 | 0020 | [A Log in for everyone, and family accounts built but switched off](0020-family-accounts.md)                       | Proposed           |
 | 0021 | [Toran is run by Milan Patel as a sole trader](0021-sole-trader.md)                                                | Accepted           |
-| 0026 | [Live now is worked out on the phone, from the events mandirs list](0026-live-now.md)                              | Proposed           |
 | 0022 | [Count follows and asks to post, as totals, to show committees what their page brings](0022-followers-and-asks.md) | Proposed           |
 | 0023 | [Email each committee member monthly, with a link to stop it](0023-monthly-committee-email.md)                     | Proposed           |
+| 0026 | [Live now is worked out on the phone, from the events mandirs list](0026-live-now.md)                              | Proposed           |
