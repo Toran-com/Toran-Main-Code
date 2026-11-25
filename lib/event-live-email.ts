@@ -1,9 +1,10 @@
-import { committeeEmailOn } from "@/lib/committee-monthly-send";
+import { committeeEmailOn } from "@/lib/committee-email";
 import {
   EMAIL_COLOURS as C,
   BODY_FONT,
   HEADING_FONT,
   emailButton,
+  emailDateTile,
   emailLayout,
   emailLink,
   emailParagraph,
@@ -37,26 +38,6 @@ export function eventLiveEmailOn(
   env: Record<string, string | undefined> = process.env,
 ): boolean {
   return committeeEmailOn(env.COMMITTEE_EMAIL) && mailerReady(env);
-}
-
-const LONDON = "Europe/London";
-
-// The date tile: "SAT" over "14" over "NOV", like the site's own tiles.
-function dateTile(startsAt: string): string {
-  const at = new Date(startsAt);
-  const part = (o: Intl.DateTimeFormatOptions) =>
-    new Intl.DateTimeFormat("en-GB", { timeZone: LONDON, ...o }).format(at);
-  const day = part({ weekday: "short" }).toUpperCase();
-  const date = part({ day: "numeric" });
-  const month = part({ month: "short" }).toUpperCase();
-  return [
-    `<td width="64" valign="top" style="width:64px;padding:0 16px 0 0">`,
-    `<table role="presentation" width="64" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.tile}" style="background:${C.tile};border-radius:14px;border:1px solid #d8ddee">`,
-    `<tr><td align="center" style="padding:8px 4px 2px;font-family:${BODY_FONT};font-size:12px;font-weight:700;letter-spacing:0.08em;color:${C.lapis}">${day}</td></tr>`,
-    `<tr><td align="center" style="padding:0 4px;font-family:${HEADING_FONT};font-size:28px;line-height:1.1;color:${C.ink}">${date}</td></tr>`,
-    `<tr><td align="center" style="padding:2px 4px 8px;font-family:${BODY_FONT};font-size:12px;font-weight:700;letter-spacing:0.08em;color:${C.lapis}">${month}</td></tr>`,
-    `</table></td>`,
-  ].join("");
 }
 
 export function eventLiveEmail({
@@ -98,7 +79,7 @@ export function eventLiveEmail({
       `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;border:1px solid ${C.line};border-radius:18px;border-collapse:separate">`,
       `<tr><td style="padding:18px">`,
       `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>`,
-      dateTile(event.next_starts_at),
+      emailDateTile(event.next_starts_at),
       `<td valign="top">`,
       `<p style="margin:0 0 4px;font-family:${HEADING_FONT};font-size:22px;line-height:1.25;color:${C.ink}">${escapeHtml(event.title)}</p>`,
       `<p style="margin:0 0 12px;font-family:${BODY_FONT};font-size:16px;line-height:1.4;color:${C.muted}">${escapeHtml(when)}</p>`,

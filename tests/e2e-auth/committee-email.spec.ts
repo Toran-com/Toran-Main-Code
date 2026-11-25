@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 import { logInAsAdmin, openAdminTool, sql } from "./helpers";
 
-// Toran previews the monthly email to a mandir's committee, which isn't
+// Toran previews the weekly email to a mandir's committee, which isn't
 // sent until COMMITTEE_EMAIL is on (it isn't in tests), and can send one to
 // themselves once an email sender is set up. Uses a mandir no other test
 // looks at.
 const SLUG = "medway-hindu-mandir-gillingham";
 
-test("admins preview the monthly committee email before it's switched on", async ({
+test("admins preview the weekly committee email before it's switched on", async ({
   page,
 }) => {
   const email = `committee-email-${Date.now()}@example.com`;
@@ -28,10 +28,15 @@ test("admins preview the monthly committee email before it's switched on", async
     .selectOption(SLUG);
   await page.getByRole("button", { name: "Show" }).click();
   await expect(page).toHaveURL(new RegExp(`mandir=${SLUG}`));
-  const preview = page.getByRole("region", { name: /your month on Toran$/ });
-  await expect(preview).toContainText("visits to your page");
-  await expect(preview).toContainText(`/manage/${SLUG}`);
-  await expect(preview).toContainText(/follows? your mandir on Toran/);
+  const preview = page.getByRole("region", { name: /your week on Toran$/ });
+  // The email as committees see it, and its plain text.
+  await expect(
+    preview.getByTitle(/^The email as committees see it/),
+  ).toBeVisible();
+  await preview.getByText("The plain text version").click();
+  await expect(preview).toContainText("Your week on Toran");
+  await expect(preview).toContainText(`/manage/${SLUG}/numbers`);
+  await expect(preview).toContainText(/follows? your mandir/);
   await expect(preview).toContainText(
     "To stop it: (a link just for each committee member)",
   );

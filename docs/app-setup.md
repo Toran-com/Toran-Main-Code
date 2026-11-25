@@ -717,27 +717,36 @@ each turns them on again. To switch notifications off, remove the three
 variables and redeploy; existing push addresses are deleted after a year,
 or delete the rows in `push_subscriptions`.
 
-### The monthly email to committees
+### The weekly email to committees
 
-Once a month, each member of a mandir's committee gets an email about the
-mandir's page: visits, calendar adds and shares over four weeks, how many
-follow it and how many new, "I went" and seva places taken on Toran, what's
-coming up and anything worth doing (`lib/committee-monthly.ts`). The
-weekly job sends it every Thursday to committees that haven't had this
-month's, so it goes out on the first Thursday of the month and any left
-over go the week after. A committee whose first member joined in the last
-two weeks waits for the next month.
+Every Monday morning, each member of a mandir's committee gets an email
+about last week on the mandir's page (`lib/committee-digest.ts`, decision
+0030, which replaced the monthly email): a picture of the week's visits
+with a bar for each day and last week's behind them, how it compares, tiles
+for new followers, calendar adds, WhatsApp shares and seva places taken
+(each against last week), a cheer when they pass 100 followers and the
+like, the most visited event with a button to share it again, what's coming
+up, anything worth doing, and a square picture of their week to post in
+their WhatsApp groups. The job is `/api/cron/digest` (06:50 UTC on Mondays
+in `vercel.json`). A committee whose first member joined in the last week
+waits for the next.
 
-Check the wording first: `/ops/committee-email` shows any mandir's email,
-and **Send this to me** emails it to your own address.
+The pictures are drawn by the site itself (`/api/digest/card`), from data
+signed with `CRON_SECRET` in the picture's address, so nothing is looked up
+and nobody else can make Toran draw anything. Every picture has its words
+written out too, for email programs that hide pictures.
+
+Check it first: `/ops/committee-email` shows any mandir's email as
+committees see it, and **Send this to me** emails it to your own address.
 
 To switch it on: the email sender must be set up (`RESEND_API_KEY` and
 `DIGEST_FROM`, as for the weekly email above), then in Vercel → Settings
 → Environment Variables (Production only) add `COMMITTEE_EMAIL` with the
 value `on`, and redeploy. Each email's "To stop it" link is made from
-`CRON_SECRET`, so **don't change that afterwards** or old links stop
-working. To switch it off, set `COMMITTEE_EMAIL` to `off` and redeploy;
-stop links keep working.
+`CRON_SECRET`, so **don't change that afterwards** or old links (and the
+pictures in old emails) stop working. Anyone who stopped the monthly email
+stays stopped. To switch it off, set `COMMITTEE_EMAIL` to `off` and
+redeploy; stop links keep working.
 
 ### "It's live" emails
 
@@ -745,7 +754,7 @@ When a committee member puts events on their mandir's page (adds one,
 ticks several, or publishes a poster or WhatsApp message), they get one
 email listing each event with its link and a **Share on WhatsApp** button
 (`lib/event-live-email.ts`, decision 0028). It goes only to the person who
-pressed the button. It's on whenever the monthly email is: `COMMITTEE_EMAIL`
+pressed the button. It's on whenever the weekly email is: `COMMITTEE_EMAIL`
 is `on` and the email sender is set up.
 
 ### Seva emails to committees
@@ -755,7 +764,7 @@ decision 0029): an **evening roundup** of the places taken on Toran since
 the last one (the daily job `/api/cron/seva`, after 17:40 UTC), and
 **"Seva full"** straight away when every place still to come in a seva is
 taken. Each committee member can stop them from the email, separately from
-the monthly email. They're on whenever the monthly email is
+the weekly email. They're on whenever the weekly email is
 (`COMMITTEE_EMAIL` is `on` and the email sender is set up). The job's
 runs show in Supabase's `job_runs` table as `seva-roundup`.
 

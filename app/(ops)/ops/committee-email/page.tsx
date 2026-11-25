@@ -10,19 +10,21 @@ import {
   quietButtonClass,
 } from "@/components/ui";
 import { requireToranAdmin } from "@/lib/auth";
-import { committeeEmailOn } from "@/lib/committee-monthly-send";
+import { lastWeekStart, weekKey } from "@/lib/committee-digest";
+import { committeeEmailOn } from "@/lib/committee-email";
 import { londonDate } from "@/lib/london";
 import { mailerReady } from "@/lib/mailer";
 import { pageTitle } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase/session";
 import { sendPreviewToMe } from "./actions";
-import { previewEmail } from "./monthly";
+import { previewEmail } from "./preview";
 
-// The monthly email to each mandir's committee: how its page did, who
-// follows it, what's coming up and anything to do. The weekly job sends it
-// once a month when COMMITTEE_EMAIL is "on" (lib/committee-monthly-send.ts).
-// Here a Toran admin sees what it says for any mandir, sends it to
-// themselves, and sees which committees have had this month's.
+// The weekly email to each mandir's committee (decision 0030): last week
+// on its page as pictures, who follows it, what's coming up and anything to
+// do. The Monday job sends it when COMMITTEE_EMAIL is "on"
+// (lib/committee-digest-send.ts). Here a Toran admin sees it for any
+// mandir, sends it to themselves, and sees which committees have had this
+// week's.
 
 export const metadata: Metadata = {
   title: pageTitle("Committee email · Admin"),
@@ -34,8 +36,8 @@ export default function CommitteeEmailPage(
 ) {
   return (
     <OpsPage
-      title="Monthly committee email"
-      intro="The monthly email to each mandir's committee."
+      title="Weekly committee email"
+      intro="The weekly email to each mandir's committee, with last week's numbers drawn as pictures."
     >
       <Suspense fallback={<Loading />}>
         <Preview {...props} />
@@ -62,11 +64,11 @@ async function Preview({ searchParams }: PageProps<"/ops/committee-email">) {
   const preview = chosen ? await previewEmail(supabase, chosen) : null;
   const email = preview?.email ?? null;
   const problem = preview?.problem ?? false;
-  const month = londonDate().slice(0, 7);
+  const week = weekKey(lastWeekStart(londonDate()));
   const { data: sentRows } = await supabase
     .from("committee_emails_sent")
     .select("mandir_id, recipients")
-    .eq("month", month);
+    .eq("month", week);
   const sentTo = new Map(
     (sentRows ?? []).map((r) => [r.mandir_id, r.recipients]),
   );
@@ -76,10 +78,9 @@ async function Preview({ searchParams }: PageProps<"/ops/committee-email">) {
     <>
       {on ? (
         <Notice tone="success">
-          <strong>On.</strong> Every Thursday, committees that haven&apos;t had
-          this month&apos;s email get it: so on the first Thursday of the month,
-          and any left over the week after. Committees that joined in the last
-          two weeks wait for next month. Each member can stop it from the email.
+          <strong>On.</strong> Every Monday morning each committee gets last
+          week&apos;s email. Committees that joined in the last week wait for
+          the next one. Each member can stop it from the email.
         </Notice>
       ) : (
         <Notice>
@@ -117,7 +118,7 @@ async function Preview({ searchParams }: PageProps<"/ops/committee-email">) {
                 <option key={m.slug} value={m.slug}>
                   {m.name}, {m.town}
                   {sentTo.has(m.id)
-                    ? ` · sent this month to ${sentTo.get(m.id)}`
+                    ? ` · sent this week to ${sentTo.get(m.id)}`
                     : ""}
                 </option>
               ))}
@@ -145,9 +146,20 @@ async function Preview({ searchParams }: PageProps<"/ops/committee-email">) {
               The page numbers couldn&apos;t be loaded, so they show as 0.
             </Notice>
           )}
-          <pre className="border-line bg-surface rounded-2xl border p-5 font-sans text-lg whitespace-pre-wrap">
-            {email.text}
-          </pre>
+          <iframe
+            title={`The email as committees see it: ${email.subject}`}
+            srcDoc={email.html}
+            sandbox=""
+            className="border-line h-[70rem] w-full rounded-2xl border bg-white"
+          />
+          <details className="border-line bg-surface rounded-2xl border p-5">
+            <summary className="cursor-pointer font-semibold">
+              The plain text version
+            </summary>
+            <pre className="mt-3 font-sans text-lg whitespace-pre-wrap">
+              {email.text}
+            </pre>
+          </details>
           <div className="flex flex-wrap items-center gap-3">
             <form action={sendPreviewToMe}>
               <input type="hidden" name="mandir" value={chosen!.slug} />

@@ -527,8 +527,8 @@ isOneToOne: false
 "can_edit_mandir_photo":
 { Args: { "object_name": string }; Returns: boolean
                            },
-"committee_emails_due":
-{ Args: { "for_month": string,"since": string }; Returns: Json
+"committee_digests_due":
+{ Args: { "for_week": string,"week_start": string }; Returns: Json
                            },
 "committee_members":
 { Args: { "target": string }; Returns: {
@@ -599,6 +599,9 @@ isOneToOne: false
                            },
 "mandir_count_summary":
 { Args: { "since": string,"target": string }; Returns: Json
+                           },
+"mandir_count_summary_of":
+{ Args: { "base": string,"since": string }; Returns: Json
                            },
 "mandir_supporters":
 { Args: { "since": string,"target": string }; Returns: Json

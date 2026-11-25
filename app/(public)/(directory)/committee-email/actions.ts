@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { checkStopCode, emailKind } from "@/lib/committee-monthly-send";
+import { checkStopCode, emailKind } from "@/lib/committee-email";
 import { createRobotClient } from "@/lib/supabase/robot";
 
 // Stopping (or restarting) a committee email (the monthly one, or the seva

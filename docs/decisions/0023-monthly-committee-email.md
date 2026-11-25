@@ -1,7 +1,7 @@
 # 0023. Email each committee member monthly, with a link to stop it
 
 Date: 2026-11-24
-Status: Proposed
+Status: Superseded by 0030
 
 ## Context
 
