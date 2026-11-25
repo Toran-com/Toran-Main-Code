@@ -231,6 +231,14 @@ doesn't keep the picture or the message, only the event details it
 finds, which are checked before anything is published. Anthropic doesn't use what we send to train its models and
 deletes it within 30 days.
 
+**Forwarding a poster by email.** A committee member can forward an email
+with a poster or event details to their mandir's Toran address. It arrives
+through Resend. We check it's from the email address they log in with, and
+read it as above, without the forwarding lines, email addresses or phone
+numbers. We reply to that address with what we found. We don't keep the
+email, its attachments or who sent it: only its delivery id, which mandir
+it was for and how many events we found, for 30 days.
+
 **Emails to committees.** Each Monday we email each member of a
 mandir's committee on Toran, at their login email, a summary of how the
 mandir's page did the week before (visits, calendar adds, shares, how many
@@ -274,7 +282,7 @@ under contract:
 | Supabase               | Database, login and the mandirs' photos               | London (UK)                                                |
 | Vercel                 | Hosting the website                                   | Servers in London; a global network delivers pages quickly |
 | Sentry                 | Error reports (with personal data removed)            | EU (Germany)                                               |
-| Resend                 | Sending login links (and later the weekly email)      | EU (Ireland)                                               |
+| Resend                 | Sending login links and emails; receiving forwards    | EU (Ireland)                                               |
 | Anthropic (Claude API) | Reading posters and pasted messages into events       | USA                                                        |
 | postcodes.io           | Finding your postcode district when you press Near me | UK (a rounded position only, never linked to you)          |
 

@@ -205,6 +205,26 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"inbound_emails": {
+                  Row: {
+                    "email_id": string,"events": number,"mandir_id": string | null,"outcome": string,"received_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "email_id": string,"events"?: number,"mandir_id"?: string | null,"outcome"?: string,"received_at"?: string
+                  }
+                  Update: {
+                    "email_id"?: string,"events"?: number,"mandir_id"?: string | null,"outcome"?: string,"received_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "inbound_emails_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"job_runs": {
                   Row: {
                     "id": number,"job": string,"ran_at": string,"summary": NonNullable<Json>
@@ -573,6 +593,14 @@ isOneToOne: false
                            },
 "health":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"inbound_email_arrived":
+{ Args: { "target": string }; Returns: boolean
+                           },
+"inbound_sender_mandirs":
+{ Args: { "sender": string }; Returns: {
+              "id": string,"name": string,"slug": string,"today": number,"town": string
+            }[]
                            },
 "invite_committee_member":
 { Args: { "invitee": string,"target": string }; Returns: string

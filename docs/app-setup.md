@@ -768,6 +768,39 @@ the weekly email. They're on whenever the weekly email is
 (`COMMITTEE_EMAIL` is `on` and the email sender is set up). The job's
 runs show in Supabase's `job_runs` table as `seva-roundup`.
 
+### Forwarding posters by email (built, switched off)
+
+Each mandir looked after on Toran gets its own address, such as
+`shree-ram-mandir@events.your-domain`, shown on its committee page under
+**Add events → Forward it by email** (`lib/inbound-email.ts`, decision
+0031). A committee member forwards a poster, a PDF or an event message to
+it from the address they log in with; the events wait under "Posters
+waiting for you" and they get a reply saying what was found. It needs
+poster reading (`ANTHROPIC_API_KEY`) and the email sender set up first.
+To switch it on:
+
+1. Pick a receiving domain. Use a subdomain, such as `events.your-domain`,
+   so your own email isn't affected.
+2. In **resend.com → Domains**, add it (or open your existing domain) and
+   turn on **Receiving**. Resend shows an **MX** record: add it at your
+   domain's DNS provider exactly as shown. It must be the lowest-priority
+   MX for that subdomain. Wait until Resend shows it as verified.
+3. In **resend.com → Webhooks**, add an endpoint
+   `https://<your site>/api/inbound/email` for the event `email.received`.
+   Resend shows a **signing secret** starting `whsec_`.
+4. In **Vercel → Project → Settings → Environment Variables**, for
+   **Production**, add `RESEND_WEBHOOK_SECRET` (the signing secret; type it
+   there yourself, never paste it into the chat) and `INBOUND_DOMAIN` (the
+   domain from step 1, such as `events.your-domain`).
+5. Redeploy. The card appears on committee pages. To try it, forward an
+   email with a poster to your test mandir's address from your login
+   email: the reply comes within a minute.
+
+Resend's webhook log shows each delivery. Toran's `inbound_emails` table
+(Supabase) shows how each went (`read`, `nothing`, `failed`, `unknown`
+sender, `unverified`, `choose`, `too-many`), without who sent it; rows go
+after 30 days.
+
 ### Log in, and family accounts (built, switched off)
 
 Every page's header has a gold **Log in** button (a person in a circle
