@@ -221,14 +221,14 @@ isOneToOne: false
                   ]
                 },"mandir_admins": {
                   Row: {
-                    "added_at": string,"added_by": string | null,"consented_at": string | null,"mandir_id": string,"monthly_email": boolean,"user_id": string
+                    "added_at": string,"added_by": string | null,"consented_at": string | null,"mandir_id": string,"monthly_email": boolean,"seva_email": boolean,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id": string,"monthly_email"?: boolean,"user_id": string
+                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id": string,"monthly_email"?: boolean,"seva_email"?: boolean,"user_id": string
                   }
                   Update: {
-                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id"?: string,"monthly_email"?: boolean,"user_id"?: string
+                    "added_at"?: string,"added_by"?: string | null,"consented_at"?: string | null,"mandir_id"?: string,"monthly_email"?: boolean,"seva_email"?: boolean,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -369,14 +369,14 @@ isOneToOne: false
                   ]
                 },"seva_roles": {
                   Row: {
-                    "created_at": string,"description": string | null,"event_id": string | null,"id": string,"mandir_id": string,"name": string,"needs_dbs": boolean,"open": boolean
+                    "created_at": string,"description": string | null,"event_id": string | null,"full_emailed_at": string | null,"id": string,"mandir_id": string,"name": string,"needs_dbs": boolean,"open": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"description"?: string | null,"event_id"?: string | null,"id"?: string,"mandir_id": string,"name": string,"needs_dbs"?: boolean,"open"?: boolean
+                    "created_at"?: string,"description"?: string | null,"event_id"?: string | null,"full_emailed_at"?: string | null,"id"?: string,"mandir_id": string,"name": string,"needs_dbs"?: boolean,"open"?: boolean
                   }
                   Update: {
-                    "created_at"?: string,"description"?: string | null,"event_id"?: string | null,"id"?: string,"mandir_id"?: string,"name"?: string,"needs_dbs"?: boolean,"open"?: boolean
+                    "created_at"?: string,"description"?: string | null,"event_id"?: string | null,"full_emailed_at"?: string | null,"id"?: string,"mandir_id"?: string,"name"?: string,"needs_dbs"?: boolean,"open"?: boolean
                   }
                   Relationships: [
                     {
@@ -387,6 +387,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "seva_roles_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"seva_roundups_sent": {
+                  Row: {
+                    "mandir_id": string,"places": number,"recipients": number,"sent_at": string,"through": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "mandir_id": string,"places": number,"recipients": number,"sent_at"?: string,"through": string
+                  }
+                  Update: {
+                    "mandir_id"?: string,"places"?: number,"recipients"?: number,"sent_at"?: string,"through"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "seva_roundups_sent_mandir_id_fkey"
       columns: ["mandir_id"]
 isOneToOne: false
       referencedRelation: "mandirs"
@@ -628,6 +648,21 @@ isOneToOne: false
                            },
 "set_committee_email":
 { Args: { "member": string,"target": string,"wanted": boolean }; Returns: boolean
+                           },
+"set_seva_email":
+{ Args: { "member": string,"target": string,"wanted": boolean }; Returns: boolean
+                           },
+"seva_email_recipients":
+{ Args: { "target": string }; Returns: Json
+                           },
+"seva_full_notice":
+{ Args: { "target_shift": string }; Returns: Json
+                           },
+"seva_role_summary":
+{ Args: { "target": string }; Returns: Json
+                           },
+"seva_roundups_due":
+{ Args: { "until": string }; Returns: Json
                            },
 "subscribe_digest":
 { Args: { "address": string,"area": string,"confirm": string,"leave": string }; Returns: undefined

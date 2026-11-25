@@ -1,6 +1,10 @@
 "use server";
 
 import { updateTag } from "next/cache";
+import { after } from "next/server";
+import { sevaEmailOn, tellIfSevaFull } from "@/lib/seva-email";
+import { siteUrl } from "@/lib/site";
+import { createRobotClient } from "@/lib/supabase/robot";
 import { createPublicServerClient } from "@/lib/supabase/server";
 
 // Taking and giving back a seva slot, as a visitor (no login, no name).
@@ -40,6 +44,14 @@ export async function takeSlot(
     return { ok: false, shift, error: reason };
   }
   refresh(slug);
+  // If that was the last place, the committee hears straight away
+  // (lib/seva-email.ts), after the volunteer's page has its answer.
+  if (sevaEmailOn()) {
+    after(async () => {
+      const robot = createRobotClient();
+      if (robot) await tellIfSevaFull(robot, shift, siteUrl());
+    });
+  }
   return { ok: true, slot: data, shift };
 }
 
