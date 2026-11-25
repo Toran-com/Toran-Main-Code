@@ -15,6 +15,12 @@ import {
 import { feedAddress } from "@/lib/calendar-feed";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
+import {
+  eventLiveEmailOn,
+  sendEventLive,
+  type LiveEvent,
+} from "@/lib/event-live-email";
+import { requestOrigin } from "@/lib/origin";
 import { lookupPostcode } from "@/lib/geo";
 import { londonDate } from "@/lib/london";
 import { cleanNotice, noticeUntil } from "@/lib/notices";
@@ -48,6 +54,36 @@ import { createSessionClient } from "@/lib/supabase/session";
 // row-level security decides who may change what; these actions check the
 // form and refresh the public pages afterwards.
 
+// "It's live": emails whoever just put these events on the page, after the
+// page has gone back to them (lib/event-live-email.ts).
+async function tellWhoAdded(
+  mandir: { name: string; town: string; slug: string },
+  events: LiveEvent[],
+) {
+  if (!events.length || !eventLiveEmailOn()) return;
+  const [user, siteUrl] = await Promise.all([
+    getCurrentUser(),
+    requestOrigin(),
+  ]);
+  after(() => sendEventLive(user?.email ?? null, { mandir, events, siteUrl }));
+}
+
+const liveEvent = (
+  id: string,
+  event: {
+    title: string;
+    startsAt: Date;
+    allDay: boolean;
+    rule: string | null;
+  },
+): LiveEvent => ({
+  id,
+  title: event.title,
+  next_starts_at: event.startsAt.toISOString(),
+  all_day: event.allDay,
+  recurrence: event.rule,
+});
+
 export async function addEvent(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
   const back: (query: string) => never = (query) =>
@@ -61,7 +97,7 @@ export async function addEvent(formData: FormData) {
   if (!supabase) back("error=failed");
   const { data: mandir } = await supabase
     .from("mandirs")
-    .select("id, slug")
+    .select("id, slug, name, town")
     .eq("slug", slug)
     .maybeSingle();
   if (!mandir) back("error=failed");
@@ -105,6 +141,7 @@ export async function addEvent(formData: FormData) {
   );
   updateTag(`mandir:${mandir.slug}`);
   updateTag("events");
+  await tellWhoAdded(mandir, [liveEvent(saved.id, checked.event)]);
   back("added=1");
 }
 
@@ -130,7 +167,7 @@ export async function addPickedEvents(formData: FormData) {
   if (!supabase) back("error=failed");
   const { data: mandir } = await supabase
     .from("mandirs")
-    .select("id, slug")
+    .select("id, slug, name, town")
     .eq("slug", slug)
     .maybeSingle();
   if (!mandir) back("error=failed");
@@ -142,6 +179,7 @@ export async function addPickedEvents(formData: FormData) {
   let added = 0;
   let skipped = 0;
   let failed = 0;
+  const live: LiveEvent[] = [];
   for (const { result, festivalDateId } of checked) {
     if (!result.ok) continue;
     const item = comparableEvent(result.event);
@@ -156,6 +194,7 @@ export async function addPickedEvents(formData: FormData) {
     });
     if (saved.ok) {
       added += 1;
+      live.push(liveEvent(saved.id, result.event));
       // Two picks for the same event count once.
       listed.push({
         kind: "event",
@@ -173,6 +212,7 @@ export async function addPickedEvents(formData: FormData) {
   if (added) {
     updateTag(`mandir:${mandir.slug}`);
     updateTag("events");
+    await tellWhoAdded(mandir, live);
   }
   const counts = `added=${added}${skipped ? `&skipped=${skipped}` : ""}`;
   if (failed) back(`${counts}&error=failed`);
@@ -340,6 +380,14 @@ export async function reviewPosterAsCommittee(formData: FormData) {
   if (decision === "publish") {
     updateTag(`mandir:${result.slug}`);
     updateTag("events");
+    if (result.published) {
+      const { data: mandir } = await supabase
+        .from("mandirs")
+        .select("name, town, slug")
+        .eq("slug", result.slug)
+        .maybeSingle();
+      if (mandir) await tellWhoAdded(mandir, [result.published]);
+    }
   }
   back(
     `done=${decision === "discard" ? "discarded" : result.merged ? "merged" : "published"}`,

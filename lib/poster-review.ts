@@ -13,8 +13,18 @@ import { saveEvent } from "@/lib/event-store";
 import { londonDate } from "@/lib/london";
 import { type Poster, posterFrom } from "@/lib/posters";
 
+// A new event a poster put on the page (not one it added details to), for
+// the "It's live" email (lib/event-live-email.ts).
+export type PublishedEvent = {
+  id: string;
+  title: string;
+  next_starts_at: string;
+  all_day: boolean;
+  recurrence: string | null;
+};
+
 export type ReviewResult =
-  | { ok: true; slug: string; merged: boolean }
+  | { ok: true; slug: string; merged: boolean; published?: PublishedEvent }
   | {
       ok: false;
       error:
@@ -162,7 +172,18 @@ export async function reviewPoster(
     await db.from("events").update({ status: "removed" }).eq("id", eventId);
     return { ok: false, error: "done" };
   }
-  return { ok: true, slug, merged: false };
+  return {
+    ok: true,
+    slug,
+    merged: false,
+    published: {
+      id: eventId,
+      title: checked.event.title,
+      next_starts_at: checked.event.startsAt.toISOString(),
+      all_day: checked.event.allDay,
+      recurrence: checked.event.rule,
+    },
+  };
 }
 
 // The poster is about an event already listed: anything new it says is

@@ -739,6 +739,15 @@ value `on`, and redeploy. Each email's "To stop it" link is made from
 working. To switch it off, set `COMMITTEE_EMAIL` to `off` and redeploy;
 stop links keep working.
 
+### "It's live" emails
+
+When a committee member puts events on their mandir's page (adds one,
+ticks several, or publishes a poster or WhatsApp message), they get one
+email listing each event with its link and a **Share on WhatsApp** button
+(`lib/event-live-email.ts`, decision 0028). It goes only to the person who
+pressed the button. It's on whenever the monthly email is: `COMMITTEE_EMAIL`
+is `on` and the email sender is set up.
+
 ### Log in, and family accounts (built, switched off)
 
 Every page's header has a gold **Log in** button (a person in a circle

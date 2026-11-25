@@ -42,3 +42,4 @@ that replaces it and mark the old one Superseded.
 | 0025 | [Families ask a committee about pujas and bookings by email, not kept](0025-requests-to-mandirs.md)                | Proposed           |
 | 0026 | [Live now is worked out on the phone, from the events mandirs list](0026-live-now.md)                              | Proposed           |
 | 0027 | [Committees say what language an event is in, from a fixed list](0027-event-languages.md)                          | Proposed           |
+| 0028 | [Email whoever adds an event that it's live, with a WhatsApp button](0028-event-live-email.md)                     | Proposed           |
