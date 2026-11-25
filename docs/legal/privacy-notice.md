@@ -231,14 +231,17 @@ doesn't keep the picture or the message, only the event details it
 finds, which are checked before anything is published. Anthropic doesn't use what we send to train its models and
 deletes it within 30 days.
 
-**A monthly email to committees.** Once a month we email each member of a
+**Emails to committees.** Each Monday we email each member of a
 mandir's committee on Toran, at their login email, a summary of how the
-mandir's page did (visits, calendar adds, shares, how many people follow
-it, seva places taken), what's coming up and anything worth doing. It
-says nothing about who visited or follows. We use Resend to send it. Every
-email has a link to stop it, for you and that mandir only; other members
-still get theirs. We keep only which mandirs' committees have had each
-month's email, not who.
+mandir's page did the week before (visits, calendar adds, shares, how many
+people follow it, seva places taken), what's coming up and anything worth
+doing. Each evening we email them the number of seva places taken that
+day, and straight away when every place in a seva is taken. Whoever adds
+events gets one email saying they're live. These emails say nothing about
+who visited, follows or took a place. We use Resend to send them. The
+weekly and seva emails each have a link to stop them, for you and that
+mandir only; other members still get theirs. We keep only which mandirs'
+committees have had each email, not who.
 
 ## Mandirs' own details
 
