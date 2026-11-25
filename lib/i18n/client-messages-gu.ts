@@ -118,6 +118,7 @@ export const guClient: Record<ClientKey, string> = {
   "report.error.venue":
     "મંદિર સિવાયની જગ્યાએ કાર્યક્રમ હોય તો, જગ્યાનું નામ અને પોસ્ટકોડ બંને આપો.",
   "report.error.venuePostcode": "આ જગ્યાનો UK પોસ્ટકોડ લાગતો નથી.",
+  "report.error.languages": "કૃપા કરીને યાદીમાંથી વધુમાં વધુ 4 ભાષાઓ પસંદ કરો.",
   "report.error.link":
     "કૃપા કરીને http:// કે https://થી શરૂ થતું વેબ સરનામું લખો, અથવા ખાલી રાખો.",
   "report.error.links": "કૃપા કરીને બેથી વધુ વેબ સરનામાં ન લખો.",

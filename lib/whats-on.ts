@@ -21,6 +21,8 @@ export type ListedEvent = {
   status: string;
   recurrence: string | null;
   link: string | null;
+  // The languages it's held in (lib/event-languages.ts), if said.
+  languages: string[];
   next_starts_at: string;
   mandir: {
     slug: string;
@@ -55,7 +57,7 @@ export async function listUpcomingEvents(): Promise<Loaded<ListedEvent[]>> {
   const { data, error } = await db
     .from("events")
     .select(
-      "id, title, title_gu, summary, kind, confirmed_at, origin, starts_at, all_day, status, recurrence, link, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), event_occurrences (starts_at, cancelled)",
+      "id, title, title_gu, summary, kind, confirmed_at, origin, starts_at, all_day, status, recurrence, link, languages, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), event_occurrences (starts_at, cancelled)",
     )
     .in("status", ["published", "cancelled"])
     .or(upcomingFilter(from))
@@ -99,7 +101,7 @@ export async function listEventsById(
   const { data, error } = await db
     .from("events")
     .select(
-      "id, title, title_gu, summary, kind, confirmed_at, origin, starts_at, all_day, status, recurrence, link, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), event_occurrences (starts_at, cancelled)",
+      "id, title, title_gu, summary, kind, confirmed_at, origin, starts_at, all_day, status, recurrence, link, languages, mandir:mandirs!inner (slug, name, town, region, latitude, longitude), event_occurrences (starts_at, cancelled)",
     )
     .in("id", ids)
     .in("status", ["published", "cancelled"])

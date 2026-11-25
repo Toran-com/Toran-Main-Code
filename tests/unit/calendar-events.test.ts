@@ -26,6 +26,7 @@ const event = (over: Partial<MandirEvent>): MandirEvent => ({
   confirmed_at: null,
   recurrence: null,
   origin: null,
+  languages: [],
   next_starts_at: "2026-11-08T18:30:00Z",
   ...over,
 });

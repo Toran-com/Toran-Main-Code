@@ -32,6 +32,7 @@ const event = (
   status: "published",
   recurrence: null,
   link: null,
+  languages: [],
   next_starts_at: next,
   mandir: { slug: id, name: id, town: "T", region: "R", ...where },
 });

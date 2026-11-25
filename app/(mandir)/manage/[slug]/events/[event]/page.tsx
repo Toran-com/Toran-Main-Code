@@ -50,7 +50,7 @@ async function EditEvent({
   const { data: row } = await supabase
     .from("events")
     .select(
-      "id, title, summary, title_gu, summary_gu, kind, starts_at, ends_at, all_day, recurrence, cost_note, tickets_needed, tickets_url, location_note, venue_name, venue_postcode, event_occurrences (starts_at, cancelled)",
+      "id, title, summary, title_gu, summary_gu, kind, starts_at, ends_at, all_day, recurrence, cost_note, tickets_needed, tickets_url, location_note, venue_name, venue_postcode, languages, event_occurrences (starts_at, cancelled)",
     )
     .eq("id", eventId)
     .eq("mandir_id", mandir.id)
@@ -82,6 +82,7 @@ async function EditEvent({
             kinds
             tickets
             place
+            languages
             values={eventInputFromEvent(event)}
           />
           {event.recurrence && (

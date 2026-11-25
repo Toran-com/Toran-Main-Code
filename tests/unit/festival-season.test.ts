@@ -56,6 +56,7 @@ function event(
     status: "published",
     recurrence: null,
     link: null,
+    languages: [],
     next_starts_at: at,
     mandir: {
       slug: "shree-mandir",

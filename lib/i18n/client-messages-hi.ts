@@ -188,6 +188,7 @@ export const hiClient: Record<ClientKey, string> = {
   "report.error.venue":
     "मंदिर के अलावा कहीं और होने वाले कार्यक्रम के लिए, कृपया जगह का नाम और पोस्टकोड दोनों दें।",
   "report.error.venuePostcode": "यह जगह का UK पोस्टकोड नहीं लगता।",
+  "report.error.languages": "कृपया सूची में से अधिक से अधिक 4 भाषाएँ चुनें।",
   "report.error.repeat": "कृपया चुनें कि यह कितनी बार दोहराया जाता है।",
   "report.error.until":
     "कृपया पहली तारीख़ के बाद की, और उससे एक साल के अंदर की आख़िरी तारीख़ चुनें।",

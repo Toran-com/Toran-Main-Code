@@ -575,7 +575,14 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               </label>
             </div>
           )}
-          <EventFields gujarati kinds tickets place values={formValues} />
+          <EventFields
+            gujarati
+            kinds
+            tickets
+            place
+            languages
+            values={formValues}
+          />
           <button type="submit" className={buttonClass}>
             Add event
           </button>

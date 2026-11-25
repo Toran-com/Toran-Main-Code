@@ -57,6 +57,7 @@ export async function saveEvent(
       location_note: event.locationNote,
       venue_name: event.venueName,
       venue_postcode: event.venuePostcode,
+      languages: event.languages,
     })
     .select("id")
     .single();
@@ -108,6 +109,7 @@ export async function updateEvent(
       location_note: event.locationNote ?? "",
       venue_name: event.venueName ?? "",
       venue_postcode: event.venuePostcode ?? "",
+      languages: event.languages,
     },
     dates: event.occurrences.map((at) => at.toISOString()),
     today: `${londonDate()}T00:00:00Z`,

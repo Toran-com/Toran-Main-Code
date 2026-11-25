@@ -415,6 +415,8 @@ export const taClient: Record<ClientKey, string> = {
   "live.stripLabel": "இப்போது நடக்கிறது",
   "live.stripMore": "மேலும் {count}",
   "live.stripOpen": "இப்போது என்ன நடக்கிறது என்று பாருங்கள்",
+  "report.error.languages":
+    "பட்டியலிலிருந்து அதிகபட்சம் 4 மொழிகளைத் தேர்ந்தெடுக்கவும்.",
   "request.sent": "அனுப்பப்பட்டது. குழு உங்களுக்கு நேரடியாகப் பதில் அளிக்கும்.",
   "request.error.what":
     "எதைப் பற்றிக் கேட்க விரும்புகிறீர்கள் என்று தேர்ந்தெடுக்கவும்.",
