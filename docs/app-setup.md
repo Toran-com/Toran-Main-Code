@@ -801,6 +801,17 @@ Resend's webhook log shows each delivery. Toran's `inbound_emails` table
 sender, `unverified`, `choose`, `too-many`), without who sent it; rows go
 after 30 days.
 
+### Events API for mandirs' own systems
+
+A committee can let its own website or booking software put events on
+Toran by itself (`lib/events-api.ts`, decision 0032). They make a key on
+the committee page (**Your mandir → Your website or booking system**) and
+send it, with the page `/for-mandirs/events-api`, to whoever runs the
+system. It needs `SUPABASE_SECRET_KEY` in Vercel (already set for the
+nightly job); nothing else to switch on. Keys and the events each system
+added are in Supabase's `mandir_api_keys` (hashes only) and `api_events`
+tables. A committee member stops a key from the same place.
+
 ### Log in, and family accounts (built, switched off)
 
 Every page's header has a gold **Log in** button (a person in a circle

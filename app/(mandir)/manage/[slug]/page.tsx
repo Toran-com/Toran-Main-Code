@@ -72,6 +72,7 @@ import {
   addPickedEvents,
   cancelInvite,
   changeEvent,
+  createApiKey,
   giveConsent,
   inviteMember,
   removeCalendar,
@@ -84,8 +85,11 @@ import {
   savePhoto,
   postNotice,
   removeNotice,
+  revokeApiKey,
   updatePracticalDetails,
 } from "./actions";
+import { ApiKeyMaker } from "@/components/api-keys";
+import { EVENTS_API_PATH } from "@/lib/events-api";
 
 export const metadata: Metadata = {
   title: pageTitle("Manage your mandir"),
@@ -104,6 +108,7 @@ const ERRORS: Record<string, string> = {
   "invite-too-many":
     "You have five invites waiting. Cancel one, or wait for them to be accepted.",
   "calendar-empty": "Paste your calendar's address first.",
+  "api-failed": "That didn't work. Try again.",
   "calendar-address":
     "That doesn't look like a calendar address. Copy the iCal address (it often ends in .ics) from your calendar's settings.",
   ...DUPLICATE_ERRORS,
@@ -158,6 +163,8 @@ const DONE: Record<string, string> = {
   calendar:
     "Saved. Toran reads your calendar tonight, and new events will wait here for you to check.",
   "calendar-removed": "Toran won't read your calendar any more.",
+  "api-stopped":
+    "That key no longer works. Events it put on your page stay there.",
   consent: "Thanks. That's recorded.",
   notice:
     "Posted. It's at the top of your public page and your events' pages until its last day.",
@@ -204,6 +211,17 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     .select("url, last_read_at, last_outcome, last_found, last_added")
     .eq("mandir_id", mandir.id)
     .maybeSingle();
+  // Keys for the mandir's own website or booking system (decision 0032).
+  const { data: apiKeys } = await supabase!
+    .from("mandir_api_keys")
+    .select("id, label, prefix, created_at, last_used_at")
+    .eq("mandir_id", mandir.id)
+    .is("revoked_at", null)
+    .order("created_at");
+  const { count: apiEventCount } = await supabase!
+    .from("api_events")
+    .select("event_id", { count: "exact", head: true })
+    .eq("mandir_id", mandir.id);
 
   const from = `${londonDate()}T00:00:00Z`;
   const { data: rows } = await supabase!
@@ -442,7 +460,9 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             : ["notice", "notice-removed"].includes(doneKey) ||
                 errorKey.startsWith("notice-")
               ? "notices"
-              : undefined);
+              : doneKey === "api-stopped" || errorKey.startsWith("api-")
+                ? "api"
+                : undefined);
   const notice = error ? (
     <Notice tone="error">{error}</Notice>
   ) : done ? (
@@ -1478,6 +1498,28 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                   <CalendarFields slug={mandir.slug} calendar={calendar} />
                 </Sheet>
               </div>
+              <div>
+                <Sheet
+                  id="api"
+                  title="Connect your own system"
+                  open={focus === "api"}
+                  stamp={stamp}
+                  triggerClass={settingClass}
+                  trigger={settingRow(
+                    "Your website or booking system",
+                    apiKeys?.length
+                      ? `${apiKeys.length} ${apiKeys.length === 1 ? "key" : "keys"} working${apiEventCount ? `, ${apiEventCount} ${apiEventCount === 1 ? "event" : "events"} from it` : ""}`
+                      : "Put events on Toran automatically",
+                  )}
+                >
+                  {inSheet("api")}
+                  <ApiFields
+                    slug={mandir.slug}
+                    keys={apiKeys ?? []}
+                    events={apiEventCount ?? 0}
+                  />
+                </Sheet>
+              </div>
               <a
                 href={GUIDE_PATH}
                 target="_blank"
@@ -1534,6 +1576,81 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </div>
       </div>
     </>
+  );
+}
+
+// "Connect your own system": keys for the mandir's own website or booking
+// software to put events on Toran by itself (decision 0032), with the page
+// that tells its developer how.
+function ApiFields({
+  slug,
+  keys,
+  events,
+}: {
+  slug: string;
+  keys: {
+    id: string;
+    label: string;
+    prefix: string;
+    created_at: string;
+    last_used_at: string | null;
+  }[];
+  events: number;
+}) {
+  return (
+    <div className="flex flex-col gap-5">
+      <p className="text-muted">
+        If your mandir&apos;s website or booking software already lists your
+        events, it can put them on Toran by itself, and change or cancel them
+        when you do there. Make a key, then send it with{" "}
+        <Link
+          href={EVENTS_API_PATH}
+          target="_blank"
+          rel="noopener"
+          className="text-peacock font-semibold underline"
+        >
+          the instructions for your web developer
+          <span className="sr-only"> (opens in a new tab)</span>
+        </Link>
+        . Its events are published straight away as confirmed by your mandir.
+      </p>
+      {events > 0 && (
+        <p>
+          {events === 1
+            ? "1 event on your page came from your system."
+            : `${events} events on your page came from your system.`}
+        </p>
+      )}
+      {keys.length > 0 && (
+        <ul className="flex flex-col gap-3" aria-label="Working keys">
+          {keys.map((k) => (
+            <li
+              key={k.id}
+              className="border-line flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4"
+            >
+              <span className="flex min-w-0 flex-col">
+                <span className="font-semibold break-words">{k.label}</span>
+                <span className="text-muted text-base">
+                  <span className="font-mono">{k.prefix}…</span>, made{" "}
+                  {formatEventStart(k.created_at, true)}
+                  {k.last_used_at
+                    ? `, last used ${formatEventStart(k.last_used_at, true)}`
+                    : ", not used yet"}
+                </span>
+              </span>
+              <form action={revokeApiKey}>
+                <input type="hidden" name="slug" value={slug} />
+                <input type="hidden" name="key" value={k.id} />
+                <button type="submit" className={quietButtonClass}>
+                  Stop this key
+                </button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      )}
+      <ApiKeyMaker slug={slug} action={createApiKey} />
+    </div>
   );
 }
 

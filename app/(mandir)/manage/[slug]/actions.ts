@@ -13,6 +13,7 @@ import {
   matchesFor,
 } from "@/lib/duplicate-check";
 import { feedAddress } from "@/lib/calendar-feed";
+import { newApiKey } from "@/lib/events-api";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
 import {
@@ -327,6 +328,56 @@ export async function saveCalendar(formData: FormData) {
   });
   if (error) back("error=failed");
   back("done=calendar");
+}
+
+// A key for the mandir's own website or booking system to put events on
+// Toran (decision 0032). The key is shown once, here; Toran keeps only a
+// hash of it. The database checks the person is on the committee.
+export type ApiKeyState = {
+  key?: string;
+  label?: string;
+  error?: "label" | "too_many" | "failed";
+};
+
+export async function createApiKey(
+  _state: ApiKeyState,
+  formData: FormData,
+): Promise<ApiKeyState> {
+  const slug = String(formData.get("slug") ?? "");
+  const label = String(formData.get("label") ?? "").trim();
+  if (label.length < 2 || label.length > 60) return { error: "label" };
+  const supabase = await createSessionClient();
+  if (!supabase) return { error: "failed" };
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) return { error: "failed" };
+  const made = newApiKey();
+  const { error } = await supabase.rpc("create_mandir_api_key", {
+    target: mandir.id,
+    key_label: label,
+    hash: made.hash,
+    key_prefix: made.prefix,
+  });
+  if (error)
+    return { error: error.hint === "too_many" ? "too_many" : "failed" };
+  // The page isn't refreshed, so the sheet stays open with the key in it;
+  // the list of keys catches up next time.
+  return { key: made.key, label };
+}
+
+export async function revokeApiKey(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#api`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=api-failed");
+  const { data } = await supabase.rpc("revoke_mandir_api_key", {
+    target: String(formData.get("key") ?? ""),
+  });
+  back(data ? "done=api-stopped" : "error=api-failed");
 }
 
 export async function removeCalendar(formData: FormData) {
