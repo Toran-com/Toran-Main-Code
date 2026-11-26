@@ -94,7 +94,8 @@ export const OPS_GROUPS: { label: string; tools: OpsTool[] }[] = [
       {
         href: "/ops/committee-email",
         label: "Committee email",
-        about: "The monthly email to each mandir's committee.",
+        about:
+          "The weekly email to each mandir's committee, with last week drawn as pictures.",
         icon: "send",
       },
       {

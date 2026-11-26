@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { requireToranAdmin } from "@/lib/auth";
 import { sendEmail } from "@/lib/mailer";
 import { createSessionClient } from "@/lib/supabase/session";
-import { previewEmail } from "./monthly";
+import { previewEmail } from "./preview";
 
-// "Send this to me": a mandir's monthly email, to the Toran admin's own
+// "Send this to me": a mandir's weekly email, to the Toran admin's own
 // address, to see it as committees will.
 export async function sendPreviewToMe(formData: FormData) {
   const user = await requireToranAdmin("/ops/committee-email");
@@ -15,7 +15,7 @@ export async function sendPreviewToMe(formData: FormData) {
   const { data: mandir } = db
     ? await db
         .from("mandirs")
-        .select("id, slug, name, calendar, postcode, website, phone")
+        .select("id, slug, name, town, calendar, postcode, website, phone")
         .eq("slug", slug)
         .maybeSingle()
     : { data: null };

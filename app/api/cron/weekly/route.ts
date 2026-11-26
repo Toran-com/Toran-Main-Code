@@ -1,8 +1,4 @@
 import type { NextRequest } from "next/server";
-import {
-  committeeEmailOn,
-  runCommitteeMonthly,
-} from "@/lib/committee-monthly-send";
 import { listFestivalDates } from "@/lib/directory";
 import { mailerReady, sendEmail } from "@/lib/mailer";
 import { isCronRequest } from "@/lib/nightly";
@@ -14,28 +10,19 @@ import { listUpcomingEvents } from "@/lib/whats-on";
 
 // GET /api/cron/weekly: started by Vercel Cron (vercel.json) every
 // Thursday with the CRON_SECRET. Sends the weekly "What's on" email
-// (DIGEST_SIGNUPS "on"), and the monthly email to committees that haven't
-// had this month's yet (COMMITTEE_EMAIL "on"): so on the first Thursday of
-// the month, and any left over the week after. Each does nothing until
-// it's switched on and an email sender is set up.
+// (DIGEST_SIGNUPS "on"); it does nothing until it's switched on and an
+// email sender is set up. (Committees' own weekly email goes on Mondays,
+// from /api/cron/digest.)
 export const maxDuration = 60;
-
-// Committee emails stop starting after this, to finish inside the time
-// limit; the rest go next week.
-const COMMITTEE_BUDGET_MS = 40_000;
 
 export async function GET(request: NextRequest) {
   if (!isCronRequest(request.headers.get("authorization"))) {
     return new Response("Not found", { status: 404 });
   }
   const weekly = weeklyEmailOn() && mailerReady();
-  const committees = committeeEmailOn() && mailerReady();
-  if (!weekly && !committees) {
-    return Response.json({
-      skipped: "The weekly and committee emails aren't switched on.",
-    });
+  if (!weekly) {
+    return Response.json({ skipped: "The weekly email isn't switched on." });
   }
-  const started = Date.now();
   const db = createRobotClient();
   if (!db) {
     return Response.json(
@@ -44,40 +31,28 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  let weeklySummary: unknown = {
-    skipped: "The weekly email isn't switched on.",
-  };
-  if (weekly) {
-    const [events, dates] = await Promise.all([
-      listUpcomingEvents(),
-      listFestivalDates(),
-    ]);
-    weeklySummary =
-      events.state === "ok"
-        ? await runWeekly(
-            db,
-            {
-              events: events.data,
-              dates: dates.state === "ok" ? dates.data : [],
-            },
-            siteUrl(),
-            {
-              send: (to, email) => sendEmail(to, email),
-              leaveCode: (e) => leaveCode(e),
-            },
-          )
-        : { error: "Events couldn't be read" };
-  }
-
-  const committeeSummary = committees
-    ? await runCommitteeMonthly(db, siteUrl(), {
-        send: (to, email) => sendEmail(to, email),
-        timeLeft: () => Date.now() - started <= COMMITTEE_BUDGET_MS,
-      })
-    : { skipped: "The committee email isn't switched on." };
+  const [events, dates] = await Promise.all([
+    listUpcomingEvents(),
+    listFestivalDates(),
+  ]);
+  const weeklySummary =
+    events.state === "ok"
+      ? await runWeekly(
+          db,
+          {
+            events: events.data,
+            dates: dates.state === "ok" ? dates.data : [],
+          },
+          siteUrl(),
+          {
+            send: (to, email) => sendEmail(to, email),
+            leaveCode: (e) => leaveCode(e),
+          },
+        )
+      : { error: "Events couldn't be read" };
 
   return Response.json(
-    { weekly: weeklySummary, committees: committeeSummary },
+    { weekly: weeklySummary },
     { headers: { "cache-control": "no-store" } },
   );
 }

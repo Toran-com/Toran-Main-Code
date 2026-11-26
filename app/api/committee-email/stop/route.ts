@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { checkStopCode, emailKind } from "@/lib/committee-monthly-send";
+import { checkStopCode, emailKind } from "@/lib/committee-email";
 import { createRobotClient } from "@/lib/supabase/robot";
 
 // POST /api/committee-email/stop?u=…&m=…&c=…(&k=seva): an email

@@ -6,7 +6,7 @@ import {
   checkStopCode,
   type EmailKind,
   emailKind,
-} from "@/lib/committee-monthly-send";
+} from "@/lib/committee-email";
 import { pageTitle } from "@/lib/site";
 import { createRobotClient } from "@/lib/supabase/robot";
 import { setCommitteeEmail } from "../actions";
@@ -31,13 +31,14 @@ const WORDS: Record<
     after: string;
   }
 > = {
+  // The weekly email (decision 0030): "monthly" in links from before it.
   monthly: {
-    heading: "The monthly email about your mandir",
-    which: "the monthly email",
+    heading: "The weekly email about your mandir",
+    which: "the weekly email",
     about: (name) =>
-      `Once a month Toran emails you how ${name}'s page did, who follows it and anything worth doing.`,
-    stop: "Stop the monthly email",
-    again: "Start the monthly email again",
+      `Every Monday Toran emails you how ${name}'s page did last week, who follows it and anything worth doing.`,
+    stop: "Stop the weekly email",
+    again: "Start the weekly email again",
     after:
       "Your mandir's numbers are always on its Numbers page when you log in.",
   },

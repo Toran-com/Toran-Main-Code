@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// The monthly committee email's stop link: a link that isn't complete, or
+// The weekly committee email's stop link: a link that isn't complete, or
 // made up, is turned away, and an email program's one-click unsubscribe
 // always gets an answer. (A real link stops it: tests/unit and the
 // database tests.)
@@ -18,7 +18,7 @@ test("a committee email stop link that isn't real is turned away", async ({
       ),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Stop the monthly email" }),
+      page.getByRole("button", { name: "Stop the weekly email" }),
     ).toHaveCount(0);
   }
   const oneClick = await request.post(`/api/${fake.slice(1)}`);
@@ -47,4 +47,20 @@ test("a seva email stop link says so, and isn't real without its code", async ({
   ).toHaveCount(0);
   const oneClick = await request.post(`/api/${fake.slice(1)}`);
   expect(oneClick.status()).toBe(200);
+});
+
+// The weekly email's pictures are drawn only from an address Toran signed.
+test("the weekly email's pictures can't be drawn from a made-up address", async ({
+  request,
+}) => {
+  const fake = Buffer.from(
+    JSON.stringify({ k: "share", n: "Not Toran's", d: [1, 2, 3, 4, 5, 6, 7] }),
+  ).toString("base64url");
+  for (const path of [
+    "/api/digest/card",
+    `/api/digest/card?p=${fake}`,
+    `/api/digest/card?p=${fake}&s=madeup`,
+  ]) {
+    expect((await request.get(path)).status()).toBe(404);
+  }
 });

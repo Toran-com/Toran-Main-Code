@@ -34,6 +34,8 @@ const nextConfig: NextConfig = {
   // The sample posters are read from disk by "Watch AI read a poster".
   outputFileTracingIncludes: {
     "/demo/poster": ["./public/demo-posters/*.jpg"],
+    // The weekly email's pictures are drawn in the site's own fonts.
+    "/api/digest/card": ["./assets/fonts/*.woff"],
   },
   experimental: {
     // Build from scratch every time. Next keeps a cache of its build work

@@ -4,7 +4,7 @@ import {
   stopCode,
   stopUrl,
   unsubscribeHeaders,
-} from "@/lib/committee-monthly-send";
+} from "@/lib/committee-email";
 import type { Database } from "@/lib/database.types";
 import {
   EMAIL_COLOURS as C,
