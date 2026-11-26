@@ -104,7 +104,7 @@ export default function EventsApiPage() {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 pb-16">
       <PageHeading
         title="Events API"
-        intro="If your mandir's website or booking software already lists your events, it can put them on Toran by itself, and change or cancel them when you do. They're published straight away, as confirmed by your mandir."
+        intro="For a mandir's own website or booking software that can send its events to Toran by itself, and change or cancel them when you do. They're published straight away, as confirmed by your mandir. Most mandirs don't need this: their committee presses “Connect your website” and Toran reads the website itself."
       />
 
       <Section id="key" title="1. Get a key">
@@ -112,7 +112,7 @@ export default function EventsApiPage() {
           Someone on your mandir&apos;s committee makes one on its committee
           page on Toran:{" "}
           <strong>
-            Your mandir → Your website or booking system → Make a key
+            Add events → Connect your website → For web developers → Make a key
           </strong>
           . It starts <code>toran_</code> and is shown once. Keep it on your
           server, never in a web page&apos;s code: anyone with it can put events

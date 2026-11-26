@@ -1,5 +1,15 @@
-import { expect, test } from "@playwright/test";
-import { logIn, mandirSetting, sql } from "./helpers";
+import { expect, test, type Page } from "@playwright/test";
+import { logIn, sql } from "./helpers";
+
+// Add events → Connect your website → For web developers.
+async function developerKeys(page: Page) {
+  await page.getByRole("button", { name: "Add events", exact: true }).click();
+  await page.getByRole("button", { name: /^Connect your website/ }).click();
+  const sheet = page.locator("dialog[open]");
+  await sheet.getByText("For web developers").click();
+  await expect(sheet.getByLabel("What it's for")).toBeVisible();
+  return sheet;
+}
 
 // The events API (decision 0032): a committee makes a key, the mandir's
 // own system puts an event on its page with it, changes it, lists it and
@@ -28,7 +38,7 @@ test("a mandir's own system puts its events on Toran with a key", async ({
   sql(`delete from public.events where title like 'E2E API%'`);
 
   await page.goto(`/manage/${SLUG}`);
-  let sheet = await mandirSetting(page, "Your website or booking system");
+  let sheet = await developerKeys(page);
   await expect(
     sheet.getByRole("link", { name: /instructions for your web developer/ }),
   ).toHaveAttribute("href", "/for-mandirs/events-api");
@@ -112,8 +122,10 @@ test("a mandir's own system puts its events on Toran with a key", async ({
 
   // The committee stops the key: it no longer works.
   await page.goto(`/manage/${SLUG}`);
-  sheet = await mandirSetting(page, "Your website or booking system");
-  await expect(sheet.getByText("Our website")).toBeVisible();
+  sheet = await developerKeys(page);
+  await expect(
+    sheet.getByRole("list", { name: "Working keys" }).getByText("Our website"),
+  ).toBeVisible();
   await sheet.getByRole("button", { name: "Stop this key" }).click();
   await expect(page.getByText("That key no longer works")).toBeVisible();
   expect(

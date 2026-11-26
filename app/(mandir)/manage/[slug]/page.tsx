@@ -72,7 +72,10 @@ import {
   addPickedEvents,
   cancelInvite,
   changeEvent,
+  askWebsiteHelp,
+  connectWebsite,
   createApiKey,
+  disconnectWebsite,
   giveConsent,
   inviteMember,
   removeCalendar,
@@ -86,8 +89,10 @@ import {
   postNotice,
   removeNotice,
   revokeApiKey,
+  saveWebsiteSettings,
   updatePracticalDetails,
 } from "./actions";
+import { WebsiteConnectForm } from "@/components/website-connect";
 import { ApiKeyMaker } from "@/components/api-keys";
 import { EVENTS_API_PATH } from "@/lib/events-api";
 
@@ -109,6 +114,7 @@ const ERRORS: Record<string, string> = {
     "You have five invites waiting. Cancel one, or wait for them to be accepted.",
   "calendar-empty": "Paste your calendar's address first.",
   "api-failed": "That didn't work. Try again.",
+  "website-failed": "That didn't work. Try again.",
   "calendar-address":
     "That doesn't look like a calendar address. Copy the iCal address (it often ends in .ics) from your calendar's settings.",
   ...DUPLICATE_ERRORS,
@@ -165,11 +171,20 @@ const DONE: Record<string, string> = {
   "calendar-removed": "Toran won't read your calendar any more.",
   "api-stopped":
     "That key no longer works. Events it put on your page stay there.",
+  "website-saved": "Saved.",
+  "website-off":
+    "Toran won't read your website any more. Events it added stay on your page.",
+  "website-help":
+    "Thanks. Toran's team will be in touch to help connect your website.",
   consent: "Thanks. That's recorded.",
   notice:
     "Posted. It's at the top of your public page and your events' pages until its last day.",
   "notice-removed": "Notice removed from your page.",
 };
+
+// Connecting a website reads it while the committee waits, then reads a
+// couple of its posters afterwards (lib/website-connect.ts).
+export const maxDuration = 120;
 
 export default function ManagePage(props: PageProps<"/manage/[slug]">) {
   return (
@@ -211,7 +226,15 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
     .select("url, last_read_at, last_outcome, last_found, last_added")
     .eq("mandir_id", mandir.id)
     .maybeSingle();
-  // Keys for the mandir's own website or booking system (decision 0032).
+  // The mandir's own website, if the committee connected it (decision
+  // 0032), and keys for a web developer's own system.
+  const { data: connection } = await supabase!
+    .from("website_connections")
+    .select(
+      "website, auto_publish, read_posters, last_checked_at, last_outcome, last_found, last_published, last_queued, last_posters, help_asked_at",
+    )
+    .eq("mandir_id", mandir.id)
+    .maybeSingle();
   const { data: apiKeys } = await supabase!
     .from("mandir_api_keys")
     .select("id, label, prefix, created_at, last_used_at")
@@ -444,7 +467,10 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             ? festivals.length
               ? "festivals"
               : "again"
-            : undefined;
+            : /^(website|api)-/.test(doneKey) ||
+                /^(website|api)-/.test(errorKey)
+              ? "connect-website"
+              : undefined;
   const focus =
     addOpen ??
     (["invited", "uninvited", "removed", "joined"].includes(doneKey) ||
@@ -460,9 +486,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
             : ["notice", "notice-removed"].includes(doneKey) ||
                 errorKey.startsWith("notice-")
               ? "notices"
-              : doneKey === "api-stopped" || errorKey.startsWith("api-")
-                ? "api"
-                : undefined);
+              : undefined);
   const notice = error ? (
     <Notice tone="error">{error}</Notice>
   ) : done ? (
@@ -569,6 +593,27 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
       ),
     });
   }
+  ways.push({
+    id: "connect-website",
+    icon: "M4 5h16v11H4zM8 20h8M12 16v4M9 10l2 2 4-4",
+    title: "Connect your website",
+    badge: connection ? "Connected" : undefined,
+    body: connection
+      ? "Toran keeps up with your website every night."
+      : "One button: Toran adds the events from your website, every night.",
+    content: (
+      <ConnectWebsite
+        slug={mandir.slug}
+        website={mandir.website ?? ""}
+        connection={connection}
+        forwardTo={
+          forwardDomain ? forwardingAddress(mandir.slug, forwardDomain) : null
+        }
+        apiKeys={apiKeys ?? []}
+        apiEvents={apiEventCount ?? 0}
+      />
+    ),
+  });
   ways.push({
     id: "add-event",
     icon: "M4 20h4L19 9l-4-4L4 16zM13 7l4 4",
@@ -1498,28 +1543,6 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
                   <CalendarFields slug={mandir.slug} calendar={calendar} />
                 </Sheet>
               </div>
-              <div>
-                <Sheet
-                  id="api"
-                  title="Connect your own system"
-                  open={focus === "api"}
-                  stamp={stamp}
-                  triggerClass={settingClass}
-                  trigger={settingRow(
-                    "Your website or booking system",
-                    apiKeys?.length
-                      ? `${apiKeys.length} ${apiKeys.length === 1 ? "key" : "keys"} working${apiEventCount ? `, ${apiEventCount} ${apiEventCount === 1 ? "event" : "events"} from it` : ""}`
-                      : "Put events on Toran automatically",
-                  )}
-                >
-                  {inSheet("api")}
-                  <ApiFields
-                    slug={mandir.slug}
-                    keys={apiKeys ?? []}
-                    events={apiEventCount ?? 0}
-                  />
-                </Sheet>
-              </div>
               <a
                 href={GUIDE_PATH}
                 target="_blank"
@@ -1576,6 +1599,193 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
         </div>
       </div>
     </>
+  );
+}
+
+// "Connect your website" (decision 0032): connected, how the last read
+// went, its two choices and a way to stop; not yet, one address and one
+// button. Keys for a web developer's own system are tucked underneath.
+function ConnectWebsite({
+  slug,
+  website,
+  connection,
+  forwardTo,
+  apiKeys,
+  apiEvents,
+}: {
+  slug: string;
+  website: string;
+  connection: {
+    website: string;
+    auto_publish: boolean;
+    read_posters: boolean;
+    last_checked_at: string | null;
+    last_outcome: string | null;
+    last_found: number | null;
+    last_published: number | null;
+    last_queued: number | null;
+    last_posters: number | null;
+    help_asked_at: string | null;
+  } | null;
+  forwardTo: string | null;
+  apiKeys: Parameters<typeof ApiFields>[0]["keys"];
+  apiEvents: number;
+}) {
+  const readingOn = posterReadingOn();
+  const developers = (
+    <details className="border-line rounded-2xl border p-4">
+      <summary className="cursor-pointer font-semibold">
+        For web developers: connect your own system with a key
+      </summary>
+      <div className="mt-4">
+        <ApiFields slug={slug} keys={apiKeys} events={apiEvents} />
+      </div>
+    </details>
+  );
+  if (!connection) {
+    return (
+      <div className="flex flex-col gap-5">
+        <p className="text-muted">
+          If your website lists your events or shows your posters, Toran can add
+          them for you. Press the button and Toran reads your website now, then
+          again every night, so new events appear here without anyone typing
+          them.
+        </p>
+        <WebsiteConnectForm
+          slug={slug}
+          website={website}
+          readingOn={readingOn}
+          action={connectWebsite}
+          helpAction={askWebsiteHelp}
+          forwardTo={forwardTo}
+        />
+        {developers}
+      </div>
+    );
+  }
+  const n = (v: number | null) => v ?? 0;
+  const host = (() => {
+    try {
+      return new URL(connection.website).hostname.replace(/^www\./, "");
+    } catch {
+      return connection.website;
+    }
+  })();
+  return (
+    <div className="flex flex-col gap-5">
+      <div
+        className="border-leaf bg-leaf/10 flex flex-col gap-1 rounded-2xl border-l-4 p-4"
+        data-testid="website-connected"
+      >
+        <p className="font-semibold break-words">Connected to {host}</p>
+        {connection.last_checked_at ? (
+          <p className="text-muted">
+            Last read {formatEventStart(connection.last_checked_at, false)}:{" "}
+            {n(connection.last_found) || n(connection.last_posters)
+              ? [
+                  `${n(connection.last_found)} ${n(connection.last_found) === 1 ? "event" : "events"} listed`,
+                  n(connection.last_published)
+                    ? `${n(connection.last_published)} added to your page`
+                    : "",
+                  n(connection.last_queued)
+                    ? `${n(connection.last_queued)} waiting for you`
+                    : "",
+                  n(connection.last_posters)
+                    ? `${n(connection.last_posters)} ${n(connection.last_posters) === 1 ? "poster" : "posters"}`
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(", ")
+              : connection.last_outcome === "blocked"
+                ? "your website asks robots not to read it"
+                : "no events Toran can read yet"}
+            .
+          </p>
+        ) : (
+          <p className="text-muted">Toran reads it tonight.</p>
+        )}
+      </div>
+      {connection.last_checked_at &&
+        !n(connection.last_found) &&
+        !n(connection.last_posters) &&
+        (connection.help_asked_at ? (
+          <p>
+            You asked Toran to help connect it: Toran&apos;s team will be in
+            touch.
+          </p>
+        ) : (
+          <form action={askWebsiteHelp}>
+            <input type="hidden" name="slug" value={slug} />
+            <p className="mb-3">
+              Toran can&apos;t read events from your website by itself yet.
+              {forwardTo
+                ? ` You can forward posters to ${forwardTo}, or`
+                : ""}{" "}
+              ask Toran&apos;s team to help connect it.
+            </p>
+            <button type="submit" className={buttonClass}>
+              Ask Toran to help
+            </button>
+          </form>
+        ))}
+      <form action={saveWebsiteSettings} className="flex flex-col gap-4">
+        <input type="hidden" name="slug" value={slug} />
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name="auto_publish"
+            defaultChecked={connection.auto_publish}
+            className="mt-1 size-6 shrink-0"
+          />
+          <span>
+            Put the events your website lists on Toran straight away
+            <span className="text-muted block text-base">
+              Untick to check each one first.
+            </span>
+          </span>
+        </label>
+        {readingOn && (
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              name="read_posters"
+              defaultChecked={connection.read_posters}
+              className="mt-1 size-6 shrink-0"
+            />
+            <span>
+              Read the posters and patrikas on it too
+              <span className="text-muted block text-base">
+                Toran&apos;s AI reads them; you check what it finds.
+              </span>
+            </span>
+          </label>
+        )}
+        <button type="submit" className={quietButtonClass}>
+          Save
+        </button>
+      </form>
+      <WebsiteConnectForm
+        slug={slug}
+        website={connection.website}
+        autoPublish={connection.auto_publish}
+        readPosters={connection.read_posters}
+        readingOn={readingOn}
+        action={connectWebsite}
+        helpAction={askWebsiteHelp}
+        forwardTo={forwardTo}
+        again
+      />
+      <form action={disconnectWebsite}>
+        <input type="hidden" name="slug" value={slug} />
+        <button
+          type="submit"
+          className="text-muted min-h-11 cursor-pointer font-semibold underline"
+        >
+          Stop reading my website
+        </button>
+      </form>
+      {developers}
+    </div>
   );
 }
 

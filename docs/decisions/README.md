@@ -46,4 +46,4 @@ that replaces it and mark the old one Superseded.
 | 0029 | [Tell committees about seva places by email: each evening, and when a seva fills](0029-seva-emails.md)             | Proposed           |
 | 0030 | [Email committees weekly, with last week drawn as pictures](0030-weekly-committee-email.md)                        | Proposed           |
 | 0031 | [Committees forward posters to their mandir's own Toran email address](0031-forward-to-toran.md)                   | Proposed           |
-| 0032 | [A mandir's own website or booking system puts its events on Toran with a key](0032-events-api.md)                 | Proposed           |
+| 0032 | [Committees connect their own website with one button (and a key for developers)](0032-events-api.md)              | Proposed           |

@@ -587,6 +587,46 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"website_connections": {
+                  Row: {
+                    "auto_publish": boolean,"connected_at": string,"connected_by": string | null,"help_asked_at": string | null,"last_checked_at": string | null,"last_found": number | null,"last_outcome": string | null,"last_posters": number | null,"last_published": number | null,"last_queued": number | null,"mandir_id": string,"read_posters": boolean,"website": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auto_publish"?: boolean,"connected_at"?: string,"connected_by"?: string | null,"help_asked_at"?: string | null,"last_checked_at"?: string | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_posters"?: number | null,"last_published"?: number | null,"last_queued"?: number | null,"mandir_id": string,"read_posters"?: boolean,"website": string
+                  }
+                  Update: {
+                    "auto_publish"?: boolean,"connected_at"?: string,"connected_by"?: string | null,"help_asked_at"?: string | null,"last_checked_at"?: string | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_posters"?: number | null,"last_published"?: number | null,"last_queued"?: number | null,"mandir_id"?: string,"read_posters"?: boolean,"website"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "website_connections_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: true
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"website_reads": {
+                  Row: {
+                    "events": number,"mandir_id": string,"read_at": string,"url": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "events"?: number,"mandir_id": string,"read_at"?: string,"url": string
+                  }
+                  Update: {
+                    "events"?: number,"mandir_id"?: string,"read_at"?: string,"url"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "website_reads_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -775,6 +815,9 @@ isOneToOne: false
                            },
 "valid_opening_hours":
 { Args: { "hours": Json }; Returns: boolean
+                           },
+"website_connections_due":
+{ Args: { "max_sites": number }; Returns: Json
                            }
           }
           Enums: {

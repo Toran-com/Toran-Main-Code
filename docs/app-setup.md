@@ -801,16 +801,24 @@ Resend's webhook log shows each delivery. Toran's `inbound_emails` table
 sender, `unverified`, `choose`, `too-many`), without who sent it; rows go
 after 30 days.
 
-### Events API for mandirs' own systems
+### Connect your website (committees)
 
-A committee can let its own website or booking software put events on
-Toran by itself (`lib/events-api.ts`, decision 0032). They make a key on
-the committee page (**Your mandir → Your website or booking system**) and
-send it, with the page `/for-mandirs/events-api`, to whoever runs the
-system. It needs `SUPABASE_SECRET_KEY` in Vercel (already set for the
-nightly job); nothing else to switch on. Keys and the events each system
-added are in Supabase's `mandir_api_keys` (hashes only) and `api_events`
-tables. A committee member stops a key from the same place.
+In **Add events → Connect your website**, a committee presses one button
+and Toran reads its website straight away, then every night
+(`lib/website-connect.ts`, decision 0032): events the site lists as data
+go live (or wait, if the committee prefers), and its posters and patrikas
+are read with AI and wait to be checked. Nothing to switch on: it uses
+`SUPABASE_SECRET_KEY` (set for the nightly job) and, for posters,
+`ANTHROPIC_API_KEY`. The nightly read is the job `/api/cron/websites`
+(vercel.json, 02:45 UTC); its runs show in Supabase's `job_runs` as
+`websites`. "Ask Toran to help" emails `ADMIN_ALERTS_TO`, like claims do.
+Connections are in the `website_connections` table, posters already read
+in `website_reads`.
+
+Under "For web developers" on the same card, a committee can make a key
+for its own system instead, with the instructions at
+`/for-mandirs/events-api`. Keys (hashes only) are in `mandir_api_keys`,
+the events each system added in `api_events`.
 
 ### Log in, and family accounts (built, switched off)
 

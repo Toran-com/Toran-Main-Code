@@ -61,6 +61,30 @@ export function claimAlertEmail(
   };
 }
 
+// A committee asked for help connecting its website (decision 0032):
+// which mandir, not who asked.
+export function websiteHelpEmail(
+  mandir: { name: string; town: string },
+  site: string,
+  slug: string,
+): Email {
+  const where = `${mandir.name}, ${mandir.town}`;
+  const link = `${site}/ops/mandirs/${slug}`;
+  return {
+    subject: `${mandir.name} would like help connecting their website`,
+    text: [
+      `The committee of ${where} pressed "Ask Toran to help" for connecting their website: Toran couldn't read events from it by itself.`,
+      `Their page in the admin area:\n${link}`,
+    ].join("\n\n"),
+    html: [
+      `<div style="${FONT}">`,
+      `<p>The committee of <strong>${escape(where)}</strong> pressed &ldquo;Ask Toran to help&rdquo; for connecting their website: Toran couldn't read events from it by itself.</p>`,
+      `<p><a href="${escape(link)}" style="color:#0b6b68;font-weight:bold">Open their page in the admin area</a></p>`,
+      "</div>",
+    ].join("\n"),
+  };
+}
+
 // Sends it to each admin address; never fails loudly (the claim is saved
 // either way, and shows on /ops).
 export async function alertAdmins(

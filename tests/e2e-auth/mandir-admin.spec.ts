@@ -316,7 +316,7 @@ test("claim, approve, add an event, cancel it", async ({ browser }) => {
   await member.goto(`/manage/${SLUG}`);
   await mandirSetting(member, "Details");
   await member
-    .getByLabel("Website")
+    .getByLabel("Website", { exact: true })
     .fill("krishnatemple-leicester.example.org");
   await member.getByLabel("Mandir phone number").fill("0116 000 0000");
   await member
