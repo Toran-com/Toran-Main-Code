@@ -43,11 +43,12 @@ export async function queueRead(
   from: PosterSource,
   events: EventInput[],
   link: string,
-): Promise<{ added: number; skipped: number }> {
+): Promise<{ added: number; skipped: number; queued: EventInput[] }> {
   const known = (await knownFor(supabase, [mandirId])).get(mandirId) ?? [];
   const sourceId = await posterSource(supabase, mandirId, from);
   let added = 0;
   let skipped = 0;
+  const queued: EventInput[] = [];
   for (const input of events) {
     const item = comparableInput(input);
     if (!checkEvent(input).ok || alreadyKnown(item, known)) {
@@ -66,6 +67,7 @@ export async function queueRead(
       continue;
     }
     added += 1;
+    queued.push(input);
     // The same event twice on one poster is queued once.
     known.push({
       ...item,
@@ -75,5 +77,5 @@ export async function queueRead(
       discarded: false,
     });
   }
-  return { added, skipped };
+  return { added, skipped, queued };
 }

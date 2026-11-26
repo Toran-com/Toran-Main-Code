@@ -35,7 +35,7 @@ This DPIA covers what is built now and what is planned. Sections marked
 | Committee members (email)   | A weekly summary of their page (monthly until decision 0030), sent to their login email; each member can stop it, and whether they have is kept with their committee place. An "It's live" email to whoever adds events (decision 0028), to their login email, nothing kept. Seva emails (decision 0029): counts of anonymous places only, each member can stop them | Built; sent once `COMMITTEE_EMAIL` is on   |
 | Families asking a mandir    | Name, email or phone, what and when, a message: passed to the committee by email, not kept by Toran                                                                                                                                                                                                                                                                  | Now (decision 0025)                        |
 | Seva volunteers by name     | Name, one contact detail, age band; for under-16s a parent's or guardian's details                                                                                                                                                                                                                                                                                   | Planned, not built                         |
-| People forwarding posters   | Phone number or email, the message and images                                                                                                                                                                                                                                                                                                                        | Pilot by hand; planned automation          |
+| People forwarding posters   | Their email address, matched to their committee login and not kept; the email and its pictures, read by Anthropic for events and not kept (decision 0031)                                                                                                                                                                                                            | Built; on once its keys are set            |
 
 ### How it flows
 
@@ -48,6 +48,10 @@ This DPIA covers what is built now and what is planned. Sections marked
 - A poster photo sent to be read goes to the Claude API (Anthropic) with
   an instruction to leave out names and numbers; only the event details
   come back, as drafts for a person to check. The picture isn't stored.
+- A poster forwarded by email (decision 0031) is read the same way, only
+  from a committee member's own login address, after taking out the
+  forwarding lines, email addresses and phone numbers. Toran keeps the
+  email's id, the mandir and how many events it found, for 30 days.
 - Mandir photos are uploaded by the mandir's committee (or Toran) to a
   public storage bucket only they can write to.
 - **When switched on:** weekly emails go out through Resend. Sign-ups are

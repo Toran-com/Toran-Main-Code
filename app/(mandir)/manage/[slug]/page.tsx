@@ -20,6 +20,11 @@ import { CopyText } from "@/components/copy-text";
 import { PosterPicture } from "@/components/poster-picture";
 import { CHANGES_DAYS, recentChanges } from "@/lib/committee-changes";
 import { weekEvents, weekMessage } from "@/lib/committee-week";
+import {
+  forwardingAddress,
+  inboundDomain,
+  inboundEmailOn,
+} from "@/lib/inbound-email";
 import { MAX_MESSAGE_CHARS, posterReadingOn } from "@/lib/poster-reader";
 import { CommitteeTodo } from "@/components/committee-todo";
 import { NoticeForm } from "@/components/notice-form";
@@ -499,6 +504,47 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[slug]">) {
               Read the message
             </button>
           </form>
+        </>
+      ),
+    });
+  }
+  const forwardDomain = inboundEmailOn() ? inboundDomain() : null;
+  if (forwardDomain) {
+    const address = forwardingAddress(mandir.slug, forwardDomain);
+    ways.push({
+      id: "forward-email",
+      icon: "M3 6h18v12H3zM3 7l9 6 9-6",
+      title: "Forward it by email",
+      body: "Send posters and messages to your mandir's own Toran address.",
+      content: (
+        <>
+          <p className="text-muted">
+            Forward an email with a poster, a PDF patrika or the details of an
+            event to this address. Toran reads the events and they wait under
+            &ldquo;Posters waiting for you&rdquo; for you to check. You get a
+            reply saying what it found.
+          </p>
+          <div className="bg-sunk flex flex-col gap-2 rounded-2xl p-4">
+            <p
+              className="font-semibold break-all"
+              data-testid="forward-address"
+            >
+              {address}
+            </p>
+            <CopyText text={address} label="Copy the address" />
+          </div>
+          <p className="text-muted">
+            Send it from the address you log in with
+            {user.email ? (
+              <>
+                {" "}
+                (<span className="font-semibold break-all">{user.email}</span>)
+              </>
+            ) : null}
+            : Toran only reads emails from this mandir&apos;s committee. Save
+            the address as a contact, say &ldquo;Toran events&rdquo;, to find it
+            quickly. The email isn&apos;t kept.
+          </p>
         </>
       ),
     });

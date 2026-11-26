@@ -45,3 +45,4 @@ that replaces it and mark the old one Superseded.
 | 0028 | [Email whoever adds an event that it's live, with a WhatsApp button](0028-event-live-email.md)                     | Proposed           |
 | 0029 | [Tell committees about seva places by email: each evening, and when a seva fills](0029-seva-emails.md)             | Proposed           |
 | 0030 | [Email committees weekly, with last week drawn as pictures](0030-weekly-committee-email.md)                        | Proposed           |
+| 0031 | [Committees forward posters to their mandir's own Toran email address](0031-forward-to-toran.md)                   | Proposed           |

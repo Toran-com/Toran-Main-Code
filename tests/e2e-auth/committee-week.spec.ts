@@ -54,6 +54,10 @@ test("a committee sees this week's message and what's changed", async ({
   await expect(
     page.getByRole("button", { name: /^Photo of a poster/ }),
   ).toHaveCount(0);
+  // Nor does forwarding by email (decision 0031), which also needs it.
+  await expect(
+    page.getByRole("button", { name: /^Forward it by email/ }),
+  ).toHaveCount(0);
 
   sql(`delete from public.events where title = '${TITLE}'`);
 });

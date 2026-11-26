@@ -25,8 +25,10 @@ export const MAX_POSTER_BYTES = 4 * 1024 * 1024;
 
 const MODEL = "claude-opus-5-5";
 
-export function posterReadingOn(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+export function posterReadingOn(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return Boolean(env.ANTHROPIC_API_KEY);
 }
 
 // The longest message a committee can paste in to be read.
