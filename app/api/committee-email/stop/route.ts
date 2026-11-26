@@ -1,18 +1,19 @@
 import type { NextRequest } from "next/server";
-import { checkStopCode } from "@/lib/committee-monthly-send";
+import { checkStopCode, emailKind } from "@/lib/committee-monthly-send";
 import { createRobotClient } from "@/lib/supabase/robot";
 
-// POST /api/committee-email/stop?u=…&m=…&c=…: an email program's own
-// "Unsubscribe" button (List-Unsubscribe-Post) on the monthly committee
-// email. Stops it at once, for that member and mandir. The same answer
+// POST /api/committee-email/stop?u=…&m=…&c=…(&k=seva): an email
+// program's own "Unsubscribe" button (List-Unsubscribe-Post) on the
+// monthly committee email, or the seva emails. Stops it at once, for that member and mandir. The same answer
 // either way.
 export async function POST(request: NextRequest) {
   const q = request.nextUrl.searchParams;
   const u = q.get("u");
   const m = q.get("m");
-  if (checkStopCode(u, m, q.get("c"))) {
+  const kind = emailKind(q.get("k"));
+  if (checkStopCode(u, m, q.get("c"), undefined, kind)) {
     const db = createRobotClient();
-    await db?.rpc("set_committee_email", {
+    await db?.rpc(kind === "seva" ? "set_seva_email" : "set_committee_email", {
       member: u!,
       target: m!,
       wanted: false,

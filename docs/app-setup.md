@@ -748,6 +748,17 @@ email listing each event with its link and a **Share on WhatsApp** button
 pressed the button. It's on whenever the monthly email is: `COMMITTEE_EMAIL`
 is `on` and the email sender is set up.
 
+### Seva emails to committees
+
+Two emails tell a committee how seva is going (`lib/seva-email.ts`,
+decision 0029): an **evening roundup** of the places taken on Toran since
+the last one (the daily job `/api/cron/seva`, after 17:40 UTC), and
+**"Seva full"** straight away when every place still to come in a seva is
+taken. Each committee member can stop them from the email, separately from
+the monthly email. They're on whenever the monthly email is
+(`COMMITTEE_EMAIL` is `on` and the email sender is set up). The job's
+runs show in Supabase's `job_runs` table as `seva-roundup`.
+
 ### Log in, and family accounts (built, switched off)
 
 Every page's header has a gold **Log in** button (a person in a circle
