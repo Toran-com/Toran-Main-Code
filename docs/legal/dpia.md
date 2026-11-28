@@ -52,6 +52,12 @@ This DPIA covers what is built now and what is planned. Sections marked
   from a committee member's own login address, after taking out the
   forwarding lines, email addresses and phone numbers. Toran keeps the
   email's id, the mandir and how many events it found, for 30 days.
+- A committee can connect its mandir's website (decision 0032): Toran
+  reads the public site each night, as the website check already does,
+  and its posters with AI (only the pictures are sent, as for any poster).
+  Toran keeps the posters' addresses, how the last read went and who
+  connected it. A web developer's key instead sends only events; Toran
+  keeps a hash of each key, its name and which committee member made it.
 - Mandir photos are uploaded by the mandir's committee (or Toran) to a
   public storage bucket only they can write to.
 - **When switched on:** weekly emails go out through Resend. Sign-ups are

@@ -1,6 +1,6 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag, updateTag } from "next/cache";
 import { after } from "next/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -13,6 +13,16 @@ import {
   matchesFor,
 } from "@/lib/duplicate-check";
 import { feedAddress } from "@/lib/calendar-feed";
+import { newApiKey } from "@/lib/events-api";
+import { alertAdmins, websiteHelpEmail } from "@/lib/admin-alerts";
+import { posterReadingOn as readingPostersOn } from "@/lib/poster-reader";
+import {
+  isCalendarAddress,
+  readWebsitePosters,
+  syncWebsite,
+  websiteAddress,
+} from "@/lib/website-connect";
+import { checkWebsite } from "@/lib/website-check";
 import { checkEvent, eventInputFrom } from "@/lib/event-form";
 import { saveEvent } from "@/lib/event-store";
 import {
@@ -327,6 +337,256 @@ export async function saveCalendar(formData: FormData) {
   });
   if (error) back("error=failed");
   back("done=calendar");
+}
+
+// A key for the mandir's own website or booking system to put events on
+// Toran (decision 0032). The key is shown once, here; Toran keeps only a
+// hash of it. The database checks the person is on the committee.
+export type ApiKeyState = {
+  key?: string;
+  label?: string;
+  error?: "label" | "too_many" | "failed";
+};
+
+export async function createApiKey(
+  _state: ApiKeyState,
+  formData: FormData,
+): Promise<ApiKeyState> {
+  const slug = String(formData.get("slug") ?? "");
+  const label = String(formData.get("label") ?? "").trim();
+  if (label.length < 2 || label.length > 60) return { error: "label" };
+  const supabase = await createSessionClient();
+  if (!supabase) return { error: "failed" };
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) return { error: "failed" };
+  const made = newApiKey();
+  const { error } = await supabase.rpc("create_mandir_api_key", {
+    target: mandir.id,
+    key_label: label,
+    hash: made.hash,
+    key_prefix: made.prefix,
+  });
+  if (error)
+    return { error: error.hint === "too_many" ? "too_many" : "failed" };
+  // The page isn't refreshed, so the sheet stays open with the key in it;
+  // the list of keys catches up next time.
+  return { key: made.key, label };
+}
+
+export async function revokeApiKey(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#connect-website`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=api-failed");
+  const { data } = await supabase.rpc("revoke_mandir_api_key", {
+    target: String(formData.get("key") ?? ""),
+  });
+  back(data ? "done=api-stopped" : "error=api-failed");
+}
+
+// "Connect your website" (decision 0032): the committee gives its
+// website's address once; Toran reads it straight away, publishes (or
+// queues) what it lists, starts reading its posters, and reads it again
+// every night (/api/cron/websites). The database checks the person is on
+// the committee.
+export type ConnectState = {
+  error?: "address" | "calendar" | "unreachable" | "failed";
+  result?: {
+    website: string;
+    outcome: "found" | "none" | "blocked";
+    found: number;
+    published: number;
+    queued: number;
+    posters: number;
+    readingPosters: number;
+    autoPublish: boolean;
+  };
+};
+
+export async function connectWebsite(
+  _state: ConnectState,
+  formData: FormData,
+): Promise<ConnectState> {
+  const slug = String(formData.get("slug") ?? "");
+  const typed = String(formData.get("website") ?? "");
+  if (isCalendarAddress(typed)) return { error: "calendar" };
+  const website = websiteAddress(typed);
+  if (!website) return { error: "address" };
+  const autoPublish = formData.get("auto_publish") === "on";
+  const readPosters = formData.get("read_posters") === "on";
+
+  const user = await getCurrentUser();
+  const supabase = await createSessionClient();
+  if (!user || !supabase) return { error: "failed" };
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, slug, name, town")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) return { error: "failed" };
+  // On the committee: the same check the database makes when saving.
+  const { data: admin } = await supabase
+    .from("mandir_admins")
+    .select("mandir_id")
+    .eq("mandir_id", mandir.id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!admin) return { error: "failed" };
+  if (
+    !sendLimiter.allow(`website:${mandir.id}`, senderAddress(await headers()))
+  ) {
+    return { error: "failed" };
+  }
+
+  // A quick look first, so a wrong address isn't saved.
+  const result = await checkWebsite(website);
+  if (result.outcome === "unreachable") return { error: "unreachable" };
+
+  const connection = {
+    mandir_id: mandir.id,
+    website,
+    auto_publish: autoPublish,
+    read_posters: readPosters,
+  };
+  const { error } = await supabase
+    .from("website_connections")
+    .upsert({ ...connection, connected_by: user.id });
+  if (error) return { error: "failed" };
+
+  // Toran's own access publishes and queues, as the nightly job does.
+  const robot = createRobotClient();
+  if (!robot) {
+    return {
+      result: {
+        website,
+        outcome: result.outcome,
+        found: result.events.length,
+        published: 0,
+        queued: 0,
+        posters: result.documents.length,
+        readingPosters: 0,
+        autoPublish,
+      },
+    };
+  }
+  const summary = await syncWebsite(robot, mandir, connection, {
+    check: async () => result,
+  });
+  // The public pages show the new events; refreshed once the answer has
+  // gone, so this page isn't reloaded under the committee (which would
+  // close the sheet before they see what happened).
+  if (summary.published) {
+    after(() => {
+      revalidateTag(`mandir:${mandir.slug}`, { expire: 0 });
+      revalidateTag("events", { expire: 0 });
+    });
+  }
+  const reading =
+    readPosters && readingPostersOn()
+      ? summary.postersLeft.slice(0, POSTERS_NOW)
+      : [];
+  if (reading.length) {
+    after(() => readWebsitePosters(robot, mandir, reading));
+  }
+  return {
+    result: {
+      website,
+      outcome: summary.outcome === "unreachable" ? "none" : summary.outcome,
+      found: summary.found,
+      published: summary.published,
+      queued: summary.queued,
+      posters: summary.posters,
+      readingPosters: reading.length,
+      autoPublish,
+    },
+  };
+}
+
+// Posters read straight away when a website is connected; the rest are
+// read over the next nights.
+const POSTERS_NOW = 2;
+
+export async function saveWebsiteSettings(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#connect-website`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=website-failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=website-failed");
+  const { error } = await supabase
+    .from("website_connections")
+    .update({
+      auto_publish: formData.get("auto_publish") === "on",
+      read_posters: formData.get("read_posters") === "on",
+    })
+    .eq("mandir_id", mandir.id);
+  back(error ? "error=website-failed" : "done=website-saved");
+}
+
+export async function disconnectWebsite(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#connect-website`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=website-failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=website-failed");
+  const { error } = await supabase
+    .from("website_connections")
+    .delete()
+    .eq("mandir_id", mandir.id);
+  back(error ? "error=website-failed" : "done=website-off");
+}
+
+// "Ask Toran to help": Toran's admins are emailed which mandir (not who)
+// and help connect it by hand. Once a day at most.
+export async function askWebsiteHelp(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "");
+  const back: (query: string) => never = (query) =>
+    redirect(`/manage/${encodeURIComponent(slug)}?${query}#connect-website`);
+  const supabase = await createSessionClient();
+  if (!supabase) back("error=website-failed");
+  const { data: mandir } = await supabase
+    .from("mandirs")
+    .select("id, name, town, website")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!mandir) back("error=website-failed");
+  const { data: row } = await supabase
+    .from("website_connections")
+    .select("help_asked_at")
+    .eq("mandir_id", mandir.id)
+    .maybeSingle();
+  if (!row) back("error=website-failed");
+  const asked = row.help_asked_at ? Date.parse(row.help_asked_at) : 0;
+  if (Date.now() - asked > 86_400_000) {
+    const { error } = await supabase
+      .from("website_connections")
+      .update({ help_asked_at: new Date().toISOString() })
+      .eq("mandir_id", mandir.id);
+    if (error) back("error=website-failed");
+    const site = await requestOrigin();
+    after(() =>
+      alertAdmins(
+        websiteHelpEmail({ name: mandir.name, town: mandir.town }, site, slug),
+      ),
+    );
+  }
+  back("done=website-help");
 }
 
 export async function removeCalendar(formData: FormData) {

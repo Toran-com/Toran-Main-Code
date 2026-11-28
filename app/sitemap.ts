@@ -67,6 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/seva`, changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/for-mandirs`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/for-mandirs/guide`, changeFrequency: "monthly" },
+    { url: `${base}/for-mandirs/events-api`, changeFrequency: "monthly" },
     ...[
       "/about",
       "/contact",

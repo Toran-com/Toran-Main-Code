@@ -84,27 +84,34 @@ export async function recordWebsiteCheck(
   return { added };
 }
 
-// The mandir websites checked longest ago, never-checked first.
+// The mandir websites checked longest ago, never-checked first. Websites
+// a committee connected are left out: they're read every night by their
+// own job (lib/website-connect.ts), which can publish what they list.
 export async function websiteQueue(
   db: SupabaseClient<Database>,
   limit: number,
 ): Promise<{ id: string; website: string }[]> {
-  const [{ data: mandirs }, { data: sources }] = await Promise.all([
-    db
-      .from("mandirs")
-      .select("id, website")
-      .not("website", "is", null)
-      .neq("status", "hidden"),
-    db
-      .from("sources")
-      .select("mandir_id, last_checked_at")
-      .eq("kind", SOURCE.kind),
-  ]);
+  const [{ data: mandirs }, { data: sources }, { data: connected }] =
+    await Promise.all([
+      db
+        .from("mandirs")
+        .select("id, website")
+        .not("website", "is", null)
+        .neq("status", "hidden"),
+      db
+        .from("sources")
+        .select("mandir_id, last_checked_at")
+        .eq("kind", SOURCE.kind),
+      db.from("website_connections").select("mandir_id"),
+    ]);
   const lastChecked = new Map(
     (sources ?? []).map((s) => [s.mandir_id, s.last_checked_at ?? ""]),
   );
+  const own = new Set((connected ?? []).map((c) => c.mandir_id));
   return (mandirs ?? [])
-    .flatMap((m) => (m.website ? [{ id: m.id, website: m.website }] : []))
+    .flatMap((m) =>
+      m.website && !own.has(m.id) ? [{ id: m.id, website: m.website }] : [],
+    )
     .sort((a, b) =>
       (lastChecked.get(a.id) ?? "").localeCompare(lastChecked.get(b.id) ?? ""),
     )

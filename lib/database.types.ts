@@ -5,7 +5,39 @@ export type Database = {
   
   "public": {
           Tables: {
-            "committee_emails_sent": {
+            "api_events": {
+                  Row: {
+                    "event_id": string,"external_id": string,"key_id": string | null,"mandir_id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "event_id": string,"external_id": string,"key_id"?: string | null,"mandir_id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "event_id"?: string,"external_id"?: string,"key_id"?: string | null,"mandir_id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "api_events_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: true
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "api_events_key_id_fkey"
+      columns: ["key_id"]
+isOneToOne: false
+      referencedRelation: "mandir_api_keys"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "api_events_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"committee_emails_sent": {
                   Row: {
                     "mandir_id": string,"month": string,"recipients": number,"sent_at": string
                   }
@@ -253,6 +285,26 @@ isOneToOne: false
                   Relationships: [
                     {
       foreignKeyName: "mandir_admins_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"mandir_api_keys": {
+                  Row: {
+                    "created_at": string,"created_by": string | null,"id": string,"key_hash": string,"label": string,"last_used_at": string | null,"mandir_id": string,"prefix": string,"revoked_at": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by"?: string | null,"id"?: string,"key_hash": string,"label": string,"last_used_at"?: string | null,"mandir_id": string,"prefix": string,"revoked_at"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string | null,"id"?: string,"key_hash"?: string,"label"?: string,"last_used_at"?: string | null,"mandir_id"?: string,"prefix"?: string,"revoked_at"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mandir_api_keys_mandir_id_fkey"
       columns: ["mandir_id"]
 isOneToOne: false
       referencedRelation: "mandirs"
@@ -535,6 +587,46 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"website_connections": {
+                  Row: {
+                    "auto_publish": boolean,"connected_at": string,"connected_by": string | null,"help_asked_at": string | null,"last_checked_at": string | null,"last_found": number | null,"last_outcome": string | null,"last_posters": number | null,"last_published": number | null,"last_queued": number | null,"mandir_id": string,"read_posters": boolean,"website": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auto_publish"?: boolean,"connected_at"?: string,"connected_by"?: string | null,"help_asked_at"?: string | null,"last_checked_at"?: string | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_posters"?: number | null,"last_published"?: number | null,"last_queued"?: number | null,"mandir_id": string,"read_posters"?: boolean,"website": string
+                  }
+                  Update: {
+                    "auto_publish"?: boolean,"connected_at"?: string,"connected_by"?: string | null,"help_asked_at"?: string | null,"last_checked_at"?: string | null,"last_found"?: number | null,"last_outcome"?: string | null,"last_posters"?: number | null,"last_published"?: number | null,"last_queued"?: number | null,"mandir_id"?: string,"read_posters"?: boolean,"website"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "website_connections_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: true
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"website_reads": {
+                  Row: {
+                    "events": number,"mandir_id": string,"read_at": string,"url": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "events"?: number,"mandir_id": string,"read_at"?: string,"url": string
+                  }
+                  Update: {
+                    "events"?: number,"mandir_id"?: string,"read_at"?: string,"url"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "website_reads_mandir_id_fkey"
+      columns: ["mandir_id"]
+isOneToOne: false
+      referencedRelation: "mandirs"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -560,6 +652,9 @@ isOneToOne: false
                            },
 "count_visit":
 { Args: { "page": string,"what": string }; Returns: undefined
+                           },
+"create_mandir_api_key":
+{ Args: { "hash": string,"key_label": string,"key_prefix": string,"target": string }; Returns: string
                            },
 "daily_count_summary":
 { Args: { "since": string }; Returns: Json
@@ -631,6 +726,9 @@ isOneToOne: false
 "mandir_count_summary_of":
 { Args: { "base": string,"since": string }; Returns: Json
                            },
+"mandir_for_api_key":
+{ Args: { "hash": string }; Returns: Json
+                           },
 "mandir_supporters":
 { Args: { "since": string,"target": string }; Returns: Json
                            },
@@ -670,6 +768,9 @@ isOneToOne: false
 { Args: { "target_slug": string }; Returns: {
               "email": string
             }[]
+                           },
+"revoke_mandir_api_key":
+{ Args: { "target": string }; Returns: boolean
                            },
 "run_retention":
 { Args: Record<PropertyKey, never>; Returns: Json
@@ -714,6 +815,9 @@ isOneToOne: false
                            },
 "valid_opening_hours":
 { Args: { "hours": Json }; Returns: boolean
+                           },
+"website_connections_due":
+{ Args: { "max_sites": number }; Returns: Json
                            }
           }
           Enums: {

@@ -90,6 +90,9 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}" >> "$GITHUB_ENV"
           echo "MAILPIT_URL=${MAILPIT_URL:-${INBUCKET_URL:-http://127.0.0.1:54324}}" >> "$GITHUB_ENV"
           echo "DB_URL=$DB_URL" >> "$GITHUB_ENV"
+          # The local stack's own service key, for what the site does as
+          # itself (the events API, decision 0032). Not a real secret.
+          echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}" >> "$GITHUB_ENV"
           rm supabase.env
 
       - name: Install packages

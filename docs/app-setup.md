@@ -801,6 +801,25 @@ Resend's webhook log shows each delivery. Toran's `inbound_emails` table
 sender, `unverified`, `choose`, `too-many`), without who sent it; rows go
 after 30 days.
 
+### Connect your website (committees)
+
+In **Add events → Connect your website**, a committee presses one button
+and Toran reads its website straight away, then every night
+(`lib/website-connect.ts`, decision 0032): events the site lists as data
+go live (or wait, if the committee prefers), and its posters and patrikas
+are read with AI and wait to be checked. Nothing to switch on: it uses
+`SUPABASE_SECRET_KEY` (set for the nightly job) and, for posters,
+`ANTHROPIC_API_KEY`. The nightly read is the job `/api/cron/websites`
+(vercel.json, 02:45 UTC); its runs show in Supabase's `job_runs` as
+`websites`. "Ask Toran to help" emails `ADMIN_ALERTS_TO`, like claims do.
+Connections are in the `website_connections` table, posters already read
+in `website_reads`.
+
+Under "For web developers" on the same card, a committee can make a key
+for its own system instead, with the instructions at
+`/for-mandirs/events-api`. Keys (hashes only) are in `mandir_api_keys`,
+the events each system added in `api_events`.
+
 ### Log in, and family accounts (built, switched off)
 
 Every page's header has a gold **Log in** button (a person in a circle
